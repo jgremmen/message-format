@@ -31,6 +31,24 @@ required formatters are then registered manually. This is useful when full contr
 is needed.
 
 ```java
+import de.sayayi.lib.message.MessageSupportFactory;
+import de.sayayi.lib.message.formatter.DefaultFormatterService;
+import de.sayayi.lib.message.formatter.FormattableType;
+import de.sayayi.lib.message.formatter.FormatterService;
+import de.sayayi.lib.message.formatter.GenericFormatterService;
+import de.sayayi.lib.message.formatter.parameter.named.BoolFormatter;
+import de.sayayi.lib.message.formatter.parameter.named.ChoiceFormatter;
+import de.sayayi.lib.message.formatter.parameter.runtime.extra.InetAddressFormatter;
+import de.sayayi.lib.message.formatter.post.PostFormatter;
+import de.sayayi.lib.message.formatter.post.runtime.CasePostFormatter;
+import de.sayayi.lib.message.formatter.post.runtime.ClipPostFormatter;
+
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.util.Locale;
+import java.util.ServiceLoader;
+import java.util.Set;
+
 var formatterService = new GenericFormatterService();
 formatterService.addFormatter(new BoolFormatter());
 formatterService.addFormatter(new ChoiceFormatter());
@@ -147,7 +165,8 @@ public class ExcludingFormatterService extends DefaultFormatterService
         .load(PostFormatter.class, classLoader)
         .stream()
         .map(ServiceLoader.Provider::get)
-        .filter(postFormatter -> !excludedPostFormatters.contains(postFormatter.getName()))
+        .filter(postFormatter ->
+            !excludedPostFormatters.contains(postFormatter.getName()))
         .forEach(this::addPostFormatter);
   }
 }
@@ -160,8 +179,8 @@ The `WithRegistry` interface provides three methods for registering formatters.
 
 ### addFormatter
 
-The `addFormatter` method is the most common way to register a parameter formatter. It registers the formatter for all 
-types returned by the formatter's `getFormattableTypes()` method. If the formatter implements `NamedParameterFormatter`, 
+The `addFormatter` method is the most common way to register a parameter formatter. It registers the formatter for all
+types returned by the formatter's `getFormattableTypes()` method. If the formatter implements `NamedParameterFormatter`,
 it is additionally registered by name so it can be selected via `format:<name>` in message parameters.
 
 ```java
@@ -248,9 +267,9 @@ When a parameter is being formatted, the formatter service resolves the appropri
    configuration key names appear in the parameter's configuration.
 
 3. Finally, the service resolves type-based formatters by walking the value's class hierarchy (superclasses and
-   interfaces) and collecting all matching formatters in priority order. The formatter with the lowest order value is 
-   tried first. A matching formatter can still decide that it is not responsible for formatting and delegate to the 
-   next formatter in the list. For example, `ByteArrayFormatter` delegates when the `bytes` configuration key is absent, 
+   interfaces) and collecting all matching formatters in priority order. The formatter with the lowest order value is
+   tried first. A matching formatter can still decide that it is not responsible for formatting and delegate to the next
+   formatter in the list. For example, `ByteArrayFormatter` delegates when the `bytes` configuration key is absent,
    allowing the value to be handled by a more general formatter such as `ArrayFormatter`.
 
 The string formatter registered for `Object` ensures that there is always at least one formatter available for any 

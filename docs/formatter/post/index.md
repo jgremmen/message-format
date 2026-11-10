@@ -20,6 +20,20 @@ becomes the input to the post formatter. Any additional elements are configurati
 transformation. The sub-message is a full message in its own right: it can contain text, parameter references, template
 references and even nested post formatter invocations.
 
+The examples on this page use the following message support.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageSupportFactory;
+import de.sayayi.lib.message.formatter.GenericFormatterService;
+import de.sayayi.lib.message.formatter.post.runtime.CasePostFormatter;
+import de.sayayi.lib.message.formatter.post.runtime.ClipPostFormatter;
+
+import java.util.Locale;
+
+var messageSupport = MessageSupportFactory.createDefault();
+// all built-in formatters are available
+```
+
 ```java
 messageSupport
     .message("%(clip,'%{description}',clip:30)")

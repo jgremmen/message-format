@@ -3,310 +3,336 @@ title: 0.24.0 -> 0.25.0
 toc_depth: 2
 ---
 
-# [Version 0.25.0](https://github.com/jgremmen/message-format/tree/develop) (2026-09-23)
+# [Version 0.25.0](https://github.com/jgremmen/message-format/tree/0.25.0) (2026-11-10)
 
 
 ## Breaking Changes
 
-### Temporal values are no longer misclassified
+### `number:integer` formats integer types with grouping
 
-The formatter for temporal values (`ToTemporalDelegate`) registered the `temporal` classifier incorrectly. Instead of
-calling `ClassifierContext.addClassifier(String)`, it called `ClassifierContext.updateClassifiers(Object)` and passed
-the classifier name `"temporal"` as the value to classify. As a result, formatter selection logic that inspects
-classifiers never saw a value actually tagged as `temporal`; the string `"temporal"` was classified as a `string`
-value instead.
+For `number:integer`, the number formatter rendered integer types (`Integer`, `Long`, `BigInteger` and the atomic and
+accumulator types) with their plain `toString()` representation, while floating point values and `BigDecimal` were
+formatted with the locale-specific integer format. For `Locale.US`, `1234567L` was rendered as `1234567` and
+`1234567.0` as `1,234,567`.
 
-Custom formatters or match expressions that relied on the (absent) `temporal` classifier to select temporal-specific
-behavior must be re-checked: values of type `java.time.temporal.Temporal` are now correctly reported with the
-`temporal` classifier, which may change which formatter or match branch is selected for such values.
-
-### `SortedStringMap.remove(Object)` always throws once sealed
-
-Calling `remove(Object)` on a sealed (immutable) `SortedStringMap` previously only threw
-`UnsupportedOperationException` when the key to remove was actually present in the map. Removing a key that did not
-exist silently returned `null` instead, even though the map is immutable. `remove(Object)` on a sealed map now always
-throws `UnsupportedOperationException`, regardless of whether the key exists:
+`number:integer` now applies the locale-specific integer format to all numeric types. The previous output for integer
+types is available as the new value `number:plain`, which is also the behavior when the `number` configuration key is
+absent:
 
 ```java
-SortedStringMap<String> sealed = SortedStringMap
-    .<String>builder()
-    .put("a", "1")
-    .seal();
+// before: "1234567", now: "1,234,567"
+messageSupport
+    .message("%{v,number:integer}")
+    .with("v", 1234567)
+    .locale(Locale.US)
+    .format();
 
-// Before: returned null, no exception
-// After: throws UnsupportedOperationException
-sealed.remove("does-not-exist");
+// "1234567"
+messageSupport
+    .message("%{v,number:plain}")
+    .with("v", 1234567)
+    .locale(Locale.US)
+    .format();
 ```
 
-Code that relied on `remove` silently doing nothing for absent keys on a sealed map must now catch or avoid calling
-`remove` on sealed instances entirely.
+Messages that use `number:integer` to suppress grouping separators for integer values must use `number:plain`
+instead.
 
-### Parser exceptions from annotation scanning are no longer wrapped
+### Supplier parameter values are evaluated at most once
 
-`AbstractAnnotationAdopter.adopt(...)` used to catch `Exception` around class scanning and message parsing, wrapping
-every failure &ndash; including `MessageParserException` raised while parsing an invalid message or template text
-&ndash; in a `MessageAdopterException`. Only I/O related failures are now wrapped this way; the catch clauses were
-narrowed from `Exception` to `IOException`.
+The formatters for `Supplier`, `BooleanSupplier`, `IntSupplier`, `LongSupplier` and `DoubleSupplier` invoked the
+supplier for every map key comparison and once more for the formatted text. An expensive supplier was evaluated
+several times per formatting call, and a supplier returning a different value on each call (a counter, a clock or a
+random value) could select a map entry that did not match the formatted value.
 
-As a consequence, a `MessageParserException` raised for an invalid message or template annotation now propagates
-unchanged from `adopt(Class<?>)`, `adopt(Path)` and `adopt(ClassLoader, Set<String>)`, instead of being wrapped in a
-`MessageAdopterException`. Code that catches `MessageAdopterException` around these calls to handle malformed message
-syntax must additionally catch `MessageParserException`:
+`MessageConfigurer.with(String, Object)` now wraps values of these five types in a caching delegate, which invokes the
+supplier at most once. The cached value is kept for as long as the parameter is set: formatting again with the same
+configurer, or calling a supplier obtained from `formatSupplier()` again, reuses the value of the first evaluation.
+A configurer that is reused and must re-evaluate the supplier needs to set the parameter again with `with(...)`.
+`MessageConfigurer.getParameters()` returns the caching delegate instead of the original supplier.
+
+Formatter selection is based on the type of the delegate. If an application class implements one of the supplier
+interfaces, for example `class Counter implements LongSupplier`, a parameter formatter registered for `Counter` is no
+longer used for values set with `with(...)`. Such values are formatted by the formatter of the supplier interface.
+
+### Zoned temporal values keep their time zone
+
+The temporal formatter converted every value to the system default time zone before formatting, so a `ZonedDateTime`
+or `OffsetDateTime` was rendered in the local time of the server instead of its own zone or offset. Values with a zone
+or an offset are now formatted in that zone or offset. Values without a zone, such as `LocalDateTime`, and instants are
+still formatted in the system default time zone.
+
+Code that relied on the conversion to the system time zone must convert the value itself before passing it, for
+example with `zonedDateTime.withZoneSameInstant(ZoneId.systemDefault())`.
+
+### `MessagePart` leaf interfaces are sealed
+
+`MessagePart.Text`, `MessagePart.Parameter`, `MessagePart.Template` and `MessagePart.PostFormat` were `non-sealed`, so
+any class could implement them. Custom implementations were not supported by the formatting, export and template
+lookup code, and the built-in parts considered themselves equal to custom parts with the same properties but not the
+other way around.
+
+The four interfaces are now `sealed` and permit the built-in implementations only. Classes implementing them no longer
+compile. Text parts are created with `TextPartFactory`, all other parts by parsing or building a message. The built-in
+parts are now only equal to parts of the same implementation.
+
+### `Message.Parameters` no longer specifies `hashCode()`
+
+`Message.Parameters` redeclared `hashCode()` with a contract based on the locale and the parameter values. None of the
+implementations followed it, and the equality of the built-in implementation was not symmetric. The redeclaration and
+its contract have been removed. Implementations may use identity equality, and code must not expect two instances with
+the same locale and values to be equal. To compare the content of two instances, compare `getLocale()` and
+`asParameterMap()`.
+
+### Exception constructor overloads without cause removed
+
+`MessageConfigurer.formattedException(...)` and `formattedExceptionSupplier(...)` had two single-argument overloads,
+one for `ExceptionConstructor` and one for `ExceptionConstructorWithCause`. For an exception class with a `(String)`
+and a `(String, Throwable)` constructor, which applies to almost every JDK exception, a constructor reference such as
+`IllegalStateException::new` matched both overloads and did not compile.
+
+The single-argument overloads taking an `ExceptionConstructorWithCause` have been removed, as they only passed `null`
+as cause. Constructor references now compile with and without a cause:
+
+```java
+IllegalStateException ex1 = messageSupport
+    .code("invalid-state")
+    .formattedException(IllegalStateException::new);
+
+IllegalStateException ex2 = messageSupport
+    .code("invalid-state")
+    .formattedException(IllegalStateException::new, cause);
+```
+
+A two-parameter lambda without cause no longer compiles. It must either pass `null` as the cause argument or be
+replaced by a lambda with one parameter.
+
+### `TypedValue.StringValue.asMessage()` takes no argument
+
+`TypedValue.StringValue.asMessage(MessageFactory)` has been replaced by `asMessage()`. A string value now keeps a
+reference to the message factory that created it and parses the string with that factory on first use. Callers must
+drop the factory argument.
+
+### `MessageFormatException` records the formatting context in nesting order
+
+`MessageFormatException` stored one code, template, locale and parameter name and built its detail message from these
+four values. For nested parts, such as a parameter inside a template referenced from a mapped message, the message
+named the wrong parameter or omitted parts of the context.
+
+The exception now records each context entry in the order the failure propagates through the nested parts, including
+the post formatter being applied. The detail message is derived from this sequence, so the wording of detail messages
+has changed. If several parameters or post formatters have been recorded, `getParameter()` and `getPostFormatter()`
+return the innermost one. The protected constructor `MessageFormatException(String, String, Locale, String,
+Throwable)` has been removed. Subclasses must use the protected `MessageFormatException(Throwable)` constructor and
+add context through the `with...` methods.
+
+### Duplicate named formatters are rejected
+
+Registering a named parameter formatter whose name was already taken silently replaced the previous formatter.
+`FormatterService.WithRegistry.addFormatter(ParameterFormatter)` now throws a `FormatterServiceException` in this case,
+consistent with `addPostFormatter(PostFormatter)`. Applications that register their own formatter under the name of a
+built-in formatter must use a new formatter service without that formatter, for example a `GenericFormatterService`.
+
+### Auto-applied named formatters no longer have a fallback
+
+A named formatter that is selected automatically through one of its configuration keys
+(`autoApplyOnNamedConfigParameter()`) was put in front of the formatters for the value type, so it could delegate to
+them with `delegateToNextFormatter()`. It is now the only formatter in the chain, exactly as if it had been selected
+with `format:<name>`. A delegating call from such a formatter throws a `NoSuchElementException`. Formatters that need
+the formatting of another type must call `context.format(value, type)` instead.
+
+### `DefaultFormatterService` uses the library class loader by default
+
+`new DefaultFormatterService()` and the constructors receiving a `null` class loader discovered service-provided
+formatters through the system class loader. In environments where the system class loader does not see the
+application libraries, such as Spring Boot executable jars, servlet containers or build tool plugins, formatters from
+other modules were not found. The class loader of the library is now used instead. To use a different class loader,
+pass it to `DefaultFormatterService(ClassLoader, int)`.
+
+### Builder restrictions for templates and post formatters
+
+`MessageBuilder.buildAsTemplate()` now throws an `IllegalStateException` if the message contains template references,
+because a template referencing another template cannot be resolved. A post formatter does not accept message-typed
+configuration values: `PostFormatterBuilder.configMessage(...)` throws an `IllegalArgumentException`, and the parser
+reports a syntax error for a post formatter configuration value that contains message syntax:
+
+```java
+// rejected: clip-suffix-text contains a parameter reference
+messageSupport.message(
+    "%(clip,'%{text}',clip:20,clip-suffix-text:'%{more}')");
+
+// accepted: plain text value
+messageSupport.message(
+    "%(clip,'%{text}',clip:20,clip-suffix-text:'...')");
+```
+
+### Invalid `geo` format patterns fail
+
+A `geo` configuration value that is neither a predefined format name nor a valid pattern was silently ignored and the
+value was formatted in degrees only. Such a pattern now makes formatting fail with a `MessageFormatException` caused by
+an `IllegalArgumentException` that names the pattern.
+
+### Message codes and template names are returned as snapshots
+
+`MessageAccessor.getMessageCodes()` and `getTemplateNames()` returned unmodifiable views of the internal maps of the
+message support. They now return sorted, unmodifiable copies taken at the time of the call. Code that kept the returned
+set to observe later registrations must call the method again.
+
+### Corrupt packs are reported as `IOException`
+
+Importing a pack without a version, or with content that cannot be decoded, failed with runtime exceptions such as
+`IllegalArgumentException` or `NullPointerException`. Both cases now throw a `java.io.StreamCorruptedException`, and a
+pack with a version newer than the supported one throws an `IOException`. Code that caught runtime exceptions around
+`importMessages(...)` must catch `IOException` instead.
+
+### `ResourceBundleAdopter` requires the requested locales
+
+The overloads of `adopt(...)` taking a `Set<Locale>` accepted a bundle that the `ResourceBundle` lookup had found for a
+fallback locale (a parent locale, the default locale or the base bundle) and registered its texts for that fallback
+locale. A requested locale without a bundle of its own was therefore never reported. A bundle whose locale differs from
+the requested one is now treated as missing: the `Set<Locale>` overloads throw a `MessageAdopterException`, and the
+overloads without locales skip it. Texts are registered for the requested locale.
+
+### Annotation adopter exceptions
+
+`AbstractAnnotationAdopter` wrapped every exception raised while scanning and adopting classes in a
+`MessageAdopterException`, including the `MessageParserException` for an invalid message or template text. Only I/O
+failures are wrapped now. A `MessageParserException` propagates unchanged from `adopt(Class<?>)`, `adopt(Path)`,
+`adopt(byte[])` and `adopt(ClassLoader, Set<String>)`:
 
 ```java
 try {
-  new AnnotationAdopter(messageSupport).adopt(SomeAnnotatedClass.class);
+  new AnnotationAdopter(messageSupport).adopt(ShopMessages.class);
 } catch(MessageParserException ex) {
-  // invalid message/template format string
+  // invalid message or template text
 } catch(MessageAdopterException ex) {
-  // class path scanning or class file I/O failure
+  // class path scanning or class file failure
 }
 ```
 
-### `@Text` locales must be valid language tags
+Class path resources with a protocol other than `file`, `jar`, `war` or `zip`, such as `vfs:` or `bundleresource:`,
+were skipped silently during package scanning. They now cause a `MessageAdopterException`.
 
-The `locale` of a `@Text` annotation was converted with `Locale.forLanguageTag`, although its documentation suggested
-Java locale notations like `de_DE`. `forLanguageTag` does not understand such notations and silently returns
-`Locale.ROOT` for them, so a text declared for `de_DE` became the fallback text for every locale, and two such texts
-failed with a misleading duplicate definition error for locale `''`.
-
-The locale must now be empty (for `Locale.ROOT`), an ISO 639 language code like `de`, or an IETF BCP 47 language tag
-like `de-DE`. Any other value, including the underscore notation, makes the annotation adopter throw a
-`MessageAdopterException` that names the offending locale. Annotations using the underscore notation must be changed:
+The `locale` of a `@Text` annotation was converted with `Locale.forLanguageTag`, which returns the root locale for
+notations like `de_DE`. Such a text became the fallback for every locale, and two of them failed with a duplicate
+definition error for the empty locale. The locale must now be empty, an ISO 639 language code like `de` or an IETF
+BCP 47 language tag like `de-DE`. Any other value causes a `MessageAdopterException` naming the locale:
 
 ```java
 // before
 @Text(locale = "de_DE", text = "Hallo %{name}!")
 
-// after
+// now
 @Text(locale = "de-DE", text = "Hallo %{name}!")
 ```
 
-### Apache Tika pack detectors are no longer auto-registered
+### SpEL expressions are restricted to reading data
 
-Automatic detection of message format pack files by Apache Tika previously worked out of the box: the module declared
-`requires static org.apache.tika.core` and shipped a `META-INF/services/org.apache.tika.detect.Detector` file that
-registered an internal, non-exported `PackTikaDetector` class for Tika 3.
+The `spel` formatter of the `message-format-spring` module evaluated expressions with the standard type locator and a
+reflective method resolver. Expressions could therefore reference types, invoke static methods and call methods of
+`Class` objects. Type references such as `T(java.lang.System)` are now rejected, and only instance methods of objects
+other than `Class` objects can be invoked. Such expressions make formatting fail with a `MessageFormatException` caused
+by a `SpelEvaluationException`. Expressions using these constructs must be rewritten, for example by passing the
+required value as an additional message parameter and referencing it as a variable (`#name`).
 
-This automatic registration has been removed. Detector support is now split into two public, exported classes in the
-new `de.sayayi.lib.message.pack` package:
+### Log4j formatting failures are reported
 
-- `PackTika3Detector` for Apache Tika in the range `[1.19,4.0)`
-- `PackTika4Detector` for Apache Tika in the range `[4.0,5.0)`
+`Log4jMessageFactory` replaced the text of a log message by a placeholder whenever formatting threw any `Throwable`,
+without reporting the failure. Runtime exceptions now still produce the placeholder text but are additionally reported
+as a warning through Log4j's `StatusLogger`, including the message format string and the stack trace. An `Error`
+thrown while formatting is no longer suppressed and propagates to the logging call. The module now requires Log4j
+2.11.0 or later.
 
-`PackTikaDetector` still exists as a deprecated alias for `PackTika3Detector`, kept for source compatibility. None of
-these classes are registered automatically anymore; applications that want Tika to detect message format pack files
-must add the fully qualified class name of the appropriate detector to their own
-`META-INF/services/org.apache.tika.detect.Detector` file:
+### Apache Tika detectors are no longer registered automatically
 
-```
-de.sayayi.lib.message.pack.PackTika3Detector
-```
+The core module contained an internal Apache Tika detector for message format packs and registered it through a
+`META-INF/services/org.apache.tika.detect.Detector` file. It only worked with Tika versions before 4.0, and the
+`pack` dependency brought `tika-core` into the class path of every application.
 
-or, for Apache Tika 4:
+The service file has been removed, and `tika-core` is excluded from the dependencies, so Tika is no longer pulled in
+transitively. The detectors are now public classes in the exported package `de.sayayi.lib.message.pack`.
+`PackTika3Detector` supports Tika versions `[1.19,4.0)` and `PackTika4Detector` supports `[4.0,5.0)`.
+`PackTikaDetector` remains available for Tika versions before 4.0. An application that wants Tika to detect pack files
+must register the detector matching its Tika version in its own service file:
 
-```
+```text title="META-INF/services/org.apache.tika.detect.Detector"
 de.sayayi.lib.message.pack.PackTika4Detector
 ```
 
-With the service file in place, detection through `Tika#detect(InputStream)` works exactly as before. This change
-also allows applications running on Apache Tika 4 to use the message pack detector, which was not possible in
-0.24.0.
+Only one of the detectors must be registered. The detector interface differs between Tika 3 and Tika 4, so a detector
+for the other major version fails with an `AbstractMethodError` when Tika invokes it.
 
-*Dependency versions for compile and runtime scopes are unchanged in this release.*
+### Gradle plugin regex filters are `ListProperty`
 
+The `include`, `exclude` and `ignore` filters of the `messageFormat` extension were copied to the `messageFormatPack`
+task once, when the task was created. If the task was realized before the `messageFormat` block had been evaluated,
+for example by `jar { from messageFormatPack }` placed above it, all filters were silently lost.
 
-### Supplier parameter values are evaluated at most once
+The filters are now modelled as `ListProperty<String>` and forwarded to the task lazily. The return type of
+`MessageFormatMessagesExtension.getIncludeRegexFilters()`, `getExcludeRegexFilters()` and
+`MessageFormatTemplatesExtension.getIgnoreRegexFilters()` changed from `List<String>` to `ListProperty<String>`. Build
+scripts using the `include`, `exclude` and `ignore` methods are not affected. Build logic accessing the lists directly
+must use the `ListProperty` API, such as `get()` and `add(...)`.
 
-The supplier formatters (`SupplierFormatter`, `BooleanSupplierFormatter`, `IntSupplierFormatter`,
-`LongSupplierFormatter` and `DoubleSupplierFormatter`) used to invoke the supplier once for every map key comparison
-and once more for formatting. An expensive supplier was evaluated several times per format, and a supplier returning
-a different value on each call (a counter, a clock or a random value) could select a map entry that did not match
-the formatted value.
+### Dependency changes
 
-`MessageConfigurer.with(String, Object)` now wraps `Supplier`, `BooleanSupplier`, `IntSupplier`, `LongSupplier` and
-`DoubleSupplier` values in a caching delegate, so the supplier is invoked at most once. The cached value is kept for
-as long as the parameter is set: formatting the message again with the same configurer, or using a supplier returned
-by `formatSupplier()`, reuses the value supplied on the first evaluation instead of invoking the supplier again.
+| Dependency                           | Type    | Old version | New version  |
+|--------------------------------------|---------|-------------|--------------|
+| `org.apache.logging.log4j:log4j-api` | compile | [2.0,3.0)   | [2.11.0,3.0) |
 
-Code that reuses a configurer and expects a supplier parameter to be re-evaluated on each format must set the
-parameter again with `with(...)` before formatting. `MessageConfigurer.getParameters()` now returns the caching
-delegate instead of the supplier passed to `with(...)`.
+The dependency applies only to the `message-format-log4j` module. Its scope changed from `runtime` to `compile`, as
+described under Bug Fixes.
 
-Formatters are now selected based on the type of the caching delegate. If an application implements one of these
-supplier interfaces itself (e.g. `MySupplier implements LongSupplier`) and has registered a parameter formatter for
-that specific type, that formatter is no longer used for values set with `with(...)`. The value is formatted by the
-formatter for the supplier interface (here `LongSupplierFormatter`) instead.
-
-
-### Gradle plugin regex filters are `ListProperty` instead of `List`
-
-The Gradle plugin copied the `include`, `exclude` and `ignore` regex filters from the `messageFormat` extension to the
-`messageFormatPack` task once, when the task was realized. If anything realized the task before the `messageFormat`
-block was evaluated, for example `jar { from messageFormatPack }` placed above it, `tasks.named(...).get()` or an eager
-`tasks.withType(...).all { ... }`, every filter added in the `messageFormat` block afterwards was silently dropped.
-
-The filters are now modelled as `ListProperty<String>` and forwarded to the task lazily, so they are evaluated when the
-task executes. As a consequence, the return type of the following methods changed from `List<String>` to
-`ListProperty<String>`:
-
-- `MessageFormatMessagesExtension.getIncludeRegexFilters()`
-- `MessageFormatMessagesExtension.getExcludeRegexFilters()`
-- `MessageFormatTemplatesExtension.getIgnoreRegexFilters()`
-
-Build scripts that use the `include`, `exclude` and `ignore` methods are not affected. Build logic that reads or
-modifies the returned list directly must use the `ListProperty` API instead (e.g. `get()`, `add(...)` or
-`addAll(...)`). Filters added on the task are added to the filters of the extension; assigning the property on the
-task replaces them.
-
-### `Message.Parameters` no longer specifies `hashCode()`
-
-`Message.Parameters` redeclared `hashCode()` and documented it as the sum of the hash codes of the locale, the
-parameter names and the parameter values. None of the implementations followed this contract: most of them use
-identity equality, and `MessageParameters.equals(Object)` accepted any `Parameters` implementation, so equality was
-not symmetric.
-
-The `hashCode()` redeclaration and its contract have been removed. The interface now states that implementations
-may use identity equality and that code must not rely on two parameters instances being equal because they provide
-the same locale and parameter values. `MessageParameters` is only equal to another `MessageParameters` instance with
-the same locale and parameter values, which makes `equals` symmetric. To compare the content of two parameters
-instances, compare `getLocale()` and `asParameterMap()` instead.
-
-### Exception constructor references are no longer ambiguous
-
-`MessageConfigurer.formattedException(...)` and `formattedExceptionSupplier(...)` had two overloads with a single
-argument, one for `ExceptionConstructor` and one for `ExceptionConstructorWithCause`. For an exception class with a
-`(String)` and a `(String, Throwable)` constructor, which includes almost every JDK exception, a constructor reference
-such as `formattedException(IllegalStateException::new)` matched both overloads and did not compile.
-
-The single-argument overloads for `ExceptionConstructorWithCause` have been removed. They only passed `null` as
-cause to the constructor. The remaining overloads are:
-
-- `formattedException(ExceptionConstructor)` and `formattedExceptionSupplier(ExceptionConstructor)`
-- `formattedException(ExceptionConstructorWithCause, Throwable)` and
-  `formattedExceptionSupplier(ExceptionConstructorWithCause, Throwable)`
-
-Constructor references now work with and without a cause. Code that passed a two-parameter lambda or a reference to
-a `(String, Throwable)`-only constructor without a cause no longer compiles. Pass `null` as cause, e.g.
-`formattedException((msg, cause) -> new MyException(msg, cause), null)`, or use a lambda with one parameter.
-
-### `number:integer` applies the locale-specific integer format to integer types
-
-The number formatter rendered integer types (`Integer`, `Long`, `BigInteger`, etc.) with their plain `toString()`
-representation for `number:integer`, while floating point values and `BigDecimal` were formatted using the
-locale-specific integer format. For `Locale.US`, `1234567L` was rendered as `1234567`, but `1234567.0` as
-`1,234,567`.
-
-`number:integer` now uses the locale-specific integer format for all numeric types, so integer types are rendered with
-grouping separators as well. The previous behavior is available as `number:plain`, which is also the default when
-the `number` configuration key is absent:
-
-```java
-// before: "1234567", after: "1,234,567"
-messageSupport.message("%{v,number:integer}").with("v", 1234567).locale(Locale.US).format();
-
-// "1234567"
-messageSupport.message("%{v,number:plain}").with("v", 1234567).locale(Locale.US).format();
-```
-
-Messages using `number:integer` for integer values to suppress grouping separators must use `number:plain` instead.
-
-### `MessagePart` leaf interfaces are sealed
-
-`MessagePart.Text`, `MessagePart.Parameter`, `MessagePart.Template` and `MessagePart.PostFormat` were declared
-`non-sealed`, so any class could implement them. Custom implementations were never supported, though: formatting a
-message containing a custom parameter, template or post format part failed with a `ClassCastException`, exporting
-such a message failed with an `IllegalArgumentException`, and template references in custom parts were not collected.
-In addition, the built-in parts considered themselves equal to custom parts with the same properties, but not vice
-versa, which broke the `equals`/`hashCode` contract and could make `LRUMessagePartNormalizer` return a part of the
-wrong type.
-
-The four interfaces are now `sealed` and permit the built-in implementations only. Classes implementing one of these
-interfaces no longer compile. The built-in parts are only equal to parts of the same implementation class.
 
 ## New Features
 
-### `MessageSupportFactory.createDefault()` and `createGeneric()`
+### Factory methods for configurable message support
 
-Two convenience factory methods have been added to simplify the most common ways of obtaining a configurable
-`MessageSupport` instance:
+`MessageSupportFactory` provides two methods for the most common setups. `createDefault()` returns a configurable
+message support with all formatters of the shared `DefaultFormatterService`. `createGeneric()` returns one with an
+empty `GenericFormatterService`, so all formatters must be registered explicitly. Both use the shared message factory.
 
 ```java
-// Fully populated, ready to add messages and templates
-ConfigurableMessageSupport withDefaults =
+ConfigurableMessageSupport messageSupport =
     MessageSupportFactory.createDefault();
 
-// Empty formatter service, for full control over
-// which formatters are registered
-ConfigurableMessageSupport minimal =
-    MessageSupportFactory.createGeneric();
+messageSupport.addMessage("cart.summary",
+    "%{items,format:choice,0:'empty',1:'one item'," +
+    ":'%{items} items'}");
 ```
 
-`createDefault()` is equivalent to `create(DefaultFormatterService.getSharedInstance())`, while `createGeneric()` is
-equivalent to `create(new GenericFormatterService())`. Both remain fully configurable until `seal()` is called.
+### Templates from resource bundles
 
-### Stricter, atomic formatter registration
-
-`GenericFormatterService.addFormatter(...)` and `addNamedFormatter(...)` now validate all preconditions (kebab-case
-naming, `Object` formatters implementing `DefaultFormatter`, and auto-apply configuration key conflicts) before
-mutating any internal state. If registration fails, the formatter service is left completely unchanged instead of
-possibly containing a partially registered formatter.
-
-In addition, registering a named formatter whose name has already been registered is now rejected with a
-`FormatterServiceException`, consistent with the existing behavior of `addPostFormatter(PostFormatter)`:
+`ResourceBundleAdopter` can adopt templates in addition to messages. The new `adoptTemplates(...)` methods mirror the
+existing `adopt(...)` methods and accept a single `ResourceBundle`, a collection of bundles, or a bundle base name with
+an optional class loader and an optional set of locales. Each key becomes the template name and must follow the
+kebab-case naming convention. Texts for the same name from bundles of different locales are combined into one
+locale-aware template.
 
 ```java
-// name: "custom"
-service.addNamedFormatter(new MyNamedFormatter());
-// throws FormatterServiceException: duplicate name
-service.addNamedFormatter(new MyNamedFormatter());
+new ResourceBundleAdopter(messageSupport)
+    .adoptTemplates("com.example.templates",
+        Set.of(Locale.ENGLISH, Locale.GERMAN));
 ```
 
-### `SyntaxErrorMessageBuilder.with(Token)`
+### Deferred formatter discovery in `DefaultFormatterService` subclasses
 
-`AbstractAntlr4Parser.SyntaxErrorMessageBuilder` gained a `with(Token)` method, mirroring the existing
-`with(SyntaxTree)`. It formats the error message and creates a `SyntaxErrorBuilder` spanning the entire given token,
-without having to construct a start/stop token pair manually:
-
-```java
-throw createSyntaxError()
-    .with("expected a number")
-    .with(token)
-    .build();
-```
-
-### `AbstractAnnotationAdopter.adopt(byte[])`
-
-The annotation adopter can adopt messages and templates from class file content that has already been read. Classes
-adopted this way are deduplicated together with `adopt(Path)`, `adopt(Class)` and package scanning. The Gradle plugin
-uses it to read each class file only once. Invalid class file content, given to `adopt(byte[])` or `adopt(Path)`,
-is reported as `MessageAdopterException`.
-
-### Apache Tika pack detectors as public API
-
-The `de.sayayi.lib.message.pack` package is now exported from the module and contains `PackConstants` (the shared
-MIME type and pack configuration), together with `PackTika3Detector` and `PackTika4Detector` described under Breaking
-Changes above. Applications integrating with Apache Tika can now reference these types directly instead of relying on
-internal, non-exported classes.
-
-### Deferred discovery in `DefaultFormatterService` subclasses
-
-The `DefaultFormatterService` constructors call the overridable `addDefaultFormatters()`, which in turn calls
+The constructors of `DefaultFormatterService` call the overridable `addDefaultFormatters()`, which calls
 `addParameterFormattersFromService()` and `addPostFormattersFromService()`. These calls happen before the fields of a
-subclass are initialized, so an override that uses such fields sees `null` or default values. The new protected
-constructor `DefaultFormatterService(ClassLoader, int, boolean)` lets a subclass skip this call and invoke
-`addDefaultFormatters()` itself, at the end of its own constructor:
+subclass are initialized. The new protected constructor `DefaultFormatterService(ClassLoader, int, boolean)` lets a
+subclass skip the call and invoke `addDefaultFormatters()` at the end of its own constructor:
 
 ```java
-public class ExcludingFormatterService extends DefaultFormatterService
+public class FilteringFormatterService
+    extends DefaultFormatterService
 {
-  private final Set<String> excludedPostFormatters;
+  private final Set<String> excluded;
 
-  public ExcludingFormatterService(Set<String> excludedPostFormatters)
+  public FilteringFormatterService(Set<String> excluded)
   {
     super(null, DEFAULT_FORMATTER_CACHE_SIZE, false);
 
-    this.excludedPostFormatters = excludedPostFormatters;
+    this.excluded = excluded;
 
     addDefaultFormatters();
   }
@@ -318,106 +344,196 @@ public class ExcludingFormatterService extends DefaultFormatterService
         .load(PostFormatter.class, classLoader)
         .stream()
         .map(ServiceLoader.Provider::get)
-        .filter(postFormatter -> !excludedPostFormatters.contains(postFormatter.getName()))
+        .filter(pf -> !excluded.contains(pf.getName()))
         .forEach(this::addPostFormatter);
   }
 }
 ```
 
-The public constructors behave as before.
+### Post formatter context in `MessageFormatException`
+
+`MessageFormatException` records the post formatter being applied when formatting fails. It is available through
+`getPostFormatter()` and can be added with `withPostFormatter(String)`. `getContextKey()` returns the recorded context
+as a key sequence, such as `l-c-p1-t1` for a parameter inside a template of a message with code and locale.
+
+### Adopting class file content
+
+`AbstractAnnotationAdopter.adopt(byte[])` adopts the messages and templates of class file content that has already
+been read. Classes adopted this way are recognized together with `adopt(Path)`, `adopt(Class<?>)` and package
+scanning, so the same class is never adopted twice. Invalid class file content is reported as
+`MessageAdopterException`.
+
+### Syntax errors spanning a token
+
+`AbstractAntlr4Parser.SyntaxErrorMessageBuilder` provides `with(Token)` in addition to `with(SyntaxTree)`. It formats
+the error message and creates a syntax error builder that spans the given token:
+
+```java
+syntaxErrorMessage("unexpected token '%{t}'")
+    .with("t", token.getText())
+    .with(token)
+    .report();
+```
+
+### Public pack API
+
+The new exported package `de.sayayi.lib.message.pack` contains `PackConstants`, which provides the MIME type and the
+pack configuration of message format packs, and the Apache Tika detectors described under Breaking Changes.
+
+### Format string serialization helpers
+
+`MessageUtil.isUnquotableString(String)` tells whether a string can be written without quotes in a message format
+string. Names that are keywords of the syntax, such as `true` or `empty`, require quotes. `serializeSimpleString(...)`
+writes a string with or without quotes accordingly, which is useful for custom message parts and configuration values
+that implement `FormatStringSerializer`.
+
+### Gradle plugin
+
+The plugin declares compatibility with the Gradle configuration cache and isolated projects. The new
+`MessageFormatMessagesExtension.getResolvedDuplicateStrategy()` returns the configured duplicate strategy converted
+to a `DuplicateStrategy` value.
 
 
 ## Bug Fixes
 
-`ConfigurableMessageSupport.importMessages(InputStream)` and `MessageUtil.importMessages(...)` are documented to close
-the pack stream regardless of whether the import succeeds, but left it open if the stream did not start with a valid
-pack header. `MessageSupport.exportMessages(...)` closed the output stream after writing the pack, but left it open if
-the pack exceeded the message or template limit. Both directions now close the stream in all cases, and the Javadoc of
-all import and export methods documents this. To write or read a pack as part of a larger stream, such as a ZIP entry,
-pass a `FilterOutputStream` or `FilterInputStream` that does not close the wrapped stream.
+- On the module path, `DefaultFormatterService` did not find any of the built-in parameter and post formatters,
+  because the module descriptor of `message-format` did not declare them as service providers and `META-INF/services`
+  files are ignored for named modules. Formatting therefore fell back to the string formatter for all values. The
+  module descriptor now provides all built-in formatters.
 
-`MessageConfigurer.formattedExceptionSupplier(ExceptionConstructorWithCause, Throwable)` returned the same exception
-instance on every `Supplier.get()`, so a thrown exception kept the stack trace of its first creation and accumulated
-suppressed exceptions. The variant without a cause created a new exception, but formatted the message again on every
-call. Both variants now format the message once and create a new exception on every call.
+- Types of the ANTLR runtime, the `pack` library and the core module are part of the public API of the library and
+  its add-on modules, but were declared as runtime dependencies and not required transitively by the module
+  descriptors. Applications using these types had to declare the dependencies themselves. They are now `compile`
+  dependencies and are required transitively, as are the Log4j API and the Spring context dependencies of the
+  respective add-on modules.
 
-`MessageConfigurer.getParameters()` was annotated as unmodifiable, but returned the configurer's internal parameter
-map. Modifying that map bypassed the parameter name validation and the caching of supplier values in
-`with(String, Object)`. The method now returns an unmodifiable view, which still reflects later changes made through
-the configurer.
+- Messages, templates and default configuration values of a configurable message support were stored without
+  synchronization, so concurrent registration and formatting could corrupt the internal maps or let two threads both
+  pass the duplicate check. Registration is now atomic and guarded together with the message and template filters.
+  Formatter registration validates all preconditions before changing the formatter service, so a failed registration
+  no longer leaves a partially registered formatter, and a rejected duplicate post formatter no longer replaces the
+  registered one.
 
-`InternalMessageBuilder` allowed methods such as `text(...)`, `parameter(...)` and `build()` to be called again after
-`build()`, `buildWithCode(String)` or `buildAsTemplate()` had already produced a message. Since the built
-`CompoundMessage` holds a direct reference to the builder's internal parts list, continuing to use the builder after
-building silently mutated the already returned message. The builder now tracks whether it has been built and throws
-`IllegalStateException` from every mutating method once that happens.
+- Several caches kept strong references to classes for the lifetime of the application, which prevented their class
+  loaders from being garbage collected after a redeployment: the formatter cache of the formatter service, the type
+  cache of the annotation formatter and the reflection caches shared by all `spel` formatter instances. The first two
+  no longer reference the cached classes, and the reflection caches now belong to the formatter instance. The number
+  formatter no longer keeps decimal format symbols for every locale ever used.
 
-`LocalizedMessageBundleWithCode` stored its locale-to-message entries in a `HashMap`, so the iteration order used to
-pick a fallback ("default language") entry when no exact locale match exists was undefined and could vary between
-JVM runs. The map is now a `LinkedHashMap`, so the first entry with an empty language acts as a predictable,
-insertion-order-based fallback. The constructor also now rejects `null` message values explicitly and normalizes a
-`null` locale key to `Locale.ROOT`, instead of relying on ad-hoc `null` checks scattered through the lookup code.
+- The formatter cache located types by a binary search over class names but detected hits by identity. Two different
+  classes with the same name, loaded by different class loaders, made the lookup loop forever while holding the cache
+  lock. Types with the same name are now ordered consistently.
 
-`MatchResultFormatter` treated any `Matcher` that did not satisfy `matches()` (a whole-input match) as "no match" and
-returned empty text, even if the matcher already had an established match from a prior `find()` or `lookingAt()`
-call. Partial matches obtained through `find()` were therefore discarded and formatted as empty text. The formatter
-now checks whether a match has already been established (via `Matcher.start()`) before falling back to a whole-input
-`matches()` attempt, so results from `find()` are preserved.
+- A post formatter received the default locale of the message support through `PostFormatterContext.getLocale()`
+  instead of the locale of the current formatting call. Locale-sensitive post formatters, such as `case`, ignored a
+  locale set with `locale(...)`.
 
-`PostFormatterContextImpl.getLocale()` returned the message accessor's configured locale instead of the locale
-supplied for the current formatting call. A post formatter that depends on locale (such as case conversion) ignored a
-locale explicitly set via `.locale(...)` on the message and always used the message support's default locale.
+- A default value of a template parameter was looked up under the name of the delegated message parameter instead of
+  the template parameter name. For a reference like `%[tpl,count->n,count=0]`, the default was ignored when `n` was not
+  set.
 
-`PostFormatterPart` discarded the surrounding space markers whenever the message being post-formatted evaluated to
-empty text, causing spacing configured on the message part to be lost entirely. Empty results with a configured
-leading or trailing space now produce a single space instead of no text at all.
+- Two template parts with the same name and spacing but different default parameters or parameter delegations were
+  considered equal. A message part normalizer could therefore replace a template reference by one with different
+  defaults. In addition, the small LRU normalizer could return the part of an earlier cache slot after an identity hit,
+  and `FormattableType` instances with the same type but a different order were considered equal.
 
-`FormattableType.equals(Object)` and `hashCode()` only considered the formatted type and ignored the registration
-`order`. Two `FormattableType` instances for the same type but a different priority order were therefore treated as
-equal, which could cause one of them to be silently dropped when used in a set or as a map key.
+- Characters outside the Basic Multilingual Plane, such as emoji, lost their low surrogate in message text and were
+  rendered as a lone high surrogate.
 
-`TemplatePart.equals(Object)` and `hashCode()` did not take the default parameter map and parameter delegate map into
-account. Two template parts with the same name and spacing but different default parameter values or parameter
-delegations were incorrectly considered equal, which could affect message part deduplication and normalization.
+- Message text could not contain combining marks, format characters or private use characters, so text in scripts
+  like Thai or Arabic and emoji sequences joined by zero width joiners could not be parsed. These characters are now
+  accepted, and names and unquoted values accept combining marks and zero width joiners. C1 control characters are
+  ignored like C0 control characters.
 
-`SortedStringMap`'s spliterator always reported the `IMMUTABLE` characteristic, even for a non-sealed, mutable map,
-which violates the `Spliterator` contract and can lead to incorrect optimizations by callers such as parallel
-streams. `estimateSize()` also always returned the total map size rather than the number of elements remaining after
-some have already been consumed. Both characteristics are now reported correctly. Additionally, copying a sealed,
-empty `SortedStringMap` (whose backing array is `null`) into a new mutable map no longer throws a
-`NullPointerException`.
+- `asFormatString()` did not always produce a format string that parses to the same message. Backslashes were not
+  escaped, string values that are keywords of the syntax were written without quotes, and string defaults of template
+  references could be written unquoted. A single backslash in message text is now treated as a regular character
+  instead of starting an escape sequence.
 
-An unsealed (mutable) `SortedStringMap` rejected several standard `Map` operations with an
-`UnsupportedOperationException`. Its entries were immutable snapshots and its iterators did not support `remove()`,
-so `replaceAll(...)`, `Entry.setValue(...)`, `entrySet().remove(...)`, `entrySet().removeIf(...)`,
-`keySet().remove(...)`, `values().remove(...)` and `Iterator.remove()` all failed. An unsealed map now supports all of
-these operations. `Entry.setValue(...)` writes the value through to the map. Once the map is sealed, these operations
-throw `UnsupportedOperationException`, as before.
+- A locale-aware message or template selected the first entry with the same language in hash map order when no entry
+  matched the requested language and country. For `de-AT`, a text for `de-DE` could be chosen over a text for `de`. An
+  entry with the same language and no country now ranks above one with a different country, and the declaration order
+  of the texts is preserved.
 
-`SupplierDelegate.value` was not declared `volatile`, so a thread reading a cached value after another thread had
-already computed and stored it via the delegate supplier was not guaranteed to see the up-to-date value under the
-Java Memory Model. The field is now `volatile`, making the cached value visible across threads as intended.
+- The `clip` post formatter counted UTF-16 characters, so it could split a surrogate pair, an emoji sequence or a
+  letter with a combining accent. It now counts user-perceived characters (grapheme clusters) for the formatting
+  locale and never splits them.
 
-`LRUMessagePartNormalizer` lacked a locking mechanism around its internal cache, allowing concurrent access from
-multiple threads to leave the cache in an inconsistent state. A locking mechanism has been added to guard cache reads
-and writes.
+- The list formatters added the `list-value-more` text but continued with the remaining elements instead of stopping.
 
-`MessageUtil`'s kebab-case name validation methods iterated over names using UTF-16 char indices instead of Unicode
-code points, so names containing supplementary characters (outside the Basic Multilingual Plane) could be validated
-incorrectly, since a surrogate pair could be misread as two separate characters. The iteration now advances by
-`Character.charCount(codePoint)` instead of a fixed step of one.
+- `NaN` and infinite values threw an exception when compared to string map keys and could match number map keys. They
+  no longer match number keys and do not throw for string keys. The `geo` formatter renders them as empty text.
 
-`PropertiesAdopter.adopt(Properties)`, `adoptTemplates(Properties)` and `adopt(Map<Locale,Properties>)` did not check
-their `properties` argument for `null`, resulting in a `NullPointerException` with no indication of which parameter
-was `null`. All three methods now explicitly reject a `null` properties argument with a descriptive message.
+- A temporal value lacking a field required by the selected format, such as a `LocalDate` with a format containing a
+  time, made formatting fail. It is now formatted as empty text, as are invalid date and time patterns.
 
-`AbstractAnnotationAdopter.scan_checkVisited(String)` recorded raw classpath entry names (including `.class`
-suffixes and OS-specific path separators) as visited, while `adopt(ClassLoader, Set<String>)` recorded normalized
-binary class names. As a result, the same class scanned through both entry points could be visited and adopted
-twice, which could lead to duplicate message or template registration errors. Classpath names are now normalized to
-binary class names consistently across both entry points.
+- The formatter for legacy date types (`Calendar`, `Date`, `FileTime` and `InstantSource`) classified the string
+  `"temporal"` instead of adding the `temporal` classifier. The `classifier` formatter therefore reported these values
+  as `string` values.
 
-`ParameterValueHelper.getEnum(...)`, and with it `Parameters.getParameterValueAsEnum(...)`, checked whether the value
-is a constant of the requested enum type before unwrapping an `Optional`, so `Optional.of(MyEnum.A)` returned an empty
-result. This was documented, but inconsistent with `getBoolean`, `getLong` and `getString`, which accept wrapped
-values of their own type. The `Optional` is now unwrapped first, so a wrapped enum constant is returned as well.
+- The number formatter compared `AtomicInteger`, `AtomicLong`, `LongAdder` and `LongAccumulator` values with bool,
+  number and string map keys as `double` values, which loses precision for large values. They are now compared like
+  the other integer types.
+
+- The formatter for `MatchResult` values called `matches()` on a `Matcher`, which discarded a match found before with
+  `find()` or `lookingAt()` and produced empty text. An existing match is now kept.
+
+- A post formatter part whose sub-message formatted to empty text lost its surrounding spaces. It now produces a single
+  space if the part has a leading or trailing space.
+
+- `MessageBuilder` and the part builders could still be used after `build()`, `buildWithCode(String)` or
+  `buildAsTemplate()`, which modified the message that had already been returned. They now throw an
+  `IllegalStateException`. The configuration map of a built part could also be modified through the builder.
+
+- `formattedExceptionSupplier(ExceptionConstructorWithCause, Throwable)` returned the same exception instance on every
+  `get()`, so the exception kept the stack trace of its first creation and accumulated suppressed exceptions. The
+  variant without cause created a new exception but formatted the message again on every call. Both now format the
+  message once and create a new exception on every call.
+
+- `MessageConfigurer.getParameters()` returned the internal parameter map, so modifications bypassed the parameter
+  name validation. It now returns an unmodifiable view.
+
+- The pack stream was left open when an import failed on an invalid pack header. The import now closes the stream in
+  all cases, as documented. An export with more than 65535 messages or templates, which the pack format cannot
+  represent, is rejected with an `IOException` before anything is written.
+
+- Adding context to a `MessageFormatException` with one of the `with...` methods created a new exception with a new
+  stack trace, which hid the location of the failure. The original stack trace is now preserved.
+
+- `toString()` of a locale-aware template threw an exception. It now lists the text for each locale.
+
+- `SupplierDelegate` did not publish the computed value safely to other threads, and a supplier that requested its own
+  value recursively invoked itself until the stack overflowed. The value is now visible to all threads, and recursive
+  initialization fails with an `IllegalStateException`.
+
+- `SortedStringMap` reported its spliterator as `IMMUTABLE` even for an unsealed map and estimated the remaining size
+  incorrectly. Copying an empty sealed map threw a `NullPointerException`, and `remove(Object)` on a sealed map only
+  threw `UnsupportedOperationException` if the key was present. An unsealed map now supports all optional `Map`
+  operations, including `replaceAll(...)`, `Entry.setValue(...)` and removal through its views and iterators.
+
+- `MessageUtil.trimAndNormalizeSpaces(String)` returned the unchanged string if trimming and normalizing did not change
+  its length, even when it contained space characters other than a regular space. The name validation methods of
+  `MessageUtil` processed UTF-16 characters instead of code points and could misjudge names with supplementary
+  characters.
+
+- `Parameters.getParameterValueAsEnum(...)` did not unwrap an `Optional` containing a constant of the requested enum
+  type and returned an empty result. The `Optional` is now unwrapped first, as for the other conversion methods.
+
+- The annotation adopter recorded visited classes under different keys for package scanning and for `adopt(Path)` or
+  `adopt(ClassLoader, Set<String>)`, so the same class could be adopted twice and fail with a duplicate definition.
+  Class directories whose path contains encoded characters, such as spaces, were not scanned. Scanning a jar file
+  closed the jar file cached by the JVM, which broke later class loading from that jar. A parse error in a
+  single-text `@TemplateDef` did not name the template.
+
+- `MessageSupportMessageSource` passed `MessageSourceResolvable` arguments to the message as objects instead of
+  resolving them, unlike Spring's `AbstractMessageSource`. They are now resolved lazily, when the message uses the
+  parameter. A `NoSuchMessageException` raised while resolving such an argument is propagated unwrapped.
+
+- The log messages created by `Log4jMessageFactory` returned `null` from `getFormat()`. They now return the message
+  format string.
+
+- The Gradle plugin failed when it was applied before the `java` plugin, and the pack task left a file handle open for
+  every scanned class file. The task tracked the duplicate strategy as given, so equal strategies in different
+  notations (`'fail'`, `'FAIL'` or `DuplicateStrategy.FAIL`) were different task inputs. The converted strategy is now
+  the input, and unknown strategies as well as invalid regular expressions in the filters are reported before the task
+  runs.

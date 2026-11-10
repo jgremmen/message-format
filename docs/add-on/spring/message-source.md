@@ -13,7 +13,8 @@ formatting capabilities without any code changes on the consumer side.
 ## Dependency
 
 The class is part of the `message-format-spring` module, which also contains the
-[SpEL formatter](../../formatter/parameter/named/spel.md). It requires Spring Framework 6.0.8 or later.
+[SpEL formatter](../../formatter/parameter/named/spel.md). It supports Spring Framework versions from 6.0.8 up to, but
+not including, 7.1.
 
 === "Gradle (Groovy)"
 
@@ -55,6 +56,13 @@ With the default prefix `p`, the first argument becomes `p1`, the second `p2`, t
 template that will be resolved through this message source references the arguments by their generated names.
 
 ```java
+import de.sayayi.lib.message.MessageSupport;
+import de.sayayi.lib.message.MessageSupportFactory;
+import de.sayayi.lib.message.formatter.DefaultFormatterService;
+import de.sayayi.lib.message.spring.MessageSupportMessageSource;
+
+import java.util.Locale;
+
 // Message registered with code "order.confirmation"
 // template: "Order %{p1} placed for %{p2} item(s)."
 

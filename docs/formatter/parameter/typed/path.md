@@ -17,6 +17,18 @@ delegated to the next available formatter.
 
 Outputs the path string as-is, exactly as `Path.toString()` returns it.
 
+The examples on this page use the following message support.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageSupportFactory;
+
+import java.io.File;
+import java.nio.file.Path;
+
+var messageSupport = MessageSupportFactory.createDefault();
+// all built-in formatters are available
+```
+
 ```java
 messageSupport
     .message("%{file}")

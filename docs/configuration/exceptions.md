@@ -28,6 +28,20 @@ RuntimeException
 beyond the standard constructors for a message string and an optional cause. Catching `MessageException` is a 
 convenient way to handle every error that originates from the library in one place:
 
+The examples on this page use the following message support.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageFactory;
+import de.sayayi.lib.message.MessageSupportFactory;
+import de.sayayi.lib.message.exception.MessageException;
+import de.sayayi.lib.message.exception.MessageFormatException;
+
+import java.util.Locale;
+
+var messageSupport = MessageSupportFactory.createDefault();
+// all built-in formatters are available
+```
+
 ```java
 messageSupport.addMessage("order-summary",
     "Total: %{total,number:'#,##0.00'}");
@@ -36,6 +50,7 @@ try {
   messageSupport
       .code("order-summary")
       .with("total", 1234.5)
+      .locale(Locale.US)
       .format();
   // "Total: 1,234.50"
 } catch(MessageException ex) {

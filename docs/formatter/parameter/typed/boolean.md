@@ -10,11 +10,25 @@ on values that are not inherently boolean.
 
 ## Map Key Types
 
-All boolean formatting, regardless of whether the formatter was selected by type or by name, supports the same four map
-key types: `bool`, `string`, `null` and `empty`.
+All boolean formatting, regardless of whether the formatter was selected by type or by name, supports the same three
+map key types: `bool`, `null` and `empty`.
 
 The **bool** keys `true` and `false` map the boolean value to custom text. This is the most common and recommended way
 to customize boolean output.
+
+The examples on this page use the following message support.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageSupportFactory;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BooleanSupplier;
+
+var messageSupport = MessageSupportFactory.createDefault();
+// all built-in formatters are available
+```
 
 ```java
 messageSupport
@@ -24,15 +38,15 @@ messageSupport
 // "enabled"
 ```
 
-**String** keys match against the string representation of the boolean value, although this is not recommended. Use
-`true` and `false` bool keys instead.
+**String** keys never match a boolean value, even if their text is `true` or `false`. The quoted key `'true'` is a
+string key, so a message that uses it instead of the bool key `true` produces the default output.
 
 ```java
 messageSupport
     .message("%{flag,'true':ja,'false':nein}")
     .with("flag", true)
     .format();
-// "ja"
+// "true"
 ```
 
 The **null** key matches when the parameter value is `null`. The **empty** key matches when the value cannot be 

@@ -26,6 +26,10 @@ The most common way to construct an adopter is by passing a `ConfigurableMessage
 message accessor, a single argument is sufficient:
 
 ```java
+import de.sayayi.lib.message.MessageSupportFactory;
+import de.sayayi.lib.message.adopter.ResourceBundleAdopter;
+import de.sayayi.lib.message.formatter.DefaultFormatterService;
+
 var messageSupport = MessageSupportFactory.create(
     DefaultFormatterService.getSharedInstance());
 

@@ -21,6 +21,17 @@ recognized:
 
 Encodes the byte array as a standard Base64 string without line breaks.
 
+The examples on this page use the following message support.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageSupportFactory;
+
+import java.nio.charset.StandardCharsets;
+
+var messageSupport = MessageSupportFactory.createDefault();
+// all built-in formatters are available
+```
+
 ```java
 messageSupport
     .message("%{data,bytes:base64}")

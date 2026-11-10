@@ -19,9 +19,56 @@ requires two methods to be implemented: `formatValue(context, value)`, which pro
 handles `null` and empty values through parameter map key matching before the `formatValue` method is called, so `value`
 is guaranteed to be non-null.
 
-The following example formats a hypothetical `Color` class by rendering its hex representation:
+The examples in this section use the following application class `Color`:
 
 ```java
+public class Color
+{
+  public static final Color ORANGE = new Color("orange", 255, 200, 0);
+
+  private final String name;
+  private final int red;
+  private final int green;
+  private final int blue;
+
+  public Color(int red, int green, int blue) {
+    this(null, red, green, blue);
+  }
+
+  public Color(String name, int red, int green, int blue)
+  {
+    this.name = name;
+    this.red = red;
+    this.green = green;
+    this.blue = blue;
+  }
+
+  public String getName() { return name; }
+  public int getRed() { return red; }
+  public int getGreen() { return green; }
+  public int getBlue() { return blue; }
+
+  public int getRGB() {
+    return (red << 16) | (green << 8) | blue;
+  }
+}
+```
+
+The following formatter renders a `Color` as its hex representation:
+
+```java
+import de.sayayi.lib.message.formatter.FormattableType;
+import de.sayayi.lib.message.formatter.parameter.AbstractParameterFormatter;
+import de.sayayi.lib.message.formatter.parameter.AbstractSingleTypeParameterFormatter;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
+import de.sayayi.lib.message.part.MessagePart.Text;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Set;
+
+import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
+
 public final class ColorFormatter
     extends AbstractSingleTypeParameterFormatter<Color>
 {
@@ -40,6 +87,22 @@ public final class ColorFormatter
     return new FormattableType(Color.class);
   }
 }
+```
+
+The formatter is registered on a new formatter service, as described in [Registration](#registration). The examples
+on this page use the following message support:
+
+```java
+import de.sayayi.lib.message.MessageSupportFactory;
+import de.sayayi.lib.message.formatter.DefaultFormatterService;
+
+import java.net.InetAddress;
+
+var formatterService = new DefaultFormatterService();
+formatterService.addFormatter(new ColorFormatter());
+
+var messageSupport = MessageSupportFactory.create(formatterService);
+// Color values are formatted by the ColorFormatter
 ```
 
 With this formatter registered, a message like `%{bg}` produces the color's hex code:
@@ -100,6 +163,27 @@ The built-in `ToTemporalDelegate` follows this pattern. It converts legacy date 
 a similar example: a family of measurement classes that share a common `Measurement` interface:
 
 ```java
+public interface Measurement
+{
+  double value();
+
+  String unit();
+}
+
+public record Weight(double value) implements Measurement {
+  public String unit() { return "kg"; }
+}
+
+public record Length(double value) implements Measurement {
+  public String unit() { return "m"; }
+}
+
+public record Temperature(double value) implements Measurement {
+  public String unit() { return "°C"; }
+}
+```
+
+```java
 public final class MeasurementFormatter
     extends AbstractParameterFormatter<Measurement>
 {
@@ -110,7 +194,7 @@ public final class MeasurementFormatter
   {
     // renders the measurement as "value unit", e.g. "3.5 kg"
     return noSpaceText(
-        measurement.getValue() + " " + measurement.getUnit());
+        measurement.value() + " " + measurement.unit());
   }
 
   @Override
@@ -126,6 +210,17 @@ public final class MeasurementFormatter
 
 All three types are now formatted by the same formatter instance. When the framework encounters a `Weight`, `Length` or
 `Temperature` value, it finds the `MeasurementFormatter` and calls its `formatValue` method.
+
+```java
+formatterService.addFormatter(new MeasurementFormatter());
+
+messageSupport
+    .message("Parcel: %{weight}, %{length}")
+    .with("weight", new Weight(3.5))
+    .with("length", new Length(0.8))
+    .format();
+// "Parcel: 3.5 kg, 0.8 m"
+```
 
 
 ## Reading Configuration Keys
@@ -177,20 +272,32 @@ public final class ColorFormatter
 }
 ```
 
-The message author controls the output by providing the `color` key:
+The extended formatter replaces the first version. Registered on a new formatter service, it lets the message author
+control the output by providing the `color` key:
 
 ```java
-messageSupport
+var colorService = new DefaultFormatterService();
+colorService.addFormatter(new ColorFormatter());
+
+var colorMessageSupport = MessageSupportFactory.create(colorService);
+
+colorMessageSupport
     .message("Hex: %{c,color:'hex'}")
     .with("c", Color.ORANGE)
     .format();
 // "Hex: #ffc800"
 
-messageSupport
+colorMessageSupport
     .message("RGB: %{c,color:'rgb'}")
     .with("c", Color.ORANGE)
     .format();
 // "RGB: 255,200,0"
+
+colorMessageSupport
+    .message("Name: %{c,color:'name'}")
+    .with("c", Color.ORANGE)
+    .format();
+// "Name: orange"
 ```
 
 Overriding `getParameterConfigNames()` to return the set of recognized key names is not strictly required for the
@@ -236,9 +343,11 @@ public final class HostAddressFormatter
 }
 ```
 
-The message author can now map well-known addresses to descriptive labels:
+After registering the formatter, the message author can map well-known addresses to descriptive labels:
 
 ```java
+formatterService.addFormatter(new HostAddressFormatter());
+
 messageSupport
     .message("""
         Connected to %{addr,\
@@ -334,13 +443,19 @@ if (value instanceof java.sql.Time)
      LocalTime.class);
 }
 if (value instanceof java.sql.Date)
-  return context.format(((java.sql.Date)value).toLocalDate(), LocalDate.class);
+  return context.format(((java.sql.Date)value).toLocalDate(),
+     LocalDate.class);
 ```
 
 The same technique works for any type conversion. For example, a formatter for a `Money` class could convert the 
 currency amount to a `Number` and delegate to the existing number formatter:
 
 ```java
+import java.math.BigDecimal;
+import java.util.Currency;
+
+public record Money(BigDecimal amount, Currency currency) {}
+
 public final class MoneyFormatter
     extends AbstractSingleTypeParameterFormatter<Money>
 {
@@ -350,11 +465,11 @@ public final class MoneyFormatter
       @NotNull Money money)
   {
     // delegate to the Number formatter for the amount
-    var amountText = context.format(money.getAmount(), Number.class);
+    var amountText = context.format(money.amount(), Number.class);
 
     // append the currency symbol
     return noSpaceText(
-        amountText.getText() + " " + money.getCurrency().getSymbol());
+        amountText.getText() + " " + money.currency().getSymbol());
   }
 
   @Override
@@ -392,12 +507,20 @@ If a formatter must be bound to a specific type regardless of what `getFormattab
 `addFormatterForType`:
 
 ```java
+public class MySpecialColor extends Color
+{
+  public MySpecialColor(int red, int green, int blue) {
+    super(red, green, blue);
+  }
+}
+
 formatterService.addFormatterForType(
     new FormattableType(MySpecialColor.class, 40),
     new ColorFormatter());
+// MySpecialColor values are formatted by this ColorFormatter instance
 ```
 
-This registers the `ColorFormatter` for `MySpecialColor` at order 40, even though the formatter's `getFormattableType()` 
+This registers the `ColorFormatter` for `MySpecialColor` at order 40, even though the formatter's `getFormattableType()`
 method returns `Color.class`. This is useful for reusing an existing formatter for a subclass at a different priority.
 
 /// warning | Custom supplier types

@@ -6,11 +6,10 @@ replaces Log4j's default message formatting with the full power of the message f
 statements with Log4j's `{}` placeholders, parameter references, map keys, templates and post formatters can be used 
 directly in log messages.
 
-The module consists of two classes. `Log4jMessageFactory` is the public entry point that is configured on loggers. It
-parses incoming log messages using the message format syntax and maps the positional arguments from Log4j's logging 
-methods to named parameters `p1`, `p2`, `p3` and so on. `Log4jMessage` is a package-private implementation of Log4j's 
-`Message` interface that evaluates the formatted result lazily, so the formatting work only happens if the log message 
-is actually written to an appender.
+The public entry point is `Log4jMessageFactory`, which is configured on loggers. It parses incoming log messages using
+the message format syntax and maps the positional arguments from Log4j's logging methods to named parameters `p1`,
+`p2`, `p3` and so on. The messages it creates evaluate the formatted result lazily, so the formatting work only happens
+if the log message is actually written to an appender.
 
 /// danger | Log Message Strings Must Be Constants
 `Log4jMessageFactory` parses every log message string as a message format string. A value concatenated into the
@@ -170,8 +169,8 @@ logger.debug("""
 
 ## Throwable Handling
 
-When the last argument passed to a log method is a `Throwable`, the factory attaches it to the returned `Log4jMessage` 
-so that Log4j can render the stack trace according to the configured layout pattern. The `Throwable` is still available
+When the last argument passed to a log method is a `Throwable`, the factory attaches it to the returned message so that
+Log4j can render the stack trace according to the configured layout pattern. The `Throwable` is still available
 as a regular parameter, so it can be referenced in the message text if needed.
 
 ```java
@@ -203,16 +202,13 @@ logger.warn("Step %{p1} failed: %{p2}. Retrying with %{p3}.",
 
 ## Lazy Formatting
 
-The `Log4jMessageFactory` produces `Log4jMessage` instances that evaluate the formatted message string lazily. The
-message format string is not parsed and the parameters are not formatted, until `getFormattedMessage()` is called by 
-the logging framework. This means that if a log statement's level is below the configured threshold, no formatting work 
-takes place at all.
+The `Log4jMessageFactory` produces messages that evaluate the formatted message string lazily. The message format
+string is not parsed and the parameters are not formatted until `getFormattedMessage()` is called by the logging
+framework. If a log statement's level is below the configured threshold, no formatting work takes place at all. The
+first call to `getFormattedMessage()` formats the message and caches the result, so subsequent calls return the cached
+text.
 
-Internally, the factory obtains a `Supplier<String>` from the message support's `formatSupplier()` method and wraps it
-in a caching delegate. The first call to `getFormattedMessage()` invokes the supplier and caches the result. Subsequent 
-calls return the cached value without re-evaluating the format expression.
-
-/// warning | Performance consideration
+/// tip | Performance consideration
 Using `Log4jMessageFactory` is slower than Log4j's default parameterized formatting. The message format engine parses 
 the format string, resolves named parameters and evaluates map keys, which involves considerably more work than simple 
 `{}` placeholder substitution. Lazy evaluation ensures that this cost is only paid when the message is actually written,
@@ -225,8 +221,8 @@ performance is critical.
 
 Existing codebases often contain log statements that already use Log4j's native `{}` placeholder syntax. To ease
 migration, the factory supports a fallback mode that is enabled by default. When the fallback is active, the factory
-inspects each message string before parsing it. If the string contains `{}` placeholders but does not contain any 
-message format markers (`%{`, `%[` or `%(`), the factory delegates formatting to Log4j's built-in `ParameterizedMessage` 
+inspects each message string before parsing it. If the string contains `{}` placeholders but does not contain any
+message format markers (`%{`, `%[` or `%(`), the factory delegates formatting to Log4j's built-in `ParameterizedMessage`
 instead of processing it through the message format engine.
 
 This means that the `Log4jMessageFactory` can be introduced to an existing logger without breaking any existing log 
@@ -307,17 +303,29 @@ described earlier.
 
 ## Error Handling
 
-If a message format string is syntactically invalid or if formatting fails for any other reason, the factory does not
-throw an exception. Instead, it returns a diagnostic placeholder string that includes the original message text. This
-prevents a broken log statement from crashing the application.
+If a message format string is syntactically invalid or if formatting fails with a runtime exception, the factory does
+not throw the exception. Instead, the log message contains a diagnostic placeholder string that includes the original
+message text. The exception itself is reported as a warning through Log4j's `StatusLogger`, together with the message
+text and the stack trace. This prevents a broken log statement from crashing the application.
 
 ```java
 logger.info("invalid %{}");
 // Output: "<internal error formatting: invalid %{}>"
+// StatusLogger: "failed to format message: invalid %{}" (warning)
 ```
 
 This behavior is intentional for a logging context, where reliability is more important than strict validation. The 
 diagnostic output makes it easy to spot and fix the problem without disrupting the application's runtime behavior.
+Status logger output is controlled by Log4j's own configuration, for example the `status` attribute of the
+`Configuration` element.
+
+Only runtime exceptions are handled this way. An `Error` thrown while formatting, such as an `OutOfMemoryError` or a
+`StackOverflowError`, is propagated to the logging call.
+
+/// note | Migration from 0.24
+Up to version 0.24.0, every `Throwable` thrown while formatting was replaced by the placeholder without being reported.
+Formatting failures now additionally appear as `StatusLogger` warnings, and an `Error` is no longer suppressed.
+///
 
 
 ## Constant Message Strings

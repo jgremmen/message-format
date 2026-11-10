@@ -65,6 +65,29 @@ The `MessageBuilder` fluent API can produce a `Template` directly by calling `bu
 operation instead of `build()`. This is useful when the template structure is determined at runtime or to avoid 
 embedding format strings in Java source.
 
+The examples on this page use the following message support.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageBuilder;
+import de.sayayi.lib.message.MessageFactory;
+import de.sayayi.lib.message.MessageSupportFactory;
+import de.sayayi.lib.message.formatter.DefaultFormatterService;
+import de.sayayi.lib.message.part.MessagePart.Text;
+import de.sayayi.lib.message.part.TextPartFactory;
+import de.sayayi.lib.message.template.AbstractNamedTemplate;
+import de.sayayi.lib.message.template.Template;
+import org.jetbrains.annotations.NotNull;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.util.Locale;
+import java.util.Map;
+
+var messageSupport = MessageSupportFactory.createDefault();
+// all built-in formatters are available
+```
+
 ```java
 Template template = MessageBuilder
     .create()
@@ -205,7 +228,7 @@ messageSupport
     .message("Report generated on %[current-date].")
     .locale(Locale.US)
     .format();
-// "Report generated on Jun 9, 2026."
+// "Report generated on Jun 9, 2026." when formatted on June 9, 2026
 ```
 
 

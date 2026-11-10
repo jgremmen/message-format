@@ -9,6 +9,18 @@ matches, the corresponding mapped message is used. If no key matches and a defau
 default is used. Otherwise, the charset's locale-sensitive display name as returned by
 `Charset.displayName(Locale)` is the final fallback.
 
+The examples on this page use the following message support.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageSupportFactory;
+
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+
+var messageSupport = MessageSupportFactory.createDefault();
+// all built-in formatters are available
+```
+
 ```java
 messageSupport
     .message("Encoding: %{cs}")

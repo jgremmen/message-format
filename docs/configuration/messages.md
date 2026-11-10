@@ -80,6 +80,15 @@ The `parseMessage(String)` method parses a message format string and returns a `
 caching enabled, previously parsed strings are served from the cache:
 
 ```java
+import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.MessageBuilder;
+import de.sayayi.lib.message.MessageFactory;
+import de.sayayi.lib.message.MessageSupportFactory;
+import de.sayayi.lib.message.formatter.DefaultFormatterService;
+
+import java.util.Locale;
+import java.util.Map;
+
 MessageFactory factory = MessageFactory.getSharedInstance();
 
 Message.WithSpaces msg = factory.parseMessage("Order %{orderId} placed.");
@@ -288,7 +297,8 @@ Message.WithSpaces msg = MessageBuilder
         .mapDefault().message("%{name}")
         .spaceBefore()
     .build();
-// Equivalent format string: "Name: %{name,null:'(not provided)',empty:'(blank)',:'%{name}'}"
+// Equivalent format string:
+//   "Name: %{name,null:'(not provided)',empty:'(blank)',:'%{name}'}"
 ```
 
 Configuration values can be attached to a parameter through `configString`, `configBool`, `configNumber` and 

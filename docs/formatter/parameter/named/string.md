@@ -13,6 +13,15 @@ Its purpose is to force string conversion on any value, regardless of its Java t
 The named `string` formatter converts any non-null value to its string representation using `String.valueOf(value)`.
 For `CharSequence` and `char[]` values this is their text content; for all other types it is the result of `toString()`.
 
+The examples on this page use the following message support.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageSupportFactory;
+
+var messageSupport = MessageSupportFactory.createDefault();
+// all built-in formatters are available
+```
+
 ```java
 messageSupport
     .message("%{policy,format:string}")

@@ -10,6 +10,18 @@ The formatter unwraps the reference by calling `get()` and delegates all formatt
 the referenced object's type. If the referenced object has been garbage collected (meaning `get()` returns `null`), the
 value is treated as `null`.
 
+The examples on this page use the following message support.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageSupportFactory;
+
+import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
+
+var messageSupport = MessageSupportFactory.createDefault();
+// all built-in formatters are available
+```
+
 ```java
 WeakReference<String> ref = new WeakReference<>("hello");
 

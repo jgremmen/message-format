@@ -17,6 +17,23 @@ many map keys the value is compared with, as with [`choice`](../named/choice.md)
 referenced in the message. The selected map entry and the formatted text are therefore always based on the same
 value, even for suppliers that return a different value on each call, such as a counter, a clock or a random value.
 
+The examples on this page use the following message support.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageSupportFactory;
+
+import java.util.Locale;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
+import java.util.function.IntSupplier;
+import java.util.function.LongSupplier;
+import java.util.function.Supplier;
+
+var messageSupport = MessageSupportFactory.createDefault();
+// all built-in formatters are available
+```
+
 ```java
 var calls = new AtomicInteger();
 Supplier<Integer> level = () -> {
@@ -74,7 +91,8 @@ public final class FreeMemory implements LongSupplier
   }
 }
 
-formatterService.addFormatter(new FreeMemoryFormatter());  // registered for FreeMemory.class
+// registered for FreeMemory.class
+formatterService.addFormatter(new FreeMemoryFormatter());
 
 messageSupport
     .message("%{mem}")
@@ -252,6 +270,7 @@ DoubleSupplier pi = () -> Math.PI;
 messageSupport
     .message("Pi: %{pi}")
     .with("pi", pi)
+    .locale(Locale.US)
     .format();
 // "Pi: 3.142"
 ```

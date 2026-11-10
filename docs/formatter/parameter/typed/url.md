@@ -26,6 +26,18 @@ The `url` configuration key controls which component of the URL to display:
 When the `url` configuration key is absent or set to `external`, the formatter outputs the complete URL in its external
 form.
 
+The examples on this page use the following message support.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageSupportFactory;
+
+import java.net.URI;
+import java.net.URL;
+
+var messageSupport = MessageSupportFactory.createDefault();
+// all built-in formatters are available
+```
+
 ```java
 messageSupport
     .message("%{u}")

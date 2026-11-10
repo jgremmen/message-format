@@ -19,6 +19,17 @@ string using the standard list configuration keys.
 The default mode is `lsb-set` (least significant bit first). The `msb-set` mode can also be used to output set bits from
 highest to lowest.
 
+The examples on this page use the following message support.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageSupportFactory;
+
+import java.util.BitSet;
+
+var messageSupport = MessageSupportFactory.createDefault();
+// all built-in formatters are available
+```
+
 ```java
 BitSet permissions = new BitSet();
 permissions.set(0);

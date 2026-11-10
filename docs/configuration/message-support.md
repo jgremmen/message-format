@@ -21,6 +21,16 @@ is convenient for simple scenarios that only require inline message formatting a
 customize configuration:
 
 ```java
+import de.sayayi.lib.message.MessageFactory;
+import de.sayayi.lib.message.MessageSupport;
+import de.sayayi.lib.message.MessageSupportFactory;
+import de.sayayi.lib.message.exception.DuplicateMessageException;
+import de.sayayi.lib.message.formatter.DefaultFormatterService;
+import de.sayayi.lib.message.template.Template;
+
+import java.util.Locale;
+import java.util.Set;
+
 MessageSupport shared = MessageSupportFactory.shared();
 
 String text = shared
@@ -232,7 +242,7 @@ MessageSupport.MessageAccessor accessor =
     messageSupport.getMessageAccessor();
 ```
 
-Through the accessor the current state of the message support can be inspected without risk of modification. It provides 
+Through the accessor the current state of the message support can be inspected without risk of modification. It provides
 methods to query messages by code, list all registered message codes, check whether a message exists, look up
 formatters, retrieve default configuration values and access the `MessageFactory`.
 

@@ -16,6 +16,24 @@ automatically selected whenever a parameter value implements `Temporal`.
 The formatter automatically detects whether the temporal value supports date fields, time fields, or both and adjusts
 the output accordingly. All formatting is locale-aware.
 
+The examples on this page use the following message support.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageSupportFactory;
+
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.YearMonth;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.Locale;
+
+var messageSupport = MessageSupportFactory.createDefault();
+// all built-in formatters are available
+```
+
 ```java
 messageSupport
     .message("%{date}")

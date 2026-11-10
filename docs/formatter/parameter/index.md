@@ -24,10 +24,22 @@ type of the parameter value. When a `double` value is passed into a message, the
 finds the `NumberFormatter` registered for numeric types and uses it to produce the text. No special syntax is required
 in the message format string.
 
+The examples on this page use the following message support.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageSupportFactory;
+
+import java.util.Locale;
+
+var messageSupport = MessageSupportFactory.createDefault();
+// all built-in formatters are available
+```
+
 ```java
 messageSupport
     .message("Total: %{amount}")
     .with("amount", 49.95)
+    .locale(Locale.US)
     .format();
 // "Total: 49.95"
 ```

@@ -16,6 +16,19 @@ The named `bool` formatter accepts the following types and applies these convers
 `false` when the value is zero and `true` when the value is non-zero. The sign of the number does not matter, only 
 whether it equals zero.
 
+The examples on this page use the following message support.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageSupportFactory;
+
+import java.util.Optional;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
+
+var messageSupport = MessageSupportFactory.createDefault();
+// all built-in formatters are available
+```
+
 ```java
 messageSupport
     .message("%{count,format:bool,true:'has items',false:'empty'}")
@@ -102,7 +115,7 @@ messageSupport
 
 ## Map Key Types
 
-The named `bool` formatter supports four map key types: `bool`, `string`, `null` and `empty`.
+The named `bool` formatter supports three map key types: `bool`, `null` and `empty`.
 
 The **bool** keys `true` and `false` are the most common way to customize the output. They map the converted boolean
 value to custom text.
@@ -115,18 +128,24 @@ messageSupport
 // "on"
 ```
 
-**String** keys match against the string representation of the converted boolean value, although this is not 
-recommended. Use `true` and `false` bool keys instead.
+The **null** key matches when the parameter value is `null`.
+
+**String** keys never match the converted value, even if their text is `true` or `false`. The quoted key `'true'` is a
+string key, not a bool key. A parameter that only has string keys therefore produces the default output.
 
 ```java
 messageSupport
     .message("%{b,format:bool,'false':nein,'true':ja}")
     .with("b", "true")
     .format();
+// "true"
+
+messageSupport
+    .message("%{b,format:bool,false:nein,true:ja}")
+    .with("b", "true")
+    .format();
 // "ja"
 ```
-
-The **null** key matches when the parameter value is `null`.
 
 
 ## The `empty` Map Key
@@ -135,7 +154,7 @@ Because the named `bool` formatter coerces non-boolean types, the conversion can
 considered empty. This is the key distinction from the type-based formatters, where the value is always a valid boolean 
 and the `empty` key never matches.
 
-For example, a string that is neither a boolean literal nor a valid number cannot be converted to a boolean. The `empty` 
+For example, a string that is neither a boolean literal nor a valid number cannot be converted to a boolean. The `empty`
 key catches these cases. Its negated form `!empty` matches any value that was successfully converted.
 
 ```java

@@ -38,6 +38,14 @@ named formatter shines: the parameter value is a plain number, but the desired o
 numbers are normally formatted.
 
 ```java
+import de.sayayi.lib.message.formatter.parameter.NamedParameterFormatter;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
+import de.sayayi.lib.message.part.MessagePart.Text;
+
+import org.jetbrains.annotations.NotNull;
+
+import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
+
 public final class ElapsedNamedFormatter implements NamedParameterFormatter
 {
   @Override
@@ -77,6 +85,22 @@ public final class ElapsedNamedFormatter implements NamedParameterFormatter
     return noSpaceText(sb.toString());
   }
 }
+```
+
+The examples on this page register their formatters on a new formatter service, as described in
+[Registration](#registration):
+
+```java
+import de.sayayi.lib.message.MessageSupportFactory;
+import de.sayayi.lib.message.formatter.DefaultFormatterService;
+
+import java.util.Locale;
+
+var formatterService = new DefaultFormatterService();
+formatterService.addFormatter(new ElapsedNamedFormatter());
+
+var messageSupport = MessageSupportFactory.create(formatterService);
+// format:elapsed is available in addition to the default formatters
 ```
 
 With this formatter registered, the message author can render a millisecond count as a readable time span:
@@ -129,6 +153,11 @@ The following example formats a numeric value as a percentage string. It extends
 so that `null` handling is automatic, and it restricts itself to numeric types through `canFormat`:
 
 ```java
+import de.sayayi.lib.message.formatter.FormattableType;
+import de.sayayi.lib.message.formatter.parameter.AbstractParameterFormatter;
+
+import java.util.Set;
+
 public final class PercentNamedFormatter
     extends AbstractParameterFormatter<Number>
     implements NamedParameterFormatter
@@ -171,12 +200,15 @@ public final class PercentNamedFormatter
 }
 ```
 
-The message author can now format any numeric value as a percentage:
+After registering the formatter, the message author can format any numeric value as a percentage:
 
 ```java
+formatterService.addFormatter(new PercentNamedFormatter());
+
 messageSupport
     .message("Progress: %{ratio,format:percent}")
     .with("ratio", 0.732)
+    .locale(Locale.US)
     .format();
 // "Progress: 73.2%"
 ```
@@ -239,6 +271,11 @@ The built-in `GeoFormatter` uses this mechanism. It declares a configuration key
 message that contains the `geo` configuration key activates the geo formatter without needing `format:geo`:
 
 ```java
+import de.sayayi.lib.message.formatter.parameter.named.extra.GeoFormatter;
+
+// GeoFormatter is not registered by default
+formatterService.addFormatter(new GeoFormatter());
+
 // explicit selection (always works)
 messageSupport
     .message("Position: %{lat,format:geo,geo:'latitude'}")
@@ -311,11 +348,14 @@ public final class CurrencyNamedFormatter
 With this formatter registered, the message author can write:
 
 ```java
+formatterService.addFormatter(new CurrencyNamedFormatter());
+
 messageSupport
     .message("Total: %{amount,currency:'EUR'}")
     .with("amount", 42.50)
+    .locale(Locale.US)
     .format();
-// "Total: €42.50" (assuming en_US locale)
+// "Total: €42.50"
 ```
 
 The `currency` configuration key triggers auto-apply, so the `CurrencyNamedFormatter` is selected without 
@@ -407,9 +447,9 @@ through `format:<name>`, it creates a formatter chain that contains only that si
 intentional because the message author has explicitly chosen a specific formatter and there is no meaningful "next" 
 formatter to fall back to.
 
-If a named formatter needs to delegate formatting to a different type's formatter, use the `context.format(value, type)` 
-method instead. This performs a fresh formatter lookup for the given type and applies it to the value. The 
-`BitmaskFormatter` built into the library uses this technique: it converts a numeric value to a `BitSet` and then 
+If a named formatter needs to delegate formatting to a different type's formatter, use the `context.format(value, type)`
+method instead. This performs a fresh formatter lookup for the given type and applies it to the value. The
+`BitmaskFormatter` built into the library uses this technique: it converts a numeric value to a `BitSet` and then
 delegates to the `BitSet` formatter:
 
 ```java
@@ -432,11 +472,26 @@ Named formatters can use map entries in the parameter configuration just like ty
 `formatUsingMappedString` and `formatUsingMappedNumber` convenience methods and the `getMapMessage` method on the
 context are all available. This lets the message author map specific formatted values to custom output.
 
-The following example creates a named formatter for a hypothetical application-specific `Priority` enum. It converts 
-the enum's numeric level to a string and uses `formatUsingMappedNumber` so that the message author can map individual
-levels to custom labels:
+The following example creates a named formatter for an application-specific `Priority` enum. It converts the enum's
+numeric level to a string and uses `formatUsingMappedNumber` so that the message author can map individual levels to
+custom labels:
 
 ```java
+public enum Priority
+{
+  LOW(1), MEDIUM(2), HIGH(3), CRITICAL(5);
+
+  private final int level;
+
+  Priority(int level) {
+    this.level = level;
+  }
+
+  public int getLevel() {
+    return level;
+  }
+}
+
 public final class PriorityNamedFormatter 
     implements NamedParameterFormatter
 {
@@ -469,6 +524,8 @@ public final class PriorityNamedFormatter
 The message author can now map priority levels to descriptive labels:
 
 ```java
+formatterService.addFormatter(new PriorityNamedFormatter());
+
 messageSupport
     .message("""
         %{p,format:priority,1:'low',2:'medium',3:'high',:'unclassified'}\

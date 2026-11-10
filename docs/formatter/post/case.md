@@ -10,6 +10,17 @@ dotless I distinction.
 Setting the `case` configuration key to `upper` or `uppercase` converts all characters in the
 text to their uppercase equivalent.
 
+The examples on this page use the following message support.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageSupportFactory;
+
+import java.util.Locale;
+
+var messageSupport = MessageSupportFactory.createDefault();
+// all built-in formatters are available
+```
+
 ```java
 messageSupport
     .message("%(case,'%{name}',case:upper)")

@@ -11,6 +11,19 @@ The maximum length is specified by the `clip` configuration key as a numeric val
 exceeds this length, it is truncated and an ellipsis character (`…`) is appended by default to signal that the text was
 cut short.
 
+The examples on this page use the following message support.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageFactory;
+import de.sayayi.lib.message.MessageSupportFactory;
+import de.sayayi.lib.message.formatter.DefaultFormatterService;
+
+import java.util.Locale;
+
+var messageSupport = MessageSupportFactory.createDefault();
+// all built-in formatters are available
+```
+
 ```java
 messageSupport
     .message("%(clip,'%{title}',clip:20)")
@@ -45,7 +58,7 @@ messageSupport
     .message("%(clip,'%{name}',clip:4,clip-suffix:false)")
     .with("name", "Cafe\u0301 au lait")
     .format();
-// "Café"
+// "Café" (still "Cafe\u0301", the accent stays attached)
 ```
 
 ```java
@@ -173,14 +186,17 @@ To control the suffix behavior consistently across all messages without repeatin
 formatter invocation, global defaults can be set on the `ConfigurableMessageSupport` instance using `setDefaultConfig`. 
 These defaults apply whenever a configuration key is not explicitly provided in the message itself.
 
+The following examples use a separate message support for the global defaults, so the other examples on this page
+keep the built-in default of `clip-suffix`.
+
 ```java
-var messageSupport = MessageSupportFactory
-    .create(new DefaultFormatterService(), MessageFactory.getSharedInstance());
+var globalSupport = MessageSupportFactory.create(
+    new DefaultFormatterService(), MessageFactory.getSharedInstance());
 
 // Globally disable the ellipsis suffix
-messageSupport.setDefaultConfig("clip-suffix", false);
+globalSupport.setDefaultConfig("clip-suffix", false);
 
-messageSupport
+globalSupport
     .message("%(clip,'%{text}',clip:10)")
     .with("text", "Hello World, this is too long")
     .format();
@@ -192,10 +208,10 @@ and overridden selectively where needed.
 
 ```java
 // Global default: suffix disabled
-messageSupport.setDefaultConfig("clip-suffix", false);
+globalSupport.setDefaultConfig("clip-suffix", false);
 
 // This message overrides the global default
-messageSupport
+globalSupport
     .message("%(clip,'%{text}',clip:10,clip-suffix:true)")
     .with("text", "Hello World, this is too long")
     .format();

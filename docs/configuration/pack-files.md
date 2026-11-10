@@ -10,6 +10,28 @@ message format strings on every application start.
 The `exportMessages` method on `MessageSupport` writes all published messages and the templates they reference to an 
 `OutputStream`.
 
+The examples on this page use the following message support.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageFactory;
+import de.sayayi.lib.message.MessageSupportFactory;
+import de.sayayi.lib.message.util.MessageUtil;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FilterInputStream;
+import java.io.FilterOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.function.Predicate;
+
+var messageSupport = MessageSupportFactory.createDefault();
+// all built-in formatters are available
+```
+
 ```java
 messageSupport.addMessage("order.placed", "Order %{orderId} placed.");
 
@@ -100,7 +122,8 @@ try(var zip = new ZipOutputStream(new FileOutputStream("bundle.zip"))) {
   messageSupport.exportMessages(new FilterOutputStream(zip) {
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
-      out.write(b, off, len);  // FilterOutputStream writes byte by byte otherwise
+      // FilterOutputStream writes byte by byte otherwise
+      out.write(b, off, len);
     }
 
     @Override

@@ -49,6 +49,25 @@ selection.
 
 ## Basic Usage
 
+The `spel` formatter is not registered automatically (see [Registration](#registration)). The examples on this page
+use a message support whose formatter service contains the default formatters and the `spel` formatter.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageSupportFactory;
+import de.sayayi.lib.message.formatter.DefaultFormatterService;
+import de.sayayi.lib.message.spring.formatter.SpELFormatter;
+
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
+var formatterService = new DefaultFormatterService();
+formatterService.addFormatter(new SpELFormatter());
+
+var messageSupport = MessageSupportFactory.create(formatterService);
+// format:spel, spel-expr and spel-format are available
+```
+
 Consider a `Map<String,Integer>` passed as a parameter. To extract a specific entry from the map, a SpEL expression 
 that navigates the map's entry set can be written.
 
@@ -84,7 +103,7 @@ map.put("D", -8);
 messageSupport
     .message("""
         %{map,format:spel,\
-            spel-expr:'entrySet().toArray()[0].value',
+            spel-expr:'entrySet().toArray()[0].value',\
             spel-format:bool,\
             false:no,\
             true:yes}\
@@ -126,12 +145,25 @@ The evaluation context's `lookupVariable` method resolves variable references by
 value from the message context.
 
 ```java
+public class Order
+{
+  private final List<String> items;
+
+  public Order(List<String> items) {
+    this.items = items;
+  }
+
+  public List<String> getItems() {
+    return items;
+  }
+}
+
 messageSupport
     .message("%{order,spel-expr:'items.get(#index)'}")
-    .with("order", order)
-    .with("index", 0)
+    .with("order", new Order(List.of("Widget", "Gadget")))
+    .with("index", 1)
     .format();
-// the first item from the order's items list
+// "Gadget"
 ```
 
 This allows expressions to be data-driven, with the extraction logic parameterized by other message values.
@@ -145,9 +177,29 @@ Variable assignment is **not** supported. Any attempt to use `#var = value` in a
 ## Property Access
 
 The SpEL evaluation context uses `DataBindingPropertyAccessor` in read-only mode. This means JavaBean properties on the
-root object can be accessed using the standard dot notation.
+root object can be accessed using the standard dot notation. The following examples use a class with JavaBean getters.
 
 ```java
+public class Person
+{
+  private final String firstName;
+  private final String lastName;
+
+  public Person(String firstName, String lastName)
+  {
+    this.firstName = firstName;
+    this.lastName = lastName;
+  }
+
+  public String getFirstName() {
+    return firstName;
+  }
+
+  public String getLastName() {
+    return lastName;
+  }
+}
+
 messageSupport
     .message("Name: %{person,spel-expr:'firstName'}")
     .with("person", new Person("Alice", "Smith"))
@@ -304,12 +356,28 @@ rejected.
 
 ## Null Handling
 
-When the parameter value is `null`, the SpEL expression is not evaluated. A `null` map key can be provided to produce
-specific output for that case.
+When the parameter value is `null`, the SpEL expression is not evaluated and the result is empty text. This also
+applies when the parameter has a `null` map entry: as soon as `spel-expr` or `spel-format` is present, the `null` entry
+is not used.
 
 ```java
 messageSupport
     .message("%{data,spel-expr:'toString()',null:'no data'}")
+    .with("data", null)
+    .format();
+// ""
+```
+
+Text for a missing value is therefore placed in a separate parameter reference without SpEL configuration. The
+following message references `data` twice. The first reference evaluates the expression, the second one only produces
+text when the value is `null`.
+
+```java
+messageSupport
+    .message("""
+        %{data,spel-expr:'size()'}\
+        %{data,null:'no data',!null:''}\
+        """)
     .with("data", null)
     .format();
 // "no data"

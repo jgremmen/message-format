@@ -10,6 +10,17 @@ The formatter extracts the throwable's localized message by calling `getLocalize
 formatting of that string to the string formatter. This means the output is the exception's message text and all map
 keys and behavior that apply to string values work transparently.
 
+The examples on this page use the following message support.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageSupportFactory;
+
+import java.io.IOException;
+
+var messageSupport = MessageSupportFactory.createDefault();
+// all built-in formatters are available
+```
+
 ```java
 messageSupport
     .message("Error: %{ex}")

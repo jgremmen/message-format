@@ -9,6 +9,15 @@ default formatter, the fallback used for any value type that has no specific for
 By default, the formatter outputs the string representation of the parameter value. For `CharSequence` and `char[]`
 values this is their text content; for all other types it is the result of `String.valueOf(value)`.
 
+The examples on this page use the following message support.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageSupportFactory;
+
+var messageSupport = MessageSupportFactory.createDefault();
+// all built-in formatters are available
+```
+
 ```java
 messageSupport
     .message("%{name}")

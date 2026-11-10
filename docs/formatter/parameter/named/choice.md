@@ -18,6 +18,15 @@ The simplest use case is mapping specific values to specific text. The following
 a word. Because `choice` never outputs the value itself, a value of `0` produces an empty string since it does
 not match either key.
 
+The examples on this page use the following message support.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageSupportFactory;
+
+var messageSupport = MessageSupportFactory.createDefault();
+// all built-in formatters are available
+```
+
 ```java
 messageSupport
     .message("%{n,format:choice,<0:'negative',>0:'positive'}")

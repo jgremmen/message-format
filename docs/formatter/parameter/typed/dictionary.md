@@ -21,6 +21,18 @@ or a boolean value.
 A string key performs a direct lookup in the dictionary. If the string is a single character and no entry is found, a
 second lookup with the `char` value is attempted.
 
+The examples on this page use the following message support.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageSupportFactory;
+
+import java.util.Hashtable;
+import java.util.Properties;
+
+var messageSupport = MessageSupportFactory.createDefault();
+// all built-in formatters are available
+```
+
 ```java
 Hashtable<String, String> config = new Hashtable<>();
 config.put("host", "localhost");

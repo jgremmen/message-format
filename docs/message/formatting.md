@@ -23,6 +23,20 @@ If a message has been published to the message support (for example through anno
 can be referenced by its code. The `code` method looks up the message and returns a configurer for it.
 
 ```java
+import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.MessageFactory;
+import de.sayayi.lib.message.MessageSupportFactory;
+import de.sayayi.lib.message.formatter.DefaultFormatterService;
+
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalInt;
+import java.util.function.IntSupplier;
+import java.util.function.Supplier;
+
 var messageSupport = MessageSupportFactory.create(
     DefaultFormatterService.getSharedInstance());
 
@@ -97,15 +111,16 @@ throws an `IllegalArgumentException`.
 ```java
 String text = messageSupport
     .message("""
-        %{product} costs %{price} and has %{inStock,\
+        %{product} costs %{price} and is %{inStock,\
             true:'in stock',\
             false:'sold out'}.\
         """)
     .with("product", "Widget")
     .with("price", 29.95)
     .with("inStock", true)
+    .locale(Locale.US)
     .format();
-// "Widget costs 29.95 and has in stock."
+// "Widget costs 29.95 and is in stock."
 ```
 
 ### Bulk Parameters from a Map

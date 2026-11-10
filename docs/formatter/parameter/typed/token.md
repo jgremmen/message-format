@@ -16,10 +16,31 @@ Because the `TokenFormatter` is not part of the default formatter set, it must b
 service before use. The ANTLR runtime dependency must be on the classpath.
 
 ```java
+import de.sayayi.lib.message.MessageSupportFactory;
+import de.sayayi.lib.message.formatter.DefaultFormatterService;
+import de.sayayi.lib.message.formatter.parameter.runtime.extra.TokenFormatter;
+
+import org.antlr.v4.runtime.CommonToken;
+
 var formatterService = new DefaultFormatterService();
 formatterService.addFormatter(new TokenFormatter());
 
 var messageSupport = MessageSupportFactory.create(formatterService).seal();
+// tokens are formatted by the TokenFormatter
+```
+
+The examples on this page format the following tokens. A lexer creates them with the same properties: the token type,
+the matched text, the line (starting at 1) and the character position within the line (starting at 0).
+
+```java
+var token = new CommonToken(5, "bloolean");
+token.setLine(1);
+token.setCharPositionInLine(2);
+
+var errorToken = new CommonToken(9, ";");
+errorToken.setLine(3);
+errorToken.setCharPositionInLine(12);
+// both tokens are on the default channel 0
 ```
 
 
@@ -73,7 +94,7 @@ messageSupport
     .message("token type: %{t,token:type}")
     .with("t", token)
     .format();
-// "token type: 5"  (the actual number depends on the grammar)
+// "token type: 5"
 ```
 
 ```java
@@ -210,9 +231,9 @@ configurableMessageSupport.setDefaultConfig(
     "token-position-format",
     factory.parseMessage("(%{line}, %{column})"));
 
-var messageSupport = configurableMessageSupport.seal();
+var positionSupport = configurableMessageSupport.seal();
 
-messageSupport
+positionSupport
     .message("at %{t,token:position}")
     .with("t", token)
     .format();

@@ -7,10 +7,12 @@ implement to tell the engine how a value of type `T` compares against each kind 
 
 Every built-in formatter that supports map key matching already implements `MapKeyComparator`. The `NumberFormatter`,
 for example, knows how to compare a `Number` value against number keys, string keys that contain numeric text and bool
-keys where zero maps to `false`. To create a custom formatter for another type and have map entries work with that type,
-implement `MapKeyComparator` in that formatter. The interface provides a default `format` method that delegates to the
-next formatter in the chain, so a formatter that only contributes map key comparison logic does not need to implement 
-formatting at all.
+keys where zero maps to `false`. Which key types are actually evaluated is decided by the formatter that looks up the
+map message: the number formatter itself only evaluates number keys, while a selecting formatter such as `choice` also
+evaluates bool and string keys (see [Number](../parameter/typed/number.md#bool-and-string-keys)). To create a custom
+formatter for another type and have map entries work with that type, implement `MapKeyComparator` in that formatter. The
+interface provides a default `format` method that delegates to the next formatter in the chain, so a formatter that only
+contributes map key comparison logic does not need to implement formatting at all.
 
 
 ## The Interface
@@ -108,9 +110,59 @@ additionally implements `MapKeyComparator<T>`. It overrides only the comparison 
 The following example creates a formatter for an `HttpStatus` class that wraps an HTTP status code. The formatter 
 renders the status as its code number by default, but map entries allow the message author to provide custom labels for 
 specific codes. The comparator supports number keys (matched against the numeric code) and string keys (matched against
-the reason phrase):
+the reason phrase). The status class itself is an application class:
 
 ```java
+import java.util.Map;
+
+public final class HttpStatus
+{
+  private static final Map<Integer,String> REASON_PHRASES = Map.of(
+      200, "OK",
+      301, "Moved Permanently",
+      404, "Not Found",
+      503, "Service Unavailable");
+
+  private final int code;
+  private final String reasonPhrase;
+
+  private HttpStatus(int code, String reasonPhrase)
+  {
+    this.code = code;
+    this.reasonPhrase = reasonPhrase;
+  }
+
+  public static HttpStatus of(int code) {
+    return new HttpStatus(code, REASON_PHRASES.get(code));
+  }
+
+  public static HttpStatus of(int code, String reasonPhrase) {
+    return new HttpStatus(code, reasonPhrase);
+  }
+
+  public int getCode() { return code; }
+  public String getReasonPhrase() { return reasonPhrase; }
+}
+```
+
+```java
+import de.sayayi.lib.message.formatter.FormattableType;
+import de.sayayi.lib.message.formatter.parameter.AbstractSingleTypeParameterFormatter;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ComparatorContext;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.MapKeyComparator;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
+import de.sayayi.lib.message.part.MapKey;
+import de.sayayi.lib.message.part.MapKey.MatchResult;
+import de.sayayi.lib.message.part.MessagePart.Text;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Set;
+
+import static de.sayayi.lib.message.part.MapKey.MatchResult.Defined.*;
+import static de.sayayi.lib.message.part.MapKey.MatchResult.forEmptyKey;
+import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
+
 public final class HttpStatusFormatter
     extends AbstractSingleTypeParameterFormatter<HttpStatus>
     implements MapKeyComparator<HttpStatus>
@@ -169,6 +221,20 @@ each number and string key through the comparator methods of this formatter. Pas
 example the code as a `long` through `formatUsingMappedNumber`, would compare that value with the comparators of its
 own type, so the `compareTo...Key` methods of this class would never be called and string keys would not match the
 reason phrase.
+
+The formatter is registered on a new formatter service, as described in [Registration](#registration). The examples
+on this page use the following message support:
+
+```java
+import de.sayayi.lib.message.MessageSupportFactory;
+import de.sayayi.lib.message.formatter.DefaultFormatterService;
+
+var formatterService = new DefaultFormatterService();
+formatterService.addFormatter(new HttpStatusFormatter());
+
+var messageSupport = MessageSupportFactory.create(formatterService);
+// HttpStatus values are formatted by the HttpStatusFormatter
+```
 
 With this formatter registered, the message author can map individual status codes to labels:
 
@@ -318,9 +384,33 @@ produce the output text.
 This approach is useful when the existing formatter cannot be modified, or when the comparison logic is orthogonal to
 the formatting logic and the two are best kept in separate classes.
 
-The following example adds string key comparison to a hypothetical `Country` type. The existing formatter already 
-renders `Country` objects as their display name. The standalone comparator adds the ability to match against ISO 
-country codes in map entries:
+The following example adds string key comparison to an application `Country` type. Its `toString()` method returns
+the English display name, so the string formatter already renders `Country` objects as their display name. The
+standalone comparator adds the ability to match against ISO country codes in map entries:
+
+```java
+import java.util.Locale;
+
+public record Country(String isoCode)
+{
+  public static Country of(String isoCode) {
+    return new Country(isoCode);
+  }
+
+  public String getIsoCode() {
+    return isoCode;
+  }
+
+  public String getDisplayName(Locale locale) {
+    return Locale.of("", isoCode).getDisplayCountry(locale);
+  }
+
+  @Override
+  public String toString() {
+    return getDisplayName(Locale.ENGLISH);
+  }
+}
+```
 
 ```java
 public final class CountryMapKeyComparator
@@ -364,9 +454,11 @@ public final class CountryMapKeyComparator
 Because the default `format` method delegates to the next formatter in the chain, the existing `Country` formatter 
 continues to produce the output text. The standalone comparator only participates in map key resolution.
 
-With both the formatter and the comparator registered, the message author can use map entries to map country codes:
+With the comparator registered, the message author can use map entries to map country codes:
 
 ```java
+formatterService.addFormatter(new CountryMapKeyComparator());
+
 messageSupport
     .message("""
         %{country,'US':'United States','DE':'Germany','FR':'France',:'Other'}\

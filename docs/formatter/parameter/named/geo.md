@@ -36,6 +36,23 @@ The `geo` configuration key accepts the following predefined format names.
 | `medium-latitude` | `51°34'9.0"N`   | Degrees, minutes and seconds with 1 decimal place  |
 | `long-latitude`   | `51°34'9.000"N` | Degrees, minutes and seconds with 3 decimal places |
 
+The examples on this page use the following message support. Its formatter service contains the default formatters and
+the `GeoFormatter`, which is not registered by default.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageSupportFactory;
+import de.sayayi.lib.message.formatter.DefaultFormatterService;
+import de.sayayi.lib.message.formatter.parameter.named.extra.GeoFormatter;
+
+import java.util.Locale;
+
+var formatterService = new DefaultFormatterService();
+formatterService.addFormatter(new GeoFormatter());
+
+var messageSupport = MessageSupportFactory.create(formatterService);
+// the default formatters and the GeoFormatter are available
+```
+
 ```java
 messageSupport
     .message("coordinates %{lon,geo:longitude}, %{lat,geo:latitude}")
@@ -113,6 +130,7 @@ The `0` before `m` and `s` pads minutes and seconds to two digits. This ensures 
 messageSupport
     .message("%{lon,geo:'dM LO'}")
     .with("lon", 4.8)
+    .locale(Locale.US)
     .format();
 // "4°48.0' E"
 ```

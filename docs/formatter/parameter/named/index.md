@@ -44,6 +44,17 @@ To select a named formatter, add `format:<name>` to the parameter configuration.
 instead and the `true` and `false` map keys would never match because the number formatter does not interpret integers 
 as booleans.
 
+The examples on this page use the following message support.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageSupportFactory;
+
+import java.util.List;
+
+var messageSupport = MessageSupportFactory.createDefault();
+// all built-in formatters are available
+```
+
 ```java
 messageSupport
     .message("""

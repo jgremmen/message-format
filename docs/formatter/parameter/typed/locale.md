@@ -25,6 +25,17 @@ on the `MessageSupport` instance, not on the parameter value itself.
 When the `locale` configuration key is absent or set to `name`, the formatter outputs the full display name of the
 locale.
 
+The examples on this page use the following message support.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageSupportFactory;
+
+import java.util.Locale;
+
+var messageSupport = MessageSupportFactory.createDefault();
+// all built-in formatters are available
+```
+
 ```java
 messageSupport.setLocale(Locale.forLanguageTag("nl-BE"));
 

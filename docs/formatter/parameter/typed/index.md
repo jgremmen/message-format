@@ -18,6 +18,21 @@ Consider a simple example. Passing an `int` value to a message parameter causes 
 `NumberFormatter`, which is registered for `int.class` (among other numeric types). No format directive is needed in 
 the message itself.
 
+The examples on this page use the following message support.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageSupportFactory;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TreeMap;
+
+var messageSupport = MessageSupportFactory.createDefault();
+// all built-in formatters are available
+```
+
 ```java
 messageSupport
     .message("You have %{count} new notifications.")

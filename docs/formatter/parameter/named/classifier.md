@@ -40,6 +40,24 @@ classifier `locale` first, followed by `string` when a string-producing configur
 produces `path`, a `BitSet` produces `bit-set` (and `list` in set-bit mode) and wrapper types like `Supplier` and 
 `Reference` produce their own classifier before delegating to the contained value.
 
+The examples on this page use the following message support. Its formatter service contains the default formatters and
+the `ClassifierFormatter`, which is not registered by default.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageSupportFactory;
+import de.sayayi.lib.message.formatter.DefaultFormatterService;
+import de.sayayi.lib.message.formatter.parameter.named.ClassifierFormatter;
+
+import java.util.List;
+import java.util.Locale;
+
+var formatterService = new DefaultFormatterService();
+formatterService.addFormatter(new ClassifierFormatter());
+
+var messageSupport = MessageSupportFactory.create(formatterService);
+// the default formatters and the ClassifierFormatter are available
+```
+
 ```java
 messageSupport
     .message("""
@@ -170,6 +188,7 @@ messageSupport
             'list':'a list of elements'}\
         """)
     .with("v", 3.14)
+    .locale(Locale.US)
     .format();
 // "Received number 3.14"
 

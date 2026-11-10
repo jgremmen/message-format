@@ -17,6 +17,21 @@ containing a `String` behaves the same as passing that string directly.
 The `OptionalFormatter` handles `java.util.Optional` values. When the optional is present, the contained object is 
 unwrapped and formatted according to its own type. When the optional is empty, the formatter produces an empty string.
 
+The examples on this page use the following message support.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageSupportFactory;
+
+import java.util.Locale;
+import java.util.Optional;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
+
+var messageSupport = MessageSupportFactory.createDefault();
+// all built-in formatters are available
+```
+
 ```java
 messageSupport
     .message("%{name}")
@@ -194,6 +209,7 @@ formatter produces an empty string.
 messageSupport
     .message("%{rate}")
     .with("rate", OptionalDouble.of(3.14))
+    .locale(Locale.US)
     .format();
 // "3.14"
 ```

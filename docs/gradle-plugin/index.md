@@ -72,6 +72,8 @@ At runtime, the pack file can then be loaded from the classpath. The default fil
 (e.g. a project named `my-app` produces `my-app.mfp`):
 
 ```java
+import de.sayayi.lib.message.MessageSupportFactory;
+
 var messageSupport = MessageSupportFactory.createDefault();
 
 try(var in = ShopMessages.class
@@ -88,6 +90,8 @@ The following example shows the complete workflow from annotated source code to 
 class with a few message definitions:
 
 ```java
+import de.sayayi.lib.message.annotation.MessageDef;
+
 @MessageDef(code = "greeting", text = "Hello %{name}!")
 @MessageDef(code = "item-count",
     text = "%{count,format:choice,0:'No items',1:'1 item'," +

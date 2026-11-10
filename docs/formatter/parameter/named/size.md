@@ -32,6 +32,18 @@ registered for the value's type. Each type defines what "size" means:
 | `Reference`                            | Delegates to the referenced value         |
 | `Supplier`                             | Delegates to the supplied value           |
 
+The examples on this page use the following message support.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageSupportFactory;
+
+import java.util.List;
+import java.util.Map;
+
+var messageSupport = MessageSupportFactory.createDefault();
+// all built-in formatters are available
+```
+
 ```java
 messageSupport
     .message("%{name,format:size}")

@@ -17,6 +17,19 @@ The `ArrayFormatter` handles all Java array types: primitive arrays (`int[]`, `l
 `AtomicIntegerArray`, `AtomicLongArray` and `AtomicReferenceArray`. It is automatically selected whenever a parameter
 value is an array.
 
+The examples on this page use the following message support.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageSupportFactory;
+
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
+var messageSupport = MessageSupportFactory.createDefault();
+// all built-in formatters are available
+```
+
 ```java
 messageSupport
     .message("%{items}")

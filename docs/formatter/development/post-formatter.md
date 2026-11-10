@@ -67,6 +67,11 @@ character. It reads the number of visible characters to keep at the end from a `
 optionally a custom mask character from `mask-char`:
 
 ```java
+import de.sayayi.lib.message.formatter.post.PostFormatter;
+import de.sayayi.lib.message.formatter.post.PostFormatterContext;
+
+import org.jetbrains.annotations.NotNull;
+
 public final class MaskPostFormatter implements PostFormatter
 {
   @Override
@@ -89,6 +94,22 @@ public final class MaskPostFormatter implements PostFormatter
     return masked + string.substring(string.length() - show);
   }
 }
+```
+
+The formatter is registered on a new formatter service, as described in [Registration](#registration). The examples
+on this page use the following message support:
+
+```java
+import de.sayayi.lib.message.MessageSupportFactory;
+import de.sayayi.lib.message.formatter.DefaultFormatterService;
+
+import java.util.Locale;
+
+var formatterService = new DefaultFormatterService();
+formatterService.addPostFormatter(new MaskPostFormatter());
+
+var messageSupport = MessageSupportFactory.create(formatterService);
+// "mask" is available next to "case" and "clip"
 ```
 
 With this formatter registered, a message author can redact sensitive values while preserving a recognizable suffix:
@@ -155,6 +176,8 @@ public final class SlugPostFormatter implements PostFormatter
 ```
 
 ```java
+formatterService.addPostFormatter(new SlugPostFormatter());
+
 messageSupport
     .message("%(slug,'%{title}')")
     .with("title", "Custom Post Formatter Guide")

@@ -33,6 +33,22 @@ greeting=Hello, %{name}!
 greeting=Hallo, %{name}!
 ```
 
+The examples on this page use the following message support.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageSupportFactory;
+import de.sayayi.lib.message.adopter.ResourceBundleAdopter;
+import de.sayayi.lib.message.formatter.DefaultFormatterService;
+
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.Set;
+
+var messageSupport = MessageSupportFactory.createDefault();
+// all built-in formatters are available
+```
+
 ```java
 adopter.adoptTemplates("com.example.templates",
     Set.of(Locale.ENGLISH, Locale.GERMAN));

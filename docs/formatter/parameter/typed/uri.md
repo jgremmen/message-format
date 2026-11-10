@@ -24,6 +24,17 @@ The `uri` configuration key controls which component of the URI to display:
 
 When the `uri` configuration key is absent or set to `default`, the formatter outputs the complete URI.
 
+The examples on this page use the following message support.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageSupportFactory;
+
+import java.net.URI;
+
+var messageSupport = MessageSupportFactory.createDefault();
+// all built-in formatters are available
+```
+
 ```java
 messageSupport
     .message("%{u}")

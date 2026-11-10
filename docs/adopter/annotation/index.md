@@ -62,6 +62,30 @@ public class OrderService
 When a message has only one text and no localization is required, use the `text` element of `@MessageDef`. It is a
 shorthand for a single `@Text` without a locale. A message declared this way matches every locale used for formatting.
 
+The examples on this page use the following message support.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageSupportFactory;
+import de.sayayi.lib.message.annotation.MessageDef;
+import de.sayayi.lib.message.annotation.TemplateDef;
+import de.sayayi.lib.message.annotation.Text;
+import de.sayayi.lib.message.annotation.adopter.AnnotationAdopter;
+import de.sayayi.lib.message.annotation.adopter.util.SyntheticMessageDef;
+import de.sayayi.lib.message.annotation.adopter.util.SyntheticTemplateDef;
+import de.sayayi.lib.message.annotation.adopter.util.SyntheticText;
+import de.sayayi.lib.message.exception.MessageAdopterException;
+import de.sayayi.lib.message.exception.MessageParserException;
+import de.sayayi.lib.message.formatter.DefaultFormatterService;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Locale;
+import java.util.Set;
+
+var messageSupport = MessageSupportFactory.createDefault();
+// all built-in formatters are available
+```
+
 ```java
 @MessageDef(code = "app.name", text = "Message Format Library")
 public final class BrandingMessages {}

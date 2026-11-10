@@ -13,6 +13,20 @@ implementations. It formats each entry as a key-value pair and joins the results
 truncation and overflow behavior are controlled by the same list configuration keys used by the array and iterable 
 formatters, plus two map-specific configuration keys.
 
+The examples on this page use the following message support.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageSupportFactory;
+
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.TreeMap;
+
+var messageSupport = MessageSupportFactory.createDefault();
+// all built-in formatters are available
+```
+
 ```java
 messageSupport
     .message("%{props}")

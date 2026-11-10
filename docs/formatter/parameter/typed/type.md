@@ -25,6 +25,22 @@ other packages fully qualified.
 Without any configuration, the formatter uses the default `ju` format. Primitive types always use their simple name 
 regardless of the format flags.
 
+The examples on this page use the following message support.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageSupportFactory;
+import de.sayayi.lib.message.formatter.parameter.runtime.TypeFormatter;
+
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+var messageSupport = MessageSupportFactory.createDefault();
+// all built-in formatters are available
+```
+
 ```java
 messageSupport
     .message("%{t}")
@@ -149,19 +165,20 @@ Parameterized types (generics) are displayed with their type arguments. The form
 the type arguments.
 
 ```java
-// Given: Map<K,V> unmodifiableMap(Map<? extends K,? extends V>)
+// Map<K,V> unmodifiableMap(Map<? extends K,? extends V>)
+var method = Collections.class.getMethod("unmodifiableMap", Map.class);
 
 messageSupport
     .message("%{t,type:''}")
-    .with("t", method.getGenericReturnType())  // Map<K,V>
+    .with("t", method.getGenericReturnType())
     .format();
-// "java.util.Map<K,V>"
+// "java.util.Map<K, V>"
 
 messageSupport
     .message("%{t}")
     .with("t", method.getGenericReturnType())
     .format();
-// "Map<K,V>"
+// "Map<K, V>"
 ```
 
 
@@ -171,19 +188,22 @@ Wildcard types are rendered with their bounds. An unbounded wildcard is shown as
 `? extends ...` and lower bounds produce `? super ...`.
 
 ```java
-// Given: void copy(List<? super T>, List<? extends T>)
+// void copy(List<? super T>, List<? extends T>)
+var copy =
+    Collections.class.getMethod("copy", List.class, List.class);
 
 messageSupport
     .message("%{t}")
-    .with("t", method.getGenericParameterTypes()[0])  // List<? super T>
+    .with("t", copy.getGenericParameterTypes()[0])
     .format();
 // "List<? super T>"
 
-// Given: void shuffle(List<?>)
+// void shuffle(List<?>)
+var shuffle = Collections.class.getMethod("shuffle", List.class);
 
 messageSupport
     .message("%{t}")
-    .with("t", method.getGenericParameterTypes()[0])  // List<?>
+    .with("t", shuffle.getGenericParameterTypes()[0])
     .format();
 // "List<?>"
 ```
@@ -195,17 +215,25 @@ By default, type variables are shown as their name only (e.g. `T`). The `v` flag
 showing the full constraint.
 
 ```java
-// Given: <T extends Iterable<String> & Enumeration<String>> void method(T)
+interface Samples
+{
+  <T extends Iterable<String> & Enumeration<String>> void accept(T t);
+
+  Optional<? extends Number>[] values();
+}
+
+// the erasure of T is its first bound, Iterable
+var accept = Samples.class.getMethod("accept", Iterable.class);
 
 messageSupport
     .message("%{t}")
-    .with("t", method.getGenericParameterTypes()[0])
+    .with("t", accept.getGenericParameterTypes()[0])
     .format();
 // "T"
 
 messageSupport
     .message("%{t,type:juv}")
-    .with("t", method.getGenericParameterTypes()[0])
+    .with("t", accept.getGenericParameterTypes()[0])
     .format();
 // "<T extends Iterable<String> & Enumeration<String>>"
 ```
@@ -215,18 +243,20 @@ messageSupport
 
 Generic array types combine the generic element type with `[]` suffixes.
 
+The `Samples` interface declared above has a method with a generic array return type.
+
 ```java
-// Given: Optional<? extends Number>[] internalMethod()
+var values = Samples.class.getMethod("values");
 
 messageSupport
     .message("%{t}")
-    .with("t", method.getGenericReturnType())
+    .with("t", values.getGenericReturnType())
     .format();
 // "Optional<? extends Number>[]"
 
 messageSupport
     .message("%{t,type:''}")
-    .with("t", method.getGenericReturnType())
+    .with("t", values.getGenericReturnType())
     .format();
 // "java.util.Optional<? extends java.lang.Number>[]"
 ```

@@ -9,6 +9,17 @@ a `TimeZone` instance. The formatter renders the time zone using its locale-spec
 Because the display name is delegated to the string formatter, all string map keys and behavior that apply to string
 values work transparently.
 
+The examples on this page use the following message support.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageSupportFactory;
+
+import java.util.TimeZone;
+
+var messageSupport = MessageSupportFactory.createDefault();
+// all built-in formatters are available
+```
+
 ```java
 messageSupport
     .message("%{tz}")

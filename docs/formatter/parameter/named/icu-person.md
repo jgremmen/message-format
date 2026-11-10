@@ -137,6 +137,19 @@ The following table summarizes which keys are active in each mode.
 
 With default settings, the formatter produces a full name in given-first order.
 
+The examples on this page use the following message support.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageSupportFactory;
+import de.sayayi.lib.message.formatter.GenericFormatterService;
+import de.sayayi.lib.message.icu.formatter.ICUPersonFormatter;
+
+import java.util.Locale;
+
+var messageSupport = MessageSupportFactory.createDefault();
+// all built-in formatters are available
+```
+
 ```java
 messageSupport
     .message("%{unused,format:icu-person}")
@@ -214,7 +227,9 @@ Sorting order combined with initials produces a compact citation format.
 
 ```java
 messageSupport
-    .message("%{unused,format:icu-person,order:sorting,given-format:initial}")
+    .message("""
+        %{unused,format:icu-person,order:sorting,given-format:initial}\
+        """)
     .with("given-name", "John")
     .with("family-name", "Smith")
     .format();
@@ -226,7 +241,10 @@ and suffix.
 
 ```java
 messageSupport
-    .message("%{unused,format:icu-person,order:surname-first,middle-format:initial}")
+    .message("""
+        %{unused,format:icu-person,order:surname-first,\
+            middle-format:initial}\
+        """)
     .with("prefix", "Dr.")
     .with("given-name", "Jane")
     .with("middle-name", "Marie")
@@ -267,7 +285,10 @@ Setting all three name parts to `initial` produces a dotted abbreviation.
 
 ```java
 messageSupport
-    .message("%{unused,format:icu-person,given-format:initial,middle-format:initial,family-format:initial}")
+    .message("""
+        %{unused,format:icu-person,given-format:initial,\
+            middle-format:initial,family-format:initial}\
+        """)
     .with("given-name", "John")
     .with("middle-name", "Michael")
     .with("family-name", "Smith")
@@ -362,7 +383,9 @@ The `formality` and `length` keys allow adjusting the monogram style.
 
 ```java
 messageSupport
-    .message("%{unused,format:icu-person,usage:monogram,formality:informal}")
+    .message("""
+        %{unused,format:icu-person,usage:monogram,formality:informal}\
+        """)
     .with("given-name", "John")
     .with("family-name", "Smith")
     .format();
@@ -479,7 +502,10 @@ template and the right side is the parameter name available in the parent messag
 
 ```java
 messageSupport
-    .message("Author: %[name-citation, given-name->firstName, family-name->lastName]")
+    .message("""
+        Author: %[name-citation,given-name->firstName,\
+            family-name->lastName]\
+        """)
     .with("firstName", "Alice")
     .with("lastName", "Smith")
     .format();
@@ -488,7 +514,10 @@ messageSupport
 
 ```java
 messageSupport
-    .message("Patient: %[name-formal, given-name->first, family-name->last, prefix->title]")
+    .message("""
+        Patient: %[name-formal,given-name->first,family-name->last,\
+            prefix->title]\
+        """)
     .with("title", "Mrs.")
     .with("first", "Emily")
     .with("last", "Watson")
@@ -503,14 +532,20 @@ corresponding parameter is not set on the message.
 
 ```java
 messageSupport
-    .message("By: %[name-citation, given-name='Anonymous', family-name='Author']")
+    .message("""
+        By: %[name-citation,given-name='Anonymous',\
+            family-name='Author']\
+        """)
     .format();
 // "By: Author, A."
 ```
 
 ```java
 messageSupport
-    .message("By: %[name-citation, given-name='Anonymous', family-name='Author']")
+    .message("""
+        By: %[name-citation,given-name='Anonymous',\
+            family-name='Author']\
+        """)
     .with("given-name", "John")
     .with("family-name", "Smith")
     .format();

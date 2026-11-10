@@ -15,8 +15,8 @@ under this custom definition.
 
 ### `isSpaceChar(char)`
 
-This method returns `true` if the given character is a tab (`\t`), a carriage return (`\r`), a Unicode `SPACE_SEPARATOR` 
-(such as the regular space U+0020 or the non-breaking space U+00A0), or a Unicode `PARAGRAPH_SEPARATOR`. Notably, the 
+This method returns `true` if the given character is a tab (`\t`), a carriage return (`\r`), a Unicode `SPACE_SEPARATOR`
+(such as the regular space U+0020 or the non-breaking space U+00A0), or a Unicode `PARAGRAPH_SEPARATOR`. Notably, the
 newline character (`\n`) is **not** considered a space character. This distinction is critical because message templates
 can contain intentional line breaks that must survive trimming and normalization.
 
@@ -191,7 +191,7 @@ letters and hyphens fails the check because such a name belongs to neither conve
 
 ```java
 MessageUtil.isKebabOrLowerCamelCaseName("date-format");   // true (kebab)
-MessageUtil.isKebabOrLowerCamelCaseName("dateFormat");    // true (camelCase)
+MessageUtil.isKebabOrLowerCamelCaseName("dateFormat");    // true (camel)
 
 // mixing styles is rejected
 MessageUtil.isKebabOrLowerCamelCaseName("date-Format");   // false
@@ -348,7 +348,7 @@ IntelliJ IDEA plugins or Gradle build scripts.
 Path packFile = Path.of("messages.pack");
 Path textFile = Path.of("messages.properties");
 
-MessageUtil.isMessageFormatPack(packFile);  // true (if it is a valid pack file)
+MessageUtil.isMessageFormatPack(packFile);  // true for a valid pack
 MessageUtil.isMessageFormatPack(textFile);  // false
 ```
 
@@ -364,6 +364,41 @@ receives templates as name-template pairs. Either consumer may be `null` if only
 
 The input stream is always closed when this method returns, regardless of success or failure. To read a pack from
 a part of a larger stream, see [Packs Inside Other Streams](../../configuration/pack-files.md#packs-inside-other-streams).
+
+The examples on this page use the following message support.
+
+```java title="Example setup"
+import de.sayayi.lib.message.FormatStringSerializer;
+import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.MessageFactory;
+import de.sayayi.lib.message.MessageSupportFactory;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
+import de.sayayi.lib.message.formatter.parameter.SingletonParameters;
+import de.sayayi.lib.message.part.MessagePart.Text;
+import de.sayayi.lib.message.part.TextJoiner;
+import de.sayayi.lib.message.util.MessageUtil;
+import de.sayayi.lib.message.util.SortedStringMap;
+import de.sayayi.lib.message.util.SupplierDelegate;
+import org.jetbrains.annotations.NotNull;
+
+import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.function.Supplier;
+
+import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
+import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
+import static de.sayayi.lib.message.part.TextPartFactory.nullText;
+import static de.sayayi.lib.message.part.TextPartFactory.spacedText;
+
+var messageSupport = MessageSupportFactory.createDefault();
+// all built-in formatters are available
+```
 
 ```java
 var factory = messageSupport.getMessageAccessor().getMessageFactory();
@@ -428,9 +463,9 @@ them to internal enum values without forcing callers to know the exact casing or
 
 ## `TextPartFactory`
 
-When a formatter produces its output, it returns a `Text` object. The `Text` interface represents a piece of text 
-together with optional leading and trailing space flags. These flags control how the text is joined with its neighbors 
-when the message is assembled. Building `Text` instances by hand requires careful handling of null values, empty strings 
+When a formatter produces its output, it returns a `Text` object. The `Text` interface represents a piece of text
+together with optional leading and trailing space flags. These flags control how the text is joined with its neighbors
+when the message is assembled. Building `Text` instances by hand requires careful handling of null values, empty strings
 and space tracking. `TextPartFactory` provides a set of static factory methods that take care of these details.
 
 ### `nullText()` and `emptyText()`

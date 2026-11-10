@@ -16,6 +16,11 @@ boolean, number (long), string and message. Each call returns the `ConfigurableM
 multiple defaults to be set in a fluent chain:
 
 ```java
+import de.sayayi.lib.message.MessageSupportFactory;
+import de.sayayi.lib.message.formatter.DefaultFormatterService;
+
+import java.util.List;
+
 var messageSupport = MessageSupportFactory.create(
     DefaultFormatterService.getSharedInstance());
 
@@ -33,11 +38,12 @@ hyphens, such as `clip-suffix` or `list-sep-last`), a default only takes effect 
 
 ### Value Types
 
-Every configuration value has one of the four types. A formatter always asks for a value of a particular type, for
-example a number for `clip` or a string for `list-sep`. If the value found in the format string has a different type,
-it is treated as absent and the default configuration is consulted instead. If the default has the wrong type as well,
-the formatter applies its built-in default. In the following example the quoted `'20'` is a string, so the `clip`
-post formatter ignores it and uses the numeric default.
+The examples on this page build on the message support configured above. Every configuration value has one of the four
+types. A formatter always asks for a value of a particular type, for example a number for `clip` or a string for
+`list-sep`. If the value found in the format string has a different type, it is treated as absent and the default
+configuration is consulted instead. If the default has the wrong type as well, the formatter applies its built-in
+default. In the following example the quoted `'20'` is a string, so the `clip` post formatter ignores it and uses the
+numeric default.
 
 ```java
 messageSupport.setDefaultConfig("clip", 10);
@@ -46,7 +52,7 @@ messageSupport
     .message("%(clip,'%{text}',clip:'20')")
     .with("text", "A sentence that is way too long")
     .format();
-// "A sentenc…"
+// "A sentence" (clip-suffix was set to false above)
 ```
 
 A string value is the one exception. Where a formatter asks for a message, a string value is accepted as well and is
@@ -170,7 +176,7 @@ messageSupport
     .message("Tags: %{tags}")
     .with("tags", List.of("new", "sale"))
     .format();
-// "Tags: 'new', 'sale'"
+// "Tags: 'new' and 'sale'" (list-sep-last was set above)
 ```
 
 A message is only used by keys whose formatter asks for a message. Keys that expect a string, such as

@@ -18,6 +18,21 @@ in practice.
 The simplest possible message is plain text. It contains no special syntax, just characters that appear in the output 
 exactly as written.
 
+The examples on this page use the following message support.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageFactory;
+import de.sayayi.lib.message.MessageSupportFactory;
+import de.sayayi.lib.message.formatter.DefaultFormatterService;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Locale;
+
+var messageSupport = MessageSupportFactory.createDefault();
+// all built-in formatters are available
+```
+
 ```java
 messageSupport.message("Hello World!").format();
 // "Hello World!"

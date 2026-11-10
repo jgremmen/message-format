@@ -71,7 +71,9 @@ To configure the filters directly on the task rather than through the extension:
 === "Gradle (Kotlin)"
 
     ```kotlin
-    tasks.named<de.sayayi.plugin.gradle.message.MessageFormatPackTask>("messageFormatPack") {
+    import de.sayayi.plugin.gradle.message.MessageFormatPackTask
+
+    tasks.named<MessageFormatPackTask>("messageFormatPack") {
       messages {
         include("ORDER-.*")
         exclude(".*-DRAFT")
@@ -114,7 +116,9 @@ added on the task with `ignore` are added to them.
 === "Gradle (Kotlin)"
 
     ```kotlin
-    tasks.named<de.sayayi.plugin.gradle.message.MessageFormatPackTask>("messageFormatPack") {
+    import de.sayayi.plugin.gradle.message.MessageFormatPackTask
+
+    tasks.named<MessageFormatPackTask>("messageFormatPack") {
       templates {
         validateReferences.set(true)
         ignore("lib-.*")
@@ -165,7 +169,9 @@ Actions are registered using the `action` method on the task:
 === "Gradle (Kotlin)"
 
     ```kotlin
-    tasks.named<de.sayayi.plugin.gradle.message.MessageFormatPackTask>("messageFormatPack") {
+    import de.sayayi.plugin.gradle.message.MessageFormatPackTask
+
+    tasks.named<MessageFormatPackTask>("messageFormatPack") {
       action {
         // 'it' is a MessageAccessor
         println("Total messages: ${it.messageCodes.size}")
@@ -206,7 +212,9 @@ prints the next ten available codes:
 === "Gradle (Kotlin)"
 
     ```kotlin
-    tasks.named<de.sayayi.plugin.gradle.message.MessageFormatPackTask>("messageFormatPack") {
+    import de.sayayi.plugin.gradle.message.MessageFormatPackTask
+
+    tasks.named<MessageFormatPackTask>("messageFormatPack") {
       action {
         val codes = it.messageCodes
         val available = mutableListOf<String>()
@@ -247,7 +255,9 @@ action fails the build if any message code does not match the expected pattern:
 === "Gradle (Kotlin)"
 
     ```kotlin
-    tasks.named<de.sayayi.plugin.gradle.message.MessageFormatPackTask>("messageFormatPack") {
+    import de.sayayi.plugin.gradle.message.MessageFormatPackTask
+
+    tasks.named<MessageFormatPackTask>("messageFormatPack") {
       action {
         val pattern = Regex("^[A-Z]+-\\d{4}$")
 

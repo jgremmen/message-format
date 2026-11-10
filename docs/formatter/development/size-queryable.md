@@ -44,10 +44,74 @@ The most common scenario is adding size support to a formatter that already hand
 extends `AbstractSingleTypeParameterFormatter` (or `AbstractParameterFormatter`) and additionally implements 
 `SizeQueryable`. This gives the formatter two responsibilities: formatting the value into text and reporting its size.
 
-The following example defines a formatter for a hypothetical `Ring<E>` data structure, which is a fixed-size circular
-buffer. The "size" of a ring is the number of elements currently stored in it.
+The following example defines a formatter for an application `Ring<E>` data structure, which is a fixed-size circular
+buffer. The "size" of a ring is the number of elements currently stored in it. Once the ring is full, adding an element
+overwrites the oldest one.
 
 ```java
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
+public final class Ring<E> implements Iterable<E>
+{
+  private final Object[] elements;
+  private int start;
+  private int count;
+
+  public Ring(int capacity) {
+    elements = new Object[capacity];
+  }
+
+  public void add(E element)
+  {
+    elements[(start + count) % elements.length] = element;
+
+    if (count < elements.length)
+      count++;
+    else
+      start = (start + 1) % elements.length;
+  }
+
+  public int count() {
+    return count;
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public Iterator<E> iterator()
+  {
+    return new Iterator<>() {
+      private int index;
+
+      public boolean hasNext() {
+        return index < count;
+      }
+
+      public E next()
+      {
+        if (!hasNext())
+          throw new NoSuchElementException();
+
+        return (E)elements[(start + index++) % elements.length];
+      }
+    };
+  }
+}
+```
+
+```java
+import de.sayayi.lib.message.formatter.FormattableType;
+import de.sayayi.lib.message.formatter.parameter.AbstractSingleTypeParameterFormatter;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
+import de.sayayi.lib.message.part.MessagePart.Text;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.util.OptionalLong;
+
+import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
+
 public final class RingFormatter
     extends AbstractSingleTypeParameterFormatter<Ring<?>>
     implements ParameterFormatter.SizeQueryable
@@ -84,6 +148,29 @@ public final class RingFormatter
 }
 ```
 
+The examples on this page use the following message support and a helper method that creates a filled ring:
+
+```java
+import de.sayayi.lib.message.MessageSupportFactory;
+import de.sayayi.lib.message.formatter.DefaultFormatterService;
+
+import java.util.List;
+
+var formatterService = new DefaultFormatterService();
+var messageSupport = MessageSupportFactory.create(formatterService);
+
+@SafeVarargs
+static <E> Ring<E> ringWithElements(E... elements)
+{
+  var ring = new Ring<E>(8);
+  for(var element: elements)
+    ring.add(element);
+
+  return ring;
+}
+// formatters added to formatterService are used by messageSupport
+```
+
 After registering this formatter, the `size` named formatter works transparently with `Ring` values:
 
 ```java
@@ -115,9 +202,17 @@ instead delegates to the contained value's formatter. The `SupplierFormatter` an
 follow this pattern. They call `context.size(innerValue)` to let the framework resolve the appropriate `SizeQueryable`
 formatter for the inner value.
 
-Consider a `Lazy<T>` wrapper that defers initialization:
+Consider a `Lazy<T>` wrapper that defers initialization. The interface deliberately does not extend `Supplier`, because
+supplier values are wrapped in a caching delegate and a formatter registered for a `Supplier` subtype would never be
+selected (see [Supplier](../parameter/typed/supplier.md)).
 
 ```java
+@FunctionalInterface
+public interface Lazy<T>
+{
+  T get();
+}
+
 public final class LazyFormatter
     extends AbstractSingleTypeParameterFormatter<Lazy<?>>
     implements ParameterFormatter.SizeQueryable
@@ -152,7 +247,21 @@ public final class LazyFormatter
 ```
 
 When the contained value is a `List` with four elements, `context.size(inner)` finds the `IterableFormatter` (which 
-implements `SizeQueryable`) and returns `4`. When the contained value is a type that has no size-aware formatter, the 
+implements `SizeQueryable`) and returns `4`.
+
+```java
+formatterService.addFormatter(new LazyFormatter());
+
+Lazy<List<String>> lazyList = () -> List.of("a", "b", "c", "d");
+
+messageSupport
+    .message("%{items,format:size}")
+    .with("items", lazyList)
+    .format();
+// "4"
+```
+
+ When the contained value is a type that has no size-aware formatter, the 
 delegation returns `OptionalLong.empty()` and the `size` formatter falls through to the `empty` map key.
 
 
@@ -166,10 +275,24 @@ The key insight is that the `format` method can delegate to the next formatter i
 `context.delegateToNextFormatter()`. The formatter itself handles no formatting at all. Its only contribution is the
 `size` method.
 
-The following example adds size support for a `Multimap<K,V>` type (such as Guava's `Multimap`) where size is defined
-as the total number of values across all keys:
+The following example adds size support for an application `Multimap<K,V>` interface that maps each key to a
+collection of values. It extends `Map`, so `Map.size()` counts the keys, while the size of a multimap is defined as the
+total number of values across all keys:
 
 ```java
+import java.util.Collection;
+import java.util.Map;
+
+public interface Multimap<K,V> extends Map<K,Collection<V>>
+{
+  default int valueCount()
+  {
+    return values().stream()
+        .mapToInt(Collection::size)
+        .sum();
+  }
+}
+
 public final class MultimapSizeFormatter
     extends AbstractSingleTypeParameterFormatter<Multimap<?,?>>
     implements ParameterFormatter.SizeQueryable
@@ -189,8 +312,8 @@ public final class MultimapSizeFormatter
       @NotNull ParameterFormatterContext context,
       @NotNull Object value)
   {
-    // total number of key-value pairs
-    return OptionalLong.of(((Multimap<?,?>)value).size());
+    // total number of values across all keys
+    return OptionalLong.of(((Multimap<?,?>)value).valueCount());
   }
 
 
@@ -201,12 +324,11 @@ public final class MultimapSizeFormatter
 }
 ```
 
-Because this formatter delegates formatting entirely, the existing formatter registered for `Multimap` (or its parent 
-type `Iterable`, `Map`, etc.) still produces the textual output. The `MultimapSizeFormatter` only activates when 
-something queries the size.
+Because this formatter delegates formatting entirely, the formatter registered for the parent type `Map` still produces
+the textual output. The `MultimapSizeFormatter` only activates when something queries the size.
 
-To ensure this formatter is consulted for size queries before the general `IterableFormatter` (which would count the 
-keys), assign a higher precedence through the `FormattableType` order:
+To ensure this formatter is consulted for size queries before the general `MapFormatter` (which would count the keys),
+assign a higher precedence through the `FormattableType` order:
 
 ```java
 @Override

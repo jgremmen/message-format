@@ -11,6 +11,19 @@ By default, integer types (`BigInteger`, `Long`, `Integer`, `Short`, `Byte`, `At
 `LongAccumulator`) are rendered using their plain `toString()` representation. All other numeric types (floating point, 
 `BigDecimal`) are formatted using a locale-specific number format.
 
+The examples on this page use the following message support.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageSupportFactory;
+
+import java.math.BigInteger;
+import java.util.Locale;
+import java.util.concurrent.atomic.AtomicInteger;
+
+var messageSupport = MessageSupportFactory.createDefault();
+// all built-in formatters are available
+```
+
 ```java
 messageSupport
     .message("%{count}")
@@ -94,6 +107,7 @@ percent sign is appended.
 messageSupport
     .message("%{progress,number:percent}")
     .with("progress", 0.75)
+    .locale(Locale.US)
     .format();
 // "75%"
 ```

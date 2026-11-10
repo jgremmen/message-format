@@ -7,12 +7,27 @@ is registered for the `Enum` type and therefore handles all enum types without a
 
 By default, the formatter outputs the enum constant's name as returned by the `name()` method.
 
+The examples on this page use the following message support.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageSupportFactory;
+
+import java.time.DayOfWeek;
+
+enum OrderStatus { PENDING, APPROVED, REJECTED, SHIPPED }
+enum Priority { LOW, MEDIUM, HIGH, CRITICAL }
+enum Grade { A, B, C, D, F }
+
+var messageSupport = MessageSupportFactory.createDefault();
+// all built-in formatters are available
+```
+
 ```java
 messageSupport
-    .message("%{direction}")
-    .with("direction", Direction.NORTH)
+    .message("%{priority}")
+    .with("priority", Priority.HIGH)
     .format();
-// "NORTH"
+// "HIGH"
 ```
 
 ```java
@@ -37,10 +52,10 @@ default behavior.
 
 ```java
 messageSupport
-    .message("%{color,enum:name}")
-    .with("color", Color.RED)
+    .message("%{status,enum:name}")
+    .with("status", OrderStatus.SHIPPED)
     .format();
-// "RED"
+// "SHIPPED"
 ```
 
 Since `name` is the default, writing `enum:name` explicitly is equivalent to omitting the configuration entirely.
@@ -55,7 +70,7 @@ messageSupport
     .message("%{priority,enum:ordinal}")
     .with("priority", Priority.HIGH)
     .format();
-// "2"  (assuming HIGH is the third constant, ordinal 2)
+// "2"
 ```
 
 ```java
@@ -63,19 +78,21 @@ messageSupport
     .message("%{day,enum:ord}")
     .with("day", DayOfWeek.WEDNESDAY)
     .format();
-// "2"  (assuming WEDNESDAY has ordinal 2)
+// "2"
 ```
 
-The ordinal mode can also be set as a system-wide default using `setDefaultConfig`:
+The ordinal mode can also be set as a default for all messages of a message support using `setDefaultConfig`. The
+following example uses a separate instance, so the other examples on this page keep the name mode.
 
 ```java
-messageSupport.setDefaultConfig("enum", "ordinal");
+var ordinalSupport = MessageSupportFactory.createDefault();
+ordinalSupport.setDefaultConfig("enum", "ordinal");
 
-messageSupport
-    .message("%{item}")
-    .with("item", MyEnum.BB)
+ordinalSupport
+    .message("%{priority}")
+    .with("priority", Priority.MEDIUM)
     .format();
-// "1"  (assuming BB has ordinal 1)
+// "1"
 ```
 
 
@@ -103,33 +120,34 @@ Comparison operators work as well. String keys are compared lexicographically ag
 
 ```java
 messageSupport
-    .message("%{e,>'C':upper,<'C':lower}")
-    .with("e", MyEnum.CC)
+    .message("%{grade,<='B':good,>'B':'needs improvement'}")
+    .with("grade", Grade.D)
     .format();
-// "upper"
+// "needs improvement"
 ```
 
 A default map key catches any constant that does not match a specific key.
 
 ```java
 messageSupport
-    .message("%{e,'AA':first,'BB':second,:'other'}")
-    .with("e", MyEnum.CC)
+    .message("%{status,'PENDING':'Awaiting review',:'Processed'}")
+    .with("status", OrderStatus.SHIPPED)
     .format();
-// "other"
+// "Processed"
 ```
 
 ### Number Keys (Ordinal Mode)
 
-In ordinal mode, number map keys are compared against the constant's ordinal value. This allows mapping specific
-ordinal positions to custom text.
+In ordinal mode, number map keys are compared against the constant's ordinal value. Because the ordinal reflects the
+declaration order, relational number keys can select ranges of constants. All priorities from `HIGH` onward are
+treated as urgent in the following example.
 
 ```java
 messageSupport
-    .message("%{level,enum:ordinal,0:'lowest',1:'low',2:'medium',3:'high'}")
-    .with("level", Level.MEDIUM)
+    .message("%{priority,enum:ordinal,>=2:'urgent',:'routine'}")
+    .with("priority", Priority.HIGH)
     .format();
-// "medium"  (assuming MEDIUM has ordinal 2)
+// "urgent"
 ```
 
 ### Null Handling
@@ -139,10 +157,10 @@ to produce specific text.
 
 ```java
 messageSupport
-    .message("%{role,null:'unassigned'}")
-    .with("role", (Role) null)
+    .message("%{status,null:'unknown'}")
+    .with("status", (OrderStatus) null)
     .format();
-// "unassigned"
+// "unknown"
 ```
 
 
@@ -153,14 +171,14 @@ formatter outputs an empty string. If a default map key (`:`) is provided, it is
 
 ```java
 messageSupport
-    .message("%{color,'RED':'warm','BLUE':'cool'}")
-    .with("color", Color.GREEN)
+    .message("%{priority,'LOW':'relaxed','CRITICAL':'immediate'}")
+    .with("priority", Priority.MEDIUM)
     .format();
 // ""
 
 messageSupport
-    .message("%{color,'RED':'warm','BLUE':'cool',:'neutral'}")
-    .with("color", Color.GREEN)
+    .message("%{priority,'LOW':'relaxed','CRITICAL':'immediate',:'normal'}")
+    .with("priority", Priority.MEDIUM)
     .format();
-// "neutral"
+// "normal"
 ```

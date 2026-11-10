@@ -45,6 +45,19 @@ When `icu` is omitted, the formatter produces empty text.
 The `icu` configuration key takes a quoted string containing the ICU pattern. The result of the ICU evaluation replaces
 the parameter in the message output.
 
+The examples on this page use the following message support.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageSupportFactory;
+import de.sayayi.lib.message.formatter.GenericFormatterService;
+import de.sayayi.lib.message.icu.formatter.ICUFormatter;
+
+import java.util.Locale;
+
+var messageSupport = MessageSupportFactory.createDefault();
+// all built-in formatters are available
+```
+
 ```java
 messageSupport
     .message("""
@@ -177,22 +190,27 @@ messageSupport
 
 ## Map Keys on the Result
 
-After the ICU pattern is evaluated, the resulting text is checked against map keys defined in the parameter. The
-formatter supports the `empty` and `!empty` map key types. This allows providing fallback text when the ICU formatting
-produces an empty result. Other map key types are ignored.
+Map entries defined on a parameter formatted with `icu` have no effect on the output. This includes the `empty` and
+`!empty` keys: an ICU pattern that evaluates to empty text produces empty text, even if an `empty` entry is present.
 
 ```java
 messageSupport
     .message("%{unused,icu:'{name}',empty:'(anonymous)'}")
     .with("name", "")
     .format();
-// "(anonymous)"
+// ""
+```
 
+Fallback text for an empty value is therefore written with a separate parameter reference that does not use the `icu`
+formatter. The `empty` key of the [string formatter](../typed/string.md) covers the empty name, and the ICU pattern is
+only used where its features are needed.
+
+```java
 messageSupport
-    .message("%{unused,icu:'{name}',empty:'(anonymous)'}")
-    .with("name", "Bob")
+    .message("Author: %{name,empty:'(anonymous)'}")
+    .with("name", "")
     .format();
-// "Bob"
+// "Author: (anonymous)"
 ```
 
 
@@ -237,7 +255,8 @@ var messageSupport = MessageSupportFactory
 
 ### Dependency
 
-Add the `message-format-icu` module to the project alongside the core message format dependency.
+Add the `message-format-icu` module to the project alongside the core message format dependency. The module brings
+ICU4J as a transitive dependency and supports ICU4J versions from 74.1 up to, but not including, 79.0.
 
 === "Gradle (Groovy)"
 

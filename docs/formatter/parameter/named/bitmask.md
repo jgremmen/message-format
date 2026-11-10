@@ -26,6 +26,23 @@ associated message is the label for that bit. The `bitset` configuration key con
 (least significant bit first, the default) or `msb-set` (most significant bit first). Only bits that are set in the 
 value **and** have a matching number map key produce output; all other bits are silently skipped.
 
+The examples on this page use the following message support. Its formatter service contains the default formatters and
+the `BitmaskFormatter`, which is not registered by default.
+
+```java title="Example setup"
+import de.sayayi.lib.message.MessageSupportFactory;
+import de.sayayi.lib.message.formatter.DefaultFormatterService;
+import de.sayayi.lib.message.formatter.parameter.named.extra.BitmaskFormatter;
+
+import java.math.BigInteger;
+
+var formatterService = new DefaultFormatterService();
+formatterService.addFormatter(new BitmaskFormatter());
+
+var messageSupport = MessageSupportFactory.create(formatterService);
+// the default formatters and the BitmaskFormatter are available
+```
+
 ```java
 // 0x15 = 0b10101 → bits 0, 2, 4 are set
 messageSupport
