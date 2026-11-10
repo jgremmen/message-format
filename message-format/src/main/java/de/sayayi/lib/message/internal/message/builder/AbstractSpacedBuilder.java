@@ -39,9 +39,7 @@ public abstract non-sealed class AbstractSpacedBuilder<S extends SpacedBuilder<S
 
 
   /**
-   * Marks the part produced by this builder to include a leading space when it is flushed.
-   *
-   * @return  this builder, never {@code null}
+   * {@inheritDoc}
    */
   @Override
   @SuppressWarnings("unchecked")
@@ -54,9 +52,7 @@ public abstract non-sealed class AbstractSpacedBuilder<S extends SpacedBuilder<S
 
 
   /**
-   * Marks the part produced by this builder to include a trailing space when it is flushed.
-   *
-   * @return  this builder, never {@code null}
+   * {@inheritDoc}
    */
   @Override
   @SuppressWarnings("unchecked")

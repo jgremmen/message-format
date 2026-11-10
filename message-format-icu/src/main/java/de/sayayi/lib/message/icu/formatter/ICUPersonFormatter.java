@@ -166,19 +166,14 @@ public final class ICUPersonFormatter implements NamedParameterFormatter
 
 
   /**
-   * Formats a person name by assembling the name parts obtained from the parameter context.
+   * {@inheritDoc}
    * <p>
    * The name parts ({@code given-name}, {@code family-name}, {@code middle-name}, {@code prefix} and {@code suffix})
-   * are read from the context parameters. If both {@code given-name} and {@code family-name} are absent, the
-   * {@linkplain #formatNull(ParameterFormatterContext) null format} is used.
+   * are read from the context parameters; {@code value} itself is not used. If both {@code given-name} and
+   * {@code family-name} are absent, the {@linkplain #formatNull(ParameterFormatterContext) null format} is used.
    * <p>
    * For {@link Usage#MONOGRAM monogram} usage, the ICU {@link PersonNameFormatter} is used to produce locale-specific
-   * initials. For all other usages, the name is assembled manually based on the per-part format configuration.
-   *
-   * @param context  the formatter context providing parameter values and configuration, not {@code null}
-   * @param value    the parameter value (unused, name parts are read from named parameters)
-   *
-   * @return  the formatted person name as text, never {@code null}
+   * initials. For all other usages, the name is assembled from the per-part format configuration.
    */
   @Override
   public @NotNull Text format(@NotNull ParameterFormatterContext context, Object value)
@@ -362,8 +357,8 @@ public final class ICUPersonFormatter implements NamedParameterFormatter
 
 
   /**
-   * Assembles name parts in surname-first order: family, prefix, given, middle, suffix.
-   * In sorting mode, a comma separates the family name from the remaining parts.
+   * Assembles name parts in surname-first order: family, prefix, given, middle, suffix. In sorting mode, a comma
+   * separates the family name from the remaining parts.
    *
    * @param sb       string builder receiving the assembled name, not {@code null}
    * @param family   formatted family name, or {@code null} to omit it

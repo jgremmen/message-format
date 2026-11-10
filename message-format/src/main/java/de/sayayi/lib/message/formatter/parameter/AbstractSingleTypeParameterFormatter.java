@@ -84,12 +84,7 @@ import java.util.Set;
 public abstract class AbstractSingleTypeParameterFormatter<T> extends AbstractParameterFormatter<T>
 {
   /**
-   * Updates the classifiers for a value handled by this formatter.
-   *
-   * @param context  classifier context to update, not {@code null}
-   * @param value    value to classify, not {@code null}
-   *
-   * @return  {@code true} if classification is complete, {@code false} to allow other formatters to add classifiers
+   * {@inheritDoc}
    *
    * @since 0.21.0
    */
@@ -119,9 +114,9 @@ public abstract class AbstractSingleTypeParameterFormatter<T> extends AbstractPa
 
 
   /**
-   * Returns the single supported type declared by {@link #getFormattableType()}.
-   *
-   * @return  a set containing the supported type, never {@code null}
+   * {@inheritDoc}
+   * <p>
+   * This implementation returns a set containing the single type declared by {@link #getFormattableType()}.
    *
    * @see #getFormattableType()
    */

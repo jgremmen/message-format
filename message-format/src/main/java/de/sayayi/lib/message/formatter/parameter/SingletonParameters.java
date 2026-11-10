@@ -98,12 +98,9 @@ public final class SingletonParameters implements Parameters
 
 
   /**
-   * Returns the parameter value if {@code parameter} matches the name provided at construction time, or {@code null}
-   * otherwise.
-   *
-   * @param parameter  parameter name, not {@code null}
-   *
-   * @return  the current value if the name matches, {@code null} otherwise
+   * {@inheritDoc}
+   * <p>
+   * This implementation returns the value only if {@code parameter} matches the name provided at construction time.
    */
   @Override
   public Object getParameterValue(@NotNull String parameter) {
@@ -112,9 +109,10 @@ public final class SingletonParameters implements Parameters
 
 
   /**
-   * Returns an immutable singleton set containing the parameter name provided at construction time.
-   *
-   * @return  a singleton set with the parameter name, never {@code null}
+   * {@inheritDoc}
+   * <p>
+   * This implementation returns an immutable singleton set containing the parameter name provided at construction
+   * time.
    */
   @Override
   public @NotNull Set<String> getParameterNames() {

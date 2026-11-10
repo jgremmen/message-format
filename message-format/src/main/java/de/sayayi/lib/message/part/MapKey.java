@@ -72,7 +72,7 @@ public sealed interface MapKey extends FormatStringSerializer
    *
    * @return  compare type, never {@code null}
    *
-   * @since 0.8.4
+   * @since 0.9.0
    */
   @Contract(pure = true)
   default @NotNull CompareType getCompareType() {
@@ -83,8 +83,8 @@ public sealed interface MapKey extends FormatStringSerializer
 
 
   /**
-   * Type constants for map keys. Each type defines how a provided value is compared to a map key
-   * by delegating to the appropriate method on a {@link MapKeyComparator}.
+   * Type constants for map keys. Each type defines how a provided value is compared to a map key by delegating to the
+   * appropriate method on a {@link MapKeyComparator}.
    *
    * @see MapKey#getType()
    *
@@ -156,8 +156,8 @@ public sealed interface MapKey extends FormatStringSerializer
 
 
     /**
-     * Compares the given {@code value} to a map key of this type by delegating to the appropriate comparison method
-     * on the provided {@code comparator}.
+     * Compares the given {@code value} to a map key of this type by delegating to the appropriate comparison method on
+     * the provided {@code comparator}.
      *
      * @param comparator  the map key comparator that performs the actual comparison, not {@code null}
      * @param value       the value to compare against the map key, may be {@code null} for {@link #NULL} and
@@ -210,8 +210,7 @@ public sealed interface MapKey extends FormatStringSerializer
      *
      * @param signum  the comparison result (essentially the value represented by {@code value.compareTo(mapKey)})
      *
-     * @return  {@code true} if the comparison type matches the comparison result,
-     *          {@code false} otherwise
+     * @return  {@code true} if the comparison type matches the comparison result, {@code false} otherwise
      */
     public boolean match(int signum)
     {
@@ -309,13 +308,19 @@ public sealed interface MapKey extends FormatStringSerializer
      * <p>
      * The logic is as follows:
      * <ul>
-     *   <li>If the {@code compareType} is {@code EQ} and {@code isNull = true}, the result is {@code NULL}.</li>
-     *   <li>If the {@code compareType} is {@code NE} and {@code isNull = false}, the result is {@code NOT_NULL}.</li>
-     *   <li>In all other cases, the result is {@code MISMATCH}.</li>
+     *   <li>
+     *     If the {@code compareType} is {@code EQ} and {@code isNull = true}, the result is {@code NULL}.
+     *   </li>
+     *   <li>
+     *     If the {@code compareType} is {@code NE} and {@code isNull = false}, the result is {@code NOT_NULL}.
+     *   </li>
+     *   <li>
+     *     In all other cases, the result is {@code MISMATCH}.
+     *   </li>
      * </ul>
      *
-     * @param compareType  the comparison type to determine the match result, not {@code null}.
-     *                     Only {@code EQ} and {@code NE} are considered, other types will result in a {@code MISMATCH}.
+     * @param compareType  the comparison type to determine the match result, not {@code null}. Only {@code EQ} and
+     *                     {@code NE} are considered, other types will result in a {@code MISMATCH}.
      * @param isNull       flag indicating whether the value being compared is null or not
      *
      * @return  the match result for the null key comparison, never {@code null}
@@ -332,18 +337,24 @@ public sealed interface MapKey extends FormatStringSerializer
 
 
     /**
-     * Returns a match result for an {@code empty} key. The result is determined by the given {@code compareType}
-     * and the {@code isEmpty} flag.
+     * Returns a match result for an {@code empty} key. The result is determined by the given {@code compareType} and
+     * the {@code isEmpty} flag.
      * <p>
      * The logic is as follows:
      * <ul>
-     *   <li>If the {@code compareType} is {@code EQ} and {@code isEmpty = true}, the result is {@code EMPTY}.</li>
-     *   <li>If the {@code compareType} is {@code NE} and {@code isEmpty = false}, the result is {@code NOT_EMPTY}.</li>
-     *   <li>In all other cases, the result is {@code MISMATCH}.</li>
+     *   <li>
+     *     If the {@code compareType} is {@code EQ} and {@code isEmpty = true}, the result is {@code EMPTY}.
+     *   </li>
+     *   <li>
+     *     If the {@code compareType} is {@code NE} and {@code isEmpty = false}, the result is {@code NOT_EMPTY}.
+     *   </li>
+     *   <li>
+     *     In all other cases, the result is {@code MISMATCH}.
+     *   </li>
      * </ul>
      *
-     * @param compareType  the comparison type to determine the match result, not {@code null}.
-     *                     Only {@code EQ} and {@code NE} are considered, other types will result in a {@code MISMATCH}.
+     * @param compareType  the comparison type to determine the match result, not {@code null}. Only {@code EQ} and
+     *                     {@code NE} are considered, other types will result in a {@code MISMATCH}.
      * @param isEmpty      flag indicating whether the value being compared is empty or not
      *
      * @return  the match result for the empty key comparison, never {@code null}

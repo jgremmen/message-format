@@ -36,8 +36,8 @@ import static java.util.stream.Collectors.toUnmodifiableSet;
  * <p>
  * Besides the cause, the exception records the context in which the error occurred (message code, template name,
  * locale, parameter name and post formatter name), as far as it is known. The context is typically added while the
- * exception propagates through nested messages and templates, using the {@code with...} methods. The order in which
- * the context is added is retained, so the detail message is able to describe the actual nesting.
+ * exception propagates through nested messages and templates, using the {@code with...} methods. The order in which the
+ * context is added is retained, so the detail message is able to describe the actual nesting.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
@@ -54,11 +54,17 @@ public class MessageFormatException extends MessageException
    * <p>
    * The entry with key {@link #UNRECOGNIZED_KEY} is used if no key sequence matches. Its placeholder {@code <key>} is
    * replaced with the unmatched sequence.
+   *
+   * @since 0.25.0
    */
   private static final Map<String,String> MESSAGES =
       new TreeMap<>(comparingInt(String::length).reversed().thenComparing(naturalOrder()));
 
-  /** Message key used if the context key sequence is not recognized. It never matches a key sequence. */
+  /**
+   * Message key used if the context key sequence is not recognized. It never matches a key sequence.
+   *
+   * @since 0.25.0
+   */
   private static final String UNRECOGNIZED_KEY = "?";
 
 
@@ -103,7 +109,11 @@ public class MessageFormatException extends MessageException
   /** Formatting context in the order it was recorded, innermost first. Contains at most 1 code and 1 locale. */
   private final List<Context> context;
 
-  /** Detail message, or {@code null} if not yet created. It is not serialized and is recreated on demand. */
+  /**
+   * Detail message, or {@code null} if not yet created. It is not serialized and is recreated on demand.
+   *
+   * @since 0.25.0
+   */
   private transient volatile String message;
 
 
@@ -164,6 +174,8 @@ public class MessageFormatException extends MessageException
    * @return  detail message, never {@code null}
    *
    * @see #getMessage()
+   *
+   * @since 0.25.0
    */
   @Contract(value = "-> new", pure = true)
   private @NotNull String createMessage()
@@ -219,6 +231,8 @@ public class MessageFormatException extends MessageException
    * Returns the context key sequence for the recorded formatting context, e.g. {@code l-c-p1-t1}.
    *
    * @return  context key sequence, never {@code null}
+   *
+   * @since 0.25.0
    */
   @Contract(value = "-> new", pure = true)
   public @NotNull String getContextKey()

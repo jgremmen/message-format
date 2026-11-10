@@ -80,13 +80,9 @@ public final class FluentMessageBuilder implements MessageBuilder
 
 
   /**
-   * Starts a literal text part and makes it the active part of this message.
+   * {@inheritDoc}
    *
-   * @param text  literal text to append, not {@code null}
-   *
-   * @return  builder for configuring the new text part, never {@code null}
-   *
-   * @throws IllegalStateException if this builder has already been built
+   * @throws IllegalStateException  if this builder has already been built
    */
   @Override
   public @NotNull TextBuilder text(@NotNull String text)
@@ -103,14 +99,10 @@ public final class FluentMessageBuilder implements MessageBuilder
 
 
   /**
-   * Starts a parameter part and makes it the active part of this message.
+   * {@inheritDoc}
    *
-   * @param name  parameter name, not {@code null}
-   *
-   * @return  builder for configuring the new parameter part, never {@code null}
-   *
-   * @throws IllegalArgumentException if {@code name} does not use a supported naming convention
-   * @throws IllegalStateException if this builder has already been built
+   * @throws IllegalArgumentException  if {@code name} does not use a supported naming convention
+   * @throws IllegalStateException  if this builder has already been built
    */
   @Override
   public @NotNull ParameterBuilder parameter(@NotNull String name)
@@ -127,14 +119,10 @@ public final class FluentMessageBuilder implements MessageBuilder
 
 
   /**
-   * Starts a post-formatter part and makes it the active part of this message.
+   * {@inheritDoc}
    *
-   * @param name  post-formatter name, not {@code null}
-   *
-   * @return  builder for configuring the new post-formatter part, never {@code null}
-   *
-   * @throws IllegalArgumentException if {@code name} does not use kebab-case
-   * @throws IllegalStateException if this builder has already been built
+   * @throws IllegalArgumentException  if {@code name} does not use kebab-case
+   * @throws IllegalStateException  if this builder has already been built
    */
   @Override
   public @NotNull PostFormatterBuilder postFormatter(@NotNull String name)
@@ -151,14 +139,10 @@ public final class FluentMessageBuilder implements MessageBuilder
 
 
   /**
-   * Starts a template reference part and makes it the active part of this message.
+   * {@inheritDoc}
    *
-   * @param name  template name, not {@code null}
-   *
-   * @return  builder for configuring the new template part, never {@code null}
-   *
-   * @throws IllegalArgumentException if {@code name} does not use kebab-case
-   * @throws IllegalStateException if this builder has already been built
+   * @throws IllegalArgumentException  if {@code name} does not use kebab-case
+   * @throws IllegalStateException  if this builder has already been built
    */
   @Override
   public @NotNull TemplateBuilder template(@NotNull String name)
@@ -175,11 +159,9 @@ public final class FluentMessageBuilder implements MessageBuilder
 
 
   /**
-   * Builds the configured message.
+   * {@inheritDoc}
    *
-   * @return  message assembled from the configured parts, never {@code null}
-   *
-   * @throws IllegalStateException if this builder has already been built
+   * @throws IllegalStateException  if this builder has already been built
    */
   @Override
   public @NotNull Message.WithSpaces build()
@@ -214,13 +196,9 @@ public final class FluentMessageBuilder implements MessageBuilder
 
 
   /**
-   * Builds the configured message and wraps it with the supplied code.
+   * {@inheritDoc}
    *
-   * @param code  message code to associate with the built message, not {@code null}
-   *
-   * @return  coded message, never {@code null}
-   *
-   * @throws IllegalStateException if this builder has already been built
+   * @throws IllegalStateException  if this builder has already been built
    */
   @Override
   public @NotNull Message.WithCode buildWithCode(@NotNull String code) {
@@ -229,9 +207,7 @@ public final class FluentMessageBuilder implements MessageBuilder
 
 
   /**
-   * Builds the configured message and exposes it as a {@link Template}.
-   *
-   * @return  template backed by the built message, never {@code null}
+   * {@inheritDoc}
    *
    * @throws IllegalStateException  if this builder has already been built or the message contains template references
    */
@@ -263,7 +239,7 @@ public final class FluentMessageBuilder implements MessageBuilder
   /**
    * Ensures this builder has not already produced a message or template.
    *
-   * @throws IllegalStateException if this builder has already produced a message or template
+   * @throws IllegalStateException  if this builder has already produced a message or template
    */
   private void checkNotBuilt()
   {

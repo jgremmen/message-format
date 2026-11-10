@@ -36,8 +36,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
- * Tests {@link MessageSupport}: formatting of messages, format suppliers, exception creation and post formatter locale
- * handling.
+ * Tests {@link MessageSupport}: formatting of messages, format suppliers, exception creation, post formatter locale
+ * handling and argument validation when adding templates.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0

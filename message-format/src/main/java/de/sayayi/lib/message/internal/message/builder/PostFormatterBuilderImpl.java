@@ -107,11 +107,7 @@ public final class PostFormatterBuilderImpl
 
 
   /**
-   * Sets the post-formatter input from a message-format string.
-   *
-   * @param message  message-format string to parse, not {@code null}
-   *
-   * @return  this post-formatter builder, never {@code null}
+   * {@inheritDoc}
    */
   @Override
   public @NotNull PostFormatterBuilder withMessage(@NotNull String message) {
@@ -120,11 +116,7 @@ public final class PostFormatterBuilderImpl
 
 
   /**
-   * Sets the post-formatter input from a pre-built message.
-   *
-   * @param message  message to pass to the post-formatter, not {@code null}
-   *
-   * @return  this post-formatter builder, never {@code null}
+   * {@inheritDoc}
    */
   @Override
   public @NotNull PostFormatterBuilder withMessage(@NotNull Message.WithSpaces message)
@@ -136,11 +128,7 @@ public final class PostFormatterBuilderImpl
 
 
   /**
-   * Sets the post-formatter input by configuring a nested message builder.
-   *
-   * @param messageConfigurer  callback that configures the nested message, not {@code null}
-   *
-   * @return  this post-formatter builder, never {@code null}
+   * {@inheritDoc}
    */
   @Override
   public @NotNull PostFormatterBuilder withMessage(@NotNull Consumer<MessageBuilder> messageConfigurer)
@@ -158,13 +146,9 @@ public final class PostFormatterBuilderImpl
 
 
   /**
-   * Flushes this part and starts a text part in the enclosing message builder.
+   * {@inheritDoc}
    *
-   * @param text  literal text for the next part, not {@code null}
-   *
-   * @return  builder for the next text part, never {@code null}
-   *
-   * @throws IllegalStateException if the enclosing builder has already been built
+   * @throws IllegalStateException  if the enclosing builder has already been built
    */
   @Override
   public @NotNull TextBuilder text(@NotNull String text)
@@ -176,14 +160,10 @@ public final class PostFormatterBuilderImpl
 
 
   /**
-   * Flushes this part and starts a parameter part in the enclosing message builder.
+   * {@inheritDoc}
    *
-   * @param name  parameter name, not {@code null}
-   *
-   * @return  builder for the parameter part, never {@code null}
-   *
-   * @throws IllegalArgumentException if {@code name} does not use a supported naming convention
-   * @throws IllegalStateException if the enclosing builder has already been built
+   * @throws IllegalArgumentException  if {@code name} does not use a supported naming convention
+   * @throws IllegalStateException     if the enclosing builder has already been built
    */
   @Override
   public @NotNull ParameterBuilder parameter(@NotNull String name)
@@ -195,14 +175,10 @@ public final class PostFormatterBuilderImpl
 
 
   /**
-   * Flushes this part and starts a post-formatter part in the enclosing message builder.
+   * {@inheritDoc}
    *
-   * @param name  post-formatter name, not {@code null}
-   *
-   * @return  builder for the post-formatter part, never {@code null}
-   *
-   * @throws IllegalArgumentException if {@code name} does not use kebab-case
-   * @throws IllegalStateException if the enclosing builder has already been built
+   * @throws IllegalArgumentException  if {@code name} does not use kebab-case
+   * @throws IllegalStateException     if the enclosing builder has already been built
    */
   @Override
   public @NotNull PostFormatterBuilder postFormatter(@NotNull String name)
@@ -214,14 +190,10 @@ public final class PostFormatterBuilderImpl
 
 
   /**
-   * Flushes this part and starts a template part in the enclosing message builder.
+   * {@inheritDoc}
    *
-   * @param name  template name, not {@code null}
-   *
-   * @return  builder for the template part, never {@code null}
-   *
-   * @throws IllegalArgumentException if {@code name} does not use kebab-case
-   * @throws IllegalStateException if the enclosing builder has already been built
+   * @throws IllegalArgumentException  if {@code name} does not use kebab-case
+   * @throws IllegalStateException     if the enclosing builder has already been built
    */
   @Override
   public @NotNull TemplateBuilder template(@NotNull String name)
@@ -233,11 +205,9 @@ public final class PostFormatterBuilderImpl
 
 
   /**
-   * Flushes this part and builds the enclosing message.
+   * {@inheritDoc}
    *
-   * @return  built message, never {@code null}
-   *
-   * @throws IllegalStateException if the enclosing builder has already been built
+   * @throws IllegalStateException  if the enclosing builder has already been built
    */
   @Override
   public @NotNull Message.WithSpaces build()
@@ -249,13 +219,9 @@ public final class PostFormatterBuilderImpl
 
 
   /**
-   * Flushes this part and builds a coded message from the enclosing builder.
+   * {@inheritDoc}
    *
-   * @param code  message code to associate with the built message, not {@code null}
-   *
-   * @return  coded message, never {@code null}
-   *
-   * @throws IllegalStateException if the enclosing builder has already been built
+   * @throws IllegalStateException  if the enclosing builder has already been built
    */
   @Override
   public @NotNull Message.WithCode buildWithCode(@NotNull String code)
@@ -267,11 +233,9 @@ public final class PostFormatterBuilderImpl
 
 
   /**
-   * Flushes this part and builds the enclosing message as a template.
+   * {@inheritDoc}
    *
-   * @return  built template, never {@code null}
-   *
-   * @throws IllegalStateException if the enclosing builder has already been built
+   * @throws IllegalStateException  if the enclosing builder has already been built
    */
   @Override
   public @NotNull Template buildAsTemplate()

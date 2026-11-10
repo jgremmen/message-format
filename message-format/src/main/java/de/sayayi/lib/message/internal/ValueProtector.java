@@ -16,6 +16,7 @@
 package de.sayayi.lib.message.internal;
 
 import de.sayayi.lib.message.util.SupplierDelegate;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 
 import java.util.function.*;
@@ -36,8 +37,10 @@ import java.util.function.*;
  * @author Jeroen Gremmen
  * @since 0.25.0
  */
+@ApiStatus.Internal
 final class ValueProtector
 {
+  /** This class is not meant to be instantiated. */
   private ValueProtector() {
   }
 

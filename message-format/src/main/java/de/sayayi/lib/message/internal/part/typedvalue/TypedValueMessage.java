@@ -66,10 +66,9 @@ public record TypedValueMessage(@NotNull Message.WithSpaces messageValue) implem
 
 
   /**
-   * Serializes this message value into its format string representation using
-   * {@link MessageUtil#serializeMessage(Context, Message, boolean)}.
-   *
-   * @param context  the serialization context, not {@code null}
+   * {@inheritDoc}
+   * <p>
+   * The message is serialized using {@link MessageUtil#serializeMessage(Context, Message, boolean)}.
    */
   @Override
   public void serialize(@NotNull Context context) {

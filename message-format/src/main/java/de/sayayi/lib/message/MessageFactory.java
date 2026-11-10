@@ -31,7 +31,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.security.SecureRandom;
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -47,7 +50,9 @@ import static java.util.Objects.requireNonNull;
  * <p>
  * The factory supports parsing both messages and templates, each in two flavors:
  * <ul>
- *   <li>A single format string (e.g. {@link #parseMessage(String)}, {@link #parseTemplate(String)}).</li>
+ *   <li>
+ *     A single format string (e.g. {@link #parseMessage(String)}, {@link #parseTemplate(String)}).
+ *   </li>
  *   <li>
  *     A locale-keyed map of format strings for locale-aware messages (e.g. {@link #parseMessage(Map)},
  *     {@link #parseTemplate(Map)}).
@@ -71,7 +76,11 @@ import static java.util.Objects.requireNonNull;
  */
 public class MessageFactory
 {
-  /** Lazily created shared factory instance, returned by {@link #getSharedInstance()}. */
+  /**
+   * Lazily created shared factory instance, returned by {@link #getSharedInstance()}.
+   *
+   * @since 0.25.0
+   */
   private static final Supplier<MessageFactory> SHARED_INSTANCE_SUPPLIER =
       SupplierDelegate.of(() -> new MessageFactory(PASS_THROUGH, 128));
 

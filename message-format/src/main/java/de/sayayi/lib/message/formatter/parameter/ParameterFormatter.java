@@ -46,9 +46,9 @@ import static java.util.Optional.empty;
 /**
  * A parameter formatter is responsible for converting a parameter value into formatted text during message formatting.
  * <p>
- * If {@link #getFormattableTypes()} returns a non-empty collection, parameter values that match one of the types in
- * the collection will be formatted using this parameter formatter. If the returned collection is empty, the formatter
- * is selected only if it implements {@link NamedParameterFormatter} and is referenced by name.
+ * If {@link #getFormattableTypes()} returns a non-empty collection, parameter values that match one of the types in the
+ * collection will be formatted using this parameter formatter. If the returned collection is empty, the formatter is
+ * selected only if it implements {@link NamedParameterFormatter} and is referenced by name.
  * <p>
  * This interface also defines several sub-interfaces that extend the formatter's capabilities:
  * <ul>
@@ -61,8 +61,8 @@ import static java.util.Optional.empty;
  *     (null, empty, bool, number, string) in the parameter configuration.
  *   </li>
  *   <li>
- *     {@link DefaultFormatter}: marks a formatter as the fallback for {@code Object}-typed values when no more
- *     specific formatter is available.
+ *     {@link DefaultFormatter}: marks a formatter as the fallback for {@code Object}-typed values when no more specific
+ *     formatter is available.
  *   </li>
  * </ul>
  *
@@ -80,8 +80,8 @@ public interface ParameterFormatter
 
 
   /**
-   * Updates the classifiers for the given {@code value}. Classifiers are type-based labels that describe the
-   * nature of a parameter value (e.g. {@code "bool"}, {@code "number"}, {@code "string"}).
+   * Updates the classifiers for the given {@code value}. Classifiers are type-based labels that describe the nature of
+   * a parameter value (e.g. {@code "bool"}, {@code "number"}, {@code "string"}).
    *
    * @param context  classifier context, not {@code null}
    * @param value    the non-{@code null} parameter value to classify
@@ -123,7 +123,7 @@ public interface ParameterFormatter
    *
    * @return  formatted null text, never {@code null}
    *
-   * @since 0.8.4
+   * @since 0.9.0
    */
   @Contract(pure = true)
   default @NotNull Text formatNull(@NotNull ParameterFormatterContext context)
@@ -143,7 +143,7 @@ public interface ParameterFormatter
    *
    * @return  formatted empty text, never {@code null}
    *
-   * @since 0.8.4
+   * @since 0.9.0
    */
   @Contract(pure = true)
   default @NotNull Text formatEmpty(@NotNull ParameterFormatterContext context)
@@ -165,14 +165,13 @@ public interface ParameterFormatter
    *
    * @param context         formatter context instance, not {@code null}
    * @param n               number key
-   * @param includeDefault  {@code true} use the default message if no mapping was found for the
-   *                                     given number key {@code n},
-   *                        {@code false} use only the mapped messages with keys of type number
+   * @param includeDefault  {@code true} use the default message if no mapping was found for the given number key
+   *                        {@code n}, {@code false} use only the mapped messages with keys of type number
    *
-   * @return  optional containing the formatted text for the given search key {@code n}, or an empty optional if the
-   *          map contains no key of type number, never {@code null}
+   * @return  optional containing the formatted text for the given search key {@code n}, or an empty optional if the map
+   *          contains no key of type number, never {@code null}
    *
-   * @since 0.8.4 (moved up from AbstractParameterFormatter)
+   * @since 0.9.0 (moved up from AbstractParameterFormatter)
    */
   @Contract(pure = true)
   default @NotNull Optional<Text> formatUsingMappedNumber(@NotNull ParameterFormatterContext context, long n,
@@ -200,14 +199,13 @@ public interface ParameterFormatter
    *
    * @param context         formatter context instance, not {@code null}
    * @param s               string key, not {@code null}
-   * @param includeDefault  {@code true} use the default message if no mapping was found for the
-   *                                     given string key {@code s},
-   *                        {@code false} use only the mapped messages with keys of type string
+   * @param includeDefault  {@code true} use the default message if no mapping was found for the given string key
+   *                        {@code s}, {@code false} use only the mapped messages with keys of type string
    *
-   * @return  optional containing the formatted text for the given search key {@code s}, or an empty optional if the
-   *          map contains no key of type string, never {@code null}
+   * @return  optional containing the formatted text for the given search key {@code s}, or an empty optional if the map
+   *          contains no key of type string, never {@code null}
    *
-   * @since 0.8.4 (moved up from AbstractParameterFormatter)
+   * @since 0.9.0 (moved up from AbstractParameterFormatter)
    */
   @Contract(pure = true)
   default @NotNull Optional<Text> formatUsingMappedString(@NotNull ParameterFormatterContext context,
@@ -228,12 +226,11 @@ public interface ParameterFormatter
   /**
    * Returns a set of java types which are supported by this formatter.
    * <p>
-   * On registration {@link FormatterService.WithRegistry#addFormatter(ParameterFormatter)}
-   * existing types which are also supported by this formatter will co-exist with each other.
-   * The order attribute determines which formatter is preferred before the other. If different
-   * formatters have both the same type and order, the formatter precedence is determined by
-   * the class name. The behavior is deterministic, but it is encouraged to select different
-   * order values for those cases.
+   * On registration {@link FormatterService.WithRegistry#addFormatter(ParameterFormatter)} existing types which are
+   * also supported by this formatter will co-exist with each other. The order attribute determines which formatter is
+   * preferred before the other. If different formatters have both the same type and order, the formatter precedence is
+   * determined by the class name. The behavior is deterministic, but it is encouraged to select different order values
+   * for those cases.
    *
    * @return  a set with supported java types for this formatter, not {@code null}
    *
@@ -275,8 +272,8 @@ public interface ParameterFormatter
      * @param context  formatter context, not {@code null}
      * @param value    object to calculate the size of, not {@code null}
      *
-     * @return  value size (&gt;= 0) or {@link OptionalLong#empty()} if this formatter is not capable of determining
-     *          the size, never {@code null}
+     * @return  value size (&gt;= 0) or {@link OptionalLong#empty()} if this formatter is not capable of determining the
+     *          size, never {@code null}
      */
     @Contract(pure = true)
     @NotNull OptionalLong size(@NotNull ParameterFormatterContext context, @NotNull Object value);
@@ -286,29 +283,29 @@ public interface ParameterFormatter
 
 
   /**
-   * A parameter formatter that can match parameter values against map keys in the parameter configuration. Map keys
-   * can be of type {@code null}, {@code empty}, {@code bool}, {@code number}, or {@code string} and this interface
-   * provides a comparison method for each.
+   * A parameter formatter that can match parameter values against map keys in the parameter configuration. Map keys can
+   * be of type {@code null}, {@code empty}, {@code bool}, {@code number}, or {@code string} and this interface provides
+   * a comparison method for each.
    * <p>
    * The default {@link #format(ParameterFormatterContext, Object)} implementation delegates to the next formatter in
    * the chain, since a map key comparator typically only contributes comparison logic rather than direct formatting.
-   * This means a {@code MapKeyComparator} must not be registered so that it is reachable <em>only</em> through
-   * explicit by-name selection (see {@link NamedParameterFormatter}): a formatter selected by name has no next
-   * formatter to delegate to and the default implementation would throw a {@code NoSuchElementException}. It must
-   * also be reachable through type-based resolution (e.g. via a registered {@link FormattableType}).
+   * This means a {@code MapKeyComparator} must not be registered so that it is reachable <em>only</em> through explicit
+   * by-name selection (see {@link NamedParameterFormatter}): a formatter selected by name has no next formatter to
+   * delegate to and the default implementation would throw a {@code NoSuchElementException}. It must also be reachable
+   * through type-based resolution (e.g. via a registered {@link FormattableType}).
    *
    * @param <T>  type of the value this comparator is capable of comparing
    *
-   * @since 0.8.4
+   * @since 0.9.0
    */
   interface MapKeyComparator<T> extends ParameterFormatter
   {
     /**
      * {@inheritDoc}
      * <p>
-     * This default implementation delegates to the next formatter in the chain, since a map key
-     * comparator typically only contributes comparison logic rather than direct formatting. See the
-     * {@link MapKeyComparator} class documentation for a caveat regarding by-name-only selection.
+     * This default implementation delegates to the next formatter in the chain, since a map key comparator typically
+     * only contributes comparison logic rather than direct formatting. See the {@link MapKeyComparator} class
+     * documentation for a caveat regarding by-name-only selection.
      *
      * @since 0.24.0
      */
@@ -326,7 +323,7 @@ public interface ParameterFormatter
      *
      * @return  comparison match result, never {@code null}
      *
-     * @since 0.9.2
+     * @since 0.10.0
      */
     @Contract(pure = true)
     default @NotNull MatchResult compareToNullKey(T value, @NotNull ComparatorContext context) {
@@ -342,7 +339,7 @@ public interface ParameterFormatter
      *
      * @return  comparison match result, never {@code null}
      *
-     * @since 0.9.2
+     * @since 0.10.0
      */
     @Contract(pure = true)
     default @NotNull MatchResult compareToEmptyKey(T value, @NotNull ComparatorContext context) {
@@ -358,7 +355,7 @@ public interface ParameterFormatter
      *
      * @return  comparison match result, never {@code null}
      *
-     * @since 0.9.2
+     * @since 0.10.0
      */
     @Contract(pure = true)
     default @NotNull MatchResult compareToBoolKey(@NotNull T value, @NotNull ComparatorContext context) {
@@ -374,7 +371,7 @@ public interface ParameterFormatter
      *
      * @return  comparison match result, never {@code null}
      *
-     * @since 0.9.2
+     * @since 0.10.0
      */
     @Contract(pure = true)
     default @NotNull MatchResult compareToNumberKey(@NotNull T value, @NotNull ComparatorContext context) {
@@ -390,7 +387,7 @@ public interface ParameterFormatter
      *
      * @return  comparison match result, never {@code null}
      *
-     * @since 0.9.2
+     * @since 0.10.0
      */
     @Contract(pure = true)
     default @NotNull MatchResult compareToStringKey(@NotNull T value, @NotNull ComparatorContext context) {
@@ -404,7 +401,7 @@ public interface ParameterFormatter
   /**
    * Context providing access to map key metadata and value matching during parameter map key comparison.
    *
-   * @since 0.8.4
+   * @since 0.9.0
    */
   interface ComparatorContext extends ConfigAccessor
   {
@@ -581,13 +578,13 @@ public interface ParameterFormatter
 
 
   /**
-   * Marker interface that qualifies a parameter formatter as the fallback formatter for {@code Object}-typed values.
-   * A default formatter is consulted when no more specific formatter is registered for the parameter value's type and
+   * Marker interface that qualifies a parameter formatter as the fallback formatter for {@code Object}-typed values. A
+   * default formatter is consulted when no more specific formatter is registered for the parameter value's type and
    * also provides map key comparison for arbitrary objects.
    *
    * @see GenericFormatterService#addFormatterForType(FormattableType, ParameterFormatter)
    *
-   * @since 0.8.4
+   * @since 0.9.0
    */
   interface DefaultFormatter extends MapKeyComparator<Object> {
   }

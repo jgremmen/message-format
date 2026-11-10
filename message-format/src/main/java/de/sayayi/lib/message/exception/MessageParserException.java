@@ -26,9 +26,8 @@ import static java.util.Locale.UK;
 
 
 /**
- * A message parser exception provides detailed information about what went wrong during message or
- * template parsing and provides a visual representation showing exactly where the parsing error
- * occurred.
+ * A message parser exception provides detailed information about what went wrong during message or template parsing and
+ * provides a visual representation showing exactly where the parsing error occurred.
  *
  * @author Jeroen Gremmen
  * @since 0.1.0
@@ -174,7 +173,7 @@ public class MessageParserException extends MessageException
    *
    * @return  error message, never {@code null}
    *
-   * @since 0.8.4
+   * @since 0.9.0
    */
   @Contract(pure = true)
   public @NotNull String getErrorMessage() {
@@ -183,12 +182,11 @@ public class MessageParserException extends MessageException
 
 
   /**
-   * Returns a visual representation of the location where the syntax error occurred during
-   * parsing.
+   * Returns a visual representation of the location where the syntax error occurred during parsing.
    *
    * @return  syntax error, never {@code null}
    *
-   * @since 0.8.4
+   * @since 0.9.0
    */
   @Contract(pure = true)
   public @NotNull String getSyntaxError() {
@@ -287,8 +285,8 @@ public class MessageParserException extends MessageException
 
 
   /**
-   * Returns a copy of this exception where the type has been replaced with the given {@code type}. The message code
-   * is only retained for type {@link Type#MESSAGE MESSAGE} and the template name only for type
+   * Returns a copy of this exception where the type has been replaced with the given {@code type}. The message code is
+   * only retained for type {@link Type#MESSAGE MESSAGE} and the template name only for type
    * {@link Type#TEMPLATE TEMPLATE}.
    *
    * @param type  type, not {@code null}

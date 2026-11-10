@@ -51,9 +51,7 @@ public final class MapRelationalBuilderImpl extends MapEqualityBuilderImpl imple
 
 
   /**
-   * Selects a less-than comparison for the map entry.
-   *
-   * @return  builder for supplying the entry value, never {@code null}
+   * {@inheritDoc}
    */
   @Override
   public @NotNull MapValueBuilder lt()
@@ -65,9 +63,7 @@ public final class MapRelationalBuilderImpl extends MapEqualityBuilderImpl imple
 
 
   /**
-   * Selects a less-than-or-equal comparison for the map entry.
-   *
-   * @return  builder for supplying the entry value, never {@code null}
+   * {@inheritDoc}
    */
   @Override
   public @NotNull MapValueBuilder lte()
@@ -79,9 +75,7 @@ public final class MapRelationalBuilderImpl extends MapEqualityBuilderImpl imple
 
 
   /**
-   * Selects a greater-than comparison for the map entry.
-   *
-   * @return  builder for supplying the entry value, never {@code null}
+   * {@inheritDoc}
    */
   @Override
   public @NotNull MapValueBuilder gt()
@@ -93,9 +87,7 @@ public final class MapRelationalBuilderImpl extends MapEqualityBuilderImpl imple
 
 
   /**
-   * Selects a greater-than-or-equal comparison for the map entry.
-   *
-   * @return  builder for supplying the entry value, never {@code null}
+   * {@inheritDoc}
    */
   @Override
   public @NotNull MapValueBuilder gte()

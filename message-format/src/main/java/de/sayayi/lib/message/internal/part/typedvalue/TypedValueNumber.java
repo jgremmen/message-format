@@ -61,11 +61,7 @@ public record TypedValueNumber(long longValue) implements NumberValue
   }
 
 
-  /**
-   * Serializes this numeric value into its format string representation.
-   *
-   * @param context  the serialization context, not {@code null}
-   */
+  /** {@inheritDoc} */
   @Override
   public void serialize(@NotNull Context context) {
     context.textJoiner().addNoSpace(Long.toString(longValue));

@@ -37,6 +37,9 @@ import static de.sayayi.lib.message.util.MessageUtil.serializeString;
 
 /**
  * This interface represents an immutable part of a compiled message (text, parameter, template or post formatter).
+ * <p>
+ * The interface hierarchy is sealed: message parts are created by the library while parsing or building a message and
+ * cannot be implemented by applications. Text parts can be created with {@link TextPartFactory}.
  *
  * @author Jeroen Gremmen
  * @since 0.1.0

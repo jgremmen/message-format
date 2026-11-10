@@ -25,11 +25,11 @@ import static de.sayayi.lib.message.pack.PackConstants.PACK_CONFIG;
 
 /**
  * File type detector for message format pack files. This detector uses the
- * {@linkplain PackConstants#PACK_CONFIG pack configuration} to identify files by their magic bytes
- * and reports the {@linkplain PackConstants#MIME_TYPE message format pack MIME type}.
+ * {@linkplain PackConstants#PACK_CONFIG pack configuration} to identify files by their magic bytes and reports the
+ * {@linkplain PackConstants#MIME_TYPE message format pack MIME type}.
  *
  * @author Jeroen Gremmen
- * @since 0.12.1
+ * @since 0.20.0
  */
 @ApiStatus.Internal
 public final class PackFileTypeDetector extends AbstractFileTypeDetector

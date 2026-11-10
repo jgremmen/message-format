@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * names and aliases.
  *
  * @author Jeroen Gremmen
- * @since 0.22.1
+ * @since 0.23.0
  */
 @DisplayName("Charset formatter")
 @TestMethodOrder(MethodOrderer.DisplayName.class)

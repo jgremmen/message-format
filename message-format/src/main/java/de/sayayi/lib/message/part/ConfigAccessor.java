@@ -32,7 +32,7 @@ import java.util.OptionalLong;
  * enum). If a key is not present in the local configuration, the message support is consulted for a default value.
  *
  * @author Jeroen Gremmen
- * @since 0.8.4
+ * @since 0.9.0
  *
  * @see MessagePart.Config
  * @see TypedValue
@@ -53,8 +53,8 @@ public interface ConfigAccessor
   /**
    * Gets a configuration value for named key {@code name}.
    * <p>
-   * The value is taken from the configuration map. If no such key is found the message support is queried for a
-   * default configuration value.
+   * The value is taken from the configuration map. If no such key is found the message support is queried for a default
+   * configuration value.
    *
    * @param name  configuration key, not {@code null}
    *
@@ -67,8 +67,8 @@ public interface ConfigAccessor
   /**
    * Gets a string configuration value for named key {@code name}.
    * <p>
-   * The value is taken from the configuration map. If no such key is found the message support is queried for a
-   * default configuration value.
+   * The value is taken from the configuration map. If no such key is found the message support is queried for a default
+   * configuration value.
    * <p>
    * If a value is found for the given {@code name} but the type is not a string, the method returns
    * {@link Optional#empty()}.
@@ -84,8 +84,8 @@ public interface ConfigAccessor
   /**
    * Gets a long configuration value for named key {@code name}.
    * <p>
-   * The value is taken from the configuration map. If no such key is found the message support is queried for a
-   * default configuration value.
+   * The value is taken from the configuration map. If no such key is found the message support is queried for a default
+   * configuration value.
    * <p>
    * If a value is found for the given {@code name} but the type is not a number, the method returns
    * {@link OptionalLong#empty()}.
@@ -103,8 +103,8 @@ public interface ConfigAccessor
   /**
    * Gets an integer configuration value for named key {@code name}.
    * <p>
-   * The value is taken from the configuration map. If no such key is found the message support is queried for a
-   * default configuration value.
+   * The value is taken from the configuration map. If no such key is found the message support is queried for a default
+   * configuration value.
    * <p>
    * If a value is found for the given {@code name} but the type is not a number, or the number value is outside the
    * integer range ({@link Integer#MIN_VALUE} to {@link Integer#MAX_VALUE}), the method returns
@@ -123,8 +123,8 @@ public interface ConfigAccessor
   /**
    * Gets a boolean configuration value for named key {@code name}.
    * <p>
-   * The value is taken from the configuration map. If no such key is found the message support is queried for a
-   * default configuration value.
+   * The value is taken from the configuration map. If no such key is found the message support is queried for a default
+   * configuration value.
    * <p>
    * If a value is found for the given {@code name} but the type is not boolean, the method returns
    * {@link Optional#empty()}.
@@ -140,8 +140,8 @@ public interface ConfigAccessor
   /**
    * Gets a message configuration value for named key {@code name}.
    * <p>
-   * The value is taken from the configuration map. If no such key is found the message support is queried for a
-   * default configuration value.
+   * The value is taken from the configuration map. If no such key is found the message support is queried for a default
+   * configuration value.
    * <p>
    * If a value is found for the given {@code name} but the type is not a string nor a message, the method returns
    * {@link Optional#empty()}.
@@ -157,11 +157,11 @@ public interface ConfigAccessor
   /**
    * Gets an enum configuration value for named key {@code name}.
    * <p>
-   * The value is taken from the configuration map. If no such key is found the message support is queried for a
-   * default configuration value.
+   * The value is taken from the configuration map. If no such key is found the message support is queried for a default
+   * configuration value.
    * <p>
-   * The string value associated with the key is matched against the enum constants of the given {@code enumType}.
-   * If no value is found, the value is not a string, or it does not match any enum constant, the method returns
+   * The string value associated with the key is matched against the enum constants of the given {@code enumType}. If no
+   * value is found, the value is not a string, or it does not match any enum constant, the method returns
    * {@link Optional#empty()}.
    *
    * @param name      configuration key, not {@code null}

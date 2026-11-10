@@ -26,8 +26,8 @@ import static de.sayayi.lib.message.pack.PackConstants.PACK_CONFIG;
  * {@link PackConstants#PACK_CONFIG pack configuration} to identify files by their magic bytes and reports the
  * {@link PackConstants#MIME_TYPE message format pack MIME type}.
  * <p>
- * Apache Tika discovers detectors through the {@link java.util.ServiceLoader ServiceLoader} mechanism. To register
- * this class, add its fully qualified name to a service file named
+ * Apache Tika discovers detectors through the {@link java.util.ServiceLoader ServiceLoader} mechanism. To register this
+ * class, add its fully qualified name to a service file named
  * {@code META-INF/services/org.apache.tika.detect.Detector}:
  * <pre>
  * de.sayayi.lib.message.pack.PackTikaDetector
@@ -45,7 +45,7 @@ import static de.sayayi.lib.message.pack.PackConstants.PACK_CONFIG;
  * </pre>
  *
  * @author Jeroen Gremmen
- * @since 0.20.0 (refactored in 0.25.0)
+ * @since 0.20.0
  */
 @SuppressWarnings("deprecation")
 public final class PackTikaDetector extends AbstractTikaDetector

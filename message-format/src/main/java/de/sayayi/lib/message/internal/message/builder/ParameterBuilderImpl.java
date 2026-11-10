@@ -71,7 +71,7 @@ public final class ParameterBuilderImpl
    * @param builder  enclosing message builder, not {@code null}
    * @param name     parameter name (must follow kebab-case or lower camel-case convention), not {@code null}
    *
-   * @throws IllegalArgumentException if {@code name} does not match the expected naming convention
+   * @throws IllegalArgumentException  if {@code name} does not match the expected naming convention
    */
   ParameterBuilderImpl(@NotNull FluentMessageBuilder builder, @NotNull String name)
   {
@@ -89,13 +89,9 @@ public final class ParameterBuilderImpl
 
 
   /**
-   * Sets the optional format name for this parameter part.
+   * {@inheritDoc}
    *
-   * @param format  format name, not {@code null}
-   *
-   * @return  this parameter builder, never {@code null}
-   *
-   * @throws IllegalArgumentException if {@code format} does not use kebab-case
+   * @throws IllegalArgumentException  if {@code format} does not use kebab-case
    */
   @Override
   public @NotNull ParameterBuilder withFormat(@NotNull String format)
@@ -110,11 +106,7 @@ public final class ParameterBuilderImpl
 
 
   /**
-   * Starts a boolean keyed map entry for this parameter.
-   *
-   * @param key  boolean key for the entry
-   *
-   * @return  builder for supplying the entry value, never {@code null}
+   * {@inheritDoc}
    */
   @Override
   public @NotNull MapValueBuilder mapBool(boolean key) {
@@ -123,9 +115,7 @@ public final class ParameterBuilderImpl
 
 
   /**
-   * Starts a map entry keyed by an empty-value comparison for this parameter.
-   *
-   * @return  builder for choosing the comparison and supplying the entry value, never {@code null}
+   * {@inheritDoc}
    */
   @Override
   public @NotNull MapEqualityBuilder mapEmpty()
@@ -136,9 +126,7 @@ public final class ParameterBuilderImpl
 
 
   /**
-   * Starts a map entry keyed by a null-value comparison for this parameter.
-   *
-   * @return  builder for choosing the comparison and supplying the entry value, never {@code null}
+   * {@inheritDoc}
    */
   @Override
   public @NotNull MapEqualityBuilder mapNull()
@@ -149,11 +137,7 @@ public final class ParameterBuilderImpl
 
 
   /**
-   * Starts a numeric map entry for this parameter.
-   *
-   * @param number  numeric key value to compare against
-   *
-   * @return  builder for choosing the comparison and supplying the entry value, never {@code null}
+   * {@inheritDoc}
    */
   @Override
   public @NotNull MapRelationalBuilder mapNumber(long number)
@@ -164,11 +148,7 @@ public final class ParameterBuilderImpl
 
 
   /**
-   * Starts a string keyed map entry for this parameter.
-   *
-   * @param string  string key value to compare against, not {@code null}
-   *
-   * @return  builder for choosing the comparison and supplying the entry value, never {@code null}
+   * {@inheritDoc}
    */
   @Override
   public @NotNull MapRelationalBuilder mapString(@NotNull String string)
@@ -229,9 +209,7 @@ public final class ParameterBuilderImpl
 
 
   /**
-   * Starts the default map entry used when no keyed entry matches.
-   *
-   * @return  builder for supplying the default entry value, never {@code null}
+   * {@inheritDoc}
    */
   @Override
   public @NotNull MapValueBuilder mapDefault() {
@@ -240,13 +218,9 @@ public final class ParameterBuilderImpl
 
 
   /**
-   * Flushes this part and starts a text part in the enclosing message builder.
+   * {@inheritDoc}
    *
-   * @param text  literal text for the next part, not {@code null}
-   *
-   * @return  builder for the next text part, never {@code null}
-   *
-   * @throws IllegalStateException if the enclosing builder has already been built
+   * @throws IllegalStateException  if the enclosing builder has already been built
    */
   @Override
   public @NotNull TextBuilder text(@NotNull String text)
@@ -258,14 +232,10 @@ public final class ParameterBuilderImpl
 
 
   /**
-   * Flushes this part and starts a parameter part in the enclosing message builder.
+   * {@inheritDoc}
    *
-   * @param name  parameter name, not {@code null}
-   *
-   * @return  builder for the parameter part, never {@code null}
-   *
-   * @throws IllegalArgumentException if {@code name} does not use a supported naming convention
-   * @throws IllegalStateException if the enclosing builder has already been built
+   * @throws IllegalArgumentException  if {@code name} does not use a supported naming convention
+   * @throws IllegalStateException     if the enclosing builder has already been built
    */
   @Override
   public @NotNull ParameterBuilder parameter(@NotNull String name)
@@ -277,14 +247,10 @@ public final class ParameterBuilderImpl
 
 
   /**
-   * Flushes this part and starts a post-formatter part in the enclosing message builder.
+   * {@inheritDoc}
    *
-   * @param name  post-formatter name, not {@code null}
-   *
-   * @return  builder for the post-formatter part, never {@code null}
-   *
-   * @throws IllegalArgumentException if {@code name} does not use kebab-case
-   * @throws IllegalStateException if the enclosing builder has already been built
+   * @throws IllegalArgumentException  if {@code name} does not use kebab-case
+   * @throws IllegalStateException     if the enclosing builder has already been built
    */
   @Override
   public @NotNull PostFormatterBuilder postFormatter(@NotNull String name)
@@ -296,14 +262,10 @@ public final class ParameterBuilderImpl
 
 
   /**
-   * Flushes this part and starts a template part in the enclosing message builder.
+   * {@inheritDoc}
    *
-   * @param name  template name, not {@code null}
-   *
-   * @return  builder for the template part, never {@code null}
-   *
-   * @throws IllegalArgumentException if {@code name} does not use kebab-case
-   * @throws IllegalStateException if the enclosing builder has already been built
+   * @throws IllegalArgumentException  if {@code name} does not use kebab-case
+   * @throws IllegalStateException     if the enclosing builder has already been built
    */
   @Override
   public @NotNull TemplateBuilder template(@NotNull String name)
@@ -315,11 +277,9 @@ public final class ParameterBuilderImpl
 
 
   /**
-   * Flushes this part and builds the enclosing message.
+   * {@inheritDoc}
    *
-   * @return  built message, never {@code null}
-   *
-   * @throws IllegalStateException if the enclosing builder has already been built
+   * @throws IllegalStateException  if the enclosing builder has already been built
    */
   @Override
   public @NotNull Message.WithSpaces build()
@@ -331,13 +291,9 @@ public final class ParameterBuilderImpl
 
 
   /**
-   * Flushes this part and builds a coded message from the enclosing builder.
+   * {@inheritDoc}
    *
-   * @param code  message code to associate with the built message, not {@code null}
-   *
-   * @return  coded message, never {@code null}
-   *
-   * @throws IllegalStateException if the enclosing builder has already been built
+   * @throws IllegalStateException  if the enclosing builder has already been built
    */
   @Override
   public @NotNull Message.WithCode buildWithCode(@NotNull String code)
@@ -349,11 +305,9 @@ public final class ParameterBuilderImpl
 
 
   /**
-   * Flushes this part and builds the enclosing message as a template.
+   * {@inheritDoc}
    *
-   * @return  built template, never {@code null}
-   *
-   * @throws IllegalStateException if the enclosing builder has already been built
+   * @throws IllegalStateException  if the enclosing builder has already been built
    */
   @Override
   public @NotNull Template buildAsTemplate()

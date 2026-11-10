@@ -89,7 +89,11 @@ public final class LRUMessagePartNormalizer
     /** Maximum number of cached parts. */
     private final int maxSize;
 
-    /** Lock guarding access to the cached parts. */
+    /**
+     * Lock guarding access to the cached parts.
+     *
+     * @since 0.25.0
+     */
     private final Lock cacheLock;
 
     /** Cached parts, ordered from most to least recently used, or {@code null} if nothing has been cached yet. */

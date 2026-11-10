@@ -138,15 +138,10 @@ public final class PostFormatterPart implements MessagePart.PostFormat
 
 
   /**
-   * Formats the embedded message and applies the named post formatter to the result.
+   * {@inheritDoc}
    * <p>
-   * If the embedded message formats to empty text, the empty text is returned as-is without invoking the post
+   * If the embedded message formats to empty text, the empty text is returned as is without invoking the post
    * formatter. Leading and trailing spaces from both this part and the formatted text are merged.
-   *
-   * @param messageAccessor  accessor for retrieving formatters and locale, not {@code null}
-   * @param parameters       formatting parameters, not {@code null}
-   *
-   * @return  the post-formatted text, never {@code null}
    *
    * @throws MessageFormatException  if no post formatter with the name of this part has been registered
    */

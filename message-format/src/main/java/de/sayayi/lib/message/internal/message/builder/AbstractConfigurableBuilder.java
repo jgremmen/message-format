@@ -77,14 +77,9 @@ public abstract non-sealed class AbstractConfigurableBuilder<S extends Configura
 
 
   /**
-   * Stores a string configuration value for the current part.
+   * {@inheritDoc}
    *
-   * @param name   configuration name, not {@code null}
-   * @param value  string value, not {@code null}
-   *
-   * @return  this builder, never {@code null}
-   *
-   * @throws IllegalArgumentException if {@code name} does not use kebab-case
+   * @throws IllegalArgumentException  if {@code name} does not use kebab-case
    */
   @Override
   public @NotNull S configString(@NotNull String name, @NotNull String value) {
@@ -93,14 +88,9 @@ public abstract non-sealed class AbstractConfigurableBuilder<S extends Configura
 
 
   /**
-   * Stores a boolean configuration value for the current part.
+   * {@inheritDoc}
    *
-   * @param name   configuration name, not {@code null}
-   * @param value  boolean value to store
-   *
-   * @return  this builder, never {@code null}
-   *
-   * @throws IllegalArgumentException if {@code name} does not use kebab-case
+   * @throws IllegalArgumentException  if {@code name} does not use kebab-case
    */
   @Override
   public @NotNull S configBool(@NotNull String name, boolean value) {
@@ -109,14 +99,9 @@ public abstract non-sealed class AbstractConfigurableBuilder<S extends Configura
 
 
   /**
-   * Stores a numeric configuration value for the current part.
+   * {@inheritDoc}
    *
-   * @param name   configuration name, not {@code null}
-   * @param value  numeric value to store
-   *
-   * @return  this builder, never {@code null}
-   *
-   * @throws IllegalArgumentException if {@code name} does not use kebab-case
+   * @throws IllegalArgumentException  if {@code name} does not use kebab-case
    */
   @Override
   public @NotNull S configNumber(@NotNull String name, long value) {
@@ -125,14 +110,9 @@ public abstract non-sealed class AbstractConfigurableBuilder<S extends Configura
 
 
   /**
-   * Stores a nested message configuration value for the current part.
+   * {@inheritDoc}
    *
-   * @param name     configuration name, not {@code null}
-   * @param message  message value, not {@code null}
-   *
-   * @return  this builder, never {@code null}
-   *
-   * @throws IllegalArgumentException if {@code name} does not use kebab-case
+   * @throws IllegalArgumentException  if {@code name} does not use kebab-case
    */
   @Override
   public @NotNull S configMessage(@NotNull String name, @NotNull Message.WithSpaces message) {

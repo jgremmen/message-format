@@ -40,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests {@link DefaultFormatterService}: discovery of formatters through the default class loader and through an
- * isolated class loader.
+ * isolated class loader, and subclasses which defer adding the default formatters until their fields are initialized.
  *
  * @author Jeroen Gremmen
  * @since 0.25.0
@@ -54,7 +54,8 @@ final class DefaultFormatterServiceTest
   void testDefaultClassLoader()
   {
     assertSame(DefaultFormatterService.class.getClassLoader(), new DefaultFormatterService().classLoader);
-    assertSame(DefaultFormatterService.class.getClassLoader(), new DefaultFormatterService(null, 16).classLoader);
+    assertSame(DefaultFormatterService.class.getClassLoader(),
+        new DefaultFormatterService(null, 16).classLoader);
 
     val classLoader = new URLClassLoader(new URL[0]);
     assertSame(classLoader, new DefaultFormatterService(classLoader, 16).classLoader);

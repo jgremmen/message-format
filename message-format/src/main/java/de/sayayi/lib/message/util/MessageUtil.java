@@ -672,7 +672,7 @@ public final class MessageUtil
    *
    * @return  {@code true} if the file is a message format pack file, {@code false} otherwise
    *
-   * @since 0.21.1
+   * @since 0.22.0
    */
   @Contract(pure = true)
   public static boolean isMessageFormatPack(@NotNull Path path)
@@ -687,9 +687,9 @@ public final class MessageUtil
 
 
   /**
-   * Imports messages and templates from a message format pack file. The {@code packStream} is
-   * validated and all entries are iterated. Each message is passed to the optional
-   * {@code messageConsumer} and each template to the optional {@code templateConsumer}.
+   * Imports messages and templates from a message format pack file. The {@code packStream} is validated and all entries
+   * are iterated. Each message is passed to the optional {@code messageConsumer} and each template to the optional
+   * {@code templateConsumer}.
    * <p>
    * The {@code packStream} is closed when this method returns, regardless of whether the import was successful or not.
    * Packs are meant to be read as a whole, e.g. from a file. To read a pack from a part of a larger stream
@@ -770,6 +770,8 @@ public final class MessageUtil
    * @param cause  runtime exception raised while unpacking, not {@code null}
    *
    * @return  stream corrupted exception with {@code cause} attached, never {@code null}
+   *
+   * @since 0.25.0
    */
   @Contract(pure = true)
   private static @NotNull StreamCorruptedException invalidPack(@NotNull RuntimeException cause)

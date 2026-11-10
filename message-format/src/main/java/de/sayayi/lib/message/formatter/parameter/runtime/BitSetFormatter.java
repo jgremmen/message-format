@@ -146,7 +146,7 @@ import static java.util.Collections.emptyIterator;
  * }</pre>
  *
  * @author Jeroen Gremmen
- * @since 0.21.1
+ * @since 0.22.0
  */
 public final class BitSetFormatter extends AbstractListFormatter<BitSet>
 {

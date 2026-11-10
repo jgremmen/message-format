@@ -54,8 +54,8 @@ import static java.util.Collections.unmodifiableSet;
  * resolves the best matching message for a given parameter value by comparing map keys using
  * {@link ParameterFormatter} instances.
  * <p>
- * Map keys are stored in a sorted order and matched against a parameter value at format time. An optional default
- * value is returned when no explicit key matches.
+ * Map keys are stored in a sorted order and matched against a parameter value at format time. An optional default value
+ * is returned when no explicit key matches.
  *
  * @author Jeroen Gremmen
  * @since 0.21.0
@@ -136,15 +136,7 @@ public final class MessagePartMap implements MessagePart.Map
   }
 
 
-  /**
-   * Tells whether the parameter configuration map contains a message entry with the given
-   * {@code keyType}.
-   *
-   * @param keyType  entry key type to look for, not {@code null}
-   *
-   * @return  {@code true} if the map contains a message with the given key type,
-   *          {@code false} otherwise
-   */
+  /** {@inheritDoc} */
   @Override
   @Contract(pure = true)
   public boolean hasMessageWithKeyType(@NotNull MapKey.Type keyType) {
@@ -277,12 +269,7 @@ public final class MessagePartMap implements MessagePart.Map
   }
 
 
-  /**
-   * Returns a set of template names referenced in all message values which are available in the message parameter
-   * configuration.
-   *
-   * @return  unmodifiable set of all referenced template names, never {@code null}
-   */
+  /** {@inheritDoc} */
   @Override
   @Contract(pure = true)
   @Unmodifiable

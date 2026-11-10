@@ -33,8 +33,8 @@ import static java.util.Objects.requireNonNull;
 
 
 /**
- * Typed value implementation for string configuration or map values. In addition to exposing the raw string, it is
- * able to parse that string lazily into a {@link Message.WithSpaces message} on demand.
+ * Typed value implementation for string configuration or map values. In addition to exposing the raw string, it is able
+ * to parse that string lazily into a {@link Message.WithSpaces message} on demand.
  *
  * @author Jeroen Gremmen
  * @since 0.4.0 (renamed in 0.8.0)
@@ -89,6 +89,8 @@ public final class TypedValueString implements StringValue
 
   /**
    * {@inheritDoc}
+   *
+   * @since 0.25.0
    */
   @Override
   public @NotNull Message.WithSpaces asMessage() {
@@ -97,11 +99,10 @@ public final class TypedValueString implements StringValue
 
 
   /**
-   * Serializes this string value into its format string representation. If the string is a valid
-   * {@linkplain de.sayayi.lib.message.util.MessageUtil#isName(String) name} and not a keyword, it is serialized
-   * unquoted; otherwise it is serialized as a quoted string.
-   *
-   * @param context  the serialization context, not {@code null}
+   * {@inheritDoc}
+   * <p>
+   * If the string is a valid {@linkplain de.sayayi.lib.message.util.MessageUtil#isName(String) name} and not a
+   * keyword, it is serialized unquoted; otherwise it is serialized as a quoted string.
    */
   @Override
   public void serialize(@NotNull Context context) {
@@ -110,8 +111,7 @@ public final class TypedValueString implements StringValue
 
 
   /**
-   * Compares this typed value string with another object for equality based on the wrapped
-   * string value.
+   * Compares this typed value string with another object for equality based on the wrapped string value.
    *
    * @param o  the object to compare with
    *

@@ -64,7 +64,11 @@ final class ParameterFormatterContextImpl extends BaseConfigAccessor implements 
   /** Explicit formatter name, or {@code null}. */
   private final String format;
 
-  /** Type used to select the formatters, {@link ParameterFormatter#NULL_TYPE NULL_TYPE} for {@code null} values. */
+  /**
+   * Type used to select the formatters, {@link ParameterFormatter#NULL_TYPE NULL_TYPE} for {@code null} values.
+   *
+   * @since 0.25.0
+   */
   private final @NotNull Class<?> type;
 
   /** Prioritized formatters available for the value being formatted. */

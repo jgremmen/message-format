@@ -458,6 +458,8 @@ public abstract class MessageFormatPackTask extends DefaultTask
    * @return  message code filter, never {@code null}
    *
    * @throws InvalidUserDataException  if an include or exclude pattern is not a valid regular expression
+   *
+   * @since 0.25.0
    */
   @Contract(pure = true)
   private @NotNull Predicate<String> createMessageCodeFilter()
@@ -498,6 +500,8 @@ public abstract class MessageFormatPackTask extends DefaultTask
    * @return  compiled patterns, never {@code null}
    *
    * @throws InvalidUserDataException  if a regular expression is not valid
+   *
+   * @since 0.25.0
    */
   @Contract(pure = true)
   private static @NotNull List<Pattern> compilePatterns(@NotNull List<String> regexList, @NotNull String kind)
@@ -685,6 +689,8 @@ public abstract class MessageFormatPackTask extends DefaultTask
    * @return  class file content, never {@code null}
    *
    * @throws GradleException  if the class file cannot be read
+   *
+   * @since 0.25.0
    */
   @Contract(pure = true)
   private static byte @NotNull [] readClassFile(@NotNull Path classPath)

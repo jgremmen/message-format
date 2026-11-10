@@ -88,8 +88,7 @@ public final class MessagePartConfig implements MessagePart.Config
   /**
    * Tells whether the parameter configuration contains any values.
    *
-   * @return  {@code true} if the parameter configuration contains at least 1 value,
-   *          {@code false} otherwise
+   * @return  {@code true} if the parameter configuration contains at least 1 value, {@code false} otherwise
    */
   @Override
   @Contract(pure = true)
@@ -99,9 +98,7 @@ public final class MessagePartConfig implements MessagePart.Config
 
 
   /**
-   * Returns a set of config names defined in the parameter configuration map.
-   *
-   * @return  unmodifiable set of config names, never {@code null}
+   * {@inheritDoc}
    *
    * @since 0.20.0
    */
@@ -122,12 +119,7 @@ public final class MessagePartConfig implements MessagePart.Config
   }
 
 
-  /**
-   * Returns a set of template names referenced in all message values which are available in
-   * the message parameter configuration.
-   *
-   * @return  unmodifiable set of all referenced template names, never {@code null}
-   */
+  /** {@inheritDoc} */
   @Override
   @Contract(pure = true)
   @Unmodifiable
@@ -148,8 +140,7 @@ public final class MessagePartConfig implements MessagePart.Config
    *
    * @param o  the object to compare with
    *
-   * @return  {@code true} if {@code o} is a {@code MessagePartConfig} with an equal
-   *          configuration map
+   * @return  {@code true} if {@code o} is a {@code MessagePartConfig} with an equal configuration map
    */
   @Override
   public boolean equals(Object o) {
@@ -169,8 +160,7 @@ public final class MessagePartConfig implements MessagePart.Config
 
 
   /**
-   * Returns a string representation of this configuration in the form
-   * <code>{key1=value1,key2=value2,...}</code>.
+   * Returns a string representation of this configuration in the form <code>{key1=value1,key2=value2,...}</code>.
    *
    * @return  string representation, never {@code null}
    */

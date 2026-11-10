@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
  * default bit configuration for lsb and msb.
  *
  * @author Jeroen Gremmen
- * @since 0.21.1
+ * @since 0.22.0
  */
 @DisplayName("BitSet formatter")
 @TestMethodOrder(MethodOrderer.DisplayName.class)

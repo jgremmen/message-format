@@ -180,6 +180,8 @@ public non-sealed class GenericFormatterService implements FormatterService.With
    * @param formatter  the formatter to validate, not {@code null}
    *
    * @throws FormatterServiceException  if the formatter is not eligible for registration
+   *
+   * @since 0.25.0
    */
   private void validateFormatterForType(@NotNull Class<?> type, @NotNull ParameterFormatter formatter)
   {
@@ -205,6 +207,8 @@ public non-sealed class GenericFormatterService implements FormatterService.With
    *
    * @param formattableType  the formattable type to register the formatter for, not {@code null}
    * @param formatter        the formatter to register, not {@code null}
+   *
+   * @since 0.25.0
    */
   private void registerFormatterForType(@NotNull FormattableType formattableType, @NotNull ParameterFormatter formatter)
   {
@@ -223,9 +227,9 @@ public non-sealed class GenericFormatterService implements FormatterService.With
    * support {@linkplain NamedParameterFormatter#autoApplyOnNamedConfigParameter() auto-apply} are additionally
    * registered to be selected automatically when their configuration key is present.
    * <p>
-   * Formatter names and parameter configuration names are validated to follow the kebab-case naming convention. A
-   * named formatter whose name has already been registered is rejected with a {@link FormatterServiceException},
-   * consistent with {@link #addPostFormatter(PostFormatter)}.
+   * Formatter names and parameter configuration names are validated to follow the kebab-case naming convention. A named
+   * formatter whose name has already been registered is rejected with a {@link FormatterServiceException}, consistent
+   * with {@link #addPostFormatter(PostFormatter)}.
    * <p>
    * All validation is performed before any internal state is mutated, so a failed registration leaves the formatter
    * service unchanged.
@@ -291,6 +295,8 @@ public non-sealed class GenericFormatterService implements FormatterService.With
    * @param namedParameterFormatter  the named formatter to validate for auto-apply, not {@code null}
    *
    * @throws FormatterServiceException  if a configuration key conflicts with an already registered auto-apply formatter
+   *
+   * @since 0.25.0
    */
   private void validateAutoApplyNamedFormatter(@NotNull NamedParameterFormatter namedParameterFormatter)
   {
@@ -314,6 +320,8 @@ public non-sealed class GenericFormatterService implements FormatterService.With
    * {@link #validateAutoApplyNamedFormatter(NamedParameterFormatter)} has passed for the same formatter.
    *
    * @param namedParameterFormatter  the named formatter to register for auto-apply, not {@code null}
+   *
+   * @since 0.25.0
    */
   private void registerAutoApplyNamedFormatter(@NotNull NamedParameterFormatter namedParameterFormatter)
   {

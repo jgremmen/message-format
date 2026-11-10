@@ -202,7 +202,7 @@ public abstract class AbstractListFormatter<T> extends AbstractParameterFormatte
   /**
    * Configuration key that controls whether duplicate element texts are suppressed.
    *
-   * @since 0.21.1
+   * @since 0.22.0
    */
   protected static final String CONFIG_UNIQUE = "list-unique";
 
@@ -314,7 +314,7 @@ public abstract class AbstractListFormatter<T> extends AbstractParameterFormatte
    * Subclasses implement {@link #prepareNextText()} to supply the next text element. The iterator reports
    * {@code hasNext() == true} as long as {@code prepareNextText()} returns a non-{@code null} value.
    *
-   * @since 0.21.1
+   * @since 0.22.0
    */
   protected static abstract class AbstractTextIterator implements Iterator<Text>
   {
@@ -323,8 +323,8 @@ public abstract class AbstractListFormatter<T> extends AbstractParameterFormatte
 
 
     /**
-     * Initializes the iterator by preparing the first text element. Must be called by subclass constructors after
-     * all fields have been assigned.
+     * Initializes the iterator by preparing the first text element. Must be called by subclass constructors after all
+     * fields have been assigned.
      *
      * @since 0.22.0
      */

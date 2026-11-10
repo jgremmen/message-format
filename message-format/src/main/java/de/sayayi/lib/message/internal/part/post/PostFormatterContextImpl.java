@@ -31,10 +31,9 @@ import java.util.Optional;
 /**
  * Default implementation of {@link PostFormatterContext} used during post format message part evaluation.
  * <p>
- * This context provides access to the post format configuration keys and the formatting locale. Configuration
- * values of type string, number and boolean are resolved through the base class. Message-typed configuration
- * values are not supported; calling {@link #getConfigValueMessage(String)} will throw an
- * {@link UnsupportedOperationException}.
+ * This context provides access to the post format configuration keys and the formatting locale. Configuration values of
+ * type string, number and boolean are resolved through the base class. Message-typed configuration values are not
+ * supported; calling {@link #getConfigValueMessage(String)} will throw an {@link UnsupportedOperationException}.
  *
  * @author Jeroen Gremmen
  * @since 0.21.0
@@ -42,7 +41,11 @@ import java.util.Optional;
 @ApiStatus.Internal
 final class PostFormatterContextImpl extends BaseConfigAccessor implements PostFormatterContext
 {
-  /** Parameters of the message being formatted, providing the formatting locale. */
+  /**
+   * Parameters of the message being formatted, providing the formatting locale.
+   *
+   * @since 0.25.0
+   */
   private final @NotNull Parameters parameters;
 
 
@@ -74,8 +77,8 @@ final class PostFormatterContextImpl extends BaseConfigAccessor implements PostF
 
 
   /**
-   * Always throws {@link UnsupportedOperationException}. Message-typed configuration values are not supported
-   * in the post formatter context.
+   * Always throws {@link UnsupportedOperationException}. Message-typed configuration values are not supported in the
+   * post formatter context.
    *
    * @param name  configuration key, not {@code null}
    *

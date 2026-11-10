@@ -22,15 +22,19 @@ import java.util.function.Supplier;
 
 
 /**
- * Log4j {@link Message} implementation that delegates message formatting to a supplier. This allows for lazy
- * evaluation of the formatted message string, deferring the formatting work until the message is actually needed.
+ * Log4j {@link Message} implementation that delegates message formatting to a supplier. This allows for lazy evaluation
+ * of the formatted message string, deferring the formatting work until the message is actually needed.
  *
  * @author Jeroen Gremmen
  * @since 0.21.0
  */
 final class Log4jMessage implements Message
 {
-  /** Message format string. */
+  /**
+   * Message format string.
+   *
+   * @since 0.25.0
+   */
   private final String format;
 
   /** Supplier providing the formatted message. */
@@ -71,6 +75,8 @@ final class Log4jMessage implements Message
    * <p>
    * Returns the unformatted message format string. This method must be implemented, as it is abstract in Log4j API
    * versions prior to 2.24.0 (and deprecated since then).
+   *
+   * @since 0.25.0
    */
   @Override
   @SuppressWarnings("deprecation")

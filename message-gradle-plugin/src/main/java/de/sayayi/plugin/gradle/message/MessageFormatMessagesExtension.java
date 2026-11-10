@@ -166,6 +166,8 @@ public abstract class MessageFormatMessagesExtension
    * @return  duplicate strategy, never {@code null}
    *
    * @throws InvalidUserDataException  if {@code value} is not a known duplicate strategy
+   *
+   * @since 0.25.0
    */
   @Contract(pure = true)
   private static @NotNull DuplicateStrategy toDuplicateStrategy(@NotNull Object value)

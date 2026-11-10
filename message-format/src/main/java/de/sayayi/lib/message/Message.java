@@ -273,22 +273,14 @@ public sealed interface Message extends FormatStringSerializer
    */
   sealed interface WithSpaces extends Message, SpacesAware permits CompoundMessage, EmptyMessage, TextMessage
   {
-    /**
-     * Tells if the message has a leading space.
-     *
-     * @return  {@code true} if the message has a leading space, {@code false} otherwise
-     */
+    /** {@inheritDoc} */
     @Override
     default boolean isSpaceBefore() {
       return getMessageParts()[0].isSpaceBefore();
     }
 
 
-    /**
-     * Tells if the message has a trailing space.
-     *
-     * @return  {@code true} if the message has a trailing space, {@code false} otherwise
-     */
+    /** {@inheritDoc} */
     @Override
     default boolean isSpaceAfter()
     {
@@ -340,10 +332,18 @@ public sealed interface Message extends FormatStringSerializer
      * The message is formatted with respect to the locale provided by {@code parameters}. If the locale does not match
      * any of the localized messages, a default message will be selected using the following rules
      * <ol>
-     *   <li>a message with the same language and no country</li>
-     *   <li>a message with the same language but a different country</li>
-     *   <li>a message for a locale without language (e.g. {@link Locale#ROOT})</li>
-     *   <li>the first available message (this may be implementation dependent)</li>
+     *   <li>
+     *     a message with the same language and no country
+     *   </li>
+     *   <li>
+     *     a message with the same language but a different country
+     *   </li>
+     *   <li>
+     *     a message for a locale without language (e.g. {@link Locale#ROOT})
+     *   </li>
+     *   <li>
+     *     the first available message (this may be implementation dependent)
+     *   </li>
      * </ol>
      * If several messages match equally well, the first one in iteration order is selected.
      *
@@ -375,8 +375,8 @@ public sealed interface Message extends FormatStringSerializer
 
 
     /**
-     * Always throws {@link UnsupportedOperationException} because a locale-aware message does not have a single
-     * array of message parts. Each locale has its own associated message with its own parts.
+     * Always throws {@link UnsupportedOperationException} because a locale-aware message does not have a single array
+     * of message parts. Each locale has its own associated message with its own parts.
      *
      * @return  never returns normally
      *
@@ -392,8 +392,8 @@ public sealed interface Message extends FormatStringSerializer
 
 
     /**
-     * Always throws {@link UnsupportedOperationException} because a locale-aware message does not have a single
-     * format string representation. Each locale has its own associated message with its own format string.
+     * Always throws {@link UnsupportedOperationException} because a locale-aware message does not have a single format
+     * string representation. Each locale has its own associated message with its own format string.
      *
      * @param charset  ignored
      *
@@ -427,9 +427,8 @@ public sealed interface Message extends FormatStringSerializer
   interface Parameters
   {
     /**
-     * Tells for which locale the message must be formatted. If no locale is provided or if no
-     * message is available for the given locale, the formatter will look for a reasonable
-     * default message.
+     * Tells for which locale the message must be formatted. If no locale is provided or if no message is available for
+     * the given locale, the formatter will look for a reasonable default message.
      *
      * @return  locale, never {@code null}
      */
@@ -442,8 +441,7 @@ public sealed interface Message extends FormatStringSerializer
      *
      * @param parameter  parameter name, not {@code null}
      *
-     * @return  parameter value or {@code null} if no value is available for the given
-     *          parameter name
+     * @return  parameter value or {@code null} if no value is available for the given parameter name
      */
     @Contract(pure = true)
     Object getParameterValue(@NotNull String parameter);
@@ -454,8 +452,8 @@ public sealed interface Message extends FormatStringSerializer
      *
      * @param parameter  parameter name, not {@code null}
      *
-     * @return  an {@link Optional} containing the boolean value, or an empty optional if the value is {@code null}
-     *          or not convertible to a boolean
+     * @return  an {@link Optional} containing the boolean value, or an empty optional if the value is {@code null} or
+     *          not convertible to a boolean
      *
      * @see ParameterValueHelper#getBoolean(Parameters, String)
      *
@@ -472,8 +470,8 @@ public sealed interface Message extends FormatStringSerializer
      *
      * @param parameter  parameter name, not {@code null}
      *
-     * @return  an {@link OptionalInt} containing the int value, or an empty optional if the value is {@code null}
-     *          or not convertible to an int
+     * @return  an {@link OptionalInt} containing the int value, or an empty optional if the value is {@code null} or
+     *          not convertible to an int
      *
      * @see ParameterValueHelper#getInt(Parameters, String)
      *
@@ -490,8 +488,8 @@ public sealed interface Message extends FormatStringSerializer
      *
      * @param parameter  parameter name, not {@code null}
      *
-     * @return  an {@link OptionalLong} containing the long value, or an empty optional if the value is {@code null}
-     *          or not convertible to a long
+     * @return  an {@link OptionalLong} containing the long value, or an empty optional if the value is {@code null} or
+     *          not convertible to a long
      *
      * @see ParameterValueHelper#getLong(Parameters, String)
      *
@@ -529,8 +527,8 @@ public sealed interface Message extends FormatStringSerializer
      *
      * @param parameter  parameter name, not {@code null}
      *
-     * @return  an {@link Optional} containing the string value, or an empty optional if the value is {@code null}
-     *          or not a {@link CharSequence}
+     * @return  an {@link Optional} containing the string value, or an empty optional if the value is {@code null} or
+     *          not a {@link CharSequence}
      *
      * @see ParameterValueHelper#getString(Parameters, String)
      *

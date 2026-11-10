@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Tests {@link OptionalFormatter}: formatting of empty and {@code null} optionals.
  *
  * @author Jeroen Gremmen
- * @since 0.8.4
+ * @since 0.9.0
  */
 @DisplayName("Optional formatter")
 @TestMethodOrder(MethodOrderer.DisplayName.class)

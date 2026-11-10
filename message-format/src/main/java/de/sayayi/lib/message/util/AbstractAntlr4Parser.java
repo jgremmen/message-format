@@ -370,7 +370,7 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
      *
      * @see SyntaxErrorBuilder#with(Token)
      *
-     * @since 0.24.1
+     * @since 0.25.0
      */
     @Contract(value = "_ -> new", pure = true)
     @NotNull SyntaxErrorBuilder with(@NotNull Token token);

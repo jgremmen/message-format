@@ -25,12 +25,12 @@ import java.io.IOException;
 
 
 /**
- * Internal implementation of {@link MapKey} representing a null map key. This enum provides two singleton constants
- * for the two supported compare types: {@link #EQ} (matches {@code null} values) and {@link #NE} (matches
- * non-{@code null} values).
+ * Internal implementation of {@link MapKey} representing a null map key. This enum provides two singleton constants for
+ * the two supported compare types: {@link #EQ} (matches {@code null} values) and {@link #NE} (matches non-{@code null}
+ * values).
  *
  * @author Jeroen Gremmen
- * @since 0.4.0 (renamed in 0.8.0)
+ * @since 0.4.0
  */
 @ApiStatus.Internal
 public enum MapKeyNull implements MapKey
@@ -63,9 +63,9 @@ public enum MapKeyNull implements MapKey
 
 
   /**
-   * Serializes this null map key into its format string representation (e.g. {@code "null"} or {@code "<>null"}).
-   *
-   * @param context  the serialization context, not {@code null}
+   * {@inheritDoc}
+   * <p>
+   * The key is serialized as {@code null}, prefixed by its comparison type if applicable (e.g. {@code <>null}).
    */
   @Override
   public void serialize(@NotNull Context context) {

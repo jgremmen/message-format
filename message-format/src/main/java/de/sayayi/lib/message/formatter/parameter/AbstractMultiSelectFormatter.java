@@ -191,8 +191,10 @@ public abstract class AbstractMultiSelectFormatter<T> extends AbstractParameterF
 
 
   /**
-   * Looks up the config value for the configured key from the parameter configuration, resolves the corresponding
-   * registered {@link MultiSelectFunction} and applies it to the given value.
+   * {@inheritDoc}
+   * <p>
+   * This implementation looks up the value of the configured key in the parameter configuration, resolves the
+   * corresponding registered {@link MultiSelectFunction} and applies it to the given value.
    * <p>
    * If the config key is absent from the parameter configuration, the {@code defaultConfigValueForAbsentKey} is used
    * instead. If no registered function matches the resolved config value, behavior depends on the
@@ -202,13 +204,10 @@ public abstract class AbstractMultiSelectFormatter<T> extends AbstractParameterF
    *     {@code true}: delegates formatting to the {@linkplain ParameterFormatterContext#delegateToNextFormatter() next
    *     formatter}
    *   </li>
-   *   <li>{@code false}: calls {@link #formatMultiSelectMismatch(ParameterFormatterContext, Object)}</li>
+   *   <li>
+   *     {@code false}: calls {@link #formatMultiSelectMismatch(ParameterFormatterContext, Object)}
+   *   </li>
    * </ul>
-   *
-   * @param context  formatter context, not {@code null}
-   * @param value    value to be formatted, not {@code null}
-   *
-   * @return  formatted text, never {@code null}
    */
   @Override
   protected @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull T value)
@@ -245,9 +244,9 @@ public abstract class AbstractMultiSelectFormatter<T> extends AbstractParameterF
 
 
   /**
-   * Returns the configuration key used by this formatter wrapped in an immutable singleton set.
-   *
-   * @return  singleton set containing the config key name, never {@code null}
+   * {@inheritDoc}
+   * <p>
+   * This implementation returns an immutable singleton set containing the configured key.
    */
   @Override
   public @Unmodifiable @NotNull Set<String> getParameterConfigNames() {

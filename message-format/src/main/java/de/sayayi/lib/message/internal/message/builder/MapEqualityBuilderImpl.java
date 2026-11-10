@@ -69,9 +69,7 @@ public non-sealed class MapEqualityBuilderImpl implements MapEqualityBuilder
 
 
   /**
-   * Selects equality comparison for the map entry.
-   *
-   * @return  builder for supplying the entry value, never {@code null}
+   * {@inheritDoc}
    */
   @Override
   public @NotNull MapValueBuilder eq()
@@ -83,9 +81,7 @@ public non-sealed class MapEqualityBuilderImpl implements MapEqualityBuilder
 
 
   /**
-   * Selects inequality comparison for the map entry.
-   *
-   * @return  builder for supplying the entry value, never {@code null}
+   * {@inheritDoc}
    */
   @Override
   public @NotNull MapValueBuilder ne()
@@ -97,11 +93,7 @@ public non-sealed class MapEqualityBuilderImpl implements MapEqualityBuilder
 
 
   /**
-   * Completes the map entry with a pre-built message value.
-   *
-   * @param message  message value for the entry, not {@code null}
-   *
-   * @return  parameter builder that owns the map, never {@code null}
+   * {@inheritDoc}
    */
   @Override
   public @NotNull ParameterBuilder message(@NotNull Message.WithSpaces message) {
@@ -110,11 +102,7 @@ public non-sealed class MapEqualityBuilderImpl implements MapEqualityBuilder
 
 
   /**
-   * Completes the map entry with a value parsed from a message-format string.
-   *
-   * @param message  message-format string for the entry value, not {@code null}
-   *
-   * @return  parameter builder that owns the map, never {@code null}
+   * {@inheritDoc}
    */
   @Override
   public @NotNull ParameterBuilder message(@NotNull String message) {
@@ -123,11 +111,7 @@ public non-sealed class MapEqualityBuilderImpl implements MapEqualityBuilder
 
 
   /**
-   * Completes the map entry by configuring a nested message builder.
-   *
-   * @param messageConfigurer  callback that configures the nested message, not {@code null}
-   *
-   * @return  parameter builder that owns the map, never {@code null}
+   * {@inheritDoc}
    */
   @Override
   public @NotNull ParameterBuilder message(@NotNull Consumer<MessageBuilder> messageConfigurer) {

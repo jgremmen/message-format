@@ -75,7 +75,7 @@ public final class TemplateBuilderImpl extends AbstractSpacedBuilder<TemplateBui
    * @param builder  enclosing message builder, not {@code null}
    * @param name     template name (must follow kebab-case convention), not {@code null}
    *
-   * @throws IllegalArgumentException if {@code name} does not match the kebab-case naming convention
+   * @throws IllegalArgumentException  if {@code name} does not match the kebab-case naming convention
    */
   TemplateBuilderImpl(@NotNull FluentMessageBuilder builder, @NotNull String name)
   {
@@ -106,14 +106,9 @@ public final class TemplateBuilderImpl extends AbstractSpacedBuilder<TemplateBui
 
 
   /**
-   * Adds a string default parameter for the referenced template.
+   * {@inheritDoc}
    *
-   * @param name   template parameter name, not {@code null}
-   * @param value  default string value, not {@code null}
-   *
-   * @return  this template builder, never {@code null}
-   *
-   * @throws IllegalArgumentException if {@code name} does not use a supported naming convention
+   * @throws IllegalArgumentException  if {@code name} does not use a supported naming convention
    */
   @Override
   public @NotNull TemplateBuilder withDefaultParameter(@NotNull String name, @NotNull String value) {
@@ -122,14 +117,9 @@ public final class TemplateBuilderImpl extends AbstractSpacedBuilder<TemplateBui
 
 
   /**
-   * Adds a boolean default parameter for the referenced template.
+   * {@inheritDoc}
    *
-   * @param name   template parameter name, not {@code null}
-   * @param value  default boolean value
-   *
-   * @return  this template builder, never {@code null}
-   *
-   * @throws IllegalArgumentException if {@code name} does not use a supported naming convention
+   * @throws IllegalArgumentException  if {@code name} does not use a supported naming convention
    */
   @Override
   public @NotNull TemplateBuilder withDefaultParameter(@NotNull String name, boolean value) {
@@ -138,14 +128,9 @@ public final class TemplateBuilderImpl extends AbstractSpacedBuilder<TemplateBui
 
 
   /**
-   * Adds a numeric default parameter for the referenced template.
+   * {@inheritDoc}
    *
-   * @param name   template parameter name, not {@code null}
-   * @param value  default numeric value
-   *
-   * @return  this template builder, never {@code null}
-   *
-   * @throws IllegalArgumentException if {@code name} does not use a supported naming convention
+   * @throws IllegalArgumentException  if {@code name} does not use a supported naming convention
    */
   @Override
   public @NotNull TemplateBuilder withDefaultParameter(@NotNull String name, long value) {
@@ -154,14 +139,9 @@ public final class TemplateBuilderImpl extends AbstractSpacedBuilder<TemplateBui
 
 
   /**
-   * Adds a message default parameter for the referenced template.
+   * {@inheritDoc}
    *
-   * @param name     template parameter name, not {@code null}
-   * @param message  default message value, not {@code null}
-   *
-   * @return  this template builder, never {@code null}
-   *
-   * @throws IllegalArgumentException if {@code name} does not use a supported naming convention
+   * @throws IllegalArgumentException  if {@code name} does not use a supported naming convention
    */
   @Override
   public @NotNull TemplateBuilder withDefaultParameter(@NotNull String name, @NotNull Message.WithSpaces message) {
@@ -170,14 +150,9 @@ public final class TemplateBuilderImpl extends AbstractSpacedBuilder<TemplateBui
 
 
   /**
-   * Adds a message default parameter by configuring a nested message builder.
+   * {@inheritDoc}
    *
-   * @param name               template parameter name, not {@code null}
-   * @param messageConfigurer  callback that configures the nested message, not {@code null}
-   *
-   * @return  this template builder, never {@code null}
-   *
-   * @throws IllegalArgumentException if {@code name} does not use a supported naming convention
+   * @throws IllegalArgumentException  if {@code name} does not use a supported naming convention
    */
   @Override
   public @NotNull TemplateBuilder withDefaultParameter(@NotNull String name,
@@ -201,7 +176,7 @@ public final class TemplateBuilderImpl extends AbstractSpacedBuilder<TemplateBui
    *
    * @return  this template builder, never {@code null}
    *
-   * @throws IllegalArgumentException if {@code name} does not match the expected naming convention
+   * @throws IllegalArgumentException  if {@code name} does not match the expected naming convention
    */
   @Contract("_, _ -> this")
   private @NotNull TemplateBuilder withDefaultParameter(@NotNull String name, @NotNull TypedValue<?> value)
@@ -219,14 +194,9 @@ public final class TemplateBuilderImpl extends AbstractSpacedBuilder<TemplateBui
 
 
   /**
-   * Delegates a template parameter to a parameter from the enclosing message.
+   * {@inheritDoc}
    *
-   * @param templateParam  template parameter name, not {@code null}
-   * @param messageParam   enclosing message parameter name, not {@code null}
-   *
-   * @return  this template builder, never {@code null}
-   *
-   * @throws IllegalArgumentException if either parameter name does not use a supported naming convention
+   * @throws IllegalArgumentException  if either parameter name does not use a supported naming convention
    */
   @Override
   public @NotNull TemplateBuilder withParameterDelegate(@NotNull String templateParam, @NotNull String messageParam)
@@ -250,13 +220,9 @@ public final class TemplateBuilderImpl extends AbstractSpacedBuilder<TemplateBui
 
 
   /**
-   * Flushes this part and starts a text part in the enclosing message builder.
+   * {@inheritDoc}
    *
-   * @param text  literal text for the next part, not {@code null}
-   *
-   * @return  builder for the next text part, never {@code null}
-   *
-   * @throws IllegalStateException if the enclosing builder has already been built
+   * @throws IllegalStateException  if the enclosing builder has already been built
    */
   @Override
   public @NotNull TextBuilder text(@NotNull String text)
@@ -268,14 +234,10 @@ public final class TemplateBuilderImpl extends AbstractSpacedBuilder<TemplateBui
 
 
   /**
-   * Flushes this part and starts a parameter part in the enclosing message builder.
+   * {@inheritDoc}
    *
-   * @param name  parameter name, not {@code null}
-   *
-   * @return  builder for the parameter part, never {@code null}
-   *
-   * @throws IllegalArgumentException if {@code name} does not use a supported naming convention
-   * @throws IllegalStateException if the enclosing builder has already been built
+   * @throws IllegalArgumentException  if {@code name} does not use a supported naming convention
+   * @throws IllegalStateException     if the enclosing builder has already been built
    */
   @Override
   public @NotNull ParameterBuilder parameter(@NotNull String name)
@@ -287,14 +249,10 @@ public final class TemplateBuilderImpl extends AbstractSpacedBuilder<TemplateBui
 
 
   /**
-   * Flushes this part and starts a post-formatter part in the enclosing message builder.
+   * {@inheritDoc}
    *
-   * @param name  post-formatter name, not {@code null}
-   *
-   * @return  builder for the post-formatter part, never {@code null}
-   *
-   * @throws IllegalArgumentException if {@code name} does not use kebab-case
-   * @throws IllegalStateException if the enclosing builder has already been built
+   * @throws IllegalArgumentException  if {@code name} does not use kebab-case
+   * @throws IllegalStateException     if the enclosing builder has already been built
    */
   @Override
   public @NotNull PostFormatterBuilder postFormatter(@NotNull String name)
@@ -306,14 +264,10 @@ public final class TemplateBuilderImpl extends AbstractSpacedBuilder<TemplateBui
 
 
   /**
-   * Flushes this part and starts a template part in the enclosing message builder.
+   * {@inheritDoc}
    *
-   * @param name  template name, not {@code null}
-   *
-   * @return  builder for the template part, never {@code null}
-   *
-   * @throws IllegalArgumentException if {@code name} does not use kebab-case
-   * @throws IllegalStateException if the enclosing builder has already been built
+   * @throws IllegalArgumentException  if {@code name} does not use kebab-case
+   * @throws IllegalStateException     if the enclosing builder has already been built
    */
   @Override
   public @NotNull TemplateBuilder template(@NotNull String name)
@@ -325,11 +279,9 @@ public final class TemplateBuilderImpl extends AbstractSpacedBuilder<TemplateBui
 
 
   /**
-   * Flushes this part and builds the enclosing message.
+   * {@inheritDoc}
    *
-   * @return  built message, never {@code null}
-   *
-   * @throws IllegalStateException if the enclosing builder has already been built
+   * @throws IllegalStateException  if the enclosing builder has already been built
    */
   @Override
   public @NotNull Message.WithSpaces build()
@@ -341,13 +293,9 @@ public final class TemplateBuilderImpl extends AbstractSpacedBuilder<TemplateBui
 
 
   /**
-   * Flushes this part and builds a coded message from the enclosing builder.
+   * {@inheritDoc}
    *
-   * @param code  message code to associate with the built message, not {@code null}
-   *
-   * @return  coded message, never {@code null}
-   *
-   * @throws IllegalStateException if the enclosing builder has already been built
+   * @throws IllegalStateException  if the enclosing builder has already been built
    */
   @Override
   public @NotNull Message.WithCode buildWithCode(@NotNull String code)
@@ -359,11 +307,9 @@ public final class TemplateBuilderImpl extends AbstractSpacedBuilder<TemplateBui
 
 
   /**
-   * Flushes this part and builds the enclosing message as a template.
+   * {@inheritDoc}
    *
-   * @return  built template, never {@code null}
-   *
-   * @throws IllegalStateException if the enclosing builder has already been built
+   * @throws IllegalStateException  if the enclosing builder has already been built
    */
   @Override
   public @NotNull Template buildAsTemplate()

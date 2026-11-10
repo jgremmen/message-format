@@ -28,8 +28,8 @@ import java.util.function.Supplier;
 
 
 /**
- * Factory for creating {@link MessageSupport} instances, which are the central entry point for registering,
- * accessing and formatting messages and templates.
+ * Factory for creating {@link MessageSupport} instances, which are the central entry point for registering, accessing
+ * and formatting messages and templates.
  * <p>
  * A message support combines a {@link FormatterService}, which supplies the parameter formatters used during message
  * formatting, with a {@link MessageFactory}, which parses message format strings. This factory offers two ways of
@@ -58,7 +58,11 @@ import java.util.function.Supplier;
  */
 public final class MessageSupportFactory
 {
-  /** Lazily created, sealed message support instance returned by {@link #shared()}. */
+  /**
+   * Lazily created, sealed message support instance returned by {@link #shared()}.
+   *
+   * @since 0.25.0
+   */
   private static final Supplier<MessageSupport> SHARED_SUPPLIER = SupplierDelegate.of(() ->
       createDefault().registerTemplatesFromService(MessageSupportFactory.class.getClassLoader()).seal());
 
@@ -147,8 +151,8 @@ public final class MessageSupportFactory
    * {@linkplain DefaultFormatterService#getSharedInstance() shared default formatter service} and the
    * {@linkplain MessageFactory#getSharedInstance() shared, caching} {@link MessageFactory}.
    * <p>
-   * The default formatter service provides the full set of built-in formatters, making this a convenient starting
-   * point for most use cases that still require additional configuration such as adding messages and templates.
+   * The default formatter service provides the full set of built-in formatters, making this a convenient starting point
+   * for most use cases that still require additional configuration such as adding messages and templates.
    *
    * @return  new configurable message support instance, never {@code null}
    *

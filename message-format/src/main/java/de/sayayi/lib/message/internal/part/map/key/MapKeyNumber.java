@@ -34,7 +34,7 @@ import static java.util.Objects.requireNonNull;
  * value and a {@link CompareType} that determines how the provided value is compared to this key.
  *
  * @author Jeroen Gremmen
- * @since 0.4.0 (renamed in 0.8.0)
+ * @since 0.4.0
  */
 @ApiStatus.Internal
 @SuppressWarnings("ClassCanBeRecord")
@@ -96,10 +96,9 @@ public final class MapKeyNumber implements MapKey
 
 
   /**
-   * Serializes this numeric map key into its format string representation, including the comparison type prefix
-   * if applicable.
-   *
-   * @param context  the serialization context, not {@code null}
+   * {@inheritDoc}
+   * <p>
+   * The number is prefixed by its comparison type if applicable.
    */
   @Override
   public void serialize(@NotNull Context context) {

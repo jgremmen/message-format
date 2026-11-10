@@ -38,8 +38,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
- * Tests {@link Log4jMessageFactory}: creation of log messages with parameters and throwables, and the selection between
- * message format and Log4j placeholder styles.
+ * Tests {@link Log4jMessageFactory}: creation of log messages with parameters and throwables, the selection between
+ * message format and Log4j placeholder styles, and the handling of exceptions and errors thrown while formatting.
  *
  * @author Jeroen Gremmen
  * @since 0.21.0

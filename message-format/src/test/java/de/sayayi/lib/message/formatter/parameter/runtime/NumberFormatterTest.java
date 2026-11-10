@@ -30,15 +30,13 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import static java.lang.Double.*;
 import static java.lang.Math.PI;
-import static java.util.Locale.GERMANY;
-import static java.util.Locale.UK;
-import static java.util.Locale.US;
+import static java.util.Locale.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
- * Tests {@link NumberFormatter}: formattable types, decimal formats and non finite values matched against number keys,
- * numeric and non numeric string keys.
+ * Tests {@link NumberFormatter}: formattable types, the {@code plain} and {@code integer} formats, decimal formats and
+ * non-finite values matched against number keys, numeric and non-numeric string keys.
  *
  * @author Jeroen Gremmen
  * @since 0.9.1

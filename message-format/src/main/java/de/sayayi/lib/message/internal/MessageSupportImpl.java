@@ -59,8 +59,8 @@ import static java.util.stream.Collectors.toCollection;
 /**
  * Core implementation of {@link MessageSupport.ConfigurableMessageSupport}.
  * <p>
- * This class stores registered messages, templates and default configuration values for a message support instance.
- * It exposes that state through the nested {@link Accessor} and creates {@link Configurer} instances for individual
+ * This class stores registered messages, templates and default configuration values for a message support instance. It
+ * exposes that state through the nested {@link Accessor} and creates {@link Configurer} instances for individual
  * formatting operations.
  * <p>
  * Duplicate messages and templates are handled by configurable filters. By default, adding a message or template with
@@ -76,10 +76,18 @@ import static java.util.stream.Collectors.toCollection;
 @ApiStatus.Internal
 public final class MessageSupportImpl implements MessageSupport.ConfigurableMessageSupport
 {
-  /** Maximum number of messages and templates in a pack, as each count is packed as an unsigned short. */
+  /**
+   * Maximum number of messages and templates in a pack, as each count is packed as an unsigned short.
+   *
+   * @since 0.25.0
+   */
   private static final int MAX_PACK_COUNT = 0xffff;
 
-  /** Guards concurrent access to the mutable state (default config, messages, templates, locale, filters). */
+  /**
+   * Guards concurrent access to the mutable state (default config, messages, templates, locale, filters).
+   *
+   * @since 0.25.0
+   */
   private final @NotNull ReadWriteLock lock = new ReentrantReadWriteLock();
 
   /** Formatter registry used to resolve parameter and post formatters while formatting messages. */
@@ -414,6 +422,8 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
    * Returns the current default locale, guarded by this instance's lock.
    *
    * @return  current default locale, never {@code null}
+   *
+   * @since 0.25.0
    */
   private @NotNull Locale getLocale()
   {
@@ -429,8 +439,8 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
   /**
    * Default message filter that rejects duplicate messages with different content.
    * <p>
-   * If a message with the same code already exists and has the same content, the new message is silently ignored.
-   * If the content differs, a {@link DuplicateMessageException} is thrown.
+   * If a message with the same code already exists and has the same content, the new message is silently ignored. If
+   * the content differs, a {@link DuplicateMessageException} is thrown.
    *
    * @param message  message to check, not {@code null}
    *
@@ -461,8 +471,8 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
   /**
    * Default template filter that rejects duplicate templates with different content.
    * <p>
-   * If a template with the same name already exists and has the same content, the new template is silently ignored.
-   * If the content differs, a {@link DuplicateTemplateException} is thrown.
+   * If a template with the same name already exists and has the same content, the new template is silently ignored. If
+   * the content differs, a {@link DuplicateTemplateException} is thrown.
    *
    * @param name      template name, not {@code null}
    * @param template  template to check, not {@code null}

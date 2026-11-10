@@ -41,7 +41,7 @@ import static java.util.Optional.ofNullable;
  * falling back to default configuration values provided by the {@link MessageAccessor}.
  *
  * @author Jeroen Gremmen
- * @since 0.8.4 (extracted from ParameterFormatterContext)
+ * @since 0.9.0
  */
 @ApiStatus.Internal
 public class BaseConfigAccessor implements ConfigAccessor

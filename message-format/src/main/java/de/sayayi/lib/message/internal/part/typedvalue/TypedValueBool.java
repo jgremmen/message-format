@@ -63,9 +63,9 @@ public enum TypedValueBool implements BoolValue
 
 
   /**
-   * Serializes this boolean value into its format string representation ({@code "true"} or {@code "false"}).
-   *
-   * @param context  the serialization context, not {@code null}
+   * {@inheritDoc}
+   * <p>
+   * The value is serialized as {@code true} or {@code false}.
    */
   @Override
   public void serialize(@NotNull Context context) {

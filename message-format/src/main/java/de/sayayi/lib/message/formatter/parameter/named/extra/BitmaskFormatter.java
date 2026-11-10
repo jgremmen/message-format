@@ -113,7 +113,7 @@ import java.util.BitSet;
  * }</pre>
  *
  * @author Jeroen Gremmen
- * @since 0.21.1
+ * @since 0.22.0
  *
  * @see de.sayayi.lib.message.formatter.parameter.runtime.BitSetFormatter BitSetFormatter
  */

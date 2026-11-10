@@ -133,12 +133,9 @@ import static de.sayayi.lib.message.part.TextPartFactory.*;
 public final class TokenFormatter extends AbstractSingleTypeParameterFormatter<Token>
 {
   /**
-   * Formats the given ANTLR {@code token} based on the {@code token} configuration value in the formatting context.
-   *
-   * @param context  parameter formatter context providing configuration values, not {@code null}
-   * @param token    the ANTLR token to format, not {@code null}
-   *
-   * @return  the formatted token text, never {@code null}
+   * {@inheritDoc}
+   * <p>
+   * The output is selected by the {@code token} configuration value.
    */
   @Override
   protected @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull Token token)
@@ -272,12 +269,10 @@ public final class TokenFormatter extends AbstractSingleTypeParameterFormatter<T
 
 
     /**
-     * Returns the value for the given parameter name. Supported parameters are {@code "line"} and {@code "column"}.
-     *
-     * @param parameter  parameter name to look up, not {@code null}
-     *
-     * @return  the adjusted line or column number, or {@code null} if the parameter is not recognized or the column
-     *          is not available
+     * {@inheritDoc}
+     * <p>
+     * Supported parameters are {@code "line"} and {@code "column"}. {@code null} is returned for any other parameter
+     * name and for {@code "column"} if the column is not available.
      */
     @Override
     public Integer getParameterValue(@NotNull String parameter)
@@ -291,9 +286,9 @@ public final class TokenFormatter extends AbstractSingleTypeParameterFormatter<T
 
 
     /**
-     * Returns all position parameters as an unmodifiable map containing {@code "line"} and {@code "column"} entries.
-     *
-     * @return  unmodifiable map with line and column values, never {@code null}
+     * {@inheritDoc}
+     * <p>
+     * The returned map contains the {@code "line"} and {@code "column"} entries.
      */
     @Override
     public @Unmodifiable @NotNull Map<String,Object> asParameterMap()

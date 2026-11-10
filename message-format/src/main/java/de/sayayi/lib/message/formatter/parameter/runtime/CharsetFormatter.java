@@ -36,24 +36,22 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 /**
  * Parameter formatter for {@link Charset} values.
  * <p>
- * When no string map key matches, the default map entry is used. If no default is provided,
- * the charset's locale-sensitive display name is used as the formatted result.
+ * When no string map key matches, the default map entry is used. If no default is provided, the charset's
+ * locale-sensitive display name is used as the formatted result.
  * <p>
- * Map key comparison supports {@code string} keys matched against the charset's canonical name
- * and aliases. Only the {@code EQ} and {@code NE} comparison types are supported:
+ * Map key comparison supports {@code string} keys matched against the charset's canonical name and aliases. Only the
+ * {@code EQ} and {@code NE} comparison types are supported:
  * <ul>
  *   <li>
  *     {@code EQ} a canonical name match returns
- *     {@link de.sayayi.lib.message.part.MapKey.MatchResult.Defined#EXACT EXACT}, an alias match
- *     returns {@link de.sayayi.lib.message.part.MapKey.MatchResult.Defined#EQUIVALENT EQUIVALENT}
+ *     {@link de.sayayi.lib.message.part.MapKey.MatchResult.Defined#EXACT EXACT}, an alias match returns
+ *     {@link de.sayayi.lib.message.part.MapKey.MatchResult.Defined#EQUIVALENT EQUIVALENT}
  *   </li>
  *   <li>
  *     {@code NE} if neither the canonical name nor any alias matches the key,
- *     {@link de.sayayi.lib.message.part.MapKey.MatchResult.Defined#EXACT EXACT} is returned;
- *     if only an alias matches,
- *     {@link de.sayayi.lib.message.part.MapKey.MatchResult.Defined#LENIENT LENIENT} is returned;
- *     a canonical name match results in
- *     {@link de.sayayi.lib.message.part.MapKey.MatchResult.Defined#MISMATCH MISMATCH}
+ *     {@link de.sayayi.lib.message.part.MapKey.MatchResult.Defined#EXACT EXACT} is returned; if only an alias matches,
+ *     {@link de.sayayi.lib.message.part.MapKey.MatchResult.Defined#LENIENT LENIENT} is returned; a canonical name match
+ *     results in {@link de.sayayi.lib.message.part.MapKey.MatchResult.Defined#MISMATCH MISMATCH}
  *   </li>
  * </ul>
  * <p>
@@ -84,7 +82,7 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
  * }</pre>
  *
  * @author Jeroen Gremmen
- * @since 0.22.1
+ * @since 0.23.0
  */
 public final class CharsetFormatter
     extends AbstractSingleTypeParameterFormatter<Charset>
@@ -108,9 +106,9 @@ public final class CharsetFormatter
   /**
    * {@inheritDoc}
    * <p>
-   * Formats the given charset by first attempting to match its canonical name or aliases against
-   * string map keys. If no match is found, the default map entry is consulted. If no default is
-   * available either, the charset's locale-sensitive display name is returned.
+   * Formats the given charset by first attempting to match its canonical name or aliases against string map keys. If no
+   * match is found, the default map entry is consulted. If no default is available either, the charset's
+   * locale-sensitive display name is returned.
    */
   @Override
   protected @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull Charset charset)
@@ -138,8 +136,8 @@ public final class CharsetFormatter
    * <p>
    * Compares the charset's canonical name and aliases against the string map key. Only the
    * {@link de.sayayi.lib.message.part.MapKey.CompareType#EQ EQ} and
-   * {@link de.sayayi.lib.message.part.MapKey.CompareType#NE NE} comparison types are supported;
-   * all other types return {@link de.sayayi.lib.message.part.MapKey.MatchResult.Defined#MISMATCH MISMATCH}.
+   * {@link de.sayayi.lib.message.part.MapKey.CompareType#NE NE} comparison types are supported; all other types return
+   * {@link de.sayayi.lib.message.part.MapKey.MatchResult.Defined#MISMATCH MISMATCH}.
    */
   @Override
   public @NotNull MatchResult compareToStringKey(@NotNull Charset charset, @NotNull ComparatorContext context)

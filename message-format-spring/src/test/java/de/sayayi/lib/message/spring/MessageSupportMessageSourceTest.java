@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * {@code MessageSourceResolvable} instances, including their arguments.
  *
  * @author Jeroen Gremmen
- * @since 0.9.2
+ * @since 0.10.0
  */
 @DisplayName("Spring MessageSource backed by MessageSupport")
 @TestMethodOrder(MethodOrderer.DisplayName.class)

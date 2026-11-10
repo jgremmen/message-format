@@ -67,9 +67,9 @@ public enum MapKeyBool implements MapKey
 
 
   /**
-   * Serializes this boolean map key into its format string representation ({@code "true"} or {@code "false"}).
-   *
-   * @param context  the serialization context, not {@code null}
+   * {@inheritDoc}
+   * <p>
+   * The key is serialized as {@code true} or {@code false}.
    */
   @Override
   public void serialize(@NotNull Context context) {

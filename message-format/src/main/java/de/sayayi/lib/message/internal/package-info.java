@@ -28,6 +28,9 @@
  *   <li>
  *     {@link MessageParameters} and {@link NoParameters} for formatting parameters
  *   </li>
+ *   <li>
+ *     {@code ValueProtector} for protecting supplier parameter values from being evaluated more than once
+ *   </li>
  * </ul>
  * <p>
  * <strong>This package is not part of the public API.</strong> Its classes are subject to change without notice and

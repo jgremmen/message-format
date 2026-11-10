@@ -75,7 +75,11 @@ import java.util.function.Supplier;
  */
 public class DefaultFormatterService extends GenericFormatterService
 {
-  /** Lazily created, sealed default formatter service returned by {@link #getSharedInstance()}. */
+  /**
+   * Lazily created, sealed default formatter service returned by {@link #getSharedInstance()}.
+   *
+   * @since 0.25.0
+   */
   private static final Supplier<FormatterService> SHARED_INSTANCE_SUPPLIER =
       SupplierDelegate.of(() -> new DefaultFormatterService().seal());
 
@@ -157,8 +161,8 @@ public class DefaultFormatterService extends GenericFormatterService
 
 
   /**
-   * Adds the default formatters for this service. This method loads both parameter formatters and post formatters
-   * via the {@link ServiceLoader}.
+   * Adds the default formatters for this service. This method loads both parameter formatters and post formatters via
+   * the {@link ServiceLoader}.
    * <p>
    * Subclasses can override this method to customize which formatters are registered.
    * <p>

@@ -25,14 +25,13 @@ import java.io.IOException;
 
 
 /**
- * Internal implementation of {@link MapKey} representing an empty map key. This enum provides
- * two singleton constants for the two supported compare types: {@link #EQ} (matches empty values)
- * and {@link #NE} (matches non-empty values).
+ * Internal implementation of {@link MapKey} representing an empty map key. This enum provides two singleton constants
+ * for the two supported compare types: {@link #EQ} (matches empty values) and {@link #NE} (matches non-empty values).
  * <p>
  * What constitutes an "empty" value is determined by the associated parameter formatter.
  *
  * @author Jeroen Gremmen
- * @since 0.4.0 (renamed in 0.8.0)
+ * @since 0.4.0
  */
 @ApiStatus.Internal
 public enum MapKeyEmpty implements MapKey
@@ -65,9 +64,9 @@ public enum MapKeyEmpty implements MapKey
 
 
   /**
-   * Serializes this empty map key into its format string representation (e.g. {@code "empty"} or {@code "<>empty"}).
-   *
-   * @param context  the serialization context, not {@code null}
+   * {@inheritDoc}
+   * <p>
+   * The key is serialized as {@code empty}, prefixed by its comparison type if applicable (e.g. {@code <>empty}).
    */
   @Override
   public void serialize(@NotNull Context context) {

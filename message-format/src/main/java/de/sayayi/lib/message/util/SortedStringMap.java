@@ -293,6 +293,8 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
    * {@inheritDoc}
    *
    * @throws UnsupportedOperationException  if this map is sealed
+   *
+   * @since 0.25.0
    */
   @Override
   @Contract(mutates = "this")
@@ -343,6 +345,8 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
    * <p>
    * Keys are returned in sorted order. Removing a key from the returned set removes the corresponding entry from this
    * map.
+   *
+   * @since 0.25.0
    */
   @Override
   public @NotNull Set<String> keySet() {
@@ -487,6 +491,8 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
    * @param index  the zero-based index of the entry in the map
    *
    * @return  the value of the removed entry
+   *
+   * @since 0.25.0
    */
   @Contract(mutates = "this")
   @SuppressWarnings("unchecked")
@@ -571,7 +577,11 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
     }
 
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     *
+     * @since 0.25.0
+     */
     @Override
     public boolean contains(Object o)
     {
@@ -989,7 +999,11 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
     /** Index of the next entry to return. */
     int index = 0;
 
-    /** {@code true} if {@link #next()} has been called and the returned entry has not been removed yet. */
+    /**
+     * {@code true} if {@link #next()} has been called and the returned entry has not been removed yet.
+     *
+     * @since 0.25.0
+     */
     boolean canRemove;
 
 
@@ -1022,6 +1036,8 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
      * {@inheritDoc}
      *
      * @throws UnsupportedOperationException  if the map is sealed
+     *
+     * @since 0.25.0
      */
     @Override
     public void remove()

@@ -59,7 +59,11 @@ public abstract non-sealed class AbstractNamedTemplate implements NamedTemplate
   }
 
 
-  /** {@inheritDoc} */
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.25.0
+   */
   @Override
   public String toString() {
     return "Template(" + getName() + ')';

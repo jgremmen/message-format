@@ -108,10 +108,9 @@ public final class MapKeyString implements MapKey
 
 
   /**
-   * Serializes this string map key into its format string representation, including the comparison type prefix
-   * if applicable.
-   *
-   * @param context  the serialization context, not {@code null}
+   * {@inheritDoc}
+   * <p>
+   * The quoted string is prefixed by its comparison type if applicable.
    */
   @Override
   public void serialize(@NotNull Context context)
