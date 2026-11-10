@@ -20,6 +20,7 @@
 import de.sayayi.gradle.JavaAgentArgumentProvider
 
 import java.time.Instant
+import java.time.OffsetDateTime
 
 import static java.time.ZoneOffset.UTC
 
@@ -70,15 +71,23 @@ test {
 }
 
 
-// time of the last commit
+// time of the last commit: SOURCE_DATE_EPOCH (reproducible builds), CI_COMMIT_TIMESTAMP (GitLab CI)
+// or the git history (local builds); git is only executed if neither environment variable is set
+//noinspection GroovyAssignabilityCheck
 ext.commitTime = providers
-    .exec {
-      workingDir = rootDir
-      commandLine 'git', 'log', '-1', '--format=%ct'
-    }
-    .standardOutput
-    .asText
+    .environmentVariable('SOURCE_DATE_EPOCH')
     .map { Instant.ofEpochSecond(it.trim() as long).atOffset(UTC) }
+    .orElse(providers
+        .environmentVariable('CI_COMMIT_TIMESTAMP')
+        .map { OffsetDateTime.parse(it.trim()).withOffsetSameInstant(UTC) })
+    .orElse(providers
+        .exec {
+          workingDir = rootDir
+          commandLine 'git', 'log', '-1', '--format=%ct'
+        }
+        .standardOutput
+        .asText
+        .map { Instant.ofEpochSecond(it.trim() as long).atOffset(UTC) })
 
 
 tasks.named('jar') {
