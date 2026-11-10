@@ -28,7 +28,8 @@ import static java.util.Objects.requireNonNull;
  * This supplier implementation delegates to another supplier and caches the supplied value, thus
  * invoking the delegated supplier only once.
  * <p>
- * This class is thread-safe.
+ * This class is thread-safe. The class of the delegate supplier is available through {@link #getDelegateClass()}, even
+ * after the value has been obtained.
  *
  * <h2>Example</h2>
  * <pre>
@@ -51,6 +52,9 @@ import static java.util.Objects.requireNonNull;
  */
 public final class SupplierDelegate<T> implements Supplier<T>
 {
+  /** Class of the delegate supplier, retained after the delegate supplier has been released. */
+  private final Class<? extends Supplier<T>> delegateClass;
+
   /** Lock guarding the first invocation of the delegate supplier, or {@code null} once the value has been obtained. */
   private volatile ReentrantLock lock = new ReentrantLock();
 
@@ -66,14 +70,17 @@ public final class SupplierDelegate<T> implements Supplier<T>
    *
    * @param supplier  supplier to delegate to, not {@code null}
    */
-  private SupplierDelegate(@NotNull Supplier<T> supplier) {
+  @SuppressWarnings("unchecked")
+  private SupplierDelegate(@NotNull Supplier<T> supplier)
+  {
     this.supplier = requireNonNull(supplier, "supplier must not be null");
+    this.delegateClass = (Class<? extends Supplier<T>>)supplier.getClass();
   }
 
 
   /**
-   * Returns the cached value, invoking the delegate supplier on the first call.
-   * Subsequent calls will return the cached value without invoking the delegate again.
+   * Returns the cached value, invoking the delegate supplier on the first call. Subsequent calls will return the cached
+   * value without invoking the delegate again.
    * <p>
    * This method is thread-safe: concurrent first calls invoke the delegate supplier only once. If the delegate supplier
    * throws an exception, the exception is relayed to the caller and the delegate supplier is invoked again on the next
@@ -117,15 +124,36 @@ public final class SupplierDelegate<T> implements Supplier<T>
 
 
   /**
-   * Creates a supplier delegate with the given {@code supplier}.
+   * Returns the class of the supplier this instance delegates to.
+   * <p>
+   * The class remains available after the value has been obtained and the delegate supplier has been released. It
+   * allows callers to identify the origin of the supplied value without invoking the delegate supplier.
+   *
+   * @return  delegate supplier class, never {@code null} and never {@code SupplierDelegate.class}
+   *
+   * @since 0.25.0
+   */
+  @Contract(pure = true)
+  public @NotNull Class<? extends Supplier<T>> getDelegateClass() {
+    return delegateClass;
+  }
+
+
+  /**
+   * Returns a caching supplier delegate for the given {@code supplier}.
+   * <p>
+   * If {@code supplier} already is a {@code SupplierDelegate}, it is returned as is instead of being wrapped again.
+   * This way, the delegate class reported by {@link #getDelegateClass()} is never a {@code SupplierDelegate}.
    *
    * @param supplier  supplier to delegate to, not {@code null}
    * @param <T>       supplier value type
    *
    * @return  supplier delegate instance, never {@code null}
+   *
+   * @throws NullPointerException  if {@code supplier} is {@code null}
    */
-  @Contract(value = "_ -> new", pure = true)
+  @Contract(value = "_ -> !null", pure = true)
   public static <T> @NotNull Supplier<T> of(@NotNull Supplier<T> supplier) {
-    return new SupplierDelegate<>(supplier);
+    return supplier instanceof SupplierDelegate<T> delegate ? delegate : new SupplierDelegate<>(supplier);
   }
 }
