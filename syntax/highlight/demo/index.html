@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Message Format highlighting (script)</title>
+  <link id="theme" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.12.0/styles/default.min.css">
+  <link id="base" rel="stylesheet" href="../dist/message-format.css">
+  <link id="fallback" rel="stylesheet" href="../dist/message-format-delimiters.css">
+  <link rel="stylesheet" href="demo.css">
+</head>
+<body>
+  <h1>Message Format highlighting</h1>
+  <p>Uses <code>dist/message-format.min.js</code> with a plain <code>&lt;script&gt;</code> tag.
+    See also the <a href="esm.html">ESM variant</a>.</p>
+  <p class="controls">
+    <label>Theme <select id="theme-select"></select></label>
+    <label><input type="checkbox" id="base-toggle" checked> Base CSS (escapes)</label>
+    <label><input type="checkbox" id="fallback-toggle" checked> Delimiter fallback CSS</label>
+  </p>
+  <div id="samples"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.12.0/highlight.min.js"></script>
+  <script src="../dist/message-format.min.js"></script>
+  <script src="demo.js"></script>
+  <script>renderDemo(hljs);</script>
+</body>
+</html>

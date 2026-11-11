@@ -1,0 +1,14 @@
+/*
+ * Optional delimiter fallback for highlight.js themes where .hljs-template-tag is not styled or
+ * has the same colour as .hljs-string (e.g. default, monokai, atom-one-dark, atom-one-light).
+ * Without it, the part delimiters %{ } %[ ] %( ) are hard to tell apart from the message text.
+ * Run `npm run check-themes` for the full list of themes that need it.
+ *
+ * Only applies to message-format blocks. Customise with these properties on .hljs or any ancestor:
+ *   --hljs-mf-template-tag-color   (default: inherited from the enclosing part, hljs-subst)
+ *   --hljs-mf-template-tag-weight  (default: bold)
+ */
+.language-message-format .hljs-template-tag {
+  color: var(--hljs-mf-template-tag-color, inherit);
+  font-weight: var(--hljs-mf-template-tag-weight, bold);
+}

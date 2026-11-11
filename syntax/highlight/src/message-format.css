@@ -1,0 +1,13 @@
+/*
+ * Base stylesheet for message-format blocks; include it with any highlight.js theme.
+ *
+ * Escape sequences (\x41, \', \{, ...) are drawn in a slightly lighter shade of the surrounding
+ * string colour. Almost no theme styles .hljs-char.escape_, and those that do use an unrelated
+ * colour, so this works the same with every light or dark theme.
+ *
+ * Customise with this property on .hljs or any ancestor:
+ *   --hljs-mf-escape-color  (default: the string colour at 70% opacity)
+ */
+.language-message-format .hljs-char.escape_ {
+  color: var(--hljs-mf-escape-color, color-mix(in srgb, currentColor 70%, transparent));
+}

@@ -33,6 +33,10 @@ allprojects {
 pluginManager.apply('de.sayayi.message.base')
 
 
+// highlight.js language (npm build, hooked into assemble/check/clean)
+apply from: 'syntax/highlight/highlight.gradle'
+
+
 // local repositories of all subprojects, provided by the de.sayayi.message.publish plugin
 def projectLocalRepositories = configurations.dependencyScope('projectLocalRepositories')
 def projectLocalRepositoryDirs = configurations.resolvable('projectLocalRepositoryDirs') {

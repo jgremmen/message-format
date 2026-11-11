@@ -1,0 +1,17 @@
+body {
+  font-family: system-ui, sans-serif;
+  max-width: 60rem;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  background: #fff;
+  color: #222;
+}
+
+.controls label {
+  margin-right: 1.5rem;
+}
+
+pre code.hljs {
+  white-space: pre-wrap;
+  border-radius: 4px;
+}

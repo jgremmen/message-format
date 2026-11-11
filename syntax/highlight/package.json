@@ -1,0 +1,39 @@
+{
+  "name": "highlightjs-message-format",
+  "version": "0.25.0-SNAPSHOT",
+  "description": "highlight.js language for message-format messages, driven by the ANTLR grammar",
+  "private": true,
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "dist/message-format.mjs",
+  "exports": {
+    ".": "./dist/message-format.mjs",
+    "./lib": "./dist/message-format.lib.mjs",
+    "./script": "./dist/message-format.min.js",
+    "./css": "./dist/message-format.css",
+    "./css/delimiters": "./dist/message-format-delimiters.css"
+  },
+  "files": [
+    "dist/"
+  ],
+  "scripts": {
+    "prepare-grammar": "node scripts/prepare-grammar.mjs",
+    "generate": "node scripts/prepare-grammar.mjs && node scripts/generate.mjs",
+    "check-version": "node scripts/check-version.mjs",
+    "build": "npm run check-version && npm run generate && node scripts/build.mjs",
+    "test": "npm run build && node --test test/",
+    "check-themes": "node scripts/check-themes.mjs",
+    "test:update": "npm run build && UPDATE_SNAPSHOTS=1 node --test test/",
+    "clean": "node -e \"for (const d of ['build', 'dist', 'src/generated']) require('fs').rmSync(d, { recursive: true, force: true })\""
+  },
+  "dependencies": {
+    "antlr4": "4.13.2"
+  },
+  "peerDependencies": {
+    "highlight.js": ">=11.9.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.0",
+    "highlight.js": "11.12.0"
+  }
+}

@@ -91,6 +91,10 @@ nav:
     - Log4j: add-on/log4j.md
     - Spring:
       - Message Source: add-on/spring/message-source.md
+    - highlight.js:
+      - add-on/highlight-js/index.md
+      - Integration: add-on/highlight-js/integration.md
+      - Styling: add-on/highlight-js/styling.md
   - Gradle Plugin:
     - gradle-plugin/index.md
     - Extension Configuration: gradle-plugin/extension.md

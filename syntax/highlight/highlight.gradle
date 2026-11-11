@@ -1,0 +1,159 @@
+/*
+ * Copyright 2026 Jeroen Gremmen
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import groovy.json.JsonSlurper
+
+
+def highlightDir = layout.projectDirectory.dir('syntax/highlight')
+def grammarDir = layout.projectDirectory.dir('message-format/src/main/antlr')
+def testResourceDir = layout.projectDirectory.dir('message-format/src/test/resources')
+def npm = System.getProperty('os.name').toLowerCase().contains('windows') ? 'npm.cmd' : 'npm'
+
+// the ANTLR tool must have exactly the version of the antlr4 runtime in package.json
+def antlrVersion = new JsonSlurper().parse(highlightDir.file('package.json').asFile).dependencies.antlr4
+
+// the package version follows the library version (message-format in gradle/libs.versions.toml)
+def libraryVersion = project.version.toString()
+
+
+def highlightAntlrTool = configurations.dependencyScope('highlightAntlrTool')
+def highlightAntlrToolClasspath = configurations.resolvable('highlightAntlrToolClasspath') {
+  extendsFrom highlightAntlrTool.get()
+}
+
+dependencies {
+  add(highlightAntlrTool.name, "org.antlr:antlr4:${antlrVersion}!!")
+}
+
+
+def highlightSyncVersion = tasks.register('highlightSyncVersion', Exec) {
+  group = 'highlight'
+  description = 'Sets the version of the highlight.js package to the library version.'
+
+  def packageJson = highlightDir.file('package.json').asFile
+
+  workingDir = highlightDir
+  commandLine npm, 'version', libraryVersion, '--no-git-tag-version', '--allow-same-version'
+
+  onlyIf('package version differs from library version') {
+    new JsonSlurper().parse(packageJson).version != libraryVersion
+  }
+}
+
+
+def highlightNpmInstall = tasks.register('highlightNpmInstall', Exec) {
+  group = 'highlight'
+  description = 'Installs the npm dependencies of the highlight.js language.'
+
+  dependsOn highlightSyncVersion
+
+  workingDir = highlightDir
+  commandLine npm, 'ci', '--no-audit', '--no-fund'
+
+  inputs
+      .files(highlightDir.file('package.json'), highlightDir.file('package-lock.json'))
+      .withPropertyName('packageFiles')
+      .withPathSensitivity(PathSensitivity.RELATIVE)
+
+  // npm writes this file on every install; cheaper to track than all of node_modules
+  outputs
+      .file(highlightDir.file('node_modules/.package-lock.json'))
+      .withPropertyName('installedPackages')
+}
+
+
+def highlightBuild = tasks.register('highlightBuild', Exec) {
+  group = 'highlight'
+  description = 'Generates the parser and builds the highlight.js language distributables.'
+
+  dependsOn highlightNpmInstall
+
+  def antlrClasspath = highlightAntlrToolClasspath.get()
+
+  workingDir = highlightDir
+  commandLine npm, 'run', 'build'
+
+  inputs
+      .files(grammarDir.file('MessageLexer.g4'), grammarDir.file('MessageParser.g4'))
+      .withPropertyName('grammars')
+      .withPathSensitivity(PathSensitivity.NAME_ONLY)
+  inputs
+      .files(antlrClasspath)
+      .withPropertyName('antlrTool')
+      .withNormalizer(ClasspathNormalizer)
+  inputs
+      .files(
+          fileTree(highlightDir.dir('src')) { exclude 'generated/**' },
+          highlightDir.dir('scripts'),
+          highlightDir.file('package.json'),
+          highlightDir.file('package-lock.json'))
+      .withPropertyName('sources')
+      .withPathSensitivity(PathSensitivity.RELATIVE)
+
+  outputs
+      .dirs(highlightDir.dir('dist'), highlightDir.dir('src/generated'))
+      .withPropertyName('distributables')
+
+  doFirst {
+    environment 'ANTLR_CLASSPATH', antlrClasspath.asPath
+  }
+}
+
+
+def highlightTest = tasks.register('highlightTest', Exec) {
+  group = 'verification'
+  description = 'Runs the tests of the highlight.js language.'
+
+  dependsOn highlightBuild
+
+  def marker = layout.buildDirectory.file('highlight/test-passed')
+
+  workingDir = highlightDir
+  commandLine 'node', '--test', 'test/'
+
+  inputs
+      .files(highlightDir.dir('src'), highlightDir.dir('dist'), highlightDir.dir('test'))
+      .withPropertyName('sources')
+      .withPathSensitivity(PathSensitivity.RELATIVE)
+
+  inputs
+      .files(testResourceDir.file('message.properties'), testResourceDir.file('template.properties'))
+      .withPropertyName('testResources')
+      .withPathSensitivity(PathSensitivity.NAME_ONLY)
+
+  outputs
+      .file(marker)
+      .withPropertyName('marker')
+
+  doLast {
+    def file = marker.get().asFile
+    file.parentFile.mkdirs()
+    file.text = ''
+  }
+}
+
+
+def highlightClean = tasks.register('highlightClean', Delete) {
+  group = 'highlight'
+  description = 'Deletes the generated files of the highlight.js language.'
+
+  delete highlightDir.dir('build'), highlightDir.dir('dist'), highlightDir.dir('src/generated')
+}
+
+
+tasks.named('assemble') { dependsOn highlightBuild }
+tasks.named('check') { dependsOn highlightTest }
+tasks.named('clean') { dependsOn highlightClean }
