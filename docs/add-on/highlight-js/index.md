@@ -1,3 +1,7 @@
+---
+icon: material/format-color-highlight
+---
+
 # highlight.js
 
 Message format strings appear in many places outside of Java code. They show up in documentation, in administration

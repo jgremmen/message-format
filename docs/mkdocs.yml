@@ -90,6 +90,7 @@ nav:
     - add-on/index.md
     - Log4j: add-on/log4j.md
     - Spring:
+      - add-on/spring/index.md
       - Message Source: add-on/spring/message-source.md
     - highlight.js:
       - add-on/highlight-js/index.md

@@ -1,4 +1,5 @@
 ---
+icon: material/code-braces
 toc_depth: 2
 ---
 
