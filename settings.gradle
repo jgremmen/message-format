@@ -29,6 +29,9 @@ include 'message-format-log4j'
 include 'message-format-spring'
 include 'message-gradle-plugin'
 
+include 'highlight'
+project(':highlight').projectDir = file('syntax/highlight')
+
 
 includeBuild 'build-logic'
 

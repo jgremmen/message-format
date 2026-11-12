@@ -27,6 +27,7 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING
 plugins {
   id 'antlr'
   id 'idea'
+  id 'java-test-fixtures'
 
   id 'de.sayayi.message.base'
   id 'de.sayayi.message.java-library'
@@ -44,28 +45,18 @@ sourceSets {
 }
 
 
-configurations {
-  antlr4 {
-    canBeConsumed = false
-    canBeResolved = true
-  }
-
-  testOutput {
-    canBeConsumed = true
-    canBeResolved = false
-  }
-
-  // the antlr plugin makes api extend antlr, which would publish the antlr tool (antlr:antlr:2.7.7 by default) as an
-  // api dependency; the tool is resolved from antlr4 instead
-  api.setExtendsFrom([])
+def antlr4Tool = configurations.dependencyScope('antlr4')
+def antlr4Classpath = configurations.resolvable('antlr4Classpath') {
+  extendsFrom antlr4Tool.get()
 }
 
+// the test fixtures are only shared with the tests of the other library modules and must not be published
+components.java.withVariantsFromConfiguration(configurations.testFixturesApiElements) { skip() }
+components.java.withVariantsFromConfiguration(configurations.testFixturesRuntimeElements) { skip() }
 
-artifacts {
-  testOutput(sourceSets.test.java.classesDirectory) {
-    builtBy tasks.compileTestJava
-  }
-}
+// the antlr plugin makes api extend antlr, which would publish the antlr tool (antlr:antlr:2.7.7 by default) as an
+// api dependency; the tool is resolved from antlr4 instead
+configurations.api.setExtendsFrom([])
 
 
 dependencies {
@@ -80,6 +71,12 @@ dependencies {
 
   // test
   testImplementation libs.spring.core
+
+  // test fixtures
+  testFixturesAnnotationProcessor libs.lombok
+  testFixturesCompileOnly libs.jetbrains.annotations
+  testFixturesCompileOnly libs.lombok
+  testFixturesImplementation libs.junit.jupiter.api
 
   // tika
   tika3CompileOnly sourceSets.main.output
@@ -99,32 +96,44 @@ dependencies {
 }
 
 
-generateGrammarSource {
+tasks.named('generateGrammarSource', AntlrTask) {
   //noinspection GroovyAccessibility
-  antlrClasspath = configurations.antlr4
-
-  def parserPackage = 'de.sayayi.lib.message.internal.parser'
+  antlrClasspath = antlr4Classpath.get()
 
   outputDirectory = layout.buildDirectory.dir('generated/sources/antlr/main').get().asFile
-  packageName = parserPackage
+  packageName = 'de.sayayi.lib.message.internal.parser'
+}
 
-  // the IntelliJ Antlr plugin resolves tokenVocab = MessageLexer from the grammar directory
-  def grammarTokens = layout.projectDirectory.file('src/main/antlr/MessageLexer.tokens').asFile
 
-  outputs.file grammarTokens
+tasks.register('ideSyncTokens') {
+  group = 'ide'
+  description = 'Copies the generated MessageLexer.tokens to the grammar directory for the IntelliJ Antlr plugin.'
+
+  def generatedTokens = tasks
+      .named('generateGrammarSource', AntlrTask)
+      .map { new File(it.outputDirectory, it.packageName.get().replace('.', '/') + '/MessageLexer.tokens') }
+  def grammarTokens = layout
+      .projectDirectory
+      .file('src/main/antlr/MessageLexer.tokens')
+      .asFile
+
+  inputs
+      .file(generatedTokens)
+      .withPropertyName('generatedTokens')
+
+  outputs
+      .file(grammarTokens)
+      .withPropertyName('grammarTokens')
 
   doLast {
-    Files.copy(
-        new File(outputDirectory, parserPackage.replace('.', '/') + '/MessageLexer.tokens').toPath(),
-        grammarTokens.toPath(),
-        REPLACE_EXISTING)
+    Files.copy(generatedTokens.get().toPath(), grammarTokens.toPath(), REPLACE_EXISTING)
   }
 }
 
 
-generateTestGrammarSource {
+tasks.named('generateTestGrammarSource', AntlrTask) {
   //noinspection GroovyAccessibility
-  antlrClasspath = configurations.antlr4
+  antlrClasspath = antlr4Classpath.get()
 
   outputDirectory = layout.buildDirectory.dir('generated/sources/antlr/test').get().asFile
   packageName = 'de.sayayi.lib.message.util'
@@ -132,19 +141,19 @@ generateTestGrammarSource {
 
 
 tasks.named('compileJava') {
-  dependsOn generateGrammarSource
+  dependsOn tasks.named('generateGrammarSource')
 
   options.compilerArgs << '-implicit:class'
 }
 
 
 tasks.named('compileTestJava') {
-  dependsOn generateTestGrammarSource
+  dependsOn tasks.named('generateTestGrammarSource')
 }
 
 
 tasks.named('sourcesJar') {
-  dependsOn generateGrammarSource
+  dependsOn tasks.named('generateGrammarSource')
 
   exclude 'gen/*'
   exclude '**/*.interp'
@@ -161,7 +170,7 @@ tasks.named('jar') {
 }
 
 
-javadoc {
+tasks.named('javadoc', Javadoc) {
   source += sourceSets.tika3.allJava
   source += sourceSets.tika4.allJava
 

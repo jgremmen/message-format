@@ -39,7 +39,7 @@ syntax/highlight/
   DESIGN.md                   (this file)
   README.md                   usage, scopes, build instructions
   package.json                private (unpublished) package, build scripts
-  highlight.gradle            Gradle integration, applied by the root build.gradle (§3.2)
+  highlight.gradle            build file of the Gradle subproject :highlight (§3.2)
   scripts/
     prepare-grammar.mjs       creates JS-target-safe copies of the .g4 files
     generate.mjs              runs the ANTLR tool (JavaScript target)
@@ -109,13 +109,13 @@ which is git-ignored.
 
 - npm scripts: `prepare-grammar`, `generate` (runs both), `build`, `test`, `clean`. `build` and
   `test` depend on `generate`.
-- Gradle: the root build applies `syntax/highlight/highlight.gradle`, which registers
+- Gradle: this directory is the subproject `:highlight` (build file `highlight.gradle`), which registers
   `highlightSyncVersion` (sets the package version to the library version from
   `gradle/libs.versions.toml`), `highlightNpmInstall`, `highlightBuild` (→ `assemble`), `highlightTest` (→ `check`) and
   `highlightClean` (→ `clean`). Gradle resolves `org.antlr:antlr4` in the exact version of the npm
   runtime from Maven Central and passes it to `generate.mjs` as `$ANTLR_CLASSPATH`, so no separate
-  download is needed. The highlighter is deliberately not a Gradle subproject: the root build adds
-  every subproject to `projectLocalRepositories`, which a Node-only subproject would break.
+  download is needed. As it publishes nothing, the root build leaves it out of
+  `projectLocalRepositories`.
 
 ## 4. Turning tokens into highlight.js scopes
 

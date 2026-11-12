@@ -25,6 +25,10 @@ plugins {
 layout.buildDirectory = '.build'
 
 
+group = 'de.sayayi.lib'
+version = versionCatalogs.named('libs').findVersion('message-format').get().requiredVersion
+
+
 ext.snapshot = BuildSupport.isSnapshot(project)
 ext.releaseVersion = BuildSupport.releaseVersion(project)
 

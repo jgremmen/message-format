@@ -265,8 +265,8 @@ How the build works:
 
 ### Gradle
 
-The root Gradle build applies `highlight.gradle`, so the highlighter is part of the normal build. Node.js
-and npm must be on the `PATH`.
+The highlighter is the Gradle subproject `:highlight` (build file `highlight.gradle`), so it is part of the
+normal build. Node.js and npm must be on the `PATH`.
 
 | Task                  | Does                                                      | Hooked into |
 |-----------------------|-----------------------------------------------------------|-------------|

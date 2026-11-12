@@ -17,9 +17,17 @@
 import groovy.json.JsonSlurper
 
 
-def highlightDir = layout.projectDirectory.dir('syntax/highlight')
-def grammarDir = layout.projectDirectory.dir('message-format/src/main/antlr')
-def testResourceDir = layout.projectDirectory.dir('message-format/src/test/resources')
+plugins {
+  id 'de.sayayi.message.base'
+}
+
+
+description = 'Message Format highlight.js language'
+
+
+def highlightDir = layout.projectDirectory
+def grammarDir = layout.settingsDirectory.dir('message-format/src/main/antlr')
+def testResourceDir = layout.settingsDirectory.dir('message-format/src/test/resources')
 def npm = System.getProperty('os.name').toLowerCase().contains('windows') ? 'npm.cmd' : 'npm'
 
 // the ANTLR tool must have exactly the version of the antlr4 runtime in package.json

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-javadoc {
+tasks.named('javadoc', Javadoc) {
   title = "${project.description} ${version}"
 
   (options as StandardJavadocDocletOptions).with {
@@ -30,11 +30,16 @@ javadoc {
 }
 
 
-ext.resolveVersion = { artifactName ->
-  configurations
+ext.resolveVersion = { moduleName ->
+  def component = configurations
       .compileClasspath
-      .resolvedConfiguration
-      .resolvedArtifacts
-      .find { it.name == artifactName }
-      .moduleVersion.id.version
+      .incoming
+      .resolutionResult
+      .allComponents
+      .find { it.moduleVersion?.name == moduleName }
+
+  if (component == null)
+    throw new GradleException("module '${moduleName}' not found in ${project.path} compile classpath")
+
+  component.moduleVersion.version
 }

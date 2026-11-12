@@ -24,31 +24,26 @@ plugins {
 description = 'Message Format Library Projects'
 
 
-allprojects {
-  group = 'de.sayayi.lib'
-  version = rootProject.libs.versions.message.format.get()
-}
-
-
 pluginManager.apply('de.sayayi.message.base')
 
 
-// highlight.js language (npm build, hooked into assemble/check/clean)
-apply from: 'syntax/highlight/highlight.gradle'
-
-
-// local repositories of all subprojects, provided by the de.sayayi.message.publish plugin
+// local repositories of all published subprojects, provided by the de.sayayi.message.publish plugin
 def projectLocalRepositories = configurations.dependencyScope('projectLocalRepositories')
 def projectLocalRepositoryDirs = configurations.resolvable('projectLocalRepositoryDirs') {
   extendsFrom projectLocalRepositories.get()
 
   attributes {
-    attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category, 'project-local-repository'))
+    attribute(
+        Category.CATEGORY_ATTRIBUTE as Attribute<Object>,
+        objects.named(Category, 'project-local-repository'))
   }
 }
 
+
 dependencies {
-  subprojects.each { subproject -> add(projectLocalRepositories.name, project(subproject.path)) }
+  subprojects
+      .findAll { it.path != ':highlight' }
+      .each { subproject -> add(projectLocalRepositories.name, project(subproject.path)) }
 }
 
 

@@ -74,13 +74,19 @@ publishing {
 }
 
 
+// publish verified artifacts only
+tasks.withType(AbstractPublishToMaven).configureEach {
+  dependsOn tasks.named('check')
+}
+
+
 def projectLocalRepositoryDir = layout.buildDirectory.dir('project-local-repository')
 
 def publishToProjectLocalRepository = tasks.register('publishToProjectLocalRepository') {
   group = PublishingPlugin.PUBLISH_TASK_GROUP
   description = 'Create a local repository with releasable artifacts.'
 
-  dependsOn publishOSSRHPublicationToProjectLocalRepository
+  dependsOn tasks.named('publishOSSRHPublicationToProjectLocalRepository')
 
   outputs.dir projectLocalRepositoryDir
 }
@@ -89,7 +95,9 @@ def publishToProjectLocalRepository = tasks.register('publishToProjectLocalRepos
 // provides the local repository to the root project (releaseAllDryRun)
 configurations.consumable('projectLocalRepositoryElements') {
   attributes {
-    attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category, 'project-local-repository'))
+    attribute(
+        Category.CATEGORY_ATTRIBUTE,
+        objects.named(Category, 'project-local-repository'))
   }
 
   outgoing.artifact(projectLocalRepositoryDir) {

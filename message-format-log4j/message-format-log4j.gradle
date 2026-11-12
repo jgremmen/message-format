@@ -35,19 +35,19 @@ dependencies {
   api project(':message-format')
   api libs.log4j.api
 
-  testImplementation project(path: ':message-format', configuration: 'testOutput')
+  testImplementation testFixtures(project(':message-format'))
   testImplementation libs.log4j.core
 }
 
 
-javadoc {
+tasks.named('javadoc', Javadoc) {
   (options as StandardJavadocDocletOptions).with {
     group('Log4j', [
         'de.sayayi.lib.message.log4j',
     ])
 
     linksOffline(
-        "https://javadoc.io/doc/de.sayayi.lib/message-format/${rootProject.version}/",
+        "https://javadoc.io/doc/de.sayayi.lib/message-format/${project.version}/",
         "${rootDir}/gradle/javadocs/message-format")
     linksOffline(
         "https://javadoc.io/doc/org.jetbrains/annotations/${resolveVersion('annotations')}/",

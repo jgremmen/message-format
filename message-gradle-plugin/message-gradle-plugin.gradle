@@ -36,16 +36,28 @@ plugins {
 description = 'Message Format Gradle Plugin'
 
 
-def messageFormatAnnotationsProject = rootProject.project(':message-format-annotations')
+// jar of the message-format-annotations project, provided by its annotationsJarElements configuration
+def annotationsJar = configurations.dependencyScope('annotationsJar')
+def annotationsJarClasspath = configurations.resolvable('annotationsJarClasspath') {
+  extendsFrom annotationsJar.get()
+
+  attributes {
+    attribute(
+        Category.CATEGORY_ATTRIBUTE,
+        objects.named(Category, 'annotations-jar'))
+  }
+}
 
 
 dependencies {
   api gradleApi()
 
+  add(annotationsJar.name, project(':message-format-annotations'))
+
   // the relocated ASM classes are only part of the annotations jar, not of its classes directory. IntelliJ IDEA maps
   // project dependencies (and artifacts resolved from them) to module dependencies and would not see these classes, so
   // the jar is added as a file dependency for compilation and the project dependency is used at runtime
-  implementation files(messageFormatAnnotationsProject.tasks.named('jar', Jar).flatMap { it.archiveFile })
+  implementation files(annotationsJarClasspath)
 
   compileOnly project(':message-format')
   runtimeOnly project(':message-format-annotations')
@@ -77,7 +89,7 @@ sourceSets.test.resources.srcDir tasks.register('generateTestResources') {
 }
 
 
-jar {
+tasks.named('jar', Jar) {
   archiveBaseName = 'message-format-gradle-plugin'
 }
 
@@ -139,6 +151,9 @@ tasks.named('zipMavenCentralPortalPublication') {
 
 
 tasks.named('publishPlugins') {
+  // publish verified artifacts only
+  dependsOn tasks.named('check')
+
   mustRunAfter 'zipMavenCentralPortalPublication'
   mustRunAfter 'validateMavenCentralPortalPublication'
   mustRunAfter 'releaseMavenCentralPortalPublication'

@@ -36,18 +36,18 @@ dependencies {
 
   implementation libs.icu4j
 
-  testImplementation project(path: ':message-format', configuration: 'testOutput')
+  testImplementation testFixtures(project(':message-format'))
 }
 
 
-javadoc {
+tasks.named('javadoc', Javadoc) {
   (options as StandardJavadocDocletOptions).with {
     group('ICU', [
         'de.sayayi.lib.message.icu',
     ])
 
     linksOffline(
-        "https://javadoc.io/doc/de.sayayi.lib/message-format/${rootProject.version}/",
+        "https://javadoc.io/doc/de.sayayi.lib/message-format/${project.version}/",
         "${rootDir}/gradle/javadocs/message-format")
     linksOffline(
         "https://javadoc.io/doc/org.jetbrains/annotations/${resolveVersion('annotations')}/",

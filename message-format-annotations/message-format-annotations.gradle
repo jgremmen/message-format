@@ -73,6 +73,18 @@ tasks.register('prepareRelocatedAsmClasses', RelocateAsmClasses) {
 sourceSets.main.output.dir(asmMainDir, builtBy: 'prepareRelocatedAsmClasses')
 
 
+// the relocated ASM classes are only part of the jar; provides the jar to the message-gradle-plugin project
+configurations.consumable('annotationsJarElements') {
+  attributes {
+    attribute(
+        Category.CATEGORY_ATTRIBUTE,
+        objects.named(Category, 'annotations-jar'))
+  }
+
+  outgoing.artifact(tasks.named('jar'))
+}
+
+
 tasks.named('processResources') {
   // version of the bundled ASM library, mentioned in META-INF/NOTICE
   def asmVersion = providers.provider {
@@ -105,14 +117,14 @@ tasks.named('sourcesJar') {
 }
 
 
-javadoc {
+tasks.named('javadoc', Javadoc) {
   (options as StandardJavadocDocletOptions).with {
     group('Adopters', [
         'de.sayayi.lib.message.annotation',
     ])
 
     linksOffline(
-        "https://javadoc.io/doc/de.sayayi.lib/message-format/${rootProject.version}/",
+        "https://javadoc.io/doc/de.sayayi.lib/message-format/${project.version}/",
         "${rootDir}/gradle/javadocs/message-format")
     linksOffline(
         "https://javadoc.io/doc/org.jetbrains/annotations/${resolveVersion('annotations')}/",
