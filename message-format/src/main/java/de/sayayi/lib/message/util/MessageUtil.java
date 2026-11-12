@@ -506,21 +506,30 @@ public final class MessageUtil
 
 
   /**
-   * Serializes a string into the format string representation by appending characters to the
-   * context's {@linkplain Context#textJoiner() text joiner}, applying the following escaping rules:
+   * Serializes a string into the format string representation by appending characters to the context's
+   * {@linkplain Context#textJoiner() text joiner}, applying the following escaping rules:
    * <ul>
-   *   <li>The active {@linkplain Context#inStringWithQuote() string quote character} and the backslash
-   *       character are backslash-escaped.</li>
-   *   <li>A {@code %} character followed by <code>{</code>, <code>[</code> or <code>(</code> is
-   *       backslash-escaped to prevent it from being interpreted as a parameter reference.</li>
-   *   <li>ISO control characters and characters that cannot be
-   *       {@linkplain Context#canEncode(char) encoded} by the context's charset are written as
-   *       Unicode escape sequences (e.g. <code>&#92;u00e9</code>).</li>
-   *   <li>All other characters are appended as-is.</li>
+   *   <li>
+   *     The active {@linkplain Context#inStringWithQuote() string quote character} and the backslash character are
+   *     backslash-escaped.
+   *   </li>
+   *   <li>
+   *     A {@code %} character followed by <code>{</code>, <code>[</code> or <code>(</code> is backslash-escaped to
+   *     prevent it from being interpreted as a parameter reference.
+   *   </li>
+   *   <li>
+   *     ISO control characters and characters that cannot be {@linkplain Context#canEncode(char) encoded} by the
+   *     context's charset are written as Unicode escape sequences (e.g. <code>&#92;u00e9</code>). A supplementary
+   *     character (surrogate pair) is {@linkplain Context#canEncode(CharSequence) checked as a whole} and, if it cannot
+   *     be encoded, written as two Unicode escape sequences.
+   *   </li>
+   *   <li>
+   *     All other characters are appended as-is.
+   *   </li>
    * </ul>
    *
-   * @param context  the serialization context providing charset encoding, text joiner and
-   *                 string quoting information, not {@code null}
+   * @param context  the serialization context providing charset encoding, text joiner and string quoting information,
+   *                 not {@code null}
    * @param string   the string to serialize, not {@code null}
    *
    * @see #serializeQuotedString(Context, String)
@@ -538,6 +547,15 @@ public final class MessageUtil
         textJoiner.add('\\').add(ch);
       else if (ch == '%' && i + 1 < l && "{[(".indexOf(stringCharArray[i + 1]) >= 0)
         textJoiner.addNoSpace("\\%");
+      else if (isHighSurrogate(ch) && i + 1 < l && isLowSurrogate(stringCharArray[i + 1]))
+      {
+        final var lowSurrogate = stringCharArray[++i];
+
+        if (context.canEncode(String.valueOf(new char[] { ch, lowSurrogate })))
+          textJoiner.add(ch).add(lowSurrogate);
+        else
+          textJoiner.addNoSpace(String.format("\\u%04x\\u%04x", (int)ch, (int)lowSurrogate));
+      }
       else if (!isISOControl(ch) && context.canEncode(ch))
         textJoiner.add(ch);
       else

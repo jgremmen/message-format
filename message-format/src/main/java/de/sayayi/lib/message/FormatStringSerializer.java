@@ -140,5 +140,22 @@ public interface FormatStringSerializer
     public boolean canEncode(char ch) {
       return encoder.canEncode(ch);
     }
+
+
+    /**
+     * Tells whether the given character sequence can be encoded using the context's charset encoder. Unlike
+     * {@link #canEncode(char)}, this method is able to check supplementary characters (e.g. emojis), which are
+     * represented by a surrogate pair.
+     *
+     * @param chars  the character sequence to check, not {@code null}
+     *
+     * @return  {@code true} if the character sequence can be encoded, {@code false} otherwise
+     *
+     * @since 0.25.0
+     */
+    @Contract(pure = true)
+    public boolean canEncode(@NotNull CharSequence chars) {
+      return encoder.canEncode(chars);
+    }
   }
 }

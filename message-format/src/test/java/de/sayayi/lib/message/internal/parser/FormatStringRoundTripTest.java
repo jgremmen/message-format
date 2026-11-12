@@ -21,12 +21,14 @@ import lombok.val;
 import org.intellij.lang.annotations.Language;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
@@ -106,5 +108,16 @@ final class FormatStringRoundTripTest
       assertTrue(message.isSame(reparsed),
           () -> "'" + formatString + "' -> '" + serialized + "' (" + charset + ") is not the same message");
     }
+  }
+
+
+  @Test
+  @DisplayName("Supplementary characters are only escaped if the charset cannot encode them")
+  void testSupplementaryCharacters()
+  {
+    val message = MESSAGE_FACTORY.parseMessage("Smile \uD83D\uDE00 now");
+
+    assertEquals("Smile \uD83D\uDE00 now", message.asFormatString(UTF_8));
+    assertEquals("Smile \\ud83d\\ude00 now", message.asFormatString(US_ASCII));
   }
 }
