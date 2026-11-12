@@ -23,6 +23,9 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -100,5 +103,30 @@ final class IterableFormatterTest extends AbstractFormatterTest
         .message("%{c,list-max-size:2,list-value-more:'...',list-unique:true}")
         .with("c", List.of(1, 1, 2, 2, 3, 3, 4, 4))
         .format());
+  }
+
+
+  @Test
+  @DisplayName("Escaped parameter in string list value stays text")
+  void testListValueEscapedParameter() throws IOException
+  {
+    val formatterService = createFormatterService(new IterableFormatter());
+    val messageSupport = MessageSupportFactory.create(formatterService);
+
+    assertEquals("<1>, <2>", messageSupport
+        .message("%{c,list-value:'<%{value}>'}").with("c", List.of(1, 2)).format());
+    assertEquals("<%{value}>, <%{value}>", messageSupport
+        .message("%{c,list-value:'<\\%{value}>'}").with("c", List.of(1, 2)).format());
+
+    // the string value survives a pack round trip
+    messageSupport.addMessage("MSG", "%{c,list-value:'<\\%{value}>'}");
+
+    val pack = new ByteArrayOutputStream();
+    messageSupport.exportMessages(pack);
+
+    val importedMessageSupport = MessageSupportFactory.create(formatterService);
+    importedMessageSupport.importMessages(new ByteArrayInputStream(pack.toByteArray()));
+
+    assertEquals("<%{value}>, <%{value}>", importedMessageSupport.code("MSG").with("c", List.of(1, 2)).format());
   }
 }

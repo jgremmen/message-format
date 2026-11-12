@@ -17,6 +17,9 @@ package de.sayayi.lib.message.internal.part.typedvalue;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageFactory;
+import de.sayayi.lib.message.internal.message.EmptyMessage;
+import de.sayayi.lib.message.internal.message.TextMessage;
+import de.sayayi.lib.message.internal.part.TextPart;
 import de.sayayi.lib.message.part.TypedValue.StringValue;
 import de.sayayi.lib.message.util.SupplierDelegate;
 import de.sayayi.lib.pack.PackInputStream;
@@ -34,10 +37,11 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * Typed value implementation for string configuration or map values. In addition to exposing the raw string, it is able
- * to parse that string lazily into a {@link Message.WithSpaces message} on demand.
+ * to convert that string lazily into a {@link Message.WithSpaces text message} on demand. The string is used as is and
+ * never parsed as a message format.
  *
  * @author Jeroen Gremmen
- * @since 0.4.0 (renamed in 0.8.0)
+ * @since 0.4.0
  */
 @ApiStatus.Internal
 public final class TypedValueString implements StringValue
@@ -52,7 +56,8 @@ public final class TypedValueString implements StringValue
   /**
    * Creates a new typed value string wrapping the given string.
    *
-   * @param messageFactory  factory used for lazily parsing the string into a message, not {@code null}
+   * @param messageFactory  factory providing the message part normalizer for the text message representation, not
+   *                        {@code null}
    * @param string          the string value, not {@code null}
    *
    * @throws NullPointerException  if {@code messageFactory} or {@code string} is {@code null}
@@ -63,8 +68,9 @@ public final class TypedValueString implements StringValue
 
     this.string = requireNonNull(string, "string must not be null");
 
-    //noinspection LanguageMismatch
-    messageSupplier = SupplierDelegate.of(() -> messageFactory.parseMessage(string));
+    messageSupplier = SupplierDelegate.of(() -> string.isEmpty()
+        ? EmptyMessage.INSTANCE
+        : new TextMessage(messageFactory.getMessagePartNormalizer().normalize(new TextPart(string))));
   }
 
 

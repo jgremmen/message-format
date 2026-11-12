@@ -684,7 +684,8 @@ public final class PackSupport
 
   /**
    * Converts the given typed value into a {@link TypedValue.MessageValue}, either by returning it directly if it
-   * already is a message value, or by converting a string value into a message value using the message factory.
+   * already is a message value, or by parsing a string value into a message value using the message factory. Packs with
+   * a version before 4 stored message values as strings.
    *
    * @param typedValue  typed value to convert, not {@code null}
    *
@@ -699,7 +700,8 @@ public final class PackSupport
   {
     return switch(typedValue) {
       case TypedValue.MessageValue messageValue -> messageValue;
-      case TypedValue.StringValue stringValue -> new TypedValueMessage(stringValue.asMessage());
+      case TypedValue.StringValue stringValue ->
+          new TypedValueMessage(messageFactory.parseMessage(stringValue.stringValue()));
       default -> throw new IllegalStateException();
     };
   }

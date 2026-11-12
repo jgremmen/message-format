@@ -16,6 +16,8 @@
 package de.sayayi.lib.message.part.config.value;
 
 import de.sayayi.lib.message.MessageFactory;
+import de.sayayi.lib.message.internal.message.TextMessage;
+import de.sayayi.lib.message.internal.part.TextPart;
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueBool;
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueMessage;
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueNumber;
@@ -76,7 +78,8 @@ class TypedValueTest
     assertEquals("Hello %{s}", string.stringValue());
     assertEquals("Hello %{s}", string.asObject());
 
-    assertEquals(messageFactory.parseMessage("Hello  %{ s }"), string.asMessage());
+    // the string is used as is, not parsed as a message format
+    assertEquals(new TextMessage(new TextPart("Hello %{s}")), string.asMessage());
   }
 
 
@@ -93,7 +96,7 @@ class TypedValueTest
 
     assertEquals(messageFactory.parseMessage("%{a, format:bool } %{ s }."), message.asObject());
     assertEquals(
-        message.asObject(),
+        new TextMessage(new TextPart("%{a, format:bool } %{ s }.")),
         new TypedValueString(messageFactory, "%{a, format:bool } %{ s }.").asMessage());
   }
 }

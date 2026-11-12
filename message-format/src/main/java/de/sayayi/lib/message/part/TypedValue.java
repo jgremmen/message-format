@@ -93,13 +93,15 @@ public sealed interface TypedValue<T> extends FormatStringSerializer
 
 
     /**
-     * Returns the string value parsed as a message, allowing it to be used wherever a message is expected (e.g. as
-     * a template reference or a formatted parameter value).
+     * Returns the string value as a text message, allowing it to be used wherever a message is expected (e.g. as a
+     * template reference or a formatted parameter value).
      * <p>
-     * The string is parsed lazily on first access, using the message factory that was in effect when this value was
-     * created, and the resulting message is cached.
+     * The string is used as is and never parsed as a message format, so {@code list-value:'<\%{value}>'} in a format
+     * string results in the text {@code <%{value}>}. Configuration values which must be messages are defined as
+     * messages instead, e.g. {@code list-value:'<%{value}>'} in a format string. The message is created lazily on first
+     * access and cached.
      *
-     * @return  string value parsed as a message, never {@code null}
+     * @return  string value as a text message, never {@code null}
      *
      * @since 0.25.0
      */

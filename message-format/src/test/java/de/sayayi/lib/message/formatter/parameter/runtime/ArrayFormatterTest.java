@@ -22,6 +22,7 @@ import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.formatter.parameter.named.BoolFormatter;
 import de.sayayi.lib.message.internal.part.TextPart;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
+import de.sayayi.lib.message.internal.part.typedvalue.TypedValueMessage;
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.TypedValue;
@@ -74,13 +75,13 @@ final class ArrayFormatterTest extends AbstractFormatterTest
     val messageFactory = messageAccessor.getMessageFactory();
 
     val map = Map.<String,TypedValue<?>>of(
-        "list-value", new TypedValueString(messageFactory, "%{value,true:wahr,false:falsch}"));
+        "list-value", new TypedValueMessage(messageFactory.parseMessage("%{value,true:wahr,false:falsch}")));
 
     assertEquals(new TextPart("wahr, falsch, wahr"),
         format(messageAccessor, new boolean[] { true, false, true }, map, Map.of()));
 
     val booleanMap = Map.<String,TypedValue<?>>of(
-        "list-value", new TypedValueString(messageFactory, "%{value,true:YES,false:NO}"));
+        "list-value", new TypedValueMessage(messageFactory.parseMessage("%{value,true:YES,false:NO}")));
 
     assertEquals(new TextPart("NO, YES"),
         format(messageAccessor, new boolean[] { false, true }, booleanMap, Map.of()));
@@ -135,7 +136,8 @@ final class ArrayFormatterTest extends AbstractFormatterTest
     formatterService.addFormatter(new NumberFormatter());
 
     assertEquals(new TextPart("01, -07, 248"), format(messageAccessor, new int[] { 1, -7, 248 },
-        Map.of("list-value", new TypedValueString(messageFactory, "%{value,number:'##00'}")), Map.of()));
+        Map.of("list-value", new TypedValueMessage(messageFactory.parseMessage("%{value,number:'##00'}"))),
+        Map.of()));
 
     formatterService.addFormatter(new NamedParameterFormatter() {
       @Override
@@ -161,7 +163,8 @@ final class ArrayFormatterTest extends AbstractFormatterTest
 
     assertEquals(new TextPart("0x40, 0xda, 0x2e"),
         format(messageAccessor, new int[] { 64, 218, 46 },
-            Map.of("list-value", new TypedValueString(messageFactory, "%{value,format:hex}")), Map.of()));
+            Map.of("list-value", new TypedValueMessage(messageFactory.parseMessage("%{value,format:hex}"))),
+            Map.of()));
   }
 
 
@@ -180,7 +183,8 @@ final class ArrayFormatterTest extends AbstractFormatterTest
     val messageFactory = messageAccessor.getMessageFactory();
 
     val map = new HashMap<String,TypedValue<?>>();
-    map.put("list-value", new TypedValueString(messageFactory, "%{value,number:'0000',true:wahr,false:falsch}"));
+    map.put("list-value",
+        new TypedValueMessage(messageFactory.parseMessage("%{value,number:'0000',true:wahr,false:falsch}")));
 
     assertEquals(new TextPart("Test, wahr, -0006"), format(messageAccessor,
         new Object[] { "Test", true, null, -6 }, map, Map.of()));

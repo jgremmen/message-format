@@ -56,7 +56,8 @@ messageSupport
 ```
 
 A string value is the one exception. Where a formatter asks for a message, a string value is accepted as well and is
-parsed as a message format string.
+used as plain text. It is not parsed, so a string containing `%{value}` produces exactly that text. A default that has
+to refer to parameters must be a message, set with `setDefaultConfig(String, Message.WithSpaces)`.
 
 
 ## Overriding at the Message Level
