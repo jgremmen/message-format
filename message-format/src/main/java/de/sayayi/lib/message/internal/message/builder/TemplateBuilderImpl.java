@@ -16,12 +16,10 @@
 package de.sayayi.lib.message.internal.message.builder;
 
 import de.sayayi.lib.message.Message;
-import de.sayayi.lib.message.MessageBuilder;
 import de.sayayi.lib.message.MessageBuilder.TemplateBuilder;
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.internal.part.template.TemplatePart;
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueBool;
-import de.sayayi.lib.message.internal.part.typedvalue.TypedValueMessage;
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueNumber;
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import de.sayayi.lib.message.part.TypedValue;
@@ -32,7 +30,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 
 import static de.sayayi.lib.message.util.MessageUtil.isKebabCaseName;
 import static de.sayayi.lib.message.util.MessageUtil.isKebabOrLowerCamelCaseName;
@@ -135,36 +132,6 @@ public final class TemplateBuilderImpl extends AbstractSpacedBuilder<TemplateBui
   @Override
   public @NotNull TemplateBuilder withDefaultParameter(@NotNull String name, long value) {
     return withDefaultParameter(name, new TypedValueNumber(value));
-  }
-
-
-  /**
-   * {@inheritDoc}
-   *
-   * @throws IllegalArgumentException  if {@code name} does not use a supported naming convention
-   */
-  @Override
-  public @NotNull TemplateBuilder withDefaultParameter(@NotNull String name, @NotNull Message.WithSpaces message) {
-    return withDefaultParameter(name, new TypedValueMessage(message));
-  }
-
-
-  /**
-   * {@inheritDoc}
-   *
-   * @throws IllegalArgumentException  if {@code name} does not use a supported naming convention
-   */
-  @Override
-  public @NotNull TemplateBuilder withDefaultParameter(@NotNull String name,
-                                                       @NotNull Consumer<MessageBuilder> messageConfigurer)
-  {
-    requireNonNull(messageConfigurer, "messageConfigurer must not be null");
-
-    final var nestedBuilder = new FluentMessageBuilder(messageFactory);
-
-    messageConfigurer.accept(nestedBuilder);
-
-    return withDefaultParameter(name, nestedBuilder.build());
   }
 
 

@@ -832,59 +832,6 @@ class MessageBuilderTest
 
 
     @Test
-    @DisplayName("withDefaultParameter(String, Message.WithSpaces) provides message default")
-    void testWithDefaultParameterMessage()
-    {
-      final var cms = createMessageSupportWithTemplate("wrapper",
-          "%{content,!null:'has content',null:'no content'}");
-      final var innerMessage = MessageBuilder
-          .create()
-          .text("hello world")
-          .build();
-
-      final var message = MessageBuilder
-          .create()
-          .template("wrapper")
-              .withDefaultParameter("content", innerMessage)
-          .build();
-
-      assertEquals("has content", cms.message(message).format());
-    }
-
-
-    @Test
-    @DisplayName("withDefaultParameter(String, Consumer) builds message via nested builder")
-    void testWithDefaultParameterConsumer()
-    {
-      final var cms = createMessageSupportWithTemplate("wrapper",
-          "%{content,!null:'has content',null:'no content'}");
-      final var message = MessageBuilder
-          .create()
-          .template("wrapper")
-              .withDefaultParameter("content", b -> b.text("built via consumer"))
-          .build();
-
-      assertEquals("has content", cms.message(message).format());
-    }
-
-
-    @Test
-    @DisplayName("withDefaultParameter(String, Consumer) with parameter in nested message")
-    void testWithDefaultParameterConsumerWithParameter()
-    {
-      final var cms = createMessageSupportWithTemplate("wrapper",
-          "%{content,!null:'has content',null:'no content'}");
-      final var message = MessageBuilder
-          .create()
-          .template("wrapper")
-              .withDefaultParameter("content", b -> b.text("Hello").parameter("user").spaceBefore())
-          .build();
-
-      assertEquals("has content", cms.message(message).with("user", "Admin").format());
-    }
-
-
-    @Test
     @DisplayName("Multiple default parameters on same template")
     void testMultipleDefaultParameters()
     {
@@ -922,30 +869,6 @@ class MessageBuilderTest
           .create()
           .template("t")
               .withDefaultParameter("name", (String)null));
-    }
-
-
-    @Test
-    @DisplayName("withDefaultParameter(Message.WithSpaces) with null value throws NullPointerException")
-    @SuppressWarnings("DataFlowIssue")
-    void testWithDefaultParameterNullMessageValueThrows()
-    {
-      assertThrows(NullPointerException.class, () -> MessageBuilder
-          .create()
-          .template("t")
-              .withDefaultParameter("name", (Message.WithSpaces)null));
-    }
-
-
-    @Test
-    @DisplayName("withDefaultParameter(Consumer) with null consumer throws NullPointerException")
-    @SuppressWarnings("DataFlowIssue")
-    void testWithDefaultParameterNullConsumerThrows()
-    {
-      assertThrows(NullPointerException.class, () -> MessageBuilder
-          .create()
-          .template("t")
-              .withDefaultParameter("name", (Consumer<MessageBuilder>)null));
     }
 
 
