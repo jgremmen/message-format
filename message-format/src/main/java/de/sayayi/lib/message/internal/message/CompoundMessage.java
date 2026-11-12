@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import static de.sayayi.lib.message.internal.pack.PackSupport.packSmallCount;
 import static java.util.Arrays.*;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
@@ -58,13 +59,6 @@ import static java.util.Objects.requireNonNull;
 @SuppressWarnings("ClassCanBeRecord")
 public final class CompoundMessage implements Message.WithSpaces
 {
-  /**
-   * Maximum number of message parts a compound message can have in order to be packed.
-   *
-   * @since 0.25.0
-   */
-  private static final int MAX_PACK_PARTS = 255;
-
   /** Message parts, not empty */
   private final @NotNull MessagePart[] messageParts;
 
@@ -239,11 +233,7 @@ public final class CompoundMessage implements Message.WithSpaces
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
-    var partCount = messageParts.length;
-    if (partCount > MAX_PACK_PARTS)
-      throw new IOException("message cannot contain more than " + MAX_PACK_PARTS + " parts (" + partCount + " found)");
-
-    packStream.writeSmallVar(partCount);
+    packSmallCount(messageParts.length, "message", "parts", packStream);
 
     for(var part: messageParts)
       PackSupport.pack(part, packStream);

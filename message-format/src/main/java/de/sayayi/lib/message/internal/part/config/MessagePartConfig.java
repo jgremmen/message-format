@@ -29,6 +29,7 @@ import org.jetbrains.annotations.Unmodifiable;
 import java.io.IOException;
 import java.util.*;
 
+import static de.sayayi.lib.message.internal.pack.PackSupport.packSmallCount;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
 
@@ -180,14 +181,16 @@ public final class MessagePartConfig implements MessagePart.Config
 
   /**
    * Writes this configuration to the given pack output stream for binary serialization.
+   * <p>
+   * A configuration with more than 255 entries cannot be packed.
    *
    * @param packStream  data output pack target, not {@code null}
    *
-   * @throws IOException  if an I/O error occurs
+   * @throws IOException  if the configuration has more than 255 entries or if an I/O error occurs
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
-    packStream.writeSmallVar(config.size());
+    packSmallCount(config.size(), "parameter configuration", "entries", packStream);
 
     for(var configEntry: config.entrySet())
     {

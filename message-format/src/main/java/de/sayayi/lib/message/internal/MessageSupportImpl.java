@@ -363,15 +363,27 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
       try(var dataStream = new PackOutputStream(PACK_CONFIG, VERSION, compress, stream)) {
         // pack all filtered messages
         dataStream.writeUnsignedShort(messageCodesCount);
+
         for(var code: messageCodes)
-          PackSupport.pack(messageSnapshot.get(code), dataStream);
+        {
+          try {
+            PackSupport.pack(messageSnapshot.get(code), dataStream);
+          } catch(IllegalArgumentException ex) {
+            throw new IOException("message '" + code + "' cannot be packed: " + ex.getMessage(), ex);
+          }
+        }
 
         // pack all required templates
         dataStream.writeUnsignedShort(templateNamesCount);
+
         for(var templateName: templateNames)
         {
-          dataStream.writeString(templateName);
-          PackSupport.pack(((MessageTemplate)templateSnapshot.get(templateName)).getMessage(), dataStream);
+          try {
+            dataStream.writeString(templateName);
+            PackSupport.pack(((MessageTemplate)templateSnapshot.get(templateName)).getMessage(), dataStream);
+          } catch(IllegalArgumentException ex) {
+            throw new IOException("template '" + templateName + "' cannot be packed: " + ex.getMessage(), ex);
+          }
         }
       }
     }

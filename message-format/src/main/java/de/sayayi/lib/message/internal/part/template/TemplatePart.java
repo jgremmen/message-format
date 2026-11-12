@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
 
+import static de.sayayi.lib.message.internal.pack.PackSupport.packSmallCount;
 import static de.sayayi.lib.message.part.MessagePart.Text.EMPTY;
 import static de.sayayi.lib.message.part.MessagePart.Text.SPACE;
 import static de.sayayi.lib.message.part.TextPartFactory.setSpaces;
@@ -227,18 +228,21 @@ public final class TemplatePart implements MessagePart.Template
 
   /**
    * Serializes this template part to the given pack output stream.
+   * <p>
+   * A template part with more than 255 default parameters or more than 255 parameter delegates cannot be packed.
    *
    * @param packStream  data output pack target, not {@code null}
    *
-   * @throws IOException  if an I/O error occurs
+   * @throws IOException  if the template part has more than 255 default parameters or parameter delegates or if an
+   *                      I/O error occurs
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
     packStream.writeBoolean(spaceBefore);
     packStream.writeBoolean(spaceAfter);
 
-    packStream.writeSmallVar(defaultParameterMap.size());
-    packStream.writeSmallVar(parameterDelegateMap.size());
+    packSmallCount(defaultParameterMap.size(), "template", "default parameters", packStream);
+    packSmallCount(parameterDelegateMap.size(), "template", "parameter delegates", packStream);
 
     for(var defaultParameter: defaultParameterMap.entrySet())
     {

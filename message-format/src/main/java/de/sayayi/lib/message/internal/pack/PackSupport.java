@@ -140,6 +140,9 @@ public final class PackSupport
   /** Type identifier for messages consisting of a single text part. */
   private static final int MESSAGE_TEXT = 5;
 
+  /** Maximum number of elements written by {@link #packSmallCount(int, String, String, PackOutputStream)}. */
+  private static final int MAX_SMALL_COUNT = 255;
+
 
   /** Message factory used for creating messages while unpacking. */
   private final MessageFactory messageFactory;
@@ -509,6 +512,36 @@ public final class PackSupport
     };
 
     return mapValues.computeIfAbsent(configValue, identity());
+  }
+
+
+  /**
+   * Packs the number of elements of a structure, like the parts of a message or the entries of a map, as a small
+   * variable-length value.
+   * <p>
+   * The pack format supports at most 255 elements per structure. This is a limitation of the pack only; structures with
+   * more elements can be created and used, but they must be reduced in size before they can be packed.
+   *
+   * @param count       number of elements to pack
+   * @param structure   name of the structure, used in the exception message, not {@code null}
+   * @param elements    name of the elements, used in the exception message, not {@code null}
+   * @param packStream  output stream to write to, not {@code null}
+   *
+   * @throws IOException  if {@code count} is larger than 255 or if an I/O error occurs during packing
+   *
+   * @since 0.25.0
+   */
+  @Contract(mutates = "param4,io")
+  public static void packSmallCount(int count, @NotNull String structure, @NotNull String elements,
+                                    @NotNull PackOutputStream packStream) throws IOException
+  {
+    if (count > MAX_SMALL_COUNT)
+    {
+      throw new IOException(structure + " with more than " + MAX_SMALL_COUNT + ' ' + elements +
+          " cannot be packed (" + count + " found)");
+    }
+
+    packStream.writeSmallVar(count);
   }
 
 

@@ -34,6 +34,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import static de.sayayi.lib.message.internal.pack.PackSupport.packSmallCount;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Locale.ROOT;
@@ -199,16 +200,18 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
 
   /**
    * Writes this localized message bundle with code to the given pack output stream.
+   * <p>
+   * A localized message bundle with more than 255 locales cannot be packed.
    *
    * @param packStream  data output pack target, not {@code null}
    *
-   * @throws IOException  if an I/O error occurs
+   * @throws IOException  if the bundle has more than 255 locales or if an I/O error occurs
    *
    * @since 0.8.0
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
-    packStream.writeSmallVar(localizedMessages.size());
+    packSmallCount(localizedMessages.size(), "localized message bundle", "locales", packStream);
     packStream.writeString(getCode());
 
     for(var entry: localizedMessages.entrySet())

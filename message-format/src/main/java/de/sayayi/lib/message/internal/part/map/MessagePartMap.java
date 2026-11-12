@@ -43,6 +43,7 @@ import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.*;
 import java.util.Map.Entry;
 
+import static de.sayayi.lib.message.internal.pack.PackSupport.packSmallCount;
 import static de.sayayi.lib.message.part.MapKey.MatchResult.Defined.MISMATCH;
 import static de.sayayi.lib.message.part.MapKey.Type.EMPTY;
 import static de.sayayi.lib.message.part.MapKey.Type.NULL;
@@ -335,14 +336,16 @@ public final class MessagePartMap implements MessagePart.Map
 
   /**
    * Serializes this message part map to the given pack output stream.
+   * <p>
+   * A message part map with more than 255 entries cannot be packed.
    *
    * @param packStream  output stream to write to, not {@code null}
    *
-   * @throws IOException  if an I/O error occurs during writing
+   * @throws IOException  if the map has more than 255 entries or if an I/O error occurs during writing
    */
   public void pack(@NotNull PackOutputStream packStream) throws IOException
   {
-    packStream.writeSmallVar(mapKeys.length);
+    packSmallCount(mapKeys.length, "parameter map", "entries", packStream);
     packStream.writeBoolean(defaultValue != null);
 
     for(int n = 0, l = mapKeys.length; n < l; n++)

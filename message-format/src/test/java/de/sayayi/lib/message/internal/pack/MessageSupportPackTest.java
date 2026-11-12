@@ -21,6 +21,7 @@ import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.exception.DuplicateMessageException;
 import de.sayayi.lib.pack.PackOutputStream;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
 
 import java.io.ByteArrayInputStream;
@@ -33,11 +34,14 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.IntFunction;
+import java.util.stream.IntStream;
 
 import static de.sayayi.lib.message.Message.Parameters;
 import static de.sayayi.lib.message.pack.PackConstants.PACK_CONFIG;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Locale.*;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toMap;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -389,5 +393,57 @@ final class MessageSupportPackTest
 
     val ex = assertThrows(IOException.class, () -> cms.exportMessages(new ByteArrayOutputStream()));
     assertTrue(ex.getMessage().contains("255 parts"));
+  }
+
+
+  @Test
+  @DisplayName("Export message exceeding the pack format limits")
+  void testExportPackFormatLimits()
+  {
+    val cms = MessageSupportFactory.createGeneric();
+
+    cms.addMessage("MAP", "%{p," + elements(256, n -> "'k" + n + "':x") + '}');
+    cms.addMessage("CONFIG", "%{p," + elements(256, n -> "c" + n + ":1") + '}');
+    cms.addMessage("TPL-DEFAULT", "%[tpl," + elements(256, n -> "p" + n + "=1") + ']');
+    cms.addMessage("TPL-DELEGATE", "%[tpl," + elements(256, n -> "p" + n + "->q") + ']');
+    cms.addMessage(cms.getMessageAccessor().getMessageFactory().parseMessage("LOCALES",
+        IntStream.range(0, 256).boxed().collect(toMap(MessageSupportPackTest::locale, n -> "text"))));
+    cms.addMessage("STRING", "x".repeat(0x10000));
+    cms.addTemplate("tpl", cms.getMessageAccessor().getMessageFactory().parseTemplate("%{p0}"));
+
+    // messages exceeding the pack format limits can be used as usual
+    assertEquals("x", cms.code("MAP").with("p", "k255").format());
+    assertEquals("1", cms.code("TPL-DEFAULT").format());
+    assertEquals("text", cms.code("LOCALES").locale(locale(255)).format());
+
+    assertExportFails(cms, "MAP", "parameter map with more than 255 entries");
+    assertExportFails(cms, "CONFIG", "parameter configuration with more than 255 entries");
+    assertExportFails(cms, "TPL-DEFAULT", "template with more than 255 default parameters");
+    assertExportFails(cms, "TPL-DELEGATE", "template with more than 255 parameter delegates");
+    assertExportFails(cms, "LOCALES", "localized message bundle with more than 255 locales");
+    assertExportFails(cms, "STRING", "message 'STRING' cannot be packed");
+  }
+
+
+  private static void assertExportFails(@NotNull MessageSupport messageSupport, @NotNull String code,
+                                        @NotNull String expectedMessage)
+  {
+    val ex = assertThrows(
+        IOException.class,
+        () -> messageSupport.exportMessages(new ByteArrayOutputStream(), false, code::equals, null),
+        code);
+
+    assertTrue(ex.getMessage().contains(expectedMessage), ex.getMessage());
+  }
+
+
+  private static @NotNull String elements(int count, @NotNull IntFunction<String> element) {
+    return IntStream.range(0, count).mapToObj(element).collect(joining(","));
+  }
+
+
+  // private use language codes qaa..qtz
+  private static @NotNull Locale locale(int n) {
+    return Locale.of("q" + (char)('a' + n / 26) + (char)('a' + n % 26));
   }
 }

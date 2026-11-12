@@ -165,8 +165,9 @@ public interface MessageSupport
    *
    * @param stream  pack output stream, not {@code null}. The stream is closed by this method
    *
-   * @throws IOException  if an I/O error occurs or if the pack would contain more than 65535 messages or more
-   *                      than 65535 templates
+   * @throws IOException  if an I/O error occurs, if the pack would contain more than 65535 messages or more than 65535
+   *                      templates or if a message or template exceeds a limit of the pack format (see
+   *                      {@link #exportMessages(OutputStream, boolean, Predicate, Predicate)})
    *
    * @since 0.24.0
    *
@@ -202,6 +203,12 @@ public interface MessageSupport
    * e.g. as an entry of a {@link java.util.zip.ZipOutputStream ZipOutputStream}, pass a
    * {@link java.io.FilterOutputStream FilterOutputStream} wrapping that stream, which overrides
    * {@link OutputStream#close() close()} to only flush the wrapped stream.
+   * <p>
+   * The pack format has limits which don't apply to messages and templates themselves: a message can have at most
+   * 255 parts, a parameter map or parameter configuration at most 255 entries, a template reference at most 255
+   * default parameters and 255 parameter delegates, a localized message at most 255 locales, and each string can have
+   * at most 65535 bytes in (modified) UTF-8 encoding. Messages and templates exceeding these limits can be used as
+   * usual, but must be reduced in size before they can be packed.
    *
    * @param stream             pack output stream, not {@code null}. The stream is closed by this method
    * @param compress           {@code true} compress pack, {@code false} do not compress pack
@@ -211,8 +218,10 @@ public interface MessageSupport
    *                           {@code null} all templates referenced by the selected messages will be included, except
    *                           for custom (non-message-backed) template implementations, which are always excluded
    *
-   * @throws IOException  if an I/O error occurs or if the pack would contain more than 65535 messages or more
-   *                      than 65535 templates. If a limit is exceeded, nothing is written to {@code stream}
+   * @throws IOException  if an I/O error occurs, if the pack would contain more than 65535 messages or more
+   *                      than 65535 templates (in which case nothing is written to {@code stream}) or if a message or
+   *                      template exceeds a limit of the pack format (in which case {@code stream} contains an
+   *                      incomplete pack)
    *
    * @see ConfigurableMessageSupport#importMessages(InputStream)
    */
