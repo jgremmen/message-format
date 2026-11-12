@@ -8,7 +8,7 @@ in a collection or array, or the number of entries in a map. The size is returne
 matched against number map keys to produce custom text, or formatted as a plain number when no map keys are provided.
 
 The formatter works with any type that has a size-aware (`SizeQueryable`) type-based formatter registered. This
-includes strings, collections, iterables, maps, arrays, byte arrays, paths (file size in bytes), optionals,
+includes strings, collections, maps, arrays, byte arrays, paths (file size in bytes), optionals,
 references and suppliers. If the value's type does not support size queries, the formatter cannot determine the size
 and the `empty` map key is used.
 
@@ -23,7 +23,7 @@ registered for the value's type. Each type defines what "size" means:
 | `CharSequence` (including `String`)    | Number of characters                      |
 | `char[]`                               | Length of the array                       |
 | `Collection` (including `List`, `Set`) | Number of elements                        |
-| `Iterable`                             | Number of elements (counted by iterating) |
+| `Iterable` (other than `Collection`)   | Unknown (not iterated)                    |
 | `Map`                                  | Number of entries                         |
 | Arrays (all types)                     | Length of the array                       |
 | `byte[]`                               | Length of the array                       |

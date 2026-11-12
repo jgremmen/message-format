@@ -32,6 +32,7 @@ import java.util.OptionalLong;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import static de.sayayi.lib.message.part.MapKey.MatchResult.Defined.MISMATCH;
 import static de.sayayi.lib.message.part.MapKey.MatchResult.forEmptyKey;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 
@@ -42,9 +43,9 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
  * Each element is formatted individually and the results are joined into a single text string. Separator, truncation
  * and overflow behavior are controlled by the list configuration keys inherited from {@link AbstractListFormatter}.
  * <p>
- * As a {@link SizeQueryable} formatter, it reports the number of elements in the iterable. For {@link Collection}
- * instances, the {@link Collection#size()} method is used directly; for other iterables, the elements are counted by
- * iteration.
+ * As a {@link SizeQueryable} formatter, it reports the number of elements of a {@link Collection}. Other iterables are
+ * iterated only once, for formatting, as they may be one-shot (e.g. a {@code DirectoryStream}) or infinite. Their size
+ * is therefore unknown and the {@code empty} and {@code !empty} map keys are matched against the formatted text.
  * <p>
  * <b>Configuration keys:</b>
  * <table border="1">
@@ -157,31 +158,34 @@ public final class IterableFormatter extends AbstractListFormatter<Iterable<?>> 
   /**
    * {@inheritDoc}
    * <p>
-   * Returns the number of elements in the iterable.
+   * Returns the number of elements of a {@link Collection}. The size of other iterables is unknown, as determining it
+   * would require iterating them.
    */
   @Override
   public @NotNull OptionalLong size(@NotNull ParameterFormatterContext context, @NotNull Object iterable)
   {
-    if (iterable instanceof Collection)
-      return OptionalLong.of(((Collection<?>)iterable).size());
-
-    var size = 0L;
-
-    for(var ignored: (Iterable<?>)iterable)
-      size++;
-
-    return OptionalLong.of(size);
+    return iterable instanceof Collection
+        ? OptionalLong.of(((Collection<?>)iterable).size())
+        : OptionalLong.empty();
   }
 
 
-  /** {@inheritDoc} */
+  /**
+   * {@inheritDoc}
+   * <p>
+   * For iterables, which are not a {@link Collection}, this formatter returns a mismatch for both the {@code empty} and
+   * the {@code !empty} key, as determining whether they are empty would require iterating them. The keys are matched
+   * against the formatted text instead.
+   */
   @Override
   public @NotNull MatchResult compareToEmptyKey(Iterable<?> iterable, @NotNull ComparatorContext context)
   {
-    return forEmptyKey(context.getCompareType(),
-        iterable instanceof Collection
-            ? ((Collection<?>)iterable).isEmpty()
-            : iterable == null || !iterable.iterator().hasNext());
+    if (iterable == null)
+      return forEmptyKey(context.getCompareType(), true);
+
+    return iterable instanceof Collection
+        ? forEmptyKey(context.getCompareType(), ((Collection<?>)iterable).isEmpty())
+        : MISMATCH;
   }
 
 

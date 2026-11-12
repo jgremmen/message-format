@@ -242,8 +242,10 @@ messageSupport
 
 ### Empty Key
 
-The `empty` key matches when the array or iterable contains no elements (length zero or no elements in the iterator).
-Its negated form `!empty` matches when there is at least one element.
+The `empty` key matches when the array or collection contains no elements. Its negated form `!empty` matches when
+there is at least one element. An iterable, which is not a `Collection`, may be one-shot (e.g. a `DirectoryStream`) or
+infinite and is therefore only iterated for formatting. The `empty` and `!empty` keys are matched against the
+formatted text instead.
 
 ```java
 messageSupport
@@ -283,7 +285,7 @@ messageSupport
 ## Size Queries
 
 Both formatters report the number of elements as their size. For arrays this is the array length. For collections this
-uses `Collection.size()`. For other iterables the elements are counted by iteration.
+uses `Collection.size()`. The size of other iterables is unknown, as they are not iterated for a size query.
 
 
 ## Interaction Table

@@ -16,6 +16,7 @@
 package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.MessageSupportFactory;
+import de.sayayi.lib.message.formatter.parameter.named.SizeFormatter;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
@@ -26,12 +27,14 @@ import org.junit.jupiter.api.TestMethodOrder;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 /**
@@ -128,5 +131,62 @@ final class IterableFormatterTest extends AbstractFormatterTest
     importedMessageSupport.importMessages(new ByteArrayInputStream(pack.toByteArray()));
 
     assertEquals("<%{value}>, <%{value}>", importedMessageSupport.code("MSG").with("c", List.of(1, 2)).format());
+  }
+
+
+  @Test
+  @DisplayName("Non-collection iterables are iterated for formatting only")
+  void testOneShotIterable()
+  {
+    val messageSupport = MessageSupportFactory
+        .create(createFormatterService(new IterableFormatter(), new SizeFormatter()));
+
+    // the empty keys are matched against the formatted text
+    assertEquals("none", messageSupport
+        .message("%{c,empty:'none',!empty:'some'}").with("c", new OneShotIterable()).format());
+    assertEquals("some", messageSupport
+        .message("%{c,empty:'none',!empty:'some'}").with("c", new OneShotIterable("a", "b")).format());
+    assertEquals("a, b", messageSupport
+        .message("%{c}").with("c", new OneShotIterable("a", "b")).format());
+    assertEquals("unknown", messageSupport
+        .message("%{c,format:size,empty:'unknown'}").with("c", new OneShotIterable("a", "b")).format());
+
+    // collections still report their size and emptiness
+    assertEquals("none", messageSupport
+        .message("%{c,empty:'none',!empty:'some'}").with("c", List.of()).format());
+    assertEquals("some", messageSupport
+        .message("%{c,empty:'none',!empty:'some'}").with("c", List.of("a")).format());
+    assertEquals("2", messageSupport
+        .message("%{c,format:size}").with("c", List.of("a", "b")).format());
+
+    val iterable = new OneShotIterable("a");
+    iterable.iterator();
+    assertThrows(IllegalStateException.class, iterable::iterator);
+  }
+
+
+
+
+  private static final class OneShotIterable implements Iterable<String>
+  {
+    private final List<String> elements;
+    private boolean iterated;
+
+
+    private OneShotIterable(String... elements) {
+      this.elements = List.of(elements);
+    }
+
+
+    @Override
+    public Iterator<String> iterator()
+    {
+      if (iterated)
+        throw new IllegalStateException("already iterated");
+
+      iterated = true;
+
+      return elements.iterator();
+    }
   }
 }
