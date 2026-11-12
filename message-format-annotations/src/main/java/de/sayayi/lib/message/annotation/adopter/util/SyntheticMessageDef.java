@@ -66,7 +66,18 @@ public record SyntheticMessageDef(@NotNull String code, @Language("MessageFormat
   {
     this.code = code.trim();
     this.text = text == null ? "" : text.trim();
-    this.texts = texts;
+    this.texts = texts.clone();
+  }
+
+
+  /**
+   * Returns the localized text variants. The returned array is a copy, so modifying it does not affect this instance.
+   *
+   * @return  localized text variants, never {@code null}
+   */
+  @Override
+  public @NotNull Text[] texts() {
+    return texts.clone();
   }
 
 
@@ -74,6 +85,36 @@ public record SyntheticMessageDef(@NotNull String code, @Language("MessageFormat
   @Override
   public Class<? extends Annotation> annotationType() {
     return MessageDef.class;
+  }
+
+
+  /**
+   * {@inheritDoc}
+   * <p>
+   * As required by the {@link Annotation} contract, this instance is equal to any {@link MessageDef} annotation with
+   * equal members, including annotations obtained by reflection. The {@code texts} member is compared element-wise.
+   */
+  @Override
+  public boolean equals(Object o)
+  {
+    return o instanceof MessageDef that &&
+           code.equals(that.code()) &&
+           text.equals(that.text()) &&
+           Arrays.equals(texts, that.texts());
+  }
+
+
+  /**
+   * {@inheritDoc}
+   * <p>
+   * The hash code is calculated as specified by {@link Annotation#hashCode()}.
+   */
+  @Override
+  public int hashCode()
+  {
+    return ((127 * "code".hashCode()) ^ code.hashCode()) +
+           ((127 * "text".hashCode()) ^ text.hashCode()) +
+           ((127 * "texts".hashCode()) ^ Arrays.hashCode(texts));
   }
 
 

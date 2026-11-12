@@ -62,6 +62,36 @@ public record SyntheticText(@NotNull String locale, @Language("MessageFormat") @
   }
 
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * As required by the {@link Annotation} contract, this instance is equal to any {@link Text} annotation with equal
+   * members, including annotations obtained by reflection.
+   */
+  @Override
+  public boolean equals(Object o)
+  {
+    return o instanceof Text that &&
+           locale.equals(that.locale()) &&
+           text.equals(that.text()) &&
+           value.equals(that.value());
+  }
+
+
+  /**
+   * {@inheritDoc}
+   * <p>
+   * The hash code is calculated as specified by {@link Annotation#hashCode()}.
+   */
+  @Override
+  public int hashCode()
+  {
+    return ((127 * "locale".hashCode()) ^ locale.hashCode()) +
+           ((127 * "text".hashCode()) ^ text.hashCode()) +
+           ((127 * "value".hashCode()) ^ value.hashCode());
+  }
+
+
   /** {@inheritDoc} */
   @Override
   public @NotNull String toString() {

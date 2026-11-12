@@ -70,7 +70,18 @@ public record SyntheticTemplateDef(@NotNull String name, @Language("MessageForma
   {
     this.name = validateName(name, "template name");
     this.text = text == null ? "" : text.trim();
-    this.texts = texts;
+    this.texts = texts.clone();
+  }
+
+
+  /**
+   * Returns the localized text variants. The returned array is a copy, so modifying it does not affect this instance.
+   *
+   * @return  localized text variants, never {@code null}
+   */
+  @Override
+  public @NotNull Text[] texts() {
+    return texts.clone();
   }
 
 
@@ -78,6 +89,36 @@ public record SyntheticTemplateDef(@NotNull String name, @Language("MessageForma
   @Override
   public Class<? extends Annotation> annotationType() {
     return TemplateDef.class;
+  }
+
+
+  /**
+   * {@inheritDoc}
+   * <p>
+   * As required by the {@link Annotation} contract, this instance is equal to any {@link TemplateDef} annotation with
+   * equal members, including annotations obtained by reflection. The {@code texts} member is compared element-wise.
+   */
+  @Override
+  public boolean equals(Object o)
+  {
+    return o instanceof TemplateDef that &&
+           name.equals(that.name()) &&
+           text.equals(that.text()) &&
+           Arrays.equals(texts, that.texts());
+  }
+
+
+  /**
+   * {@inheritDoc}
+   * <p>
+   * The hash code is calculated as specified by {@link Annotation#hashCode()}.
+   */
+  @Override
+  public int hashCode()
+  {
+    return ((127 * "name".hashCode()) ^ name.hashCode()) +
+           ((127 * "text".hashCode()) ^ text.hashCode()) +
+           ((127 * "texts".hashCode()) ^ Arrays.hashCode(texts));
   }
 
 
