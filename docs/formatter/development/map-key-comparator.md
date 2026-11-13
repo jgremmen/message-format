@@ -100,6 +100,11 @@ comparison should be delegated to the wrapped value's formatter. For example, th
 comparisons for number, bool and string keys to the contained `int` value's formatter by calling 
 `context.matchForObject(optionalInt.getAsInt(), int.class)`.
 
+For locale-sensitive string comparisons, `getCollator(int strength)` returns a `Collator` for the locale in effect,
+with canonical decomposition and the given strength (e.g. `Collator.PRIMARY` to ignore case and accents). The context
+creates each collator once and returns the same instance for all map keys of a parameter, so the collator must not be
+modified.
+
 
 ## Adding Map Key Comparison to a Typed Formatter
 

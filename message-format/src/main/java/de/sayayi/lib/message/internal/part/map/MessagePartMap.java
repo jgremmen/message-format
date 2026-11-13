@@ -33,12 +33,13 @@ import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.TypedValue;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
-import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.io.IOException;
+import java.text.Collator;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.*;
 import java.util.Map.Entry;
@@ -47,6 +48,7 @@ import static de.sayayi.lib.message.internal.pack.PackSupport.packSmallCount;
 import static de.sayayi.lib.message.part.MapKey.MatchResult.Defined.MISMATCH;
 import static de.sayayi.lib.message.part.MapKey.Type.EMPTY;
 import static de.sayayi.lib.message.part.MapKey.Type.NULL;
+import static java.text.Collator.*;
 import static java.util.Collections.unmodifiableSet;
 
 
@@ -64,7 +66,7 @@ import static java.util.Collections.unmodifiableSet;
  * @see MapKey
  * @see MessagePart.Map
  */
-@ApiStatus.Internal
+@Internal
 public final class MessagePartMap implements MessagePart.Map
 {
   /** Shared empty map instance containing no keys and no default value. */
@@ -474,13 +476,17 @@ public final class MessagePartMap implements MessagePart.Map
    *
    * @since 0.21.0
    */
-  private static final class ConfigKeyComparatorContext extends BaseConfigAccessor implements ComparatorContext
+  @Internal
+  public static final class ConfigKeyComparatorContext extends BaseConfigAccessor implements ComparatorContext
   {
     /** Locale used for comparing values with map keys. */
     private final Locale locale;
 
     /** Map key currently being compared. */
     private MapKey mapKey;
+
+    /** Collators for the locale, indexed by strength and created on first use. */
+    private final Collator[] collators = new Collator[IDENTICAL + 1];
 
 
     /**
@@ -555,6 +561,32 @@ public final class MessagePartMap implements MessagePart.Map
 
     /**
      * {@inheritDoc}
+     * <p>
+     * This implementation creates a collator for each strength once and returns the same instance for all map keys
+     * compared by this context.
+     */
+    @Override
+    public @NotNull Collator getCollator(int strength)
+    {
+      if (strength < PRIMARY || strength > IDENTICAL)
+        throw new IllegalArgumentException("invalid collator strength: " + strength);
+
+      var collator = collators[strength];
+      if (collator == null)
+      {
+        collator = Collator.getInstance(locale);
+        collator.setDecomposition(CANONICAL_DECOMPOSITION);
+        collator.setStrength(strength);
+
+        collators[strength] = collator;
+      }
+
+      return collator;
+    }
+
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     public @NotNull MatchResult matchForObject(Object value)
@@ -570,6 +602,13 @@ public final class MessagePartMap implements MessagePart.Map
     @Override
     public @NotNull <T> MatchResult matchForObject(@NotNull T value, @NotNull Class<T> valueType) {
       return findBestMatch(this, messageAccessor.getFormatters(valueType, config), value);
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public @NotNull String toString() {
+      return "ComparatorContext(locale=" + locale + ",mapKey=" + mapKey + ')';
     }
   }
 }

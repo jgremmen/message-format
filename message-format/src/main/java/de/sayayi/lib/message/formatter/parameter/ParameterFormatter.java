@@ -18,6 +18,7 @@ package de.sayayi.lib.message.formatter.parameter;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.FormatterService;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
+import de.sayayi.lib.message.internal.part.map.MessagePartMap;
 import de.sayayi.lib.message.part.ConfigAccessor;
 import de.sayayi.lib.message.part.MapKey;
 import de.sayayi.lib.message.part.MessagePart.Config;
@@ -27,6 +28,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
+import java.text.Collator;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.OptionalLong;
@@ -403,7 +405,7 @@ public interface ParameterFormatter
    *
    * @since 0.9.0
    */
-  interface ComparatorContext extends ConfigAccessor
+  sealed interface ComparatorContext extends ConfigAccessor permits MessagePartMap.ConfigKeyComparatorContext
   {
     /**
      * Returns the comparison type for the current configuration key.
@@ -473,6 +475,25 @@ public interface ParameterFormatter
      */
     @Contract(pure = true)
     @NotNull Locale getLocale();
+
+
+    /**
+     * Returns a collator for the {@linkplain #getLocale() locale} in effect, with canonical decomposition and the
+     * given {@code strength}.
+     * <p>
+     * The same collator instance is returned for repeated calls with the same strength, e.g. for all map keys compared
+     * during a single map lookup. The returned collator must therefore not be modified.
+     *
+     * @param strength  collator strength, e.g. {@link Collator#PRIMARY} or {@link Collator#IDENTICAL}
+     *
+     * @return  collator, never {@code null}
+     *
+     * @throws IllegalArgumentException  if {@code strength} is not a valid collator strength
+     *
+     * @since 0.25.0
+     */
+    @Contract(pure = true)
+    @NotNull Collator getCollator(int strength);
 
 
     /**

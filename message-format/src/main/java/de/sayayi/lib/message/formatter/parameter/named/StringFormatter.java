@@ -365,22 +365,16 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
   @Override
   public @NotNull MatchResult compareToStringKey(@NotNull Object value, @NotNull ComparatorContext context)
   {
-    final var collator = Collator.getInstance(context.getLocale());
-
-    collator.setDecomposition(CANONICAL_DECOMPOSITION);
-
     final var compareType = context.getCompareType();
     final var stringKeyValue = context.getStringKeyValue();
     final var string = asString(value);
 
     // match exact comparison
-    collator.setStrength(IDENTICAL);
-    if (compareType.match(collator.compare(string, stringKeyValue)))
+    if (compareType.match(context.getCollator(IDENTICAL).compare(string, stringKeyValue)))
       return EXACT;
 
     // match lenient comparison by ignoring case
-    collator.setStrength(PRIMARY);
-    if (compareType.match(collator.compare(string, stringKeyValue)))
+    if (compareType.match(context.getCollator(PRIMARY).compare(string, stringKeyValue)))
       return LENIENT;
 
     return MISMATCH;
