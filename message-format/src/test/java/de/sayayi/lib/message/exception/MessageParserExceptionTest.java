@@ -197,4 +197,27 @@ final class MessageParserExceptionTest
       }
     }).getMessage().startsWith(msg + ": "));
   }
+
+
+  @Test
+  @DisplayName("with...: copies keep the original stack trace, cause and suppressed exceptions")
+  @Order(5)
+  void testWithKeepsStackTrace()
+  {
+    final var cause = new IllegalStateException("cause");
+    final var suppressed = new IllegalArgumentException("suppressed");
+    final var ex = new MessageParserException("ERROR", "SYNTAX", cause);
+    ex.addSuppressed(suppressed);
+
+    final var stackTrace = ex.getStackTrace();
+    final var copy = ex
+        .withType(MESSAGE)
+        .withTemplate("tpl")
+        .withLocale(GERMANY)
+        .withCode("MSG-1");
+
+    assertArrayEquals(stackTrace, copy.getStackTrace());
+    assertSame(cause, copy.getCause());
+    assertArrayEquals(new Throwable[] { suppressed }, copy.getSuppressed());
+  }
 }

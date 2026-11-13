@@ -62,7 +62,7 @@ public class MessageParserException extends MessageException
    *
    * @since 0.9.1
    */
-  public MessageParserException(@NotNull String errorMessage, @NotNull String syntaxError, Exception cause) {
+  public MessageParserException(@NotNull String errorMessage, @NotNull String syntaxError, Throwable cause) {
     this(null, errorMessage, syntaxError, null, null, null, cause);
   }
 
@@ -81,7 +81,7 @@ public class MessageParserException extends MessageException
    * @since 0.9.1
    */
   public MessageParserException(Type type, @NotNull String errorMessage, @NotNull String syntaxError,
-                                String code, String template, Locale locale, Exception cause)
+                                String code, String template, Locale locale, Throwable cause)
   {
     super(cause);
 
@@ -244,10 +244,8 @@ public class MessageParserException extends MessageException
    * @since 0.9.1
    */
   @Contract("_ -> new")
-  public @NotNull MessageParserException withCode(@NotNull String code)
-  {
-    return new MessageParserException(Type.MESSAGE, errorMessage, syntaxError, code, null, locale,
-        (Exception)getCause());
+  public @NotNull MessageParserException withCode(@NotNull String code) {
+    return copyWith(Type.MESSAGE, code, null, locale);
   }
 
 
@@ -262,10 +260,8 @@ public class MessageParserException extends MessageException
    * @since 0.9.1
    */
   @Contract("_ -> new")
-  public @NotNull MessageParserException withTemplate(@NotNull String template)
-  {
-    return new MessageParserException(Type.TEMPLATE, errorMessage, syntaxError, null, template, locale,
-        (Exception)getCause());
+  public @NotNull MessageParserException withTemplate(@NotNull String template) {
+    return copyWith(Type.TEMPLATE, null, template, locale);
   }
 
 
@@ -280,7 +276,7 @@ public class MessageParserException extends MessageException
    */
   @Contract("_ -> new")
   public @NotNull MessageParserException withLocale(@NotNull Locale locale) {
-    return new MessageParserException(type, errorMessage, syntaxError, code, template, locale, (Exception)getCause());
+    return copyWith(type, code, template, locale);
   }
 
 
@@ -296,11 +292,33 @@ public class MessageParserException extends MessageException
    * @since 0.9.1
    */
   @Contract("_ -> new")
-  public @NotNull MessageParserException withType(@NotNull Type type)
+  public @NotNull MessageParserException withType(@NotNull Type type) {
+    return copyWith(type, type == Type.MESSAGE ? code : null, type == Type.TEMPLATE ? template : null, locale);
+  }
+
+
+  /**
+   * Creates a copy of this exception with the given context values. The copy keeps the error message, syntax error,
+   * cause, stack trace and suppressed exceptions of this exception.
+   *
+   * @param type      kind of input that failed to parse, or {@code null} if unknown
+   * @param code      message code, or {@code null}
+   * @param template  template name, or {@code null}
+   * @param locale    locale, or {@code null}
+   *
+   * @return  new exception with the given context values, never {@code null}
+   */
+  @Contract("_, _, _, _ -> new")
+  private @NotNull MessageParserException copyWith(Type type, String code, String template, Locale locale)
   {
-    return new MessageParserException(type, errorMessage, syntaxError,
-        type == Type.MESSAGE ? code : null, type == Type.TEMPLATE ? template : null, locale,
-        (Exception)getCause());
+    final var copy = new MessageParserException(type, errorMessage, syntaxError, code, template, locale, getCause());
+
+    copy.setStackTrace(getStackTrace());
+
+    for(var suppressed: getSuppressed())
+      copy.addSuppressed(suppressed);
+
+    return copy;
   }
 
 
