@@ -30,7 +30,8 @@ import java.lang.annotation.Annotation;
  *
  * @param locale  locale tag (e.g. {@code "en"} or {@code "de"}), not {@code null}
  * @param text    localized message or template text, not {@code null}
- * @param value   shorthand text value (used when both {@code locale} and {@code text} are empty), not {@code null}
+ * @param value   shorthand text value (only allowed if both {@code locale} and {@code text} are empty), not
+ *                {@code null}
  *
  * @author Jeroen Gremmen
  * @since 0.24.0

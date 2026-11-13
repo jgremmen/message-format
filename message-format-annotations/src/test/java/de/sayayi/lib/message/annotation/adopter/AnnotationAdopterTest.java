@@ -210,6 +210,45 @@ class AnnotationAdopterTest
 
 
   @Test
+  @DisplayName("reject @Text value combined with locale or text")
+  void testRejectValueWithLocaleOrText()
+  {
+    for(val text: new Text[] {
+        new SyntheticText("de", null, "Hallo"),
+        new SyntheticText(null, "Hello", "Hallo"),
+        new SyntheticText("de", "Hello", "Hallo") })
+    {
+      val texts = new Text[] { text };
+
+      val messageEx = assertThrows(MessageAdopterException.class,
+          () -> new AnnotationAdopter(newMessageSupport()).adopt(new SyntheticMessageDef("MSG", null, texts)));
+      assertEquals("@Text value for message 'MSG' must not be combined with a locale or text; use text instead",
+          messageEx.getMessage());
+
+      val templateEx = assertThrows(MessageAdopterException.class,
+          () -> new AnnotationAdopter(newMessageSupport()).adopt(new SyntheticTemplateDef("tpl", null, texts)));
+      assertEquals("@Text value for template 'tpl' must not be combined with a locale or text; use text instead",
+          templateEx.getMessage());
+    }
+  }
+
+
+  @Test
+  @DisplayName("accept @Text with value only or with locale and text")
+  void testAcceptValueOrLocaleAndText()
+  {
+    val messageSupport = newMessageSupport();
+
+    new AnnotationAdopter(messageSupport).adopt(new SyntheticMessageDef("MSG", null, new Text[] {
+        new SyntheticText(null, null, "Hello"),
+        new SyntheticText("de", "Hallo", null) }));
+
+    assertEquals("Hello", messageSupport.code("MSG").locale(ENGLISH).format());
+    assertEquals("Hallo", messageSupport.code("MSG").locale(GERMAN).format());
+  }
+
+
+  @Test
   @DisplayName("propagate MessageParserException from adopt entry points")
   void testPropagateParserExceptionFromEntryPoints() throws Exception
   {

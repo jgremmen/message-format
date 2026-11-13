@@ -71,7 +71,8 @@ public @interface Text
    * Message text without locale. This is a shorthand for when no {@link #locale()} is needed, allowing the
    * compact form {@code @Text("...")}.
    * <p>
-   * This value is used only if {@code locale} and {@code text} are not set, otherwise its value is ignored.
+   * It must not be combined with a {@code locale} or {@code text}; adopting a definition with such a text fails with a
+   * {@link de.sayayi.lib.message.exception.MessageAdopterException MessageAdopterException}.
    *
    * @return  message text
    */

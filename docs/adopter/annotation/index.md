@@ -125,6 +125,9 @@ To provide translations, list several `@Text` entries in the `texts` element and
 is either a plain language code such as `en` or `de`, or an IETF BCP 47 language tag such as `de-DE` or `fr-CA`. Java
 locale notations with an underscore, such as `de_DE`, are not supported: the adopter rejects them, like any other
 ill-formed language tag, with a `MessageAdopterException`. Leave the `text` element unset when `texts` is used.
+A localized `@Text` must use its `text` element: the shorthand `@Text("...")` sets `value`, which cannot be combined
+with a `locale` or `text`. The adopter rejects a `@Text` like `@Text(locale = "de", value = "Hallo")` with a
+`MessageAdopterException` instead of registering an empty text.
 
 ```java
 @MessageDef(code = "greeting", texts = {
@@ -356,11 +359,11 @@ messageSupport
 // "Backup completed successfully."
 ```
 
-The `SyntheticText` record accepts three string parameters: `locale`, `text` and `value`. When both `locale` and `text`
-are empty, the `value` parameter is used instead, which mirrors the behavior of the `@Text` annotation's shorthand form 
-`@Text("...")`. All three parameters are trimmed during construction and `null` values are treated as empty strings. 
-Similarly, `SyntheticMessageDef` trims the `code` and defaults a `null` text to an empty string, while
-`SyntheticTemplateDef` validates the `name` and trims the text.
+The `SyntheticText` record accepts three string parameters: `locale`, `text` and `value`. The `value` parameter mirrors
+the `@Text` annotation's shorthand form `@Text("...")` and may only be used when both `locale` and `text` are empty.
+All three parameters are trimmed during construction and `null` values are treated as empty strings. Similarly,
+`SyntheticMessageDef` trims the `code` and defaults a `null` text to an empty string, while `SyntheticTemplateDef`
+validates the `name` and trims the text.
 
 
 ## Deduplication

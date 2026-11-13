@@ -476,7 +476,8 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
    * @return  this annotation adopter instance, never {@code null}
    *
    * @throws DuplicateMessageException  if different messages are provided for the same locale
-   * @throws MessageAdopterException    if a {@linkplain Text#locale() locale} is not a valid language tag
+   * @throws MessageAdopterException    if a {@linkplain Text#locale() locale} is not a valid language tag or if a
+   *                                    {@link Text} combines {@linkplain Text#value() value} with a locale or text
    * @throws MessageParserException     if a message or template text cannot be parsed
    */
   @Contract(value = "_ -> this")
@@ -493,7 +494,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
       for(var text: texts)
       {
-        final var value = text.locale().isEmpty() && text.text().isEmpty() ? text.value() : text.text();
+        final var value = getText(text, "message", code);
 
         localizedTexts.compute(parseLocale(text.locale(), "message", code), (locale,mappedValue) -> {
           if (mappedValue == null || mappedValue.equals(value))
@@ -521,7 +522,8 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
    * @return  this annotation adopter instance, never {@code null}
    *
    * @throws DuplicateTemplateException  if different template messages are provided for the same locale
-   * @throws MessageAdopterException     if a {@linkplain Text#locale() locale} is not a valid language tag
+   * @throws MessageAdopterException     if a {@linkplain Text#locale() locale} is not a valid language tag or if a
+   *                                     {@link Text} combines {@linkplain Text#value() value} with a locale or text
    * @throws MessageParserException      if the template text cannot be parsed
    */
   @Contract(value = "_ -> this")
@@ -545,7 +547,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
       for(var text: texts)
       {
-        final var value = text.locale().isEmpty() && text.text().isEmpty() ? text.value() : text.text();
+        final var value = getText(text, "template", name);
 
         localizedTexts.compute(parseLocale(text.locale(), "template", name), (locale, mappedValue) -> {
           if (mappedValue == null || mappedValue.equals(value))
@@ -566,6 +568,37 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
     messagePublisher.addTemplate(name, template);
 
     return this;
+  }
+
+
+  /**
+   * Returns the text of a {@link Text} annotation: its {@linkplain Text#value() value} if set, otherwise its
+   * {@linkplain Text#text() text}. The value is a shorthand for a text without a locale and must therefore not be
+   * combined with a {@linkplain Text#locale() locale} or a text.
+   *
+   * @param text  text annotation, not {@code null}
+   * @param kind  kind of the annotated definition ({@code message} or {@code template}), used in the error message
+   * @param name  message code or template name, used in the error message
+   *
+   * @return  text, never {@code null}
+   *
+   * @throws MessageAdopterException  if the value is combined with a locale or a text
+   *
+   * @since 0.25.0
+   */
+  private static @NotNull String getText(@NotNull Text text, @NotNull String kind, @NotNull String name)
+  {
+    var value = text.value();
+    if (value.isEmpty())
+      return text.text();
+
+    if (!text.locale().isEmpty() || !text.text().isEmpty())
+    {
+      throw new MessageAdopterException("@Text value for " + kind + " '" + name +
+          "' must not be combined with a locale or text; use text instead");
+    }
+
+    return value;
   }
 
 
