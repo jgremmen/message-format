@@ -203,6 +203,13 @@ final class StringFormatterTest extends AbstractFormatterTest
         .message("%{object,empty:'(empty)'}")
         .with("object", object)
         .format());
+
+    // ignored lambda (hidden class)
+    final Runnable lambda = () -> {};
+    assertEquals("", messageSupport
+        .code("OBJ")
+        .with("object", lambda)
+        .format());
   }
 
 

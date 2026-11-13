@@ -42,7 +42,8 @@ import static de.sayayi.lib.message.part.MapKey.Type.*;
 import static de.sayayi.lib.message.part.MapKey.Type.EMPTY;
 import static de.sayayi.lib.message.part.MapKey.Type.NULL;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static java.text.Collator.*;
+import static java.text.Collator.IDENTICAL;
+import static java.text.Collator.PRIMARY;
 import static java.util.Objects.toIdentityString;
 
 
@@ -212,25 +213,16 @@ public final class StringFormatter implements SizeQueryable, NamedParameterForma
 
 
   /**
-   * Tells whether the string representation of {@code value} is the default {@link Object#toString()} identity string
-   * or the value is a lambda instance.
+   * Tells whether the value is an instance of a {@linkplain Class#isHidden() hidden class}, e.g. a lambda, or its
+   * string representation is the default {@link Object#toString()} identity string.
    *
    * @param value  value to check, not {@code null}
    *
    * @return  {@code true} if the value has no meaningful string representation, {@code false} otherwise
    */
   @Contract(pure = true)
-  @SuppressWarnings("RedundantIfStatement")
-  private boolean isDefaultToString(@NotNull Object value)
-  {
-    if (toIdentityString(value).equals(value.toString()))
-      return true;
-
-    final var fqClassName = value.getClass().getName();
-    if (fqClassName.contains("$$Lambda$"))
-      return true;
-
-    return false;
+  private boolean isDefaultToString(@NotNull Object value) {
+    return value.getClass().isHidden() || toIdentityString(value).equals(value.toString());
   }
 
 
