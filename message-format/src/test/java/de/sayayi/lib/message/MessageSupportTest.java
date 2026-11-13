@@ -15,21 +15,33 @@
  */
 package de.sayayi.lib.message;
 
+import de.sayayi.lib.message.Message.Parameters;
+import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.exception.DuplicateTemplateException;
+import de.sayayi.lib.message.part.MessagePart.Text;
+import de.sayayi.lib.message.template.AbstractNamedTemplate;
+import de.sayayi.lib.message.template.NamedTemplate;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.net.URL;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static de.sayayi.lib.message.MessageSupportFactory.createDefault;
 import static de.sayayi.lib.message.MessageSupportFactory.shared;
+import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
+import static java.nio.file.Files.writeString;
+import static java.util.Collections.enumeration;
 import static java.util.Locale.GERMANY;
 import static java.util.Locale.US;
 import static org.junit.jupiter.api.Assertions.*;
@@ -271,5 +283,46 @@ final class MessageSupportTest
         () -> createDefault().registerTemplatesFromService(null));
 
     assertEquals("classLoader must not be null", ex.getMessage());
+  }
+
+
+  @Test
+  @DisplayName("Registering templates from a class loader adds the service provided templates")
+  void testRegisterTemplatesFromService(@TempDir Path tempDir) throws IOException
+  {
+    val serviceFile = writeString(tempDir.resolve("services"), GreetingTestTemplate.class.getName() + '\n');
+
+    // only this class loader provides the template, so other message supports aren't affected
+    val classLoader = new ClassLoader(getClass().getClassLoader()) {
+      @Override
+      public Enumeration<URL> getResources(String name) throws IOException
+      {
+        return ("META-INF/services/" + NamedTemplate.class.getName()).equals(name)
+            ? enumeration(List.of(serviceFile.toUri().toURL()))
+            : super.getResources(name);
+      }
+    };
+
+    val messageSupport = createDefault().registerTemplatesFromService(classLoader);
+
+    assertTrue(messageSupport.getMessageAccessor().hasTemplateWithName("greeting"));
+    assertEquals("Hello Alice!", messageSupport.message("%[greeting] Alice!").format());
+  }
+
+
+
+
+  public static final class GreetingTestTemplate extends AbstractNamedTemplate
+  {
+    @Override
+    public @NotNull String getName() {
+      return "greeting";
+    }
+
+
+    @Override
+    public @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters) {
+      return noSpaceText("Hello");
+    }
   }
 }

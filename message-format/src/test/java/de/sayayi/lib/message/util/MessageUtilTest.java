@@ -18,18 +18,26 @@ package de.sayayi.lib.message.util;
 import de.sayayi.lib.message.FormatStringSerializer;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageBuilder;
+import de.sayayi.lib.message.MessageSupportFactory;
+import lombok.val;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.io.TempDir;
+
+import java.io.IOException;
+import java.nio.file.Path;
 
 import static de.sayayi.lib.message.util.MessageUtil.*;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.file.Files.newOutputStream;
+import static java.nio.file.Files.writeString;
 import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
  * Tests {@link MessageUtil}: validation of kebab case and lower camel case names, trimming and collapsing of spaces,
- * and quoting of text in format strings.
+ * quoting of text in format strings and detection of pack files.
  *
  * @author Jeroen Gremmen
  * @since 0.21.0
@@ -431,6 +439,32 @@ final class MessageUtilTest
     assertFalse(isName("a\u200eb"));
     assertFalse(isName("a\u202eb"));
     assertFalse(isName("a\u00adb"));
+  }
+
+
+  @Test
+  @DisplayName("Detect message format pack files")
+  void testIsMessageFormatPack(@TempDir Path tempDir) throws IOException
+  {
+    val messageSupport = MessageSupportFactory.createDefault().addMessage("MSG", "Hello %{name}");
+
+    for(var compress: new boolean[] { true, false })
+    {
+      final var packFile = tempDir.resolve("messages-" + compress + ".mfp");
+
+      try(var stream = newOutputStream(packFile)) {
+        messageSupport.exportMessages(stream, compress, null, null);
+      }
+
+      assertTrue(isMessageFormatPack(packFile), "compress=" + compress);
+    }
+
+    final var textFile = writeString(tempDir.resolve("messages.txt"), "MSG=Hello %{name}");
+
+    assertFalse(isMessageFormatPack(textFile));
+    assertFalse(isMessageFormatPack(writeString(tempDir.resolve("empty.mfp"), "")));
+    assertFalse(isMessageFormatPack(tempDir.resolve("missing.mfp")));
+    assertFalse(isMessageFormatPack(tempDir));
   }
 
 
