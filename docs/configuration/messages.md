@@ -181,10 +181,12 @@ The builder is not thread-safe and must not be reused after calling `build()`, `
 `buildAsTemplate()`. Starting another part or building again throws an `IllegalStateException`.
 
 Each part builder belongs to the part it creates. Calling a method that starts another part, such as `text(...)` or
-`parameter(...)`, or one of the build methods finalizes the current part. A part builder that is retained in a variable
-must not be used after that point. Its configuration methods (`configString`, `configBool`, `configNumber` and
-`configMessage`) throw an `IllegalStateException`. The configuration values are copied when the part is finalized, so
-later changes cannot alter the part that was already built.
+`parameter(...)`, or one of the build methods completes the current part. A part builder that is retained in a variable
+must not be used after that point. Every method that would change the completed part throws an
+`IllegalStateException`: the configuration methods (`configString`, `configBool`, `configNumber` and
+`configMessage`), `spaceBefore()` and `spaceAfter()`, `withFormat(...)` and the map entries of a parameter,
+`withMessage(...)` of a post formatter and `withDefaultParameter(...)` and `withParameterDelegate(...)` of a template.
+This way, a change can never be silently lost.
 
 Names are validated immediately. Parameter names must follow the kebab-case or lower camelCase convention, while
 formatter names, configuration names, post formatter names and template names must be kebab-case. A name that does

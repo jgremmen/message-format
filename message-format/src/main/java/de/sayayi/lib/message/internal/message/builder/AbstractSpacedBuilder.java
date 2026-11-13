@@ -16,7 +16,7 @@
 package de.sayayi.lib.message.internal.message.builder;
 
 import de.sayayi.lib.message.MessageBuilder.SpacedBuilder;
-import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 
 
@@ -28,7 +28,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Jeroen Gremmen
  * @since 0.21.0
  */
-@ApiStatus.Internal
+@Internal
 public abstract non-sealed class AbstractSpacedBuilder<S extends SpacedBuilder<S>> implements SpacedBuilder<S>
 {
   /** Whether a space should be inserted before the part produced by this builder. */
@@ -36,6 +36,24 @@ public abstract non-sealed class AbstractSpacedBuilder<S extends SpacedBuilder<S
 
   /** Whether a space should be inserted after the part produced by this builder. */
   protected boolean spaceAfter;
+
+  /** Indicates whether the part has already been completed and written to the enclosing builder. */
+  protected boolean flushed;
+
+
+  /**
+   * Ensures that the part has not been completed yet. A part is completed when the next part is started or the message
+   * is built; changes made to its builder afterwards would be lost.
+   *
+   * @throws IllegalStateException  if the part has already been completed
+   *
+   * @since 0.25.0
+   */
+  protected void checkNotFlushed()
+  {
+    if (flushed)
+      throw new IllegalStateException("part has already been completed and cannot be changed");
+  }
 
 
   /**
@@ -45,6 +63,7 @@ public abstract non-sealed class AbstractSpacedBuilder<S extends SpacedBuilder<S
   @SuppressWarnings("unchecked")
   public @NotNull S spaceBefore()
   {
+    checkNotFlushed();
     spaceBefore = true;
 
     return (S)this;
@@ -58,6 +77,7 @@ public abstract non-sealed class AbstractSpacedBuilder<S extends SpacedBuilder<S
   @SuppressWarnings("unchecked")
   public @NotNull S spaceAfter()
   {
+    checkNotFlushed();
     spaceAfter = true;
 
     return (S)this;

@@ -23,7 +23,7 @@ import de.sayayi.lib.message.internal.part.typedvalue.TypedValueMessage;
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueNumber;
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import de.sayayi.lib.message.part.TypedValue;
-import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -45,7 +45,7 @@ import static java.util.Objects.requireNonNull;
  * @author Jeroen Gremmen
  * @since 0.21.0
  */
-@ApiStatus.Internal
+@Internal
 public abstract non-sealed class AbstractConfigurableBuilder<S extends ConfigurableBuilder<S> & SpacedBuilder<S>>
     extends AbstractSpacedBuilder<S>
     implements ConfigurableBuilder<S>
@@ -58,9 +58,6 @@ public abstract non-sealed class AbstractConfigurableBuilder<S extends Configura
 
   /** Configuration values collected for the part being built. */
   protected final @NotNull Map<String,TypedValue<?>> config;
-
-  /** Indicates whether this part's configuration has been finalized. */
-  protected boolean finalized;
 
 
   /**
@@ -129,14 +126,13 @@ public abstract non-sealed class AbstractConfigurableBuilder<S extends Configura
    * @return  this builder, never {@code null}
    *
    * @throws IllegalArgumentException  if {@code name} does not match the kebab-case naming convention
-   * @throws IllegalStateException     if this part's configuration has already been finalized
+   * @throws IllegalStateException     if this part has already been completed
    */
   @Contract("_, _ -> this")
   @SuppressWarnings("unchecked")
   private @NotNull S withConfig(@NotNull String name, @NotNull TypedValue<?> value)
   {
-    if (finalized)
-      throw new IllegalStateException("configuration builder has already been finalized");
+    checkNotFlushed();
 
     if (!isKebabCaseName(requireNonNull(name, "name must not be null")))
       throw new IllegalArgumentException("config name '" + name + "' must match the kebab-case naming convention");

@@ -26,7 +26,7 @@ import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.TextJoiner;
 import de.sayayi.lib.message.template.Template;
-import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -50,7 +50,7 @@ import static java.util.Objects.requireNonNull;
  * @see MessageBuilder
  * @see MessageFactory#messageBuilder()
  */
-@ApiStatus.Internal
+@Internal
 public final class FluentMessageBuilder implements MessageBuilder
 {
   /** Message factory used to parse nested messages and create coded messages. */

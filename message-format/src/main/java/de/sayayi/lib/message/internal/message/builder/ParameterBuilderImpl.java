@@ -26,7 +26,7 @@ import de.sayayi.lib.message.internal.part.typedvalue.TypedValueMessage;
 import de.sayayi.lib.message.part.MapKey;
 import de.sayayi.lib.message.part.TypedValue;
 import de.sayayi.lib.message.template.Template;
-import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedHashMap;
@@ -47,7 +47,7 @@ import static java.util.Objects.requireNonNull;
  * @author Jeroen Gremmen
  * @since 0.21.0
  */
-@ApiStatus.Internal
+@Internal
 public final class ParameterBuilderImpl
     extends AbstractConfigurableBuilder<ParameterBuilder>
     implements ParameterBuilder
@@ -60,9 +60,6 @@ public final class ParameterBuilderImpl
 
   /** Optional format name associated with the parameter. */
   private String format;
-
-  /** Indicates whether this parameter part has already been written to the enclosing builder. */
-  private boolean flushed;
 
 
   /**
@@ -96,6 +93,8 @@ public final class ParameterBuilderImpl
   @Override
   public @NotNull ParameterBuilder withFormat(@NotNull String format)
   {
+    checkNotFlushed();
+
     if (!isKebabCaseName(requireNonNull(format, "format must not be null")))
       throw new IllegalArgumentException("format name '" + format + "' must match the kebab-case naming convention");
 
@@ -167,9 +166,12 @@ public final class ParameterBuilderImpl
    * @param message  message value, not {@code null}
    *
    * @return  this parameter builder, never {@code null}
+   *
+   * @throws IllegalStateException  if this parameter part has already been completed
    */
   @NotNull ParameterBuilder addMapEntry(@NotNull MapKey key, @NotNull Message.WithSpaces message)
   {
+    checkNotFlushed();
     map.put(key, new TypedValueMessage(requireNonNull(message, "message must not be null")));
 
     return this;
@@ -326,7 +328,6 @@ public final class ParameterBuilderImpl
     if (!flushed)
     {
       flushed = true;
-      finalized = true;
       builder.activePartFlusher = null;
 
       builder.parts.add(new ParameterPart(name, format, spaceBefore, spaceAfter,

@@ -728,6 +728,76 @@ class MessageBuilderTest
       assertThrows(IllegalStateException.class, () -> postFormatterBuilder.configString("case", "lower"));
       assertEquals("%(case,'hello',case:upper)end", message.asFormatString(UTF_8));
     }
+
+
+    @Test
+    @DisplayName("Parameter format and map entries cannot be added after its part is flushed")
+    void testParameterIsFinalized()
+    {
+      final var parameterBuilder = MessageBuilder
+          .create()
+          .parameter("value");
+      final var message = parameterBuilder
+          .text("end")
+          .build();
+
+      assertThrows(IllegalStateException.class, () -> parameterBuilder.withFormat("string"));
+      assertThrows(IllegalStateException.class, () -> parameterBuilder.mapNull().message("n"));
+      assertThrows(IllegalStateException.class, () -> parameterBuilder.mapDefault().message(b -> b.text("d")));
+      assertEquals("%{value}end", message.asFormatString(UTF_8));
+    }
+
+
+    @Test
+    @DisplayName("Post-formatter message cannot be changed after its part is flushed")
+    void testPostFormatterMessageIsFinalized()
+    {
+      final var postFormatterBuilder = MessageBuilder
+          .create()
+          .postFormatter("case")
+          .withMessage("hello");
+      final var message = postFormatterBuilder
+          .text("end")
+          .build();
+
+      assertThrows(IllegalStateException.class, () -> postFormatterBuilder.withMessage("changed"));
+      assertThrows(IllegalStateException.class, () -> postFormatterBuilder.withMessage(b -> b.text("changed")));
+      assertEquals("%(case,'hello')end", message.asFormatString(UTF_8));
+    }
+
+
+    @Test
+    @DisplayName("Template default parameters and delegates cannot be added after its part is flushed")
+    void testTemplateIsFinalized()
+    {
+      final var templateBuilder = MessageBuilder
+          .create()
+          .template("tpl");
+      final var message = templateBuilder
+          .text("end")
+          .build();
+
+      assertThrows(IllegalStateException.class, () -> templateBuilder.withDefaultParameter("p", "v"));
+      assertThrows(IllegalStateException.class, () -> templateBuilder.withParameterDelegate("a", "b"));
+      assertEquals("%[tpl]end", message.asFormatString(UTF_8));
+    }
+
+
+    @Test
+    @DisplayName("Spacing cannot be changed after a part is flushed")
+    void testSpacingIsFinalized()
+    {
+      final var textBuilder = MessageBuilder
+          .create()
+          .text("start");
+      final var message = textBuilder
+          .parameter("value")
+          .build();
+
+      assertThrows(IllegalStateException.class, textBuilder::spaceAfter);
+      assertThrows(IllegalStateException.class, textBuilder::spaceBefore);
+      assertEquals("start%{value}", message.asFormatString(UTF_8));
+    }
   }
 
 

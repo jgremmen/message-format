@@ -24,7 +24,7 @@ import de.sayayi.lib.message.internal.part.typedvalue.TypedValueNumber;
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import de.sayayi.lib.message.part.TypedValue;
 import de.sayayi.lib.message.template.Template;
-import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -44,7 +44,7 @@ import static java.util.Objects.requireNonNull;
  * @author Jeroen Gremmen
  * @since 0.21.0
  */
-@ApiStatus.Internal
+@Internal
 public final class TemplateBuilderImpl extends AbstractSpacedBuilder<TemplateBuilder> implements TemplateBuilder
 {
   /** Enclosing message builder that receives the completed template part. */
@@ -61,9 +61,6 @@ public final class TemplateBuilderImpl extends AbstractSpacedBuilder<TemplateBui
 
   /** Mapping from template parameter names to message parameter names. */
   private final @NotNull Map<String,String> parameterDelegates;
-
-  /** Indicates whether this template part has already been written to the enclosing builder. */
-  private boolean flushed;
 
 
   /**
@@ -144,10 +141,13 @@ public final class TemplateBuilderImpl extends AbstractSpacedBuilder<TemplateBui
    * @return  this template builder, never {@code null}
    *
    * @throws IllegalArgumentException  if {@code name} does not match the expected naming convention
+   * @throws IllegalStateException     if this template part has already been completed
    */
   @Contract("_, _ -> this")
   private @NotNull TemplateBuilder withDefaultParameter(@NotNull String name, @NotNull TypedValue<?> value)
   {
+    checkNotFlushed();
+
     if (!isKebabOrLowerCamelCaseName(requireNonNull(name, "name must not be null")))
     {
       throw new IllegalArgumentException("default parameter name '" + name +
@@ -168,6 +168,8 @@ public final class TemplateBuilderImpl extends AbstractSpacedBuilder<TemplateBui
   @Override
   public @NotNull TemplateBuilder withParameterDelegate(@NotNull String templateParam, @NotNull String messageParam)
   {
+    checkNotFlushed();
+
     if (!isKebabOrLowerCamelCaseName(requireNonNull(templateParam, "templateParam must not be null")))
     {
       throw new IllegalArgumentException("template parameter name '" + templateParam +

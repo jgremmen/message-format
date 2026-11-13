@@ -22,7 +22,7 @@ import de.sayayi.lib.message.MessageBuilder.MapValueBuilder;
 import de.sayayi.lib.message.MessageBuilder.ParameterBuilder;
 import de.sayayi.lib.message.part.MapKey;
 import de.sayayi.lib.message.part.MapKey.CompareType;
-import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
@@ -40,7 +40,7 @@ import static de.sayayi.lib.message.part.MapKey.CompareType.NE;
  * @author Jeroen Gremmen
  * @since 0.21.0
  */
-@ApiStatus.Internal
+@Internal
 public non-sealed class MapEqualityBuilderImpl implements MapEqualityBuilder
 {
   /** Parameter builder that receives the completed map entry. */

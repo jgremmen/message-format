@@ -19,7 +19,7 @@ import de.sayayi.lib.message.MessageBuilder.MapRelationalBuilder;
 import de.sayayi.lib.message.MessageBuilder.MapValueBuilder;
 import de.sayayi.lib.message.part.MapKey;
 import de.sayayi.lib.message.part.MapKey.CompareType;
-import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
@@ -35,7 +35,7 @@ import static de.sayayi.lib.message.part.MapKey.CompareType.*;
  * @author Jeroen Gremmen
  * @since 0.21.0
  */
-@ApiStatus.Internal
+@Internal
 public final class MapRelationalBuilderImpl extends MapEqualityBuilderImpl implements MapRelationalBuilder
 {
   /**

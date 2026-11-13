@@ -22,7 +22,7 @@ import de.sayayi.lib.message.internal.message.EmptyMessage;
 import de.sayayi.lib.message.internal.part.config.MessagePartConfig;
 import de.sayayi.lib.message.internal.part.post.PostFormatterPart;
 import de.sayayi.lib.message.template.Template;
-import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
@@ -39,7 +39,7 @@ import static java.util.Objects.requireNonNull;
  * @author Jeroen Gremmen
  * @since 0.21.0
  */
-@ApiStatus.Internal
+@Internal
 public final class PostFormatterBuilderImpl
     extends AbstractConfigurableBuilder<PostFormatterBuilder>
     implements PostFormatterBuilder
@@ -49,9 +49,6 @@ public final class PostFormatterBuilderImpl
 
   /** Message that will be passed to the post-formatter. */
   private @NotNull Message.WithSpaces innerMessage;
-
-  /** Indicates whether this post-formatter part has already been written to the enclosing builder. */
-  private boolean flushed;
 
 
   /**
@@ -98,7 +95,6 @@ public final class PostFormatterBuilderImpl
     if (!flushed)
     {
       flushed = true;
-      finalized = true;
       builder.activePartFlusher = null;
 
       builder.parts.add(new PostFormatterPart(name, innerMessage, spaceBefore, spaceAfter, new MessagePartConfig(config)));
@@ -121,6 +117,7 @@ public final class PostFormatterBuilderImpl
   @Override
   public @NotNull PostFormatterBuilder withMessage(@NotNull Message.WithSpaces message)
   {
+    checkNotFlushed();
     innerMessage = requireNonNull(message, "message must not be null");
 
     return this;
@@ -139,9 +136,7 @@ public final class PostFormatterBuilderImpl
 
     messageConfigurer.accept(nestedBuilder);
 
-    innerMessage = nestedBuilder.build();
-
-    return this;
+    return withMessage(nestedBuilder.build());
   }
 
 

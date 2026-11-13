@@ -20,7 +20,7 @@ import de.sayayi.lib.message.MessageBuilder;
 import de.sayayi.lib.message.MessageBuilder.MapValueBuilder;
 import de.sayayi.lib.message.MessageBuilder.ParameterBuilder;
 import de.sayayi.lib.message.part.MapKey;
-import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
@@ -34,7 +34,7 @@ import java.util.function.Consumer;
  * @author Jeroen Gremmen
  * @since 0.21.0
  */
-@ApiStatus.Internal
+@Internal
 public final class MapValueBuilderImpl implements MapValueBuilder
 {
   /** Parameter builder that receives the completed map entry. */

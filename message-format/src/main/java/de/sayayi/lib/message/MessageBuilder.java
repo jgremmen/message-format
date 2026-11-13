@@ -34,7 +34,8 @@ import java.util.function.Consumer;
  * {@link TemplateBuilder}) extend this interface, so the common message-building methods ({@link #text(String)},
  * {@link #parameter(String)}, {@link #postFormatter(String)}, {@link #template(String)}, {@link #build()},
  * {@link #buildWithCode(String)}) are available at every level. Calling a message-building method on a sub-builder
- * finalizes the current part before continuing.
+ * completes the current part before continuing. A completed part cannot be changed anymore: calling a method that
+ * modifies it on a retained sub-builder throws an {@link IllegalStateException}.
  * <p>
  * Consecutive {@link #text(String)} calls are automatically merged into a single text part.
  * <p>
@@ -72,7 +73,7 @@ public sealed interface MessageBuilder
    * Appends literal text to the message being built. Consecutive calls to this method are automatically merged into
    * a single text part.
    * <p>
-   * When called on a sub-builder, the current part is finalized first.
+   * When called on a sub-builder, the current part is completed first.
    *
    * @param text  literal text to append, not {@code null}
    *
@@ -86,7 +87,7 @@ public sealed interface MessageBuilder
   /**
    * Starts building a parameter part with the given {@code name}.
    * <p>
-   * When called on a sub-builder, the current part is finalized first.
+   * When called on a sub-builder, the current part is completed first.
    *
    * @param name  parameter name, not {@code null} or empty
    *
@@ -101,7 +102,7 @@ public sealed interface MessageBuilder
   /**
    * Starts building a post-formatter part with the given formatter {@code name}.
    * <p>
-   * When called on a sub-builder, the current part is finalized first.
+   * When called on a sub-builder, the current part is completed first.
    *
    * @param name  post-formatter name, not {@code null} or empty
    *
@@ -116,7 +117,7 @@ public sealed interface MessageBuilder
   /**
    * Starts building a template reference part with the given template {@code name}.
    * <p>
-   * When called on a sub-builder, the current part is finalized first.
+   * When called on a sub-builder, the current part is completed first.
    *
    * @param name  template name, not {@code null} or empty
    *
@@ -131,7 +132,7 @@ public sealed interface MessageBuilder
   /**
    * Builds and returns the message.
    * <p>
-   * When called on a sub-builder, the current part is finalized first.
+   * When called on a sub-builder, the current part is completed first.
    *
    * @return  the constructed message, never {@code null}
    *
@@ -143,7 +144,7 @@ public sealed interface MessageBuilder
   /**
    * Builds and returns the message with the given {@code code}.
    * <p>
-   * When called on a sub-builder, the current part is finalized first.
+   * When called on a sub-builder, the current part is completed first.
    *
    * @param code  message code, not {@code null} or empty
    *
@@ -157,7 +158,7 @@ public sealed interface MessageBuilder
   /**
    * Builds and returns the message as a {@link Template}.
    * <p>
-   * When called on a sub-builder, the current part is finalized first.
+   * When called on a sub-builder, the current part is completed first.
    *
    * @return  the constructed template, never {@code null}
    *
@@ -302,8 +303,8 @@ public sealed interface MessageBuilder
   /**
    * Mixin interface for sub-builders that support typed configuration values.
    * <p>
-   * The configuration of a part is finalized as soon as the part is flushed by moving on to another message part or by
-   * building the message. After that, the configuration can no longer be changed.
+   * A part is completed as soon as another message part is started or the message is built. After that, its
+   * configuration can no longer be changed.
    *
    * @param <S>  the self type of the sub-builder
    *
@@ -321,7 +322,7 @@ public sealed interface MessageBuilder
      * @return  this builder, never {@code null}
      *
      * @throws IllegalArgumentException  if {@code name} does not use kebab-case
-     * @throws IllegalStateException     if the configuration of this part has already been finalized
+     * @throws IllegalStateException     if this part has already been completed
      */
     @Contract("_, _ -> this")
     @NotNull S configString(@NotNull String name, @NotNull String value);
@@ -336,7 +337,7 @@ public sealed interface MessageBuilder
      * @return  this builder, never {@code null}
      *
      * @throws IllegalArgumentException  if {@code name} does not use kebab-case
-     * @throws IllegalStateException     if the configuration of this part has already been finalized
+     * @throws IllegalStateException     if this part has already been completed
      */
     @Contract("_, _ -> this")
     @NotNull S configBool(@NotNull String name, boolean value);
@@ -351,7 +352,7 @@ public sealed interface MessageBuilder
      * @return  this builder, never {@code null}
      *
      * @throws IllegalArgumentException  if {@code name} does not use kebab-case
-     * @throws IllegalStateException     if the configuration of this part has already been finalized
+     * @throws IllegalStateException     if this part has already been completed
      */
     @Contract("_, _ -> this")
     @NotNull S configNumber(@NotNull String name, long value);
@@ -367,7 +368,7 @@ public sealed interface MessageBuilder
      *
      * @throws IllegalArgumentException  if called on a post-formatter builder or if {@code name} does not use
      *                                   kebab-case
-     * @throws IllegalStateException     if the configuration of this part has already been finalized
+     * @throws IllegalStateException     if this part has already been completed
      */
     @Contract("_, _ -> this")
     @NotNull S configMessage(@NotNull String name, @NotNull Message.WithSpaces message);
