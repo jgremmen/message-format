@@ -259,4 +259,17 @@ final class MessageSupportTest
 
     assertEquals("template must not be null", ex.getMessage());
   }
+
+
+  @Test
+  @DisplayName("Registering templates from a null class loader throws with a descriptive message")
+  @SuppressWarnings("DataFlowIssue")
+  void testRegisterTemplatesFromNullClassLoader()
+  {
+    val ex = assertThrowsExactly(
+        NullPointerException.class,
+        () -> createDefault().registerTemplatesFromService(null));
+
+    assertEquals("classLoader must not be null", ex.getMessage());
+  }
 }

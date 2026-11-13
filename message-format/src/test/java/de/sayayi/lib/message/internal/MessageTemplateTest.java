@@ -28,6 +28,7 @@ import static java.util.Arrays.stream;
 import static java.util.Locale.*;
 import static java.util.stream.Collectors.toSet;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 
 
 /**
@@ -63,5 +64,15 @@ final class MessageTemplateTest
     assertEquals(")", string.substring(string.length() - 1));
     assertEquals(Set.of("en=\"Hello %{name}\"", "de-DE=\"Hallo %{name}\"", "ROOT=\"Hi\""),
         stream(string.substring(9, string.length() - 1).split(",")).collect(toSet()));
+  }
+
+
+  @Test
+  @DisplayName("Creating a template without a message throws with a descriptive message")
+  @SuppressWarnings("DataFlowIssue")
+  void testNullMessage()
+  {
+    assertEquals("message must not be null",
+        assertThrowsExactly(NullPointerException.class, () -> new MessageTemplate(null)).getMessage());
   }
 }

@@ -63,6 +63,19 @@ final class MessageFactoryTest
 
 
   @Test
+  @DisplayName("Creating a factory without a normalizer throws with a descriptive message")
+  @SuppressWarnings("DataFlowIssue")
+  void testNullNormalizer()
+  {
+    final var ex = assertThrowsExactly(
+        NullPointerException.class,
+        () -> new MessageFactory(null, 16));
+
+    assertEquals("messagePartNormalizer must not be null", ex.getMessage());
+  }
+
+
+  @Test
   @DisplayName("Wrap message with a different code using withCode()")
   void testWithCode()
   {
@@ -70,7 +83,8 @@ final class MessageFactoryTest
     assertEquals("ABC", msgWithCode1.getCode());
     assertInstanceOf(EmptyMessageWithCode.class, msgWithCode1);
 
-    final var msgWithCode2 = MessageFactory.getSharedInstance()
+    final var msgWithCode2 = MessageFactory
+        .getSharedInstance()
         .withCode("ABC", new EmptyMessageWithCode("DEF"));
     assertEquals("ABC", msgWithCode2.getCode());
     assertInstanceOf(EmptyMessageWithCode.class, msgWithCode2);

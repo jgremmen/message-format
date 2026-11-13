@@ -142,11 +142,12 @@ public class MessageFactory
    */
   public MessageFactory(@NotNull MessagePartNormalizer messagePartNormalizer, int messageCacheSize)
   {
-    this.messagePartNormalizer = messagePartNormalizer;
-    messageCompiler = new MessageCompiler(this);
+    this.messagePartNormalizer = requireNonNull(messagePartNormalizer, "messagePartNormalizer must not be null");
+    this.messageCompiler = new MessageCompiler(this);
 
     if (messageCacheSize > 0)
     {
+      messageCacheLock = new ReentrantLock();
       messageCache = new LinkedHashMap<>(32, 0.75f, true) {
         /** Evicts the least recently used message once the cache exceeds its maximum size. */
         @Override
@@ -154,12 +155,11 @@ public class MessageFactory
           return size() > messageCacheSize;
         }
       };
-      messageCacheLock = new ReentrantLock();
     }
     else
     {
-      messageCache = null;
       messageCacheLock = null;
+      messageCache = null;
     }
   }
 

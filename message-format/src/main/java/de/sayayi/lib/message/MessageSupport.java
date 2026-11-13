@@ -862,7 +862,7 @@ public interface MessageSupport
      * @see AbstractNamedTemplate
      */
     @Contract(value = "_ -> this", mutates = "this")
-    @NotNull ConfigurableMessageSupport registerTemplatesFromService(ClassLoader classLoader);
+    @NotNull ConfigurableMessageSupport registerTemplatesFromService(@NotNull ClassLoader classLoader);
 
 
     /**

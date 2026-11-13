@@ -32,6 +32,7 @@ import java.util.Locale;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Locale.ROOT;
+import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.joining;
 
 
@@ -58,7 +59,7 @@ public final class MessageTemplate implements Template
    * @param message  the message to wrap, not {@code null}
    */
   public MessageTemplate(@NotNull Message message) {
-    this.message = message;
+    this.message = requireNonNull(message, "message must not be null");
   }
 
 

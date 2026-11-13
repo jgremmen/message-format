@@ -303,10 +303,10 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
 
   /** {@inheritDoc} */
   @Override
-  public @NotNull ConfigurableMessageSupport registerTemplatesFromService(ClassLoader classLoader)
+  public @NotNull ConfigurableMessageSupport registerTemplatesFromService(@NotNull ClassLoader classLoader)
   {
     ServiceLoader
-        .load(NamedTemplate.class, classLoader)
+        .load(NamedTemplate.class, requireNonNull(classLoader, "classLoader must not be null"))
         .forEach(template -> addTemplate(template.getName(), template));
 
     return this;
