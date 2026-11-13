@@ -17,7 +17,6 @@ package de.sayayi.lib.message.adopter;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.exception.MessageAdopterException;
-import de.sayayi.lib.message.internal.MessageTemplate;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,9 +30,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
- * Tests {@link ResourceBundleAdopter}: adoption of messages and templates from resource bundles, by bundle or base
- * name, for requested and available locales, including missing locale handling and overriding the core adoption
- * methods.
+ * Tests {@link ResourceBundleAdopter}: adoption of messages and templates from resource bundles, by bundle or base name
+ * and requested locales, including missing locale handling and overriding the core adoption methods.
  *
  * @author Jeroen Gremmen
  * @since 0.25.0
@@ -110,11 +108,11 @@ final class ResourceBundleAdopterTest
     final var baseNames = new ArrayList<String>();
     final var adopter = new ResourceBundleAdopter(messageSupport) {
       @Override
-      protected void adoptTemplates(@NotNull String bundleBaseName, Locale[] locales,
-                                    ClassLoader classLoader, boolean throwOnMissingResourceBundle)
+      protected void adoptTemplates(@NotNull String bundleBaseName, @NotNull Locale @NotNull [] locales,
+                                    ClassLoader classLoader)
       {
         baseNames.add(bundleBaseName);
-        super.adoptTemplates(bundleBaseName, locales, classLoader, throwOnMissingResourceBundle);
+        super.adoptTemplates(bundleBaseName, locales, classLoader);
       }
     };
 
@@ -180,39 +178,6 @@ final class ResourceBundleAdopterTest
     assertEquals(Set.of(ROOT, GERMAN), getLocales(messageAccessor.getMessageByCode("farewell")));
     assertEquals("Willkommen", messageSupport.code("title").locale(GERMAN).format());
     assertEquals("Goodbye", messageSupport.code("farewell").locale(GERMAN).format());
-  }
-
-
-  @Test
-  @DisplayName("Adopt messages for available locales under the bundle locales only")
-  void adoptsMessagesForAvailableLocalesUnderBundleLocales()
-  {
-    final var messageSupport = createDefault();
-    final var adopter = new ResourceBundleAdopter(messageSupport);
-
-    withDefaultLocale(GERMAN, () -> adopter.adopt(MESSAGE_BUNDLE));
-
-    final var messageAccessor = messageSupport.getMessageAccessor();
-
-    assertEquals(Set.of(ROOT, GERMAN), getLocales(messageAccessor.getMessageByCode("title")));
-    assertEquals("Welcome", messageSupport.code("title").locale(FRENCH).format());
-    assertEquals("Willkommen", messageSupport.code("title").locale(GERMANY).format());
-  }
-
-
-  @Test
-  @DisplayName("Adopt templates for available locales under the bundle locales only")
-  void adoptsTemplatesForAvailableLocalesUnderBundleLocales()
-  {
-    final var messageSupport = createDefault();
-    final var adopter = new ResourceBundleAdopter(messageSupport);
-
-    withDefaultLocale(ENGLISH, () -> adopter.adoptTemplates(TEMPLATE_BUNDLE));
-
-    final var template = messageSupport.getMessageAccessor().getTemplateByName("greeting");
-
-    assertEquals(Set.of(ENGLISH, GERMAN),
-        getLocales(assertInstanceOf(MessageTemplate.class, template).getMessage()));
   }
 
 

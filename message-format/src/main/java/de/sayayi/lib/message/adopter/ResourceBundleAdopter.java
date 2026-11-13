@@ -23,7 +23,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-import static java.util.Locale.getAvailableLocales;
 import static java.util.ResourceBundle.getBundle;
 
 
@@ -37,20 +36,12 @@ import static java.util.ResourceBundle.getBundle;
  *     A single {@link ResourceBundle} or a collection of bundles can be adopted directly as messages or templates.
  *   </li>
  *   <li>
- *     A bundle base name can be provided, in which case the adopter resolves bundles for all
- *     {@linkplain java.util.Locale#getAvailableLocales() available locales} or a specified set of locales, optionally
- *     using a custom {@link ClassLoader}.
+ *     A bundle base name and a set of locales can be provided, in which case the adopter resolves the bundles for these
+ *     locales, optionally using a custom {@link ClassLoader}.
  *   </li>
  * </ul>
  * When the same message code or template name appears in multiple bundles (or multiple locales), the localized values
  * are combined into a single locale-aware message or template.
- * <p>
- * <b>Performance:</b> the overloads without a set of locales call
- * {@link ResourceBundle#getBundle(String, Locale, ClassLoader) ResourceBundle.getBundle} once for every
- * {@linkplain Locale#getAvailableLocales() available locale}, which are more than a thousand on current JDKs,
- * regardless of how many bundles actually exist. Each call probes the class loader for several candidate bundle names.
- * If the supported locales are known, the overloads accepting a {@code Set<Locale>} should be used instead, as they
- * only resolve the requested locales.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
@@ -92,7 +83,7 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
    * @since 0.11.0
    *
    * @see #adopt(Collection)
-   * @see #adopt(String)
+   * @see #adopt(String, Set)
    */
   public void adopt(@NotNull ResourceBundle resourceBundle)
   {
@@ -189,84 +180,6 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
 
 
   /**
-   * Adopts messages from resource bundles resolved by the given base name. Bundles are looked up for all
-   * {@linkplain java.util.Locale#getAvailableLocales() available locales} using the adopter's class loader. A bundle
-   * is only adopted for the locale it has been provided for; missing bundles are silently ignored.
-   * <p>
-   * This method looks up a bundle for every available locale (more than a thousand). If the supported locales are
-   * known, {@link #adopt(String, Set)} is considerably faster.
-   *
-   * @param bundleBaseName  resource bundle base name, not {@code null}
-   *
-   * @see #adopt(String, ClassLoader)
-   * @see #adopt(String, Set)
-   */
-  public void adopt(@NotNull String bundleBaseName) {
-    adopt(bundleBaseName, null, null, false);
-  }
-
-
-  /**
-   * Adopts templates from resource bundles resolved by the given base name. Bundles are looked up for all
-   * {@linkplain java.util.Locale#getAvailableLocales() available locales} using the adopter's class loader. A bundle is
-   * only adopted for the locale it has been provided for; missing bundles are silently ignored.
-   * <p>
-   * This method looks up a bundle for every available locale (more than a thousand). If the supported locales are
-   * known, {@link #adoptTemplates(String, Set)} is considerably faster.
-   *
-   * @param bundleBaseName  resource bundle base name, not {@code null}
-   *
-   * @see #adoptTemplates(String, ClassLoader)
-   * @see #adoptTemplates(String, Set)
-   *
-   * @since 0.25.0
-   */
-  public void adoptTemplates(@NotNull String bundleBaseName) {
-    adoptTemplates(bundleBaseName, null, null, false);
-  }
-
-
-  /**
-   * Adopts messages from resource bundles resolved by the given base name and class loader. Bundles are looked up for
-   * all {@linkplain java.util.Locale#getAvailableLocales() available locales}. A bundle is only adopted for the locale
-   * it has been provided for; missing bundles are silently ignored.
-   * <p>
-   * This method looks up a bundle for every available locale (more than a thousand). If the supported locales are
-   * known, {@link #adopt(String, Set, ClassLoader)} is considerably faster.
-   *
-   * @param bundleBaseName  resource bundle base name, not {@code null}
-   * @param classLoader     class loader used for loading the resource bundles, not {@code null}
-   *
-   * @see #adopt(String)
-   * @see #adopt(String, Set, ClassLoader)
-   */
-  public void adopt(@NotNull String bundleBaseName, @NotNull ClassLoader classLoader) {
-    adopt(bundleBaseName, null, classLoader, false);
-  }
-
-
-  /**
-   * Adopts templates from resource bundles resolved by the given base name and class loader. Bundles are looked up for
-   * all {@linkplain java.util.Locale#getAvailableLocales() available locales}. A bundle is only adopted for the locale
-   * it has been provided for; missing bundles are silently ignored.
-   * <p>
-   * This method looks up a bundle for every available locale (more than a thousand). If the supported locales are
-   * known, {@link #adoptTemplates(String, Set, ClassLoader)} is considerably faster.
-   *
-   * @param bundleBaseName  resource bundle base name, not {@code null}
-   * @param classLoader     class loader used for loading the resource bundles, not {@code null}
-   *
-   * @see #adoptTemplates(String)
-   * @see #adoptTemplates(String, Set, ClassLoader)
-   *
-   * @since 0.25.0
-   */
-  public void adoptTemplates(@NotNull String bundleBaseName, @NotNull ClassLoader classLoader) {
-    adoptTemplates(bundleBaseName, null, classLoader, false);
-  }
-
-
-  /**
    * Adopts messages from resource bundles resolved by the given base name for the specified set of locales. The
    * adopter's class loader is used for loading the bundles. If no bundle exists for exactly a requested locale, a
    * {@link MessageAdopterException} is thrown; a bundle for a parent locale, the default locale or the base bundle does
@@ -278,11 +191,10 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
    *
    * @throws MessageAdopterException  if the resource bundle for a requested locale is missing
    *
-   * @see #adopt(String)
    * @see #adopt(String, Set, ClassLoader)
    */
   public void adopt(@NotNull String bundleBaseName, @NotNull Set<Locale> locales) {
-    adopt(bundleBaseName, locales.toArray(Locale[]::new), null, true);
+    adopt(bundleBaseName, locales.toArray(Locale[]::new), null);
   }
 
 
@@ -298,13 +210,12 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
    *
    * @throws MessageAdopterException  if the resource bundle for a requested locale is missing
    *
-   * @see #adoptTemplates(String)
    * @see #adoptTemplates(String, Set, ClassLoader)
    *
    * @since 0.25.0
    */
   public void adoptTemplates(@NotNull String bundleBaseName, @NotNull Set<Locale> locales) {
-    adoptTemplates(bundleBaseName, locales.toArray(Locale[]::new), null, true);
+    adoptTemplates(bundleBaseName, locales.toArray(Locale[]::new), null);
   }
 
 
@@ -320,11 +231,10 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
    *
    * @throws MessageAdopterException  if the resource bundle for a requested locale is missing
    *
-   * @see #adopt(String, ClassLoader)
    * @see #adopt(String, Set)
    */
   public void adopt(@NotNull String bundleBaseName, @NotNull Set<Locale> locales, @NotNull ClassLoader classLoader) {
-    adopt(bundleBaseName, locales.toArray(Locale[]::new), classLoader, true);
+    adopt(bundleBaseName, locales.toArray(Locale[]::new), classLoader);
   }
 
 
@@ -340,62 +250,45 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
    *
    * @throws MessageAdopterException  if the resource bundle for a requested locale is missing
    *
-   * @see #adoptTemplates(String, ClassLoader)
    * @see #adoptTemplates(String, Set)
    *
    * @since 0.25.0
    */
   public void adoptTemplates(@NotNull String bundleBaseName, @NotNull Set<Locale> locales,
                              @NotNull ClassLoader classLoader) {
-    adoptTemplates(bundleBaseName, locales.toArray(Locale[]::new), classLoader, true);
+    adoptTemplates(bundleBaseName, locales.toArray(Locale[]::new), classLoader);
   }
 
 
   /**
    * Adopts all messages from the resource bundles with the given base name and locales. The public {@code adopt}
-   * methods taking a bundle base name delegate to this method. If {@code locales} is {@code null}, all
-   * {@linkplain java.util.Locale#getAvailableLocales() available locales} are used and missing bundles are silently
-   * ignored. If {@code classLoader} is {@code null}, the adopter's own class loader is used. A bundle found for a
-   * different locale than the requested one is treated as missing. When the same message code appears across multiple
-   * locales, the localized values are combined into a single locale-aware message.
+   * methods taking a bundle base name delegate to this method. If {@code classLoader} is {@code null}, the adopter's
+   * own class loader is used. A bundle found for a different locale than the requested one is treated as missing. When
+   * the same message code appears across multiple locales, the localized values are combined into a single locale-aware
+   * message.
    *
-   * @param bundleBaseName                resource bundle base name, not {@code null}
-   * @param locales                       locales to resolve, or {@code null} for all available locales
-   * @param classLoader                   class loader for bundle loading, or {@code null} to use the adopter's class
-   *                                      loader
-   * @param throwOnMissingResourceBundle  whether to throw a {@link MessageAdopterException} when a bundle cannot be
-   *                                      found
+   * @param bundleBaseName  resource bundle base name, not {@code null}
+   * @param locales         locales to resolve, not {@code null}
+   * @param classLoader     class loader for bundle loading, or {@code null} to use the adopter's class loader
    *
-   * @throws MessageAdopterException  if {@code throwOnMissingResourceBundle} is {@code true} and a resource bundle is
-   *                                  missing
+   * @throws MessageAdopterException  if the resource bundle for a requested locale is missing
    */
-  protected void adopt(@NotNull String bundleBaseName, Locale[] locales, ClassLoader classLoader,
-                       boolean throwOnMissingResourceBundle)
+  protected void adopt(@NotNull String bundleBaseName, @NotNull Locale @NotNull [] locales, ClassLoader classLoader)
   {
     final var localizedMessagesByCode = new HashMap<String,Map<Locale,String>>();
-
-    if (locales == null)
-    {
-      locales = getAvailableLocales();
-      throwOnMissingResourceBundle = false;
-    }
 
     if (classLoader == null)
       classLoader = getClass().getClassLoader();
 
     for(var locale: locales)
     {
-      final var resourceBundle =
-          getResourceBundle(bundleBaseName, locale, classLoader, throwOnMissingResourceBundle);
+      final var resourceBundle = getResourceBundle(bundleBaseName, locale, classLoader);
 
-      if (resourceBundle != null)
+      for(var code: resourceBundle.keySet())
       {
-        for(var code: resourceBundle.keySet())
-        {
-          localizedMessagesByCode
-              .computeIfAbsent(code, k -> new HashMap<>())
-              .put(locale, resourceBundle.getString(code));
-        }
+        localizedMessagesByCode
+            .computeIfAbsent(code, k -> new HashMap<>())
+            .put(locale, resourceBundle.getString(code));
       }
     }
 
@@ -406,49 +299,36 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
 
   /**
    * Adopts all templates from the resource bundles with the given base name and locales. The public
-   * {@code adoptTemplates} methods taking a bundle base name delegate to this method. If {@code locales} is
-   * {@code null}, all {@linkplain java.util.Locale#getAvailableLocales() available locales} are used and missing
-   * bundles are silently ignored. If {@code classLoader} is {@code null}, the adopter's own class loader is used. A
-   * bundle found for a different locale than the requested one is treated as missing.
+   * {@code adoptTemplates} methods taking a bundle base name delegate to this method. If {@code classLoader} is
+   * {@code null}, the adopter's own class loader is used. A bundle found for a different locale than the requested one
+   * is treated as missing.
    *
-   * @param bundleBaseName                resource bundle base name, not {@code null}
-   * @param locales                       locales to resolve, or {@code null} for all available locales
-   * @param classLoader                   class loader for bundle loading, or {@code null} to use the adopter's class
-   *                                      loader
-   * @param throwOnMissingResourceBundle  whether to throw a {@link MessageAdopterException} when a bundle cannot be
-   *                                      found
+   * @param bundleBaseName  resource bundle base name, not {@code null}
+   * @param locales         locales to resolve, not {@code null}
+   * @param classLoader     class loader for bundle loading, or {@code null} to use the adopter's class loader
    *
-   * @throws MessageAdopterException  if {@code throwOnMissingResourceBundle} is {@code true} and a resource bundle
-   *                                  is missing
+   * @throws MessageAdopterException  if the resource bundle for a requested locale is missing
    *
    * @since 0.25.0
    */
-  protected void adoptTemplates(@NotNull String bundleBaseName, Locale[] locales, ClassLoader classLoader,
-                                boolean throwOnMissingResourceBundle)
+  protected void adoptTemplates(@NotNull String bundleBaseName, @NotNull Locale @NotNull [] locales,
+                                ClassLoader classLoader)
   {
     final var localizedTemplatesByName = new HashMap<String,Map<Locale,String>>();
-
-    if (locales == null)
-    {
-      locales = getAvailableLocales();
-      throwOnMissingResourceBundle = false;
-    }
 
     if (classLoader == null)
       classLoader = getClass().getClassLoader();
 
     for(var locale: locales)
     {
-      final var resourceBundle =
-          getResourceBundle(bundleBaseName, locale, classLoader, throwOnMissingResourceBundle);
+      final var resourceBundle = getResourceBundle(bundleBaseName, locale, classLoader);
 
-      if (resourceBundle != null)
-        for(var name: resourceBundle.keySet())
-        {
-          localizedTemplatesByName
-              .computeIfAbsent(name, k -> new HashMap<>())
-              .put(locale, resourceBundle.getString(name));
-        }
+      for(var name: resourceBundle.keySet())
+      {
+        localizedTemplatesByName
+            .computeIfAbsent(name, k -> new HashMap<>())
+            .put(locale, resourceBundle.getString(name));
+      }
     }
 
     localizedTemplatesByName.forEach((name,localizedTexts) ->
@@ -462,40 +342,30 @@ public class ResourceBundleAdopter extends AbstractMessageAdopter
    * locale, the {@linkplain Locale#getDefault() default locale} or the base bundle, is treated as missing. The keys of
    * the returned bundle include the keys inherited from its parent bundles.
    *
-   * @param bundleBaseName                resource bundle base name, not {@code null}
-   * @param locale                        locale to resolve, not {@code null}
-   * @param classLoader                   class loader for bundle loading, not {@code null}
-   * @param throwOnMissingResourceBundle  whether to throw a {@link MessageAdopterException} when the bundle is missing
+   * @param bundleBaseName  resource bundle base name, not {@code null}
+   * @param locale          locale to resolve, not {@code null}
+   * @param classLoader     class loader for bundle loading, not {@code null}
    *
-   * @return  resource bundle for {@code locale} or {@code null} if the bundle is missing and
-   *          {@code throwOnMissingResourceBundle} is {@code false}
+   * @return  resource bundle for {@code locale}, never {@code null}
    *
-   * @throws MessageAdopterException  if {@code throwOnMissingResourceBundle} is {@code true} and the resource bundle is
-   *                                  missing
+   * @throws MessageAdopterException  if the resource bundle for {@code locale} is missing
    *
    * @since 0.25.0
    */
-  private static ResourceBundle getResourceBundle(@NotNull String bundleBaseName, @NotNull Locale locale,
-                                                  @NotNull ClassLoader classLoader,
-                                                  boolean throwOnMissingResourceBundle)
+  private static @NotNull ResourceBundle getResourceBundle(@NotNull String bundleBaseName, @NotNull Locale locale,
+                                                           @NotNull ClassLoader classLoader)
   {
+    final ResourceBundle resourceBundle;
+
     try {
-      final var resourceBundle = getBundle(bundleBaseName, locale, classLoader);
-      if (resourceBundle.getLocale().equals(locale))
-        return resourceBundle;
+      resourceBundle = getBundle(bundleBaseName, locale, classLoader);
     } catch(MissingResourceException ex) {
-      if (throwOnMissingResourceBundle)
-        throw new MessageAdopterException(ex.getLocalizedMessage(), ex);
-
-      return null;
+      throw new MessageAdopterException(ex.getLocalizedMessage(), ex);
     }
 
-    if (throwOnMissingResourceBundle)
-    {
-      throw new MessageAdopterException("missing resource bundle '" + bundleBaseName + "' for locale '" + locale +
-          '\'');
-    }
+    if (!resourceBundle.getLocale().equals(locale))
+      throw new MessageAdopterException("missing resource bundle '" + bundleBaseName + "' for locale '" + locale + '\'');
 
-    return null;
+    return resourceBundle;
   }
 }

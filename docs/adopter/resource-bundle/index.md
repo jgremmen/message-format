@@ -10,8 +10,8 @@ code or template name appears in bundles for different locales, the localized va
 a single locale-aware message or template. This makes the adopter a natural fit for applications that already
 organize their translations as `.properties` files following the standard Java resource bundle naming convention.
 
-The adopter provides several ways to load bundles: by base name (scanning all available locales or a specific set), 
-from a single `ResourceBundle` instance, or from a collection of bundles.
+The adopter provides several ways to load bundles: by base name and a set of locales, from a single `ResourceBundle`
+instance, or from a collection of bundles.
 
 Resource bundle entries can also be adopted as reusable templates with the corresponding `adoptTemplates` methods.
 Template keys must follow the library's kebab-case naming convention. When a template name is present in bundles for
@@ -20,8 +20,8 @@ multiple locales, the localized values are combined into one locale-aware templa
 
 ## Adopting Templates
 
-Template adoption supports the same sources and lookup options as message adoption. For example, the base-name
-overload scans available locales, while a set of locales can be specified to require those bundles:
+Template adoption supports the same sources and lookup options as message adoption. For example, a bundle base name
+and a set of locales can be specified to require the bundles for those locales:
 
 ```properties
 # com/example/templates_en.properties
@@ -68,20 +68,10 @@ base-name overloads just as with messages.
 
 ## Adopting by Bundle Base Name
 
-The simplest approach is to pass a bundle base name to the `adopt(String)` method. The adopter resolves bundles for 
-every locale available to the JVM and silently ignores any locale for which no bundle file exists. Bundles are looked
-up with `ResourceBundle.getBundle`, so the standard fallback applies. For a locale without its own bundle, the bundle
-of the JVM default locale or the base bundle (`messages.properties`) is found instead, and its entries are registered
-under the locale of that bundle.
-
-/// warning | Startup Time
-`adopt(String)` and `adoptTemplates(String)`, with or without a class loader, call `ResourceBundle.getBundle` once
-for every locale returned by `Locale.getAvailableLocales()`. Current JDKs return more than a thousand locales, and
-every lookup probes the class loader for several candidate bundle names, no matter how many bundle files actually
-exist. For a small bundle this took about 25 ms after warm-up and about 160 ms on first use, compared to about 1-2 ms
-when only two locales are requested. When the supported locales are known, use `adopt(String, Set)` or
-`adoptTemplates(String, Set)` instead, which resolve only those locales.
-///
+To load a family of bundle files, pass the bundle base name and the set of locales the application supports to the
+`adopt(String, Set)` method. Bundles are looked up with `ResourceBundle.getBundle`, and entries that share the same key
+are combined into locale-aware messages. Keys inherited from parent bundles are adopted for the requested locale as
+well.
 
 Suppose a project contains two property files on the classpath:
 
@@ -97,14 +87,15 @@ greeting=Hallo, %{name}!
 farewell=Auf Wiedersehen, %{name}.
 ```
 
-A single call to `adopt` loads both files and combines entries that share the same key into locale-aware messages:
+A single call to `adopt` loads both files:
 
 ```java
 var messageSupport = MessageSupportFactory.create(
     DefaultFormatterService.getSharedInstance());
 var adopter = new ResourceBundleAdopter(messageSupport);
 
-adopter.adopt("com.example.messages");
+adopter.adopt("com.example.messages",
+    Set.of(Locale.ENGLISH, Locale.GERMAN));
 
 messageSupport
     .code("greeting")
@@ -121,24 +112,10 @@ messageSupport
 // "Hallo, Alice!"
 ```
 
-### Custom ClassLoader
-
-When the bundle files are not accessible from the adopter's own class loader, for example when loading resources from a 
-plugin or module system, a custom `ClassLoader` can be provided as a second argument:
-
-```java
-adopter.adopt("com.example.messages", pluginClassLoader);
-```
-
-The behavior is otherwise identical: all available locales are scanned and missing bundles are silently skipped.
-
-
-## Adopting with Specific Locales
-
-When the exact set of locales an application supports is known, a `Set<Locale>` can be passed to the 
-`adopt(String, Set)` method. Unlike the base-name-only variant, this one throws a `MessageAdopterException` when a 
-bundle for one of the requested locales cannot be found. This turns missing translations into an early, visible error 
-rather than a silent gap that only surfaces at runtime when a user requests a particular locale.
+A `MessageAdopterException` is thrown when the bundle for one of the requested locales cannot be found. A bundle for a
+parent locale, the JVM default locale or the base bundle (`messages.properties`) does not count as a bundle for the
+requested locale. This turns missing translations into an early, visible error rather than a silent gap that only
+surfaces at runtime when a user requests a particular locale.
 
 ```java
 adopter.adopt("com.example.messages",
@@ -146,7 +123,10 @@ adopter.adopt("com.example.messages",
 // Throws MessageAdopterException if messages_fr.properties is missing
 ```
 
-This variant also accepts an optional `ClassLoader` for the same scenarios described above:
+### Custom ClassLoader
+
+When the bundle files are not accessible from the adopter's own class loader, for example when loading resources from a
+plugin or module system, a custom `ClassLoader` can be provided as a third argument:
 
 ```java
 adopter.adopt("com.example.messages",
@@ -163,7 +143,7 @@ the bundle is not retained: the message is a plain message that is used for ever
 several locales into locale-aware messages, adopt the bundles together with `adopt(Collection)`.
 
 This is useful when the bundle was obtained through custom lookup logic, or to adopt only a single locale
-from a bundle family without scanning the rest.
+from a bundle family.
 
 ```java
 var messageSupport = MessageSupportFactory.create(
