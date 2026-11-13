@@ -17,12 +17,14 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
+import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
+import java.util.Map;
 import java.util.function.LongSupplier;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
@@ -34,7 +36,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
- * Tests {@link LongSupplierFormatter}: formattable types and formatting of the supplied value.
+ * Tests {@link LongSupplierFormatter}: formattable types and formatting of the supplied value, also by the number
+ * formatter.
  *
  * @author Jeroen Gremmen
  * @since 0.6.3
@@ -57,12 +60,40 @@ final class LongSupplierFormatterTest extends AbstractFormatterTest
         .setLocale(ROOT)
         .getMessageAccessor();
 
-    assertEquals(nullText(), format(messageAccessor, null));
-    assertEquals(noSpaceText("0"), format(messageAccessor, (LongSupplier)() -> 0));
-    assertEquals(noSpaceText(Long.toString(MAX_VALUE)),
+    assertEquals(
+        nullText(),
+        format(messageAccessor, null));
+    assertEquals(
+        noSpaceText("0"),
+        format(messageAccessor, (LongSupplier)() -> 0));
+    assertEquals(
+        noSpaceText(Long.toString(MAX_VALUE)),
         format(messageAccessor, (LongSupplier)() -> MAX_VALUE));
-    assertEquals(noSpaceText(Long.toString(MIN_VALUE)),
+    assertEquals(
+        noSpaceText(Long.toString(MIN_VALUE)),
         format(messageAccessor, (LongSupplier)() -> MIN_VALUE));
-    assertEquals(noSpaceText("123456789"), format(messageAccessor, (LongSupplier)() -> 123456789L));
+    assertEquals(
+        noSpaceText("123456789"),
+        format(messageAccessor, (LongSupplier)() -> 123456789L));
+  }
+
+
+  @Test
+  @DisplayName("Supplied value is formatted by the number formatter")
+  void testNumberFormat()
+  {
+    val messageAccessor = MessageSupportFactory
+        .create(createFormatterService(new NumberFormatter(), new LongSupplierFormatter()))
+        .setLocale("en")
+        .getMessageAccessor();
+    val messageFactory = messageAccessor.getMessageFactory();
+
+    assertEquals(
+        noSpaceText("1,234,567,890"),
+        format(
+            messageAccessor,
+            (LongSupplier)() -> 1234567890L,
+            Map.of("number", new TypedValueString(messageFactory, "###,###,###,###")),
+            Map.of()));
   }
 }

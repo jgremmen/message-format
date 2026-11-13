@@ -16,23 +16,17 @@
 package de.sayayi.lib.message.util;
 
 import lombok.val;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static de.sayayi.lib.message.util.ConcurrentTestSupport.getConcurrently;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -120,7 +114,7 @@ final class SupplierDelegateTest
         return new Object();
       });
 
-      val values = getConcurrently(threads, supplier);
+      val values = getConcurrently(threads, thread -> supplier.get());
 
       assertEquals(1, calls.get());
       for(val value: values)
@@ -146,7 +140,7 @@ final class SupplierDelegateTest
     for(var n = 0; n < 3; n++)
       assertThrows(IllegalStateException.class, supplier::get);
 
-    for(val v: getConcurrently(threads, supplier))
+    for(val v: getConcurrently(threads, thread -> supplier.get()))
       assertSame(value, v);
 
     assertEquals(4, calls.get());
@@ -223,31 +217,5 @@ final class SupplierDelegateTest
     assertNull(innerValue.get());
     assertSame(value, self.get().get());
     assertEquals(1, calls.get());
-  }
-
-
-  private static <T> @NotNull List<T> getConcurrently(int threads, @NotNull Supplier<T> supplier) throws Exception
-  {
-    val start = new CountDownLatch(1);
-    val tasks = new ArrayList<Callable<T>>();
-
-    for(var t = 0; t < threads; t++)
-    {
-      tasks.add(() -> {
-        start.await();
-        return supplier.get();
-      });
-    }
-
-    try(val executor = Executors.newFixedThreadPool(threads)) {
-      val futures = tasks.stream().map(executor::submit).toList();
-      start.countDown();
-
-      val values = new ArrayList<T>();
-      for(val future: futures)
-        values.add(future.get(30, SECONDS));
-
-      return values;
-    }
   }
 }

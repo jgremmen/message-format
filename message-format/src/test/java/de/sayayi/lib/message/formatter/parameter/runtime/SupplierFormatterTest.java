@@ -15,26 +15,24 @@
  */
 package de.sayayi.lib.message.formatter.parameter.runtime;
 
+import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.MessageSupportFactory;
-import de.sayayi.lib.message.formatter.parameter.named.BoolFormatter;
+import de.sayayi.lib.message.formatter.DefaultFormatterService;
+import de.sayayi.lib.message.formatter.parameter.named.ClassifierFormatter;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import lombok.val;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 
-import java.util.Map;
-import java.util.function.BooleanSupplier;
-import java.util.function.LongSupplier;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 
-import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
- * Tests {@link SupplierFormatter}: formatting of values supplied as boolean and long.
+ * Tests {@link SupplierFormatter}: formatting, map key comparison, size and classifiers of the supplied value, and the
+ * single evaluation of a supplier passed as a parameter.
  *
  * @author Jeroen Gremmen
  * @since 0.1.0
@@ -43,28 +41,102 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @TestMethodOrder(MethodOrderer.DisplayName.class)
 final class SupplierFormatterTest extends AbstractFormatterTest
 {
-  @Test
-  void testBooleanSupplier()
-  {
-    val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new BoolFormatter(), new BooleanSupplierFormatter()))
-        .getMessageAccessor();
+  private MessageSupport messageSupport;
 
-    assertEquals(noSpaceText("true"), format(messageAccessor, (BooleanSupplier)() -> true));
+
+  @BeforeEach
+  void init()
+  {
+    val formatterService = new DefaultFormatterService();
+    formatterService.addFormatter(new ClassifierFormatter());
+
+    messageSupport = MessageSupportFactory.create(formatterService);
   }
 
 
   @Test
-  void testLongSupplier()
-  {
-    val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new NumberFormatter(), new LongSupplierFormatter()))
-        .setLocale("en")
-        .getMessageAccessor();
-    val messageFactory = messageAccessor.getMessageFactory();
+  void testFormattableTypes() {
+    assertFormatterForType(new SupplierFormatter(), Supplier.class);
+  }
 
-    assertEquals(noSpaceText("1,234,567,890"),
-        format(messageAccessor, (LongSupplier)() -> 1234567890L,
-            Map.of("number", new TypedValueString(messageFactory, "###,###,###,###")), Map.of()));
+
+  @Test
+  @DisplayName("Supplied value is formatted according to its type")
+  void testFormat()
+  {
+    final Supplier<List<String>> names = () -> List.of("alice", "bob", "carol");
+
+    assertEquals("Users: alice, bob and carol", messageSupport
+        .message("Users: %{names,list-sep-last:' and '}")
+        .with("names", names)
+        .format());
+  }
+
+
+  @Test
+  @DisplayName("Map keys and size are based on the supplied value")
+  void testMapKeysAndSize()
+  {
+    final Supplier<String> empty = () -> "";
+    final Supplier<Integer> one = () -> 1;
+    final Supplier<Boolean> yes = () -> true;
+    final Supplier<String> text = () -> "abc";
+    final Supplier<List<String>> list = () -> List.of("a", "b", "c");
+
+    assertEquals("no comment", messageSupport
+        .message("%{c,empty:'no comment'}")
+        .with("c", empty)
+        .format());
+    assertEquals("one", messageSupport
+        .message("%{n,1:one,:other}")
+        .with("n", one)
+        .format());
+    assertEquals("yes", messageSupport
+        .message("%{b,true:yes,false:no}")
+        .with("b", yes)
+        .format());
+    assertEquals("ABC", messageSupport
+        .message("%{s,format:choice,'abc':ABC,:other}")
+        .with("s", text)
+        .format());
+    assertEquals("3", messageSupport
+        .message("%{l,format:size}")
+        .with("l", list)
+        .format());
+  }
+
+
+  @Test
+  @DisplayName("Classifiers of the supplier and of the supplied value")
+  void testClassifiers()
+  {
+    final Supplier<List<String>> list = () -> List.of("a", "b");
+
+    assertEquals("deferred", messageSupport
+        .message("%{v,format:classifier,'supplier':'deferred','list':'a list'}")
+        .with("v", list)
+        .format());
+    assertEquals("a list", messageSupport
+        .message("%{v,format:classifier,'string':'text','list':'a list'}")
+        .with("v", list)
+        .format());
+  }
+
+
+  @Test
+  @DisplayName("Supplier passed as a parameter is evaluated once")
+  void testSupplierEvaluatedOnce()
+  {
+    val calls = new AtomicInteger();
+    final Supplier<List<String>> list = () -> {
+      calls.incrementAndGet();
+      return List.of("a", "b");
+    };
+
+    assertEquals("a, b 2 some", messageSupport
+        .message("%{l} %{l,format:size} %{l,empty:none,!empty:some}")
+        .with("l", list)
+        .format());
+    assertEquals(1, calls.get());
   }
 }

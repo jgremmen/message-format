@@ -29,17 +29,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
-import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 /**
- * Tests {@link IterableFormatter}: formattable types, element formatting, empty and {@code null} collections,
- * separators and size limits.
+ * Tests {@link IterableFormatter}: formattable types, escaped list values and non-collection iterables. The list
+ * configuration shared with {@link ArrayFormatter} is tested by {@link ListFormatterConfigTest}.
  *
  * @author Jeroen Gremmen
  * @since 0.6.0
@@ -51,61 +48,6 @@ final class IterableFormatterTest extends AbstractFormatterTest
   @Test
   void testFormattableTypes() {
     assertFormatterForType(new IterableFormatter(), Iterable.class);
-  }
-
-
-  @Test
-  void testObjectArray()
-  {
-    val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new IterableFormatter()))
-        .setLocale("de-DE")
-        .getMessageAccessor();
-
-    assertEquals(noSpaceText("Test, true, -6"),
-        format(messageAccessor, asList("Test", true, null, -6)));
-  }
-
-
-  @Test
-  void testEmptyOrNullCollection()
-  {
-    val message = MessageSupportFactory
-        .create(createFormatterService(new IterableFormatter()))
-        .message("%{c,null:null,empty:empty}");
-
-    assertEquals("null", message.with("c", null).format());
-    assertEquals("empty", message.with("c", Set.of()).format());
-  }
-
-
-  @Test
-  void testSeparator()
-  {
-    val messageSupport = MessageSupportFactory
-        .create(createFormatterService(new IterableFormatter()));
-
-    assertEquals("1, 2, 3, 4 and 5", messageSupport
-        .message("%{c,list-sep:', ',list-sep-last:' and '}").with("c", List.of(1, 2, 3, 4, 5)).format());
-
-    assertEquals("1.2.3.4.5", messageSupport
-        .message("%{c,list-sep:'.'}").with("c", List.of(1, 2, 3, 4, 5)).format());
-  }
-
-
-  @Test
-  void testMaxSizeWithMoreValue()
-  {
-    val messageSupport = MessageSupportFactory
-        .create(createFormatterService(new IterableFormatter()));
-
-    assertEquals("1, 2, ...", messageSupport
-        .message("%{c,list-max-size:2,list-value-more:'...'}").with("c", List.of(1, 2, 3, 4, 5)).format());
-
-    assertEquals("1, 2, ...", messageSupport
-        .message("%{c,list-max-size:2,list-value-more:'...',list-unique:true}")
-        .with("c", List.of(1, 1, 2, 2, 3, 3, 4, 4))
-        .format());
   }
 
 

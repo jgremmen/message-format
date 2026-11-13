@@ -29,13 +29,13 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.CyclicBarrier;
 
 import static de.sayayi.lib.message.part.normalizer.MessagePartNormalizer.PASS_THROUGH;
+import static de.sayayi.lib.message.util.ConcurrentTestSupport.runConcurrently;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Locale.JAPANESE;
 import static java.util.Locale.forLanguageTag;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
@@ -164,33 +164,12 @@ final class MessageFactoryTest
   @DisplayName("Cache is thread-safe under concurrent access")
   void testParseMessageCacheThreadSafety() throws Exception
   {
-    final var THREAD_COUNT = 8;
-
     final var factory = new MessageFactory(LRUMessagePartNormalizer.create(64), 16);
-    final var barrier = new CyclicBarrier(THREAD_COUNT);
-    final var errors = new ArrayList<Throwable>();
-    final var threads = new Thread[THREAD_COUNT];
 
-    for(int t = 0; t < THREAD_COUNT; t++)
-    {
-      threads[t] = new Thread(() -> {
-        try {
-          barrier.await();
-          for(int i = 0; i < 100; i++)
-            factory.parseMessage("msg " + (i % 20));
-        } catch(Throwable ex) {
-          synchronized(errors) {
-            errors.add(ex);
-          }
-        }
-      });
-      threads[t].start();
-    }
-
-    for(var thread: threads)
-      thread.join();
-
-    assertTrue(errors.isEmpty(), "concurrent cache access should not throw: " + errors);
+    runConcurrently(8, thread -> {
+      for(int i = 0; i < 100; i++)
+        assertEquals("msg " + (i % 20), factory.parseMessage("msg " + (i % 20)).asFormatString(UTF_8));
+    });
   }
 
 

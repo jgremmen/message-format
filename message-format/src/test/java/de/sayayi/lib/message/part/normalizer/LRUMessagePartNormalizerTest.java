@@ -20,7 +20,6 @@ import de.sayayi.lib.message.internal.message.CompoundMessage;
 import de.sayayi.lib.message.internal.part.TextPart;
 import de.sayayi.lib.message.part.MessagePart;
 import lombok.val;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -28,11 +27,10 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import java.util.ArrayList;
-import java.util.concurrent.*;
-import java.util.function.IntConsumer;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static de.sayayi.lib.message.util.ConcurrentTestSupport.runConcurrently;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.platform.commons.util.ReflectionUtils.tryToReadFieldValue;
 
@@ -190,31 +188,5 @@ final class LRUMessagePartNormalizerTest
 
     assertNotSame(parts[0], cache.normalize(new TextPart("new0")));
     assertSame(parts[maxSize - 1], cache.normalize(new TextPart("new" + (maxSize - 1))));
-  }
-
-
-  private static void runConcurrently(int threads, @NotNull IntConsumer task) throws Exception
-  {
-    val start = new CountDownLatch(1);
-    val tasks = new ArrayList<Callable<Void>>();
-
-    for(var t = 0; t < threads; t++)
-    {
-      val thread = t;
-
-      tasks.add(() -> {
-        start.await();
-        task.accept(thread);
-        return null;
-      });
-    }
-
-    try(val executor = Executors.newFixedThreadPool(threads)) {
-      val futures = tasks.stream().map(executor::submit).toList();
-      start.countDown();
-
-      for(val future: futures)
-        future.get(30, SECONDS);
-    }
   }
 }

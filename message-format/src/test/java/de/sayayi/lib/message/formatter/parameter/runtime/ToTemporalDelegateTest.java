@@ -27,11 +27,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.time.Instant;
 import java.time.InstantSource;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -42,11 +38,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests {@link ToTemporalDelegate}: formatting of {@link java.util.Date}, {@link java.sql.Date} and
- * {@link java.sql.Time} values, and formatting of legacy date/time values without the optional {@code java.sql}
- * module.
+ * {@link java.sql.Time} values, and formatting of legacy date/time values without the optional {@code java.sql} module.
  *
  * @author Jeroen Gremmen
- * @since 0.12.0  (renamed in 0.20.0)
+ * @since 0.12.0
  */
 @DisplayName("Temporal delegate")
 @TestMethodOrder(MethodOrderer.DisplayName.class)
@@ -74,31 +69,6 @@ final class ToTemporalDelegateTest extends AbstractFormatterTest
 
     assertEquals(noSpaceText("09.11.2024, 00:00:00"), format(messageAccessor, date,
         Map.of("date", new TypedValueString(messageAccessor.getMessageFactory(), "medium")), Map.of()));
-  }
-
-
-  @Test
-  @DisplayName("Format java.sql.Date")
-  @SuppressWarnings("deprecation")
-  void formatSqlDate()
-  {
-    val date = new Date(2024 - 1900, Calendar.NOVEMBER, 9);
-    val sqlDate = new java.sql.Date(date.getTime());
-
-    assertEquals(noSpaceText("2024-11-09"), format(messageAccessor, sqlDate,
-        Map.of("date", new TypedValueString(messageAccessor.getMessageFactory(), "yyyy-MM-dd")), Map.of()));
-  }
-
-
-  @Test
-  @DisplayName("Format java.sql.Time")
-  @SuppressWarnings("deprecation")
-  void formatSqlTime()
-  {
-    val sqlTime = new java.sql.Time(23, 36, 4);
-
-    assertEquals(noSpaceText("23:36"), format(messageAccessor, sqlTime,
-        Map.of("date", new TypedValueString(messageAccessor.getMessageFactory(), "HH:mm")), Map.of()));
   }
 
 

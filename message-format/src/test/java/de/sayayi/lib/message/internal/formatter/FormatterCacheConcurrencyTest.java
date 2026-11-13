@@ -21,13 +21,11 @@ import org.junit.jupiter.api.*;
 
 import java.io.Serializable;
 import java.util.*;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ThreadLocalRandom;
 
+import static de.sayayi.lib.message.util.ConcurrentTestSupport.*;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -56,30 +54,7 @@ final class FormatterCacheConcurrencyTest
         Comparable.class, Serializable.class, Iterable.class, Collection.class
     };
 
-    val latch = new CountDownLatch(1);
-    val threads = new Thread[types.length];
-    val errors = new AtomicBoolean(false);
-
-    for(var i = 0; i < types.length; i++)
-    {
-      final var type = types[i];
-
-      (threads[i] = new Thread(() -> {
-        try {
-          latch.await();
-          assertNotNull(cache.lookup(type, t -> EMPTY));
-        } catch(Exception ex) {
-          errors.set(true);
-        }
-      })).start();
-    }
-
-    latch.countDown();
-
-    for(var thread: threads)
-      thread.join(5000);
-
-    assertFalse(errors.get(), "Concurrent lookups caused an error");
+    runConcurrently(types.length, idx -> assertNotNull(cache.lookup(types[idx], t -> EMPTY)));
 
     // verify all types are retrievable
     for(var type: types)
@@ -88,67 +63,33 @@ final class FormatterCacheConcurrencyTest
 
 
   @RepeatedTest(10)
-  @DisplayName("Concurrent lookups for the same type invoke buildFormatters at most once per type")
-  void concurrentLookupsForSameType() throws InterruptedException
+  @DisplayName("Concurrent lookups for the same type return the formatters cached first")
+  void concurrentLookupsForSameType() throws Exception
   {
     val cache = new FormatterCache(8);
-    val invocationCount = new AtomicInteger(0);
-    val latch = new CountDownLatch(1);
-    val threadCount = 20;
-    val threads = new Thread[threadCount];
-    val results = new ParameterFormatter[threadCount][];
 
-    Function<Class<?>,ParameterFormatter[]> buildFormatters = t -> {
-      invocationCount.incrementAndGet();
-
-      // simulate expensive operation
+    // several threads build formatters for the same type at the same time, but only the first result is cached
+    val results = getConcurrently(20, idx -> cache.lookup(String.class, t -> {
       try {
         Thread.sleep(10);
       } catch(InterruptedException ignored) {
       }
 
-      return EMPTY;
-    };
+      return new ParameterFormatter[0];
+    }));
 
-    for(var i = 0; i < threadCount; i++)
-    {
-      final var idx = i;
+    val cached = cache.lookup(String.class, t -> fail("should be cached"));
 
-      (threads[i] = new Thread(() -> {
-        try {
-          latch.await();
-          results[idx] = cache.lookup(String.class, buildFormatters);
-        } catch(Exception ignored) {
-        }
-      })).start();
-    }
-
-    latch.countDown();
-
-    for(var thread: threads)
-      thread.join(5000);
-
-    // all results should be non-null
     for(var result: results)
-      assertNotNull(result);
-
-    // buildFormatters may be called more than once due to the concurrent lookup pattern,
-    // but the cache should not be corrupted
-    val finalResult = cache.lookup(String.class, t -> fail("should be cached"));
-    assertNotNull(finalResult);
+      assertSame(cached, result);
   }
 
 
   @RepeatedTest(10)
   @DisplayName("Concurrent lookups with cache eviction do not corrupt state")
-  @SuppressWarnings("resource")
-  void concurrentLookupsWithEviction() throws InterruptedException, ExecutionException, TimeoutException
+  void concurrentLookupsWithEviction() throws Exception
   {
     val cache = new FormatterCache(8);
-    val latch = new CountDownLatch(1);
-    val threadCount = 16;
-    val executor = Executors.newFixedThreadPool(threadCount);
-    val futures = new ArrayList<Future<?>>();
 
     // each thread inserts a unique set of types that will cause eviction
     val allTypes = new Class<?>[][] {
@@ -156,27 +97,10 @@ final class FormatterCacheConcurrencyTest
         { Map.class, Set.class, Queue.class, Comparable.class, Serializable.class, Iterable.class, Collection.class, Deque.class },
     };
 
-    for(var i = 0; i < threadCount; i++)
-    {
-      final var types = allTypes[i % 2];
-
-      futures.add(executor.submit(() -> {
-        try {
-          latch.await();
-
-          for(var type: types)
-            cache.lookup(type, t -> EMPTY);
-        } catch(InterruptedException ignored) {
-        }
-      }));
-    }
-
-    latch.countDown();
-
-    for(var future: futures)
-      future.get(5, SECONDS);
-
-    executor.shutdown();
+    runConcurrently(16, idx -> {
+      for(var type: allTypes[idx % 2])
+        cache.lookup(type, t -> EMPTY);
+    });
 
     // cache should still be functional
     assertNotNull(cache.lookup(String.class, t -> EMPTY));
@@ -186,107 +110,53 @@ final class FormatterCacheConcurrencyTest
 
   @RepeatedTest(10)
   @DisplayName("Clear during concurrent lookups does not cause exceptions")
-  void clearDuringConcurrentLookups() throws InterruptedException
+  void clearDuringConcurrentLookups() throws Exception
   {
     val cache = new FormatterCache(8);
     val types = new Class<?>[] {
         String.class, Integer.class, Long.class, Double.class,
         Float.class, Boolean.class, Byte.class, Short.class
     };
-    val running = new AtomicBoolean(true);
-    val errors = new AtomicBoolean(false);
 
     // pre-fill cache
     for(var type: types)
       cache.lookup(type, t -> EMPTY);
 
-    // start lookup threads
-    val lookupThreads = new Thread[8];
-
-    for(var i = 0; i < lookupThreads.length; i++)
-    {
-      final var type = types[i % types.length];
-
-      (lookupThreads[i] = new Thread(() -> {
-        while (running.get() && !errors.get())
-        {
-          try {
-            assertNotNull(cache.lookup(type, t -> EMPTY));
-          } catch(Exception ex) {
-            errors.set(true);
-          }
-        }
-      })).start();
-    }
-
     // repeatedly clear the cache while lookups are happening
-    for(var i = 0; i < 100; i++)
-    {
-      cache.clear();
-      Thread.yield();
-    }
-
-    running.set(false);
-
-    for(var thread: lookupThreads)
-      thread.join(5000);
-
-    assertFalse(errors.get(), "Clear during concurrent lookups caused an error");
+    runWithReaders(1, writer -> {
+      for(var i = 0; i < 100; i++)
+      {
+        cache.clear();
+        Thread.yield();
+      }
+    }, 8, reader -> assertNotNull(cache.lookup(types[reader % types.length], t -> EMPTY)));
   }
 
 
   @RepeatedTest(10)
   @DisplayName("toString during concurrent modifications does not throw")
-  @SuppressWarnings("ExtractMethodRecommender")
-  void toStringDuringConcurrentModifications() throws InterruptedException
+  void toStringDuringConcurrentModifications() throws Exception
   {
     val cache = new FormatterCache(8);
-    val running = new AtomicBoolean(true);
-    val errors = new AtomicBoolean(false);
     val types = new Class<?>[] {
         String.class, Integer.class, Long.class, Double.class,
         Float.class, Boolean.class, Byte.class, Short.class
     };
 
-    // writer thread continuously adds/evicts
-    val writerThread = new Thread(() -> {
-      for(var i = 0; running.get() && !errors.get(); i++)
+    // the writer continuously adds and evicts, the reader continuously calls toString
+    runWithReaders(1, writer -> {
+      for(var i = 0; i < 2000; i++)
       {
-        try {
-          cache.lookup(types[i % types.length], t -> EMPTY);
-          if (i % 10 == 0)
-            cache.clear();
-        } catch(Exception ex) {
-          errors.set(true);
-        }
+        cache.lookup(types[i % types.length], t -> EMPTY);
+        if (i % 10 == 0)
+          cache.clear();
       }
+    }, 1, reader -> {
+      val s = cache.toString();
+
+      assertTrue(s.startsWith("["));
+      assertTrue(s.endsWith("]"));
     });
-    writerThread.start();
-
-    // reader thread continuously calls toString
-    val readerThread = new Thread(() -> {
-      while(running.get() && !errors.get())
-      {
-        try {
-          val s = cache.toString();
-          assertNotNull(s);
-
-          assertTrue(s.startsWith("["));
-          assertTrue(s.endsWith("]"));
-        } catch(Exception ex) {
-          errors.set(true);
-        }
-      }
-    });
-    readerThread.start();
-
-    Thread.sleep(200);
-    running.set(false);
-
-    writerThread.join(5000);
-    readerThread.join(5000);
-
-    assertFalse(errors.get(), "toString during concurrent modifications caused an error");
   }
 
 
@@ -336,59 +206,31 @@ final class FormatterCacheConcurrencyTest
 
   @RepeatedTest(5)
   @DisplayName("High contention stress test with many threads")
-  @SuppressWarnings({"ResultOfMethodCallIgnored", "resource"})
+  @SuppressWarnings("ResultOfMethodCallIgnored")
   void highContentionStressTest() throws Exception
   {
     val cache = new FormatterCache(8);
-    val threadCount = 32;
-    val iterationsPerThread = 500;
-    val executor = Executors.newFixedThreadPool(threadCount);
-    val latch = new CountDownLatch(1);
-    val errors = new AtomicInteger(0);
-
     val types = new Class<?>[] {
         String.class, Integer.class, Long.class, Double.class,
         Float.class, Boolean.class, Byte.class, Short.class,
         List.class, Map.class, Set.class, Queue.class
     };
 
-    val futures = new ArrayList<Future<?>>();
+    runConcurrently(32, idx -> {
+      val rng = ThreadLocalRandom.current();
 
-    for(var t = 0; t < threadCount; t++)
-    {
-      futures.add(executor.submit(() -> {
-        try {
-          latch.await();
+      for(var i = 0; i < 500; i++)
+      {
+        assertNotNull(cache.lookup(types[rng.nextInt(types.length)], t -> EMPTY));
 
-          val rng = ThreadLocalRandom.current();
+        // occasionally clear
+        if (rng.nextInt(100) == 0)
+          cache.clear();
 
-          for(var i = 0; i < iterationsPerThread; i++)
-          {
-            val type = types[rng.nextInt(types.length)];
-            if (cache.lookup(type, tp -> EMPTY) == null)
-              errors.incrementAndGet();
-
-            // occasionally clear
-            if (rng.nextInt(100) == 0)
-              cache.clear();
-
-            // occasionally toString
-            if (rng.nextInt(50) == 0)
-              cache.toString();
-          }
-        } catch(Exception ex) {
-          errors.incrementAndGet();
-        }
-      }));
-    }
-
-    latch.countDown();
-
-    for(var future: futures)
-      future.get(30, SECONDS);
-
-    executor.shutdown();
-
-    assertEquals(0, errors.get(), "Stress test produced errors");
+        // occasionally toString
+        if (rng.nextInt(50) == 0)
+          cache.toString();
+      }
+    });
   }
 }

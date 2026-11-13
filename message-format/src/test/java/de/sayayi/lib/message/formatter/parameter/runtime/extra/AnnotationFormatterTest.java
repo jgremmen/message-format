@@ -30,17 +30,13 @@ import java.lang.annotation.Annotation;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CountDownLatch;
 
+import static de.sayayi.lib.message.util.ConcurrentTestSupport.runConcurrently;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static java.util.Objects.requireNonNull;
-import static java.util.concurrent.Executors.newFixedThreadPool;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -127,34 +123,16 @@ final class AnnotationFormatterTest extends AbstractFormatterTest
 
     val annotation = AnnotationFormatterTest.class
         .getDeclaredMethod("testConcurrentFormatting").getAnnotation(MyAnnotation.class);
-    val threads = 8;
-    val start = new CountDownLatch(1);
-    val tasks = new ArrayList<Callable<Void>>();
 
-    for(var t = 0; t < threads; t++)
-    {
-      tasks.add(() -> {
-        start.await();
-
-        for(var n = 0; n < 500; n++)
-        {
-          assertEquals("Concurrent 42 xy", context
-              .message("%{ann,annotation:name} %{ann,annotation:value} %{ann,annotation:chars}")
-              .with("ann", annotation)
-              .format());
-        }
-
-        return null;
-      });
-    }
-
-    try(val executor = newFixedThreadPool(threads)) {
-      val futures = tasks.stream().map(executor::submit).toList();
-      start.countDown();
-
-      for(val future: futures)
-        future.get(30, SECONDS);
-    }
+    runConcurrently(8, thread -> {
+      for(var n = 0; n < 500; n++)
+      {
+        assertEquals("Concurrent 42 xy", context
+            .message("%{ann,annotation:name} %{ann,annotation:value} %{ann,annotation:chars}")
+            .with("ann", annotation)
+            .format());
+      }
+    });
   }
 
 

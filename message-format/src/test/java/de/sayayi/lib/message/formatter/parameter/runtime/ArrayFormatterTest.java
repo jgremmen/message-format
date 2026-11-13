@@ -32,22 +32,18 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
- * Tests {@link ArrayFormatter}: formattable types, primitive and object arrays, empty and {@code null} arrays and list
- * separators.
+ * Tests {@link ArrayFormatter}: formattable types, primitive and object arrays. The list configuration shared with
+ * {@link IterableFormatter} is tested by {@link ListFormatterConfigTest}.
  *
  * @author Jeroen Gremmen
  * @since 0.1.0
@@ -190,85 +186,5 @@ final class ArrayFormatterTest extends AbstractFormatterTest
         new Object[] { "Test", true, null, -6 }, map, Map.of()));
     assertEquals(new TextPart("this, is, a, test"), format(messageAccessor,
         new Object[] { null, "this", null, "is", null, "a", null, "test" }));
-  }
-
-
-  @Test
-  @DisplayName("Empty or null array")
-  void testEmptyOrNullArray()
-  {
-    val messageSupport = MessageSupportFactory.create(
-        createFormatterService(new ArrayFormatter()));
-    val message = messageSupport.message("%{array,null:null,empty:empty}").getMessage();
-
-    assertEquals("null",
-        messageSupport.message(message).with("array", null).format());
-    assertEquals("empty",
-        messageSupport.message(message).with("array", new int[0]).format());
-  }
-
-
-  @Test
-  @DisplayName("Separator spaces")
-  void testSeparator()
-  {
-    val messageSupport = MessageSupportFactory
-        .create(createFormatterService(new ArrayFormatter()));
-
-    assertEquals("1, 2, 3, 4 and 5", messageSupport
-        .message("%{c,list-sep:', ',list-sep-last:' and '}")
-        .with("c", new int[] { 1, 2, 3, 4, 5})
-        .format());
-
-    assertEquals("1.2.3.4.5", messageSupport
-        .message("%{c,list-sep:'.'}")
-        .with("c", new long[] { 1, 2, 3, 4, 5 })
-        .format());
-  }
-
-
-  private static Stream<Arguments> crossTableParameters()
-  {
-    return Stream.of(
-        Arguments.of("Empty array with max size 0", new String[0], null, 0, null, ""),
-        Arguments.of("Array with last separator", new String[] { " A ", "B", "C" }, " and ", null, null, "A, B and C"),
-        Arguments.of("Array with max size 2 and more value", new String[] { "A", "B", "C" }, null, 2, "...", "A, B, ..."),
-        Arguments.of("Array with max size 2, more value and 3 overflow elements", new String[] { "A", "B", "C", "D", "E" }, null, 2, "...", "A, B, ..."),
-        Arguments.of("Array with max size 1, more value and last separator", new String[] { "A", "B", "C", "D" }, " and ", 1, "...", "A, ..."),
-        Arguments.of("Array with max size equal to length and more value", new String[] { "A", "B", "C" }, null, 3, "...", "A, B, C"),
-        Arguments.of("Array with max size 2 and last separator", new String[] { "A", "B", "C" }, " and ", 2, null, "A and B"),
-        Arguments.of("Array with max size 1 and last separator", new String[] { "A", "B", "C" }, " and ", 1, null, "A"),
-        Arguments.of("Non-empty array with max size 0 and last separator", new String[] { "A", "B", "C" }, null, 0, null, ""),
-        Arguments.of("Non-empty array with max size 0 and more value", new String[] { "A", "B", "C" }, null, 0, "...", "..."),
-        Arguments.of("Array without last separator and more value", new String[] { "A", "B", "C" }, null, null, null, "A, B, C"),
-        Arguments.of("Array with max size 2", new String[] { "A", "B", "C" }, null, 2, null, "A, B"),
-        Arguments.of("Array with max size 1", new String[] { "A", "B", "C" }, null, 1, null, "A"),
-        Arguments.of("Non-empty array with max size 0", new String[] { "A", "B", "C" }, null, 0, null, ""),
-        Arguments.of("Array with empty element and max size 2", new String[] { "A", "", "C", "D" }, null, 2, null, "A, C")
-    );
-  }
-
-
-  @DisplayName("Max size, last separator and more value")
-  @ParameterizedTest(name = "{0}")
-  @MethodSource("crossTableParameters")
-  void crossTable(@NotNull String name, Object array, String listSepLast, Integer listMaxSize, String listValueMore,
-                  @NotNull String result)
-  {
-    val messageFormat = new StringBuilder("%{array");
-    if (listSepLast != null)
-      messageFormat.append(",list-sep-last:\"").append(listSepLast).append('"');
-    if (listMaxSize != null)
-      messageFormat.append(",list-max-size:").append(listMaxSize);
-    if (listValueMore != null)
-      messageFormat.append(",list-value-more:\"").append(listValueMore).append('"');
-    messageFormat.append("}");
-
-    val message = MessageSupportFactory
-        .create(createFormatterService(new ArrayFormatter()))
-        .message(messageFormat.toString())
-        .with("array", array);
-
-    assertEquals(result, message.format());
   }
 }
