@@ -27,7 +27,7 @@ import org.apache.logging.log4j.status.StatusListener;
 import org.apache.logging.log4j.status.StatusLogger;
 import org.junit.jupiter.api.*;
 
-import java.io.StringWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -292,5 +292,30 @@ class Log4jMessageFactoryTest
 
     assertEquals("Hello %{p1}", message.getFormat());
     assertEquals("Hello Alice", message.getFormattedMessage());
+  }
+
+
+  @Test
+  @DisplayName("Serialized message contains the formatted message and throwable")
+  @SuppressWarnings("deprecation")
+  void testSerialization() throws Exception
+  {
+    final var message = LOG4J_MESSAGE_FACTORY.newMessage("Hello %{p1}", "Alice", new RuntimeException("test error"));
+    final var bytes = new ByteArrayOutputStream();
+
+    try(var out = new ObjectOutputStream(bytes)) {
+      out.writeObject(message);
+    }
+
+    final org.apache.logging.log4j.message.Message deserialized;
+
+    try(var in = new ObjectInputStream(new ByteArrayInputStream(bytes.toByteArray()))) {
+      deserialized = (org.apache.logging.log4j.message.Message)in.readObject();
+    }
+
+    assertEquals("Hello %{p1}", deserialized.getFormat());
+    assertEquals("Hello Alice", deserialized.getFormattedMessage());
+    assertNull(deserialized.getParameters());
+    assertEquals("test error", deserialized.getThrowable().getMessage());
   }
 }

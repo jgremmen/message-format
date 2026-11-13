@@ -18,12 +18,18 @@ package de.sayayi.lib.message.log4j;
 import org.apache.logging.log4j.message.Message;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.InvalidObjectException;
+import java.io.ObjectInputStream;
+import java.io.Serial;
 import java.util.function.Supplier;
 
 
 /**
  * Log4j {@link Message} implementation that delegates message formatting to a supplier. This allows for lazy evaluation
  * of the formatted message string, deferring the formatting work until the message is actually needed.
+ * <p>
+ * As the message supplier is not serializable, a serialized message is replaced by a {@link SerializedMessage}
+ * containing the formatted message.
  *
  * @author Jeroen Gremmen
  * @since 0.21.0
@@ -38,7 +44,7 @@ final class Log4jMessage implements Message
   private final String format;
 
   /** Supplier providing the formatted message. */
-  private final Supplier<String> messageSupplier;
+  private final transient Supplier<String> messageSupplier;
 
   /** Throwable associated with this log message, or {@code null}. */
   private final Throwable throwable;
@@ -102,5 +108,81 @@ final class Log4jMessage implements Message
   @Override
   public Throwable getThrowable() {
     return throwable;
+  }
+
+
+  /**
+   * Replaces this message with a {@link SerializedMessage} containing the formatted message, the format string and the
+   * throwable.
+   *
+   * @return  serializable replacement for this message, never {@code null}
+   *
+   * @since 0.25.0
+   */
+  @Serial
+  private Object writeReplace() {
+    return new SerializedMessage(format, getFormattedMessage(), throwable);
+  }
+
+
+  /**
+   * Prevents deserialization of a {@code Log4jMessage}, as it is always serialized as a {@link SerializedMessage}.
+   *
+   * @param stream  object input stream
+   *
+   * @throws InvalidObjectException  always
+   *
+   * @since 0.25.0
+   */
+  @Serial
+  private void readObject(ObjectInputStream stream) throws InvalidObjectException {
+    throw new InvalidObjectException("SerializedMessage required");
+  }
+
+
+
+
+  /**
+   * Serialized form of a {@link Log4jMessage}, containing the already formatted message.
+   *
+   * @param format            message format string
+   * @param formattedMessage  formatted message
+   * @param throwable         throwable associated with the log message, or {@code null}
+   *
+   * @since 0.25.0
+   */
+  record SerializedMessage(String format, String formattedMessage, Throwable throwable) implements Message
+  {
+    /** {@inheritDoc} */
+    @Override
+    public String getFormattedMessage() {
+      return formattedMessage;
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    @SuppressWarnings("deprecation")
+    public String getFormat() {
+      return format;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Always returns {@code null} as the message has already been formatted.
+     */
+    @Override
+    public Object[] getParameters() {
+      return null;
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public Throwable getThrowable() {
+      return throwable;
+    }
   }
 }
