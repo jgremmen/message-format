@@ -21,10 +21,7 @@ import MessageParser from './generated/MessageParser.js';
 
 const L = MessageLexer;
 
-const DELIMITERS = new Set([
-  L.P_START, L.P_END, L.TPL_START, L.TPL_END, L.PF_START, L.PF_END
-]);
-
+const DELIMITERS = new Set([ L.P_START, L.P_END, L.TPL_START, L.TPL_END, L.PF_START, L.PF_END ]);
 const PUNCTUATION = new Set([ L.COMMA, L.COLON, L.L_PAREN, L.R_PAREN ]);
 const OPERATORS = new Set([ L.EQ, L.NE, L.LT, L.LTE, L.GT, L.GTE, L.ARROW ]);
 const LITERALS = new Set([ L.BOOL, L.NULL, L.EMPTY ]);
@@ -32,10 +29,10 @@ const QUOTES = new Set([ L.SQ_START, L.SQ_END, L.DQ_START, L.DQ_END ]);
 
 
 /**
- * Returns `true` if the given `CH` token represents an escape sequence.
+ * Returns `true` if the given `CH` token represents an escape sequence. A lone backslash is a regular character.
  */
 export function isEscape(token) {
-  return token.type === L.CH && token.text.startsWith('\\');
+  return token.type === L.CH && token.text.length > 1 && token.text.startsWith('\\');
 }
 
 
@@ -73,7 +70,6 @@ export function tokenTypeScope(token)
 
 
 const P = MessageParser;
-
 const PARTS = new Set([ P.RULE_parameterPart, P.RULE_templatePart, P.RULE_postFormatPart ]);
 
 // scopes for names, by the rule enclosing the `nameOrKeyword` or the terminal itself

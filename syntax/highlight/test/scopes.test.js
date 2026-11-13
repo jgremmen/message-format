@@ -31,6 +31,10 @@ describe('text', () => {
 
       assert.equal(html, span('hljs-string', `a${span('hljs-char escape_', text)}b`));
     });
+
+  for(const text of [ 'a\\nb', 'a\\' ])
+    it(`lone backslash in ${text} is a regular character`, () =>
+      assert.equal(highlight(text), span('hljs-string', text)));
 });
 
 
