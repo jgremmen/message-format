@@ -83,6 +83,17 @@ import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 public final class ToTemporalDelegate implements ParameterFormatter
 {
   /**
+   * Tells whether the optional {@code java.sql} module is available and readable. The {@code java.sql.Date} and
+   * {@code java.sql.Time} classes are only loaded if it is, as they cannot occur as values otherwise.
+   */
+  private static final boolean JAVA_SQL_AVAILABLE = ModuleLayer
+      .boot()
+      .findModule("java.sql")
+      .filter(ToTemporalDelegate.class.getModule()::canRead)
+      .isPresent();
+
+
+  /**
    * {@inheritDoc}
    * <p>
    * Adds the {@link ClassifierContext#CLASSIFIER_TEMPORAL temporal} classifier.
@@ -116,13 +127,16 @@ public final class ToTemporalDelegate implements ParameterFormatter
       return msg != null ? context.format(msg) : nullText();
     }
 
-    // java.sql.Time has no instant
-    if (value instanceof java.sql.Time)
-      return context.format(((java.sql.Time)value).toLocalTime(), LocalTime.class);
+    if (JAVA_SQL_AVAILABLE)
+    {
+      // java.sql.Time has no instant
+      if (value instanceof java.sql.Time sqlTime)
+        return context.format(sqlTime.toLocalTime(), LocalTime.class);
 
-    // java.sql.Date has no instant
-    if (value instanceof java.sql.Date)
-      return context.format(((java.sql.Date)value).toLocalDate(), LocalDate.class);
+      // java.sql.Date has no instant
+      if (value instanceof java.sql.Date sqlDate)
+        return context.format(sqlDate.toLocalDate(), LocalDate.class);
+    }
 
     if (value instanceof InstantSource)
       value = ((InstantSource)value).instant();

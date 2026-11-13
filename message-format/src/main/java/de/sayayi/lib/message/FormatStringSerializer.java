@@ -62,23 +62,26 @@ public interface FormatStringSerializer
 
 
   /**
-   * Immutable serialization context used during format string serialization. It provides a {@link CharsetEncoder} 
-   * for checking character encodability, a {@link TextJoiner} for accumulating serialized text fragments and an
-   * optional string quote character that indicates the current quoting context for proper escaping of nested strings.
+   * Serialization context used during format string serialization. It provides a {@link CharsetEncoder} for checking
+   * character encodability, a {@link TextJoiner} for accumulating serialized text fragments and an optional string
+   * quote character that indicates the current quoting context for proper escaping of nested strings.
+   * <p>
+   * The context is only shallowly immutable: the encoder is stateful and the text joiner accumulates the serialized
+   * text. A context is therefore intended for a single serialization and is not thread-safe.
    *
-   * @param encoder            charset encoder used to determine whether a character can be
-   *                           represented in the target charset, not {@code null}
+   * @param encoder            charset encoder used to determine whether a character can be represented in the target
+   *                           charset, not {@code null}
    * @param textJoiner         text joiner used to accumulate serialized text fragments, not {@code null}
-   * @param inStringWithQuote  the active string quote character ({@code '} or {@code "}), or
-   *                           {@code null} if not currently inside a quoted string
+   * @param inStringWithQuote  the active string quote character ({@code '} or {@code "}), or {@code null} if not
+   *                           currently inside a quoted string
    *
    * @since 0.21.0
    */
   record Context(@NotNull CharsetEncoder encoder, @NotNull TextJoiner textJoiner, Character inStringWithQuote)
   {
     /**
-     * Validates that {@code inStringWithQuote}, if not {@code null}, is either a single quote
-     * ({@code '}) or a double quote ({@code "}).
+     * Validates that {@code inStringWithQuote}, if not {@code null}, is either a single quote ({@code '}) or a double
+     * quote ({@code "}).
      *
      * @throws IllegalArgumentException  if {@code inStringWithQuote} is not {@code '}, {@code "} or {@code null}
      */
@@ -100,9 +103,9 @@ public interface FormatStringSerializer
 
 
     /**
-     * Returns a new context that shares the same encoder and text joiner but with the specified string quote 
-     * character set as the active quote. This is used when serializing content inside a quoted string so that 
-     * occurrences of the quote character are properly escaped.
+     * Returns a new context that shares the same encoder and text joiner but with the specified string quote character
+     * set as the active quote. This is used when serializing content inside a quoted string so that occurrences of the
+     * quote character are properly escaped.
      *
      * @param stringQuote  the string quote character ({@code '} or {@code "})
      *
@@ -117,8 +120,8 @@ public interface FormatStringSerializer
 
 
     /**
-     * Returns a new context that shares the same encoder and text joiner but with no active string quote. This is
-     * used when serializing content that is not inside a quoted string.
+     * Returns a new context that shares the same encoder and text joiner but with no active string quote. This is used
+     * when serializing content that is not inside a quoted string.
      *
      * @return  new context without a string quote, never {@code null}
      */
@@ -129,8 +132,8 @@ public interface FormatStringSerializer
 
 
     /**
-     * Tells whether the given character can be encoded using the context's charset encoder. Characters that cannot
-     * be encoded are serialized as Unicode escape sequences (e.g. <code>&#92;u00e9</code>).
+     * Tells whether the given character can be encoded using the context's charset encoder. Characters that cannot be
+     * encoded are serialized as Unicode escape sequences (e.g. <code>&#92;u00e9</code>).
      *
      * @param ch  the character to check
      *

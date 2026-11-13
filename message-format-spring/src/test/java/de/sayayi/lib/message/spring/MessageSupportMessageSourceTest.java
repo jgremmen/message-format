@@ -18,6 +18,8 @@ package de.sayayi.lib.message.spring;
 import de.sayayi.lib.message.MessageSupportFactory;
 import lombok.val;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -30,8 +32,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 /**
- * Tests {@link MessageSupportMessageSource}: message lookup with and without a default message and resolution of
- * {@code MessageSourceResolvable} instances, including their arguments.
+ * Tests {@link MessageSupportMessageSource}: message lookup with and without a default message, resolution of
+ * {@code MessageSourceResolvable} instances, including their arguments, and validation of the parameter prefix.
  *
  * @author Jeroen Gremmen
  * @since 0.10.0
@@ -119,5 +121,42 @@ final class MessageSupportMessageSourceTest
 
     assertThrows(NoSuchMessageException.class, () -> messageSource.getMessage("spring.message.2",
         new Object[] { new DefaultMessageSourceResolvable("spring.no-field") }, ENGLISH));
+  }
+
+
+  @ParameterizedTest(name = "[{index}] {0}")
+  @DisplayName("Parameter prefixes forming valid parameter names are accepted")
+  @ValueSource(strings = { "p", "arg", "myArg", "my-arg-", "ä-" })
+  void testValidParameterPrefix(String parameterPrefix)
+  {
+    val messageSupport = MessageSupportFactory.createDefault();
+    messageSupport.addMessage("msg", "hello %{" + parameterPrefix + "1}");
+
+    assertEquals("hello jack", new MessageSupportMessageSource(parameterPrefix, messageSupport)
+        .getMessage("msg", new Object[] { "jack" }, ENGLISH));
+  }
+
+
+  @ParameterizedTest(name = "[{index}] '{0}'")
+  @DisplayName("Parameter prefixes not forming valid parameter names are rejected")
+  @ValueSource(strings = { "", " ", "1x", "P", "Arg", "p_", "my_arg", "my--arg-" })
+  void testInvalidParameterPrefix(String parameterPrefix)
+  {
+    val messageSupport = MessageSupportFactory.createDefault();
+
+    val ex = assertThrows(IllegalArgumentException.class,
+        () -> new MessageSupportMessageSource(parameterPrefix, messageSupport));
+    assertEquals("parameterPrefix '" + parameterPrefix + "' must form kebab-case or lower camel-case parameter names",
+        ex.getMessage());
+  }
+
+
+  @Test
+  @DisplayName("Message support must not be null")
+  @SuppressWarnings("DataFlowIssue")
+  void testNullMessageSupport()
+  {
+    assertEquals("messageSupport must not be null", assertThrows(NullPointerException.class,
+        () -> new MessageSupportMessageSource("p", null)).getMessage());
   }
 }

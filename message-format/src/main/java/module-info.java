@@ -103,8 +103,7 @@ module de.sayayi.lib.message
   requires transitive de.sayayi.lib.pack;
   requires transitive org.antlr.antlr4.runtime;
 
-  requires java.sql;
-
+  requires static java.sql;
   requires static java.xml;
   requires static lombok;
   requires static org.jetbrains.annotations;

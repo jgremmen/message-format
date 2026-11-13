@@ -187,8 +187,7 @@ tasks.named('javadoc', Javadoc) {
         'de.sayayi.lib.message.util'
     ])
     group('Adopters', [
-        'de.sayayi.lib.message.adopter',
-        'de.sayayi.lib.message.annotation',
+        'de.sayayi.lib.message.adopter'
     ])
     group('Formatters', [
         'de.sayayi.lib.message.formatter*'

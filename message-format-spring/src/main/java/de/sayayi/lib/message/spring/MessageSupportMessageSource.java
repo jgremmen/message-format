@@ -28,7 +28,8 @@ import org.springframework.context.NoSuchMessageException;
 
 import java.util.Locale;
 
-import static java.lang.Character.isLetter;
+import static de.sayayi.lib.message.util.MessageUtil.isKebabOrLowerCamelCaseName;
+import static java.util.Objects.requireNonNull;
 import static org.springframework.util.ObjectUtils.isEmpty;
 
 
@@ -45,7 +46,7 @@ import static org.springframework.util.ObjectUtils.isEmpty;
  * index. For example, with the default prefix the arguments are available as {@code p1}, {@code p2}, {@code p3}, etc.
  *
  * @author Jeroen Gremmen
- * @since 0.10.0  (refactored in 0.12.0)
+ * @since 0.10.0
  */
 public class MessageSupportMessageSource implements HierarchicalMessageSource
 {
@@ -75,10 +76,11 @@ public class MessageSupportMessageSource implements HierarchicalMessageSource
    * parent message source.
    *
    * @param parameterPrefix  prefix for positional parameter names (e.g. {@code "p"} results in {@code p1},
-   *                         {@code p2}, …), must start with a letter, not {@code null}
+   *                         {@code p2}, …), must form kebab-case or lower camel-case parameter names, not {@code null}
    * @param messageSupport   message support instance, not {@code null}
    *
-   * @throws IllegalArgumentException  if {@code parameterPrefix} is blank or does not start with a letter
+   * @throws IllegalArgumentException  if {@code parameterPrefix} does not form kebab-case or lower camel-case parameter
+   *                                   names (e.g. {@code "P"} or {@code "my_arg"})
    */
   public MessageSupportMessageSource(@NotNull String parameterPrefix, @NotNull MessageSupport messageSupport) {
     this(parameterPrefix, messageSupport, null);
@@ -102,21 +104,25 @@ public class MessageSupportMessageSource implements HierarchicalMessageSource
    * optional parent message source.
    *
    * @param parameterPrefix      prefix for positional parameter names (e.g. {@code "p"} results in {@code p1},
-   *                             {@code p2}, …), must start with a letter, not {@code null}
+   *                             {@code p2}, …), must form kebab-case or lower camel-case parameter names, not
+   *                             {@code null}
    * @param messageSupport       message support instance, not {@code null}
    * @param parentMessageSource  parent message source used as fallback, or {@code null}
    *
-   * @throws IllegalArgumentException  if {@code parameterPrefix} is blank or does not start with a letter
+   * @throws IllegalArgumentException  if {@code parameterPrefix} does not form kebab-case or lower camel-case parameter
+   *                                   names (e.g. {@code "P"} or {@code "my_arg"})
    */
-  protected MessageSupportMessageSource(@NotNull String parameterPrefix,
-                                        @NotNull MessageSupport messageSupport,
+  protected MessageSupportMessageSource(@NotNull String parameterPrefix, @NotNull MessageSupport messageSupport,
                                         MessageSource parentMessageSource)
   {
-    if (parameterPrefix.isBlank() || !isLetter(parameterPrefix.charAt(0)))
-      throw new IllegalArgumentException("parameterPrefix must start with a letter");
+    if (!isKebabOrLowerCamelCaseName(parameterPrefix + '1'))
+    {
+      throw new IllegalArgumentException("parameterPrefix '" + parameterPrefix +
+          "' must form kebab-case or lower camel-case parameter names");
+    }
 
     this.parameterPrefix = parameterPrefix;
-    this.messageSupport = messageSupport;
+    this.messageSupport = requireNonNull(messageSupport, "messageSupport must not be null");
     this.parentMessageSource = parentMessageSource;
   }
 

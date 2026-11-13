@@ -96,10 +96,9 @@ messageSource.getMessage("greeting", new Object[] { "World" }, Locale.US);
 ### Custom Parameter Prefix
 
 If `p1`, `p2`, etc. are not descriptive enough or conflict with existing parameter names in the templates, a custom 
-prefix can be specified. The prefix must start with a letter and must not be blank. In addition, the generated names
-must be valid parameter names (see [Syntax](../../message/syntax.md#parameters)). A prefix such as `Arg` or `my_arg`
-is accepted by the constructor, but formatting a message with arguments then throws an `IllegalArgumentException`,
-because `Arg1` and `my_arg1` are not valid parameter names.
+prefix can be specified. The generated names must be valid kebab-case or lower camel-case parameter names (see
+[Syntax](../../message/syntax.md#parameters)), so prefixes like `arg`, `myArg` or `my-arg-` can be used, but not `Arg`
+or `my_arg`.
 
 ```java
 MessageSupportMessageSource messageSource =
@@ -117,13 +116,13 @@ messageSource.getMessage("welcome", new Object[] { "Alice" }, Locale.US);
 // "Welcome back, Alice!"
 ```
 
-Attempting to create a message source with a prefix that is blank or does not start with a letter throws an
+Attempting to create a message source with a prefix that does not form valid parameter names throws an
 `IllegalArgumentException` immediately.
 
 ```java
-// throws IllegalArgumentException: parameterPrefix must start with 
-// a letter
-new MessageSupportMessageSource("1x", messageSupport);
+// throws IllegalArgumentException: parameterPrefix 'Arg' must form
+// kebab-case or lower camel-case parameter names
+new MessageSupportMessageSource("Arg", messageSupport);
 ```
 
 
