@@ -178,6 +178,28 @@ final class GeoFormatterTest extends AbstractFormatterTest
 
 
   @Test
+  @DisplayName("Formats coordinates using the default format dms")
+  void testDefaultFormat()
+  {
+    val messageSupport = MessageSupportFactory
+        .create(createFormatterService(new GeoFormatter()))
+        .setLocale(ENGLISH);
+
+    for(var n = 0; n < 2; n++)
+    {
+      assertEquals("51\u00b034'9\"", messageSupport
+          .message("%{lat,format:geo}")
+          .with("lat", dms(51, 34, 9, 0))
+          .format());
+      assertEquals(messageSupport.message("%{lat,geo:dms}").with("lat", dms(4, 48, 30, 0)).format(), messageSupport
+          .message("%{lat,format:geo}")
+          .with("lat", dms(4, 48, 30, 0))
+          .format());
+    }
+  }
+
+
+  @Test
   @DisplayName("Formats non-finite values as empty text")
   void testNonFiniteValues()
   {

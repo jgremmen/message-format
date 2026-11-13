@@ -124,6 +124,19 @@ final class TokenFormatterTest extends AbstractFormatterTest
 
 
   @Test
+  @DisplayName("Format token position without column (line)")
+  void testFormatPositionNoColumn()
+  {
+    final var mockToken = mock(Token.class);
+
+    when(mockToken.getLine()).thenReturn(5);
+    when(mockToken.getCharPositionInLine()).thenReturn(-1);
+
+    assertEquals("5", messageSupport.message("%{t,token:'position'}").with("t", mockToken).format());
+  }
+
+
+  @Test
   @DisplayName("Format token with invalid token config returns null text")
   void testFormatInvalidConfig() {
     assertEquals("", messageSupport.message("%{t,token:'invalid'}").with("t", token).format());

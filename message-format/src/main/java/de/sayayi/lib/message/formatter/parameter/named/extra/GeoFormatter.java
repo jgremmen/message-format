@@ -286,7 +286,10 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
    */
   private @NotNull Format getFormat(@NotNull ParameterFormatterContext context)
   {
-    final var formatString = context.getConfigValueString("geo").orElse("dms");
+    final var formatString = context.getConfigValueString("geo").orElse(null);
+    if (formatString == null)
+      return DEFAULT_FORMAT;
+
     final var format = FORMAT.get(formatString);
 
     return format == null ? parseFormatString(formatString) : format;
@@ -407,6 +410,9 @@ public final class GeoFormatter extends AbstractParameterFormatter<Number> imple
    */
   private static final Pattern PATTERN_FORMAT =
       Pattern.compile("d( )?(?:(0)?(m|M|MM|MMM))?( )?(?:(0)?(s|S|SS|SSS))?( )?(LO|LA)?");
+
+  /** Format used if no {@code geo} configuration value is provided: {@code dms}. */
+  private static final Format DEFAULT_FORMAT = parseFormatString("dms");
 
   /**
    * Parses a custom coordinate format pattern.

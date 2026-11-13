@@ -15,6 +15,7 @@
  */
 package de.sayayi.lib.message.formatter.parameter.runtime.extra;
 
+import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageBuilder;
 import de.sayayi.lib.message.formatter.FormattableType;
@@ -133,6 +134,17 @@ import static de.sayayi.lib.message.part.TextPartFactory.*;
 public final class TokenFormatter extends AbstractSingleTypeParameterFormatter<Token>
 {
   /**
+   * Default message used for formatting the token position: {@code %{line}%{column,!empty:':%{column}'}}.
+   */
+  private static final Message.WithSpaces DEFAULT_POSITION_MESSAGE = MessageBuilder
+      .create()
+      .parameter("line")
+      .parameter("column")
+          .mapEmpty().ne().message(mb -> mb.text(":").parameter("column"))
+      .build();
+
+
+  /**
    * {@inheritDoc}
    * <p>
    * The output is selected by the {@code token} configuration value.
@@ -161,12 +173,7 @@ public final class TokenFormatter extends AbstractSingleTypeParameterFormatter<T
 
         yield context
             .getConfigValueMessage("token-position-format")
-            .orElseGet(() -> MessageBuilder
-                .create(context)
-                .parameter("line")
-                .parameter("column")
-                    .mapEmpty().ne().message(mb -> mb.text(":").parameter("column"))
-                .build())
+            .orElse(DEFAULT_POSITION_MESSAGE)
             .formatAsText(context.getMessageAccessor(), new PositionParameters(context, token));
       }
 

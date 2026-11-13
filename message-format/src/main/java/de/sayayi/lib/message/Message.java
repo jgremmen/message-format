@@ -212,12 +212,32 @@ public sealed interface Message extends FormatStringSerializer
   /**
    * Serializes this message into its message format string representation using the given charset for encoding checks.
    * <p>
-   * Characters that cannot be encoded by the specified charset are serialized as Unicode escape sequences. The 
-   * resulting string is equivalent to the original format string from which this message was parsed.
+   * The resulting format string is normalized and parses back into an equivalent message, but it is not necessarily
+   * identical to the format string from which this message was parsed. For example:
+   * <ul>
+   *   <li>
+   *     whitespace and string quotes are normalized and quotes are omitted where they are not required
+   *   </li>
+   *   <li>
+   *     grouped map keys, like {@code (1,7):'weekend'}, are expanded into separate map entries
+   *   </li>
+   *   <li>
+   *     compare types and numbers are normalized, e.g. {@code !} becomes {@code <>} and {@code 007} becomes {@code 7}
+   *   </li>
+   *   <li>
+   *     characters that cannot be encoded by the specified charset are serialized as Unicode escape sequences
+   *   </li>
+   * </ul>
+   * <p>
+   * The format string never starts or ends with a space. A message with a leading or trailing space therefore parses
+   * back into a message without them.
    *
    * @param charset  charset used to determine character encodability, not {@code null}
    *
    * @return  the message format string representation of this message, never {@code null}
+   *
+   * @throws UnsupportedOperationException  if this message is {@link LocaleAware locale-aware}, as it has no single
+   *                                        format string representation
    *
    * @see FormatStringSerializer#serialize(FormatStringSerializer.Context)
    *
