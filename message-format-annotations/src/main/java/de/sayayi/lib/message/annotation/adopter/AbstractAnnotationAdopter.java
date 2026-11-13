@@ -48,7 +48,6 @@ import java.util.zip.ZipFile;
 import static java.nio.file.Files.newInputStream;
 import static java.nio.file.Files.readAllBytes;
 import static java.util.Locale.ROOT;
-import static java.util.Objects.requireNonNull;
 
 
 /**
@@ -135,9 +134,10 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
    *
    * @return  this annotation adopter instance, never {@code null}
    *
-   * @throws MessageAdopterException  if the classpath scan fails or if a package is located in a classpath resource
-   *                                  which cannot be scanned (only {@code file} directories and jar, war and zip
-   *                                  archives are supported)
+   * @throws MessageAdopterException  if the classpath scan fails, if a package is located in a classpath resource which
+   *                                  cannot be scanned (only {@code file} directories and jar, war and zip archives are
+   *                                  supported) or if the messages and templates of a class cannot be adopted (e.g. a
+   *                                  {@link DuplicateMessageException} as cause)
    * @throws MessageParserException   if a message or template text cannot be parsed
    */
   @Contract(value = "_, _ -> this")
@@ -230,7 +230,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
           if (classNamePath.endsWith(".class") && scan_checkVisited(classNamePath))
           {
             try(var classInputStream = newInputStream(file.toPath())) {
-              parseClass(classInputStream);
+              adopt_parseClass(classInputStream, "class file " + file);
             }
           }
         }
@@ -271,7 +271,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
         zipFile = adopt_scan_createZipFileFromUrl(separatorIndex != -1
             ? urlFile.substring(0, separatorIndex) : urlFile);
       } catch(ZipException ex) {
-        return;
+        throw new MessageAdopterException("failed to open class path archive '" + urlFile + "'", ex);
       }
     }
 
@@ -286,7 +286,7 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
             scan_checkVisited(classPathName))
         {
           try(var classInputStream = zipFile.getInputStream(zipEntry)) {
-            parseClass(classInputStream);
+            adopt_parseClass(classInputStream, "class file " + classPathName + " in " + zipFile.getName());
           }
         }
       }
@@ -346,7 +346,8 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
    *
    * @return  this annotation adopter instance, never {@code null}
    *
-   * @throws MessageAdopterException  if the class file cannot be read or is not a valid class file
+   * @throws MessageAdopterException  if the class file cannot be read, is not a valid class file or if its messages and
+   *                                  templates cannot be adopted (e.g. a {@link DuplicateMessageException} as cause)
    * @throws MessageParserException   if a message or template text cannot be parsed
    *
    * @since 0.12.0
@@ -377,7 +378,8 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
    *
    * @return  this annotation adopter instance, never {@code null}
    *
-   * @throws MessageAdopterException  if {@code classFileContent} is not a valid class file
+   * @throws MessageAdopterException  if {@code classFileContent} is not a valid class file or if its messages and
+   *                                  templates cannot be adopted (e.g. a {@link DuplicateMessageException} as cause)
    * @throws MessageParserException   if a message or template text cannot be parsed
    *
    * @since 0.25.0
@@ -395,12 +397,8 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
 
     if (!indexedClasses.contains(className))
     {
-      try {
-        parseClass(new ByteArrayInputStream(classFileContent));
-        indexedClasses.add(className);
-      } catch(IOException ex) {
-        throw new MessageAdopterException("failed to adopt messages and templates from class " + className, ex);
-      }
+      adopt_parseClass(new ByteArrayInputStream(classFileContent), "class " + className);
+      indexedClasses.add(className);
     }
 
     return this;
@@ -415,7 +413,8 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
    *
    * @return  this annotation adopter instance, never {@code null}
    *
-   * @throws MessageAdopterException  if the class file cannot be read
+   * @throws MessageAdopterException  if the class file cannot be found or read or if its messages and templates cannot
+   *                                  be adopted (e.g. a {@link DuplicateMessageException} as cause)
    * @throws MessageParserException   if a message or template text cannot be parsed
    */
   @Contract(value = "_ -> this")
@@ -435,7 +434,8 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
    *
    * @return  this annotation adopter instance, never {@code null}
    *
-   * @throws MessageAdopterException  if the class file cannot be read
+   * @throws MessageAdopterException  if the class file cannot be found or read or if its messages and templates cannot
+   *                                  be adopted (e.g. a {@link DuplicateMessageException} as cause)
    * @throws MessageParserException   if a message or template text cannot be parsed
    */
   @Contract(value = "_ -> this")
@@ -451,7 +451,10 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
         final var classResourceName = typeName.replace('.', '/') + ".class";
 
         try(var inputStream = classLoader.getResourceAsStream(classResourceName)) {
-          parseClass(requireNonNull(inputStream));
+          if (inputStream == null)
+            throw new MessageAdopterException("class file " + classResourceName + " not found for type " + typeName);
+
+          adopt_parseClass(inputStream, "type " + typeName);
           indexedClasses.add(typeName);
         } catch(IOException ex) {
           throw new MessageAdopterException("failed to adopt messages and templates from type " + typeName, ex);
@@ -591,6 +594,30 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
     } catch(IllformedLocaleException ex) {
       throw new MessageAdopterException("invalid locale '" + locale + "' for " + kind + " '" + name +
           "'; a language code (e.g. 'de') or an IETF BCP 47 language tag (e.g. 'de-DE') is required", ex);
+    }
+  }
+
+
+  /**
+   * Parses the class file provided by {@code classInputStream} using {@link #parseClass(InputStream)}. Exceptions
+   * raised while parsing, such as I/O errors, invalid class files or duplicate messages and templates, are wrapped in a
+   * {@link MessageAdopterException} naming the class file. A {@link MessageParserException} is not wrapped, as it
+   * already names the message or template which cannot be parsed.
+   *
+   * @param classInputStream  input stream of a class file, not {@code null}
+   * @param classFile         description of the class file used in exception messages, not {@code null}
+   *
+   * @throws MessageAdopterException  if the class file cannot be read or its messages and templates cannot be adopted
+   * @throws MessageParserException   if a message or template text cannot be parsed
+   */
+  private void adopt_parseClass(@NotNull InputStream classInputStream, @NotNull String classFile)
+  {
+    try {
+      parseClass(classInputStream);
+    } catch(MessageParserException ex) {
+      throw ex;
+    } catch(IOException | RuntimeException ex) {
+      throw new MessageAdopterException("failed to adopt messages and templates from " + classFile, ex);
     }
   }
 

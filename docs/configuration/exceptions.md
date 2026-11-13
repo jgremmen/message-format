@@ -174,9 +174,11 @@ messageSupport.setTemplateFilter((name, template) -> true);
 
 A `MessageAdopterException` signals that an error occurred while an adopter was reading messages or templates from an
 external source. The annotation adopter throws it when scanning the class path fails, when a class path URL is invalid
-or uses an unsupported protocol and when a class file cannot be read. The resource bundle adopter throws it when a
-resource bundle for an explicitly requested locale does not exist. The underlying I/O or resolution error is available
-through `getCause()`. A format string that cannot be parsed is not wrapped. It propagates as a `MessageParserException`.
+or uses an unsupported protocol, when a class path archive is corrupt and when a class file cannot be found or read.
+Other errors raised while the messages and templates of a class are adopted, such as a `DuplicateMessageException`, are
+wrapped in a `MessageAdopterException` naming the class. The resource bundle adopter throws it when a resource bundle for
+an explicitly requested locale does not exist. The underlying error is available through `getCause()`. A format string
+that cannot be parsed is not wrapped. It propagates as a `MessageParserException`.
 Importing a pack file reports errors as an `IOException`, not as a `MessageAdopterException`.
 
 /// note | Migration from 0.24

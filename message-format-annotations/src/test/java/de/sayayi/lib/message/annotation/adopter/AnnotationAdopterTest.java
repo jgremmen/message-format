@@ -27,6 +27,7 @@ import de.sayayi.lib.message.annotation.adopter.invalid.InvalidTemplateFixture;
 import de.sayayi.lib.message.annotation.adopter.util.SyntheticMessageDef;
 import de.sayayi.lib.message.annotation.adopter.util.SyntheticTemplateDef;
 import de.sayayi.lib.message.annotation.adopter.util.SyntheticText;
+import de.sayayi.lib.message.exception.DuplicateMessageException;
 import de.sayayi.lib.message.exception.MessageAdopterException;
 import de.sayayi.lib.message.exception.MessageParserException;
 import de.sayayi.lib.message.internal.MessageTemplate;
@@ -43,6 +44,8 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Proxy;
 import java.net.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -221,6 +224,65 @@ class AnnotationAdopterTest
         () -> new AnnotationAdopter(newMessageSupport())
             .adopt(invalidTemplateFixtureClass.getClassLoader(), Set.of(invalidTemplateFixtureClass.getPackageName())))
         .getTemplate());
+  }
+
+
+  @Test
+  @DisplayName("wrap duplicate errors from adopt entry points with the class name")
+  void testWrapDuplicateExceptionFromEntryPoints()
+  {
+    val adopter = new AnnotationAdopter(newMessageSupport());
+    adopter.adopt(new SyntheticMessageDef("type-msg-1", "different text"));
+
+    val ex = assertThrows(MessageAdopterException.class, () -> adopter.adopt(AnnotationsFixture.class));
+    assertTrue(ex.getMessage().contains(AnnotationsFixture.class.getName()), ex.getMessage());
+    assertEquals("type-msg-1", assertInstanceOf(DuplicateMessageException.class, ex.getCause()).getCode());
+  }
+
+
+  @Test
+  @DisplayName("adopt(Class<?>) fails with a descriptive message if the class file cannot be found")
+  void testAdoptClassFileNotFound()
+  {
+    val classLoader = new ClassLoader(AnnotationAdopterTest.class.getClassLoader()) {
+      @Override
+      public InputStream getResourceAsStream(String name) {
+        return null;
+      }
+    };
+    val proxyType = Proxy.newProxyInstance(classLoader, new Class<?>[] { Runnable.class }, (p, m, a) -> null).getClass();
+
+    val ex = assertThrows(MessageAdopterException.class,
+        () -> new AnnotationAdopter(newMessageSupport()).adopt(proxyType));
+    assertTrue(ex.getMessage().contains("not found"), ex.getMessage());
+  }
+
+
+  @Test
+  @DisplayName("adopt(ClassLoader, Set<String>) fails for corrupt archives")
+  void testAdoptClassLoaderCorruptArchive(@TempDir Path tempDir) throws Exception
+  {
+    val corruptJar = Files.writeString(tempDir.resolve("corrupt.jar"), "not a zip file");
+    val url = URL.of(URI.create("zip:" + corruptJar.toUri().getPath() + "!/test/"), new URLStreamHandler() {
+      @Override
+      protected URLConnection openConnection(URL u) {
+        return new URLConnection(u) {
+          @Override
+          public void connect() {
+          }
+        };
+      }
+    });
+    val classLoader = new ClassLoader(null) {
+      @Override
+      public Enumeration<URL> getResources(String name) {
+        return Collections.enumeration(List.of(url));
+      }
+    };
+
+    val ex = assertThrows(MessageAdopterException.class,
+        () -> new AnnotationAdopter(newMessageSupport()).adopt(classLoader, Set.of("test")));
+    assertTrue(ex.getMessage().contains("corrupt.jar"), ex.getMessage());
   }
 
 
