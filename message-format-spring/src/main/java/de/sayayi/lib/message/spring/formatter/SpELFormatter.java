@@ -32,8 +32,12 @@ import org.springframework.expression.spel.support.StandardOperatorOverloader;
 import org.springframework.expression.spel.support.StandardTypeComparator;
 import org.springframework.expression.spel.support.StandardTypeConverter;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static java.util.Objects.requireNonNull;
 import static org.springframework.expression.spel.SpelMessage.TYPE_NOT_FOUND;
@@ -164,6 +168,9 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object> impl
   /** Configuration keys supported by this formatter. */
   private static final Set<String> PARAMETER_CONFIG_NAMES = Set.of("spel-expr", "spel-format");
 
+  /** Maximum number of parsed expressions kept in {@link #expressionCache}. */
+  private static final int EXPRESSION_CACHE_SIZE = 64;
+
   /** Operator overloader supporting the standard operators only. */
   private static final OperatorOverloader OPERATOR_OVERLOADER = new StandardOperatorOverloader();
 
@@ -192,6 +199,17 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object> impl
 
   /** Property accessors allowing properties to be read, but not written. */
   private final List<PropertyAccessor> propertyAccessors = List.of(forReadOnlyAccess());
+
+  /** Parsed expressions by expression string. The least recently used expression is evicted first. */
+  private final Map<String,Expression> expressionCache = new LinkedHashMap<>(16, 0.75f, true) {
+    @Override
+    protected boolean removeEldestEntry(Map.Entry<String,Expression> eldest) {
+      return size() > EXPRESSION_CACHE_SIZE;
+    }
+  };
+
+  /** Lock guarding access to {@link #expressionCache}. */
+  private final Lock expressionCacheLock = new ReentrantLock();
 
 
   /**
@@ -250,13 +268,51 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object> impl
     var spelExpr = context.getConfigValueString("spel-expr");
     if (spelExpr.isPresent())
     {
-      value = spelExpressionParser
-          .parseExpression(spelExpr.get())
+      value = getExpression(spelExpr.get())
           .getValue(new ParameterEvaluationContext(context, value));
     }
 
     return context.format(value, null, context.getConfigValueString("spel-format").orElse(null),
         context.getConfig().excludeConfigByName(PARAMETER_CONFIG_NAMES));
+  }
+
+
+  /**
+   * Returns the parsed expression for {@code spelExpr}. Parsed expressions are thread-safe and kept in a bounded cache,
+   * so an expression is not parsed again on every format call.
+   *
+   * @param spelExpr  SpEL expression string, not {@code null}
+   *
+   * @return  parsed expression, never {@code null}
+   *
+   * @throws ParseException  if {@code spelExpr} is not a valid SpEL expression
+   */
+  private @NotNull Expression getExpression(@NotNull String spelExpr)
+  {
+    Expression expression;
+
+    expressionCacheLock.lock();
+    try {
+      expression = expressionCache.get(spelExpr);
+    } finally {
+      expressionCacheLock.unlock();
+    }
+
+    if (expression == null)
+    {
+      // parse outside the lock; if another thread cached the expression meanwhile, its instance is used
+      final var parsedExpression = spelExpressionParser.parseExpression(spelExpr);
+
+      expressionCacheLock.lock();
+      try {
+        if ((expression = expressionCache.putIfAbsent(spelExpr, parsedExpression)) == null)
+          expression = parsedExpression;
+      } finally {
+        expressionCacheLock.unlock();
+      }
+    }
+
+    return expression;
   }
 
 

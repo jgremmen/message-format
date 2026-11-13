@@ -106,6 +106,28 @@ final class SpELFormatterTest extends AbstractFormatterTest
   }
 
 
+  @Test
+  @DisplayName("Cached expressions are evaluated for each value and variable")
+  void testCachedExpression()
+  {
+    // more distinct expressions than the cache holds, each used repeatedly
+    for(var round = 0; round < 2; round++)
+      for(var n = 0; n < 100; n++)
+      {
+        assertEquals(String.valueOf(n + round + 1), messageSupport
+            .message("%{a,spel-expr:'#b + " + n + "'}")
+            .with("a", 0)
+            .with("b", round + 1)
+            .format());
+
+        assertEquals(String.valueOf(n * round), messageSupport
+            .message("%{a,spel-expr:'intValue() * " + round + "'}")
+            .with("a", n)
+            .format());
+      }
+  }
+
+
   @ParameterizedTest(name = "[{index}] {0}")
   @DisplayName("Type references, static methods, constructors and assignments are rejected")
   @ValueSource(strings = {
@@ -122,11 +144,15 @@ final class SpELFormatterTest extends AbstractFormatterTest
   {
     val message = messageSupport.message("%{v,spel-expr:\"" + expression.replace("\"", "'") + "\"}");
 
-    val exception = assertThrows(MessageFormatException.class, () -> message
-        .with("v", "value")
-        .with("b", 41)
-        .format());
+    // the second evaluation uses the cached expression, which must be rejected as well
+    for(var n = 0; n < 2; n++)
+    {
+      val exception = assertThrows(MessageFormatException.class, () -> message
+          .with("v", "value")
+          .with("b", 41)
+          .format());
 
-    assertInstanceOf(SpelEvaluationException.class, exception.getCause());
+      assertInstanceOf(SpelEvaluationException.class, exception.getCause());
+    }
   }
 }
