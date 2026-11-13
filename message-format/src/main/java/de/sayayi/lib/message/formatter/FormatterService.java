@@ -87,6 +87,21 @@ public sealed interface FormatterService permits FormatterService.WithRegistry, 
 
 
   /**
+   * Returns the post formatter registered with the given {@code name}.
+   *
+   * @param name  post formatter name, not {@code null}
+   *
+   * @return  post formatter, or {@code null} if no post formatter is registered with the given name
+   *
+   * @since 0.25.0
+   */
+  @Contract(pure = true)
+  default PostFormatter getPostFormatter(@NotNull String name) {
+    return getPostFormatters().get(name);
+  }
+
+
+  /**
    * Returns the accumulated set of parameter configuration names for all registered parameter formatters.
    *
    * @return  all known parameter config names, never {@code null}

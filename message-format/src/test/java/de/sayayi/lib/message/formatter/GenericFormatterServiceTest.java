@@ -17,6 +17,7 @@ package de.sayayi.lib.message.formatter;
 
 import de.sayayi.lib.message.formatter.post.PostFormatter;
 import de.sayayi.lib.message.formatter.post.PostFormatterContext;
+import de.sayayi.lib.message.formatter.post.runtime.ClipPostFormatter;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
@@ -59,6 +60,22 @@ final class GenericFormatterServiceTest
 
     assertEquals("name of post formatter NamelessPostFormatter must not be null", ex.getMessage());
     assertTrue(formatterService.getPostFormatters().isEmpty());
+  }
+
+
+  @Test
+  @DisplayName("Look up a single post formatter by name")
+  void testGetPostFormatter()
+  {
+    val formatterService = new GenericFormatterService();
+    val postFormatter = new ClipPostFormatter();
+
+    assertNull(formatterService.getPostFormatter("clip"));
+
+    formatterService.addPostFormatter(postFormatter);
+
+    assertSame(postFormatter, formatterService.getPostFormatter("clip"));
+    assertNull(formatterService.getPostFormatter("case"));
   }
 
 

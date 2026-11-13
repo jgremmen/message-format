@@ -57,7 +57,7 @@ import static java.util.Objects.requireNonNull;
  * This class is thread-safe. All mutating operations ({@link #addFormatter(ParameterFormatter)},
  * {@link #addFormatterForType(FormattableType, ParameterFormatter)}, {@link #addPostFormatter(PostFormatter)}) and
  * read operations ({@link #getFormatters(String, Class, Config)}, {@link #getPostFormatters()},
- * {@link #getParameterConfigNames()}) are protected by a reentrant read/write lock to ensure safe concurrent access.
+ * {@link #getPostFormatter(String)}, {@link #getParameterConfigNames()}) are protected by a reentrant read/write lock to ensure safe concurrent access.
  *
  * @author Jeroen Gremmen
  * @since 0.1.0 (renamed in 0.4.1)
@@ -498,6 +498,25 @@ public non-sealed class GenericFormatterService implements FormatterService.With
     readLock.lock();
     try {
       return Map.copyOf(postFormatters);
+    } finally {
+      readLock.unlock();
+    }
+  }
+
+
+  /**
+   * {@inheritDoc}
+   * <p>
+   * This implementation looks up the post formatter directly, without creating a snapshot of all post formatters.
+   */
+  @Override
+  public PostFormatter getPostFormatter(@NotNull String name)
+  {
+    final var readLock = lock.readLock();
+
+    readLock.lock();
+    try {
+      return postFormatters.get(name);
     } finally {
       readLock.unlock();
     }

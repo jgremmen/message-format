@@ -72,6 +72,13 @@ public final class FormatterServiceDelegate implements FormatterService
 
   /** {@inheritDoc} */
   @Override
+  public PostFormatter getPostFormatter(@NotNull String name) {
+    return delegate.getPostFormatter(name);
+  }
+
+
+  /** {@inheritDoc} */
+  @Override
   public @UnmodifiableView @NotNull Set<String> getParameterConfigNames() {
     return delegate.getParameterConfigNames();
   }

@@ -800,7 +800,7 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
     /** {@inheritDoc} */
     @Override
     public PostFormatter getPostFormatter(@NotNull String postFormatterName) {
-      return formatterService.getPostFormatters().get(postFormatterName);
+      return formatterService.getPostFormatter(postFormatterName);
     }
 
 
