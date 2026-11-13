@@ -17,6 +17,7 @@ package de.sayayi.lib.message.internal.pack;
 
 import de.sayayi.lib.message.Message.LocaleAware;
 import de.sayayi.lib.message.MessageSupport;
+import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.exception.DuplicateMessageException;
 import de.sayayi.lib.pack.PackOutputStream;
@@ -154,12 +155,8 @@ final class MessageSupportPackTest
   @DisplayName("Export maximum number of messages")
   void testExportMaxMessageCount() throws IOException
   {
-    val cms = MessageSupportFactory.createGeneric();
-    for(var n = 0; n < 0xffff; n++)
-      cms.addMessage("MSG-" + n, "text");
-
     val pack = new ByteArrayOutputStream();
-    cms.exportMessages(pack);
+    messageSupportWithMessages(0xffff).exportMessages(pack);
 
     val imported = MessageSupportFactory.createGeneric();
     try(val packStream = new ByteArrayInputStream(pack.toByteArray())) {
@@ -195,27 +192,6 @@ final class MessageSupportPackTest
 
     MessageSupportFactory.createGeneric().importMessages(packStream);
     assertTrue(packStreamClosed.get());
-  }
-
-
-  @Test
-  @DisplayName("Export closes the stream if the pack cannot be written")
-  void testExportFailureClosesStream()
-  {
-    val cms = MessageSupportFactory.createGeneric();
-    for(var n = 0; n <= 0xffff; n++)
-      cms.addMessage("MSG-" + n, "text");
-
-    val closed = new AtomicBoolean();
-    val pack = new ByteArrayOutputStream() {
-      @Override
-      public void close() {
-        closed.set(true);
-      }
-    };
-
-    assertThrows(IOException.class, () -> cms.exportMessages(pack));
-    assertTrue(closed.get());
   }
 
 
@@ -326,18 +302,22 @@ final class MessageSupportPackTest
 
 
   @Test
-  @DisplayName("Export too many messages")
+  @DisplayName("Export too many messages fails and closes the stream")
   void testExportTooManyMessages()
   {
-    val cms = MessageSupportFactory.createGeneric();
-    for(var n = 0; n <= 0xffff; n++)
-      cms.addMessage("MSG-" + n, "text");
-
-    val pack = new ByteArrayOutputStream();
+    val cms = messageSupportWithMessages(0x10000);
+    val closed = new AtomicBoolean();
+    val pack = new ByteArrayOutputStream() {
+      @Override
+      public void close() {
+        closed.set(true);
+      }
+    };
     val ex = assertThrows(IOException.class, () -> cms.exportMessages(pack));
 
     assertTrue(ex.getMessage().contains("messages"));
     assertEquals(0, pack.size());
+    assertTrue(closed.get());
 
     // filtering below the limit makes the export succeed
     assertDoesNotThrow(() -> cms.exportMessages(new ByteArrayOutputStream(), false,
@@ -422,6 +402,16 @@ final class MessageSupportPackTest
     assertExportFails(cms, "TPL-DELEGATE", "template with more than 255 parameter delegates");
     assertExportFails(cms, "LOCALES", "localized message bundle with more than 255 locales");
     assertExportFails(cms, "STRING", "message 'STRING' cannot be packed");
+  }
+
+
+  private static @NotNull ConfigurableMessageSupport messageSupportWithMessages(int count)
+  {
+    val cms = MessageSupportFactory.createGeneric();
+    for(var n = 0; n < count; n++)
+      cms.addMessage("MSG-" + n, "text");
+
+    return cms;
   }
 
 
