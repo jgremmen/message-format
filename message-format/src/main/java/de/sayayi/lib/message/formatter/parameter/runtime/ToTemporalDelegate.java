@@ -22,10 +22,7 @@ import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.attribute.FileTime;
-import java.time.Instant;
-import java.time.InstantSource;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.*;
 import java.time.temporal.Temporal;
 import java.util.Calendar;
 import java.util.Date;
@@ -61,14 +58,19 @@ import static de.sayayi.lib.message.part.TextPartFactory.nullText;
  * // "14:30"
  * }</pre>
  * <p>
- * {@link Calendar}, {@link Date}, {@link java.nio.file.attribute.FileTime FileTime} and {@link InstantSource} values
- * are instants, which are formatted using the system default time zone:
+ * {@link Date}, {@link java.nio.file.attribute.FileTime FileTime} and {@link InstantSource} values are instants, which
+ * are formatted using the system default time zone. A {@link Calendar} is formatted in its own
+ * {@linkplain Calendar#getTimeZone() time zone}:
  * <pre>{@code
+ * var calendar = new GregorianCalendar(TimeZone.getTimeZone("Asia/Tokyo"));
+ * calendar.set(2026, Calendar.MAY, 1, 8, 30, 0);
+ *
  * messageSupport
- *     .message("%{c,date:'yyyy-MM-dd'}")
- *     .with("c", new GregorianCalendar(2026, Calendar.MAY, 1))
+ *     .message("%{c,date:'yyyy-MM-dd HH:mm z'}")
+ *     .with("c", calendar)
+ *     .locale(Locale.US)
  *     .format();
- * // "2026-05-01"
+ * // "2026-05-01 08:30 JST"
  * }</pre>
  * <p>
  * {@code null} is matched by the {@code null} key:
@@ -110,8 +112,8 @@ public final class ToTemporalDelegate implements ParameterFormatter
   /**
    * {@inheritDoc}
    * <p>
-   * Converts the given date/time value to its {@link Temporal} equivalent and delegates formatting. {@code null}
-   * values are handled using the null/empty map key from the parameter configuration.
+   * Converts the given date/time value to its {@link Temporal} equivalent and delegates formatting. {@code null} values
+   * are handled using the null/empty map key from the parameter configuration.
    */
   @Override
   @SuppressWarnings("IfCanBeSwitch")
@@ -129,23 +131,26 @@ public final class ToTemporalDelegate implements ParameterFormatter
 
     if (JAVA_SQL_AVAILABLE)
     {
-      // java.sql.Time has no instant
       if (value instanceof java.sql.Time sqlTime)
         return context.format(sqlTime.toLocalTime(), LocalTime.class);
 
-      // java.sql.Date has no instant
       if (value instanceof java.sql.Date sqlDate)
         return context.format(sqlDate.toLocalDate(), LocalDate.class);
+    }
+
+    if (value instanceof Calendar calendar)
+    {
+      return context.format(
+          ZonedDateTime.ofInstant(calendar.toInstant(), calendar.getTimeZone().toZoneId()),
+          ZonedDateTime.class);
     }
 
     if (value instanceof InstantSource)
       value = ((InstantSource)value).instant();
     else if (value instanceof Date)
       value = ((Date)value).toInstant();
-    else if (value instanceof FileTime)
-      value = ((FileTime)value).toInstant();
     else
-      value = ((Calendar)value).toInstant();
+      value = ((FileTime)value).toInstant();
 
     return context.format(value, Instant.class);
   }

@@ -31,6 +31,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Map;
+import java.util.TimeZone;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -122,6 +123,21 @@ final class ToTemporalDelegateTest extends AbstractFormatterTest
     // a java.util.Date with the medium style includes the date: "01.01.1970, 23:36:04"
     assertEquals(noSpaceText("23:36:04"), format(messageAccessor, sqlTime,
         Map.of("date", new TypedValueString(messageAccessor.getMessageFactory(), "medium")), Map.of()));
+  }
+
+
+  @Test
+  @DisplayName("Format java.util.Calendar in its own time zone")
+  void formatCalendarWithTimeZone()
+  {
+    // use a zone which differs from the system default zone
+    val zone = getTimeZone(TimeZone.getDefault().getID().equals("Asia/Tokyo") ? "America/New_York" : "Asia/Tokyo");
+    val calendar = new GregorianCalendar(zone);
+    calendar.clear();
+    calendar.set(2024, Calendar.NOVEMBER, 9, 8, 30, 0);
+
+    assertEquals(noSpaceText("2024-11-09 08:30 " + zone.getID()), format(messageAccessor, calendar,
+        Map.of("date", new TypedValueString(messageAccessor.getMessageFactory(), "yyyy-MM-dd HH:mm VV")), Map.of()));
   }
 
 

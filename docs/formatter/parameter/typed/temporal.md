@@ -278,7 +278,7 @@ The `ToTemporalDelegate` bridges legacy date/time types to the `TemporalFormatte
 following types into a `Temporal` representation and then delegates formatting to the temporal formatter:
 
 - `java.util.Date` is converted to `Instant`
-- `java.util.Calendar` is converted to `Instant`
+- `java.util.Calendar` is converted to `ZonedDateTime` in the calendar's time zone
 - `java.time.InstantSource` is converted to `Instant`
 - `java.nio.file.attribute.FileTime` is converted to `Instant`
 - `java.sql.Date` is converted to `LocalDate` (no time component)
@@ -301,6 +301,19 @@ messageSupport
 ```
 
 The converted `Instant` has no time zone, so it is formatted in the system default time zone like any other instant.
+A `Calendar` keeps the time zone it has been set up with:
+
+```java
+var calendar = new GregorianCalendar(TimeZone.getTimeZone("Asia/Tokyo"));
+calendar.set(2024, Calendar.NOVEMBER, 9, 8, 30, 0);
+
+messageSupport
+    .message("%{c,date:'yyyy-MM-dd HH:mm z'}")
+    .with("c", calendar)
+    .locale("en-US")
+    .format();
+// "2024-11-09 08:30 JST"
+```
 
 ```java
 java.sql.Date sqlDate = java.sql.Date.valueOf("2024-11-09");
