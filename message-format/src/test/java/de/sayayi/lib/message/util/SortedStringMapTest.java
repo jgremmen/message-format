@@ -18,10 +18,15 @@ package de.sayayi.lib.message.util;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -129,8 +134,13 @@ class SortedStringMapTest
     @DisplayName("Construct sealed from map")
     void constructSealedFromMap()
     {
-      var source = Map.of("alpha", 1, "bravo", 2, "charlie", 3, "delta", 4, "echo", 5);
-      var map = new SortedStringMap<>(source, true);
+      final var source = Map.of(
+          "alpha", 1,
+          "bravo", 2,
+          "charlie", 3,
+          "delta", 4,
+          "echo", 5);
+      final var map = new SortedStringMap<>(source, true);
 
       assertEquals(5, map.size());
       assertEquals(1, map.get("alpha"));
@@ -183,30 +193,64 @@ class SortedStringMapTest
 
       assertTrue(map.isEmpty());
       assertThrows(UnsupportedOperationException.class, () -> map.put("a", "1"));
+
+      // nothing to clear, so clear does not throw
+      assertDoesNotThrow(map::clear);
     }
 
 
-    @Test
-    @DisplayName("Seal non-empty map prevents modifications")
-    void sealNonEmptyMap()
+    @SuppressWarnings("RedundantCollectionOperation")
+    static Stream<Arguments> sealedMapMutators()
     {
-      var map = new SortedStringMap<String>();
+      return Stream.of(
+          mutator("put new key", map -> map.put("foxtrot", "6")),
+          mutator("put existing key", map -> map.put("alpha", "11")),
+          mutator("putAll", map -> map.putAll(Map.of("foxtrot", "6"))),
+          mutator("remove existing key", map -> map.remove("alpha")),
+          mutator("remove missing key", map -> map.remove("zulu")),
+          mutator("clear", Map::clear),
+          mutator("replaceAll", map -> map.replaceAll((k, v) -> v)),
+          mutator("entrySet remove existing entry", map -> map.entrySet().remove(Map.entry("alpha", "1"))),
+          mutator("entrySet remove missing entry", map -> map.entrySet().remove(Map.entry("zulu", "26"))),
+          mutator("entrySet removeIf", map -> map.entrySet().removeIf(entry -> false)),
+          mutator("entrySet iterator remove", map -> {
+            var iterator = map.entrySet().iterator();
+            iterator.next();
+            iterator.remove();
+          }),
+          mutator("entry setValue", map -> map.entrySet().iterator().next().setValue("11")),
+          mutator("keySet remove existing key", map -> map.keySet().remove("alpha")),
+          mutator("keySet remove missing key", map -> map.keySet().remove("zulu")),
+          mutator("keySet removeIf", map -> map.keySet().removeIf(key -> true)),
+          mutator("keySet clear", map -> map.keySet().clear()),
+          mutator("keySet iterator remove", map -> {
+            var iterator = map.keySet().iterator();
+            iterator.next();
+            iterator.remove();
+          }),
+          mutator("values remove", map -> map.values().remove("1"))
+      );
+    }
 
-      map.put("alpha", "1");
-      map.put("bravo", "2");
-      map.put("charlie", "3");
-      map.put("delta", "4");
-      map.put("echo", "5");
 
-      map.seal();
+    @ParameterizedTest(name = "{0}")
+    @DisplayName("Mutators on a sealed non-empty map throw and leave the map unchanged")
+    @MethodSource("sealedMapMutators")
+    void sealedMapMutatorThrows(@SuppressWarnings("unused") String name, Consumer<Map<String,String>> mutator)
+    {
+      var entries = Map.of("alpha", "1", "bravo", "2", "charlie", "3", "delta", "4", "echo", "5");
+      var map = new SortedStringMap<>(entries, true);
 
-      assertThrows(UnsupportedOperationException.class, () -> map.put("foxtrot", "6"));
-      assertThrows(UnsupportedOperationException.class, () -> map.remove("alpha"));
-      assertThrows(UnsupportedOperationException.class, map::clear);
+      assertThrows(UnsupportedOperationException.class, () -> mutator.accept(map));
 
-      // Reading is still allowed
-      assertEquals(5, map.size());
+      // reading is still allowed
+      assertEquals(entries, map);
       assertEquals("1", map.get("alpha"));
+    }
+
+
+    private static Arguments mutator(String name, Consumer<Map<String,String>> mutator) {
+      return Arguments.of(name, mutator);
     }
   }
 
@@ -519,20 +563,6 @@ class SortedStringMapTest
 
 
     @Test
-    @DisplayName("Put on sealed map throws")
-    void putOnSealedMap()
-    {
-      var map = new SortedStringMap<String>();
-
-      map.put("alpha", "1");
-
-      map.seal();
-
-      assertThrows(UnsupportedOperationException.class, () -> map.put("bravo", "2"));
-    }
-
-
-    @Test
     @DisplayName("Put triggers array growth")
     void putTriggersArrayGrowth()
     {
@@ -619,7 +649,7 @@ class SortedStringMapTest
     @DisplayName("Remove existing key")
     void removeExistingKey()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
       map.put("bravo", "2");
@@ -637,7 +667,7 @@ class SortedStringMapTest
     @DisplayName("Remove first key")
     void removeFirstKey()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
       map.put("bravo", "2");
@@ -654,7 +684,7 @@ class SortedStringMapTest
     @DisplayName("Remove last key")
     void removeLastKey()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
       map.put("bravo", "2");
@@ -671,7 +701,7 @@ class SortedStringMapTest
     @DisplayName("Remove missing key returns null")
     void removeMissingKey()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
       map.put("bravo", "2");
@@ -685,7 +715,7 @@ class SortedStringMapTest
     @DisplayName("Remove null key when absent returns null")
     void removeNullKeyAbsent()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
 
@@ -698,28 +728,11 @@ class SortedStringMapTest
     @SuppressWarnings("SuspiciousMethodCalls")
     void removeNonStringKey()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
 
       assertNull(map.remove(42));
-    }
-
-
-    @Test
-    @DisplayName("Remove on sealed map throws")
-    void removeOnSealedMapThrows()
-    {
-      var map = new SortedStringMap<String>();
-
-      map.put("alpha", "1");
-      map.put("bravo", "2");
-      map.put("charlie", "3");
-      map.put("delta", "4");
-      map.put("echo", "5");
-      map.seal();
-
-      assertThrows(UnsupportedOperationException.class, () -> map.remove("alpha"));
     }
   }
 
@@ -737,7 +750,7 @@ class SortedStringMapTest
     @SuppressWarnings("ConstantValue")
     void clearNonEmptyMap()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
       map.put("bravo", "2");
@@ -758,41 +771,11 @@ class SortedStringMapTest
     @SuppressWarnings("ConstantValue")
     void clearEmptyMap()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.clear();
 
       assertEquals(0, map.size());
-    }
-
-
-    @Test
-    @DisplayName("Clear empty sealed map does not throw")
-    void clearEmptySealedMap()
-    {
-      var map = new SortedStringMap<String>();
-
-      map.seal();
-
-      assertDoesNotThrow(map::clear);
-    }
-
-
-    @Test
-    @DisplayName("Clear non-empty sealed map throws")
-    void clearNonEmptySealedMapThrows()
-    {
-      var map = new SortedStringMap<String>();
-
-      map.put("alpha", "1");
-      map.put("bravo", "2");
-      map.put("charlie", "3");
-      map.put("delta", "4");
-      map.put("echo", "5");
-
-      map.seal();
-
-      assertThrows(UnsupportedOperationException.class, map::clear);
     }
   }
 
@@ -809,7 +792,7 @@ class SortedStringMapTest
     @DisplayName("Keys are sorted")
     void keysAreSorted()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("echo", "5");
       map.put("alpha", "1");
@@ -841,7 +824,7 @@ class SortedStringMapTest
     @DisplayName("Clone produces equal map")
     void cloneProducesEqualMap()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
       map.put("bravo", "2");
@@ -849,7 +832,7 @@ class SortedStringMapTest
       map.put("delta", "4");
       map.put("echo", "5");
 
-      var cloned = map.clone();
+      final var cloned = map.clone();
 
       assertEquals(map, cloned);
       assertEquals(5, cloned.size());
@@ -860,7 +843,7 @@ class SortedStringMapTest
     @DisplayName("Clone of sealed map is unsealed")
     void cloneOfSealedMapIsUnsealed()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
       map.put("bravo", "2");
@@ -869,7 +852,7 @@ class SortedStringMapTest
       map.put("echo", "5");
       map.seal();
 
-      var cloned = map.clone();
+      final var cloned = map.clone();
 
       assertDoesNotThrow(() -> cloned.put("foxtrot", "6"));
       assertEquals(6, cloned.size());
@@ -880,7 +863,7 @@ class SortedStringMapTest
     @DisplayName("Clone is independent from original")
     void cloneIsIndependent()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
       map.put("bravo", "2");
@@ -888,7 +871,7 @@ class SortedStringMapTest
       map.put("delta", "4");
       map.put("echo", "5");
 
-      var cloned = map.clone();
+      final var cloned = map.clone();
 
       cloned.put("foxtrot", "6");
       cloned.remove("alpha");
@@ -912,7 +895,7 @@ class SortedStringMapTest
     @DisplayName("forEach visits all entries in sorted order")
     void forEachVisitsAllEntries()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("echo", "5");
       map.put("alpha", "1");
@@ -920,8 +903,8 @@ class SortedStringMapTest
       map.put("bravo", "2");
       map.put("delta", "4");
 
-      var keys = new ArrayList<String>();
-      var values = new ArrayList<String>();
+      final var keys = new ArrayList<String>();
+      final  var values = new ArrayList<String>();
 
       map.forEach((k, v) -> {
         keys.add(k);
@@ -938,8 +921,8 @@ class SortedStringMapTest
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     void forEachEmptyMap()
     {
-      var map = new SortedStringMap<String>();
-      var count = new int[] { 0 };
+      final var map = new SortedStringMap<String>();
+      final var count = new int[] { 0 };
 
       map.forEach((k, v) -> count[0]++);
 
@@ -960,7 +943,7 @@ class SortedStringMapTest
     @DisplayName("Stream collects all entries")
     void streamCollectsAllEntries()
     {
-      var map = new SortedStringMap<Integer>();
+      final var map = new SortedStringMap<Integer>();
 
       map.put("echo", 5);
       map.put("alpha", 1);
@@ -968,7 +951,7 @@ class SortedStringMapTest
       map.put("bravo", 2);
       map.put("delta", 4);
 
-      var result = map
+      final var result = map
           .stream()
           .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
 
@@ -982,7 +965,7 @@ class SortedStringMapTest
     @DisplayName("Stream preserves sorted order")
     void streamPreservesOrder()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("echo", "5");
       map.put("alpha", "1");
@@ -990,7 +973,7 @@ class SortedStringMapTest
       map.put("bravo", "2");
       map.put("delta", "4");
 
-      var keys = map
+      final var keys = map
           .stream()
           .map(Entry::getKey)
           .collect(Collectors.toList());
@@ -1013,7 +996,7 @@ class SortedStringMapTest
     @SuppressWarnings("RedundantCollectionOperation")
     void entrySetSize()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
       map.put("bravo", "2");
@@ -1038,7 +1021,7 @@ class SortedStringMapTest
     @DisplayName("entrySet iterator returns entries in sorted order")
     void entrySetIterator()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("echo", "5");
       map.put("alpha", "1");
@@ -1046,8 +1029,8 @@ class SortedStringMapTest
       map.put("bravo", "2");
       map.put("delta", "4");
 
-      var iterator = map.entrySet().iterator();
-      var keys = new ArrayList<String>();
+      final var iterator = map.entrySet().iterator();
+      final var keys = new ArrayList<String>();
 
       while(iterator.hasNext())
         keys.add(iterator.next().getKey());
@@ -1060,11 +1043,11 @@ class SortedStringMapTest
     @DisplayName("entrySet iterator throws NoSuchElementException after last")
     void entrySetIteratorExhausted()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
 
-      var iterator = map.entrySet().iterator();
+      final var iterator = map.entrySet().iterator();
       iterator.next();
 
       assertThrows(NoSuchElementException.class, iterator::next);
@@ -1076,7 +1059,7 @@ class SortedStringMapTest
     @SuppressWarnings({"RedundantCollectionOperation", "WriteOnlyObject", "ConstantValue"})
     void entrySetClear()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
       map.put("bravo", "2");
@@ -1095,7 +1078,7 @@ class SortedStringMapTest
     @SuppressWarnings("SuspiciousMethodCalls")
     void entrySetRemove()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
       map.put("bravo", "2");
@@ -1110,25 +1093,11 @@ class SortedStringMapTest
 
 
     @Test
-    @DisplayName("entrySet remove on sealed map throws UnsupportedOperationException")
-    @SuppressWarnings("WriteOnlyObject")
-    void entrySetRemoveSealedThrows()
-    {
-      var map = new SortedStringMap<>(Map.of("alpha", "1"), true);
-
-      assertThrows(UnsupportedOperationException.class,
-          () -> map.entrySet().remove(Map.entry("alpha", "1")));
-      assertThrows(UnsupportedOperationException.class,
-          () -> map.entrySet().remove(Map.entry("bravo", "2")));
-    }
-
-
-    @Test
     @DisplayName("entrySet contains checks key and value")
     @SuppressWarnings("SuspiciousMethodCalls")
     void entrySetContains()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
       map.put("bravo", null);
@@ -1145,7 +1114,7 @@ class SortedStringMapTest
     @DisplayName("entrySet removeIf removes matching entries in sorted order")
     void entrySetRemoveIf()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
       map.put("bravo", "2");
@@ -1153,7 +1122,7 @@ class SortedStringMapTest
       map.put("delta", "4");
       map.put("echo", "5");
 
-      var tested = new ArrayList<String>();
+      final var tested = new ArrayList<String>();
 
       assertTrue(map.entrySet().removeIf(e -> tested.add(e.getKey()) && Integer.parseInt(e.getValue()) % 2 == 1));
       assertEquals(List.of("alpha", "bravo", "charlie", "delta", "echo"), tested);
@@ -1169,7 +1138,7 @@ class SortedStringMapTest
     @DisplayName("entrySet removeIf leaves map unchanged if the filter throws")
     void entrySetRemoveIfFilterThrows()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
       map.put("bravo", "2");
@@ -1186,34 +1155,24 @@ class SortedStringMapTest
 
 
     @Test
-    @DisplayName("entrySet removeIf on sealed map throws UnsupportedOperationException")
-    void entrySetRemoveIfSealedThrows()
-    {
-      var map = new SortedStringMap<>(Map.of("alpha", "1"), true);
-
-      assertThrows(UnsupportedOperationException.class, () -> map.entrySet().removeIf(e -> false));
-    }
-
-
-    @Test
     @DisplayName("entrySet iterator remove removes current entry")
     void entrySetIteratorRemove()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
       map.put("bravo", "2");
       map.put("charlie", "3");
 
-      var iterator = map.entrySet().iterator();
+      final var iterator = map.entrySet().iterator();
 
       assertThrows(IllegalStateException.class, iterator::remove);
 
-      var keys = new ArrayList<String>();
+      final var keys = new ArrayList<String>();
 
       while(iterator.hasNext())
       {
-        var entry = iterator.next();
+        final var entry = iterator.next();
         keys.add(entry.getKey());
 
         if (!entry.getKey().equals("bravo"))
@@ -1230,12 +1189,12 @@ class SortedStringMapTest
     @DisplayName("entrySet iterator remove twice throws IllegalStateException")
     void entrySetIteratorRemoveTwice()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
       map.put("bravo", "2");
 
-      var iterator = map.entrySet().iterator();
+      final var iterator = map.entrySet().iterator();
       iterator.next();
       iterator.remove();
 
@@ -1245,25 +1204,11 @@ class SortedStringMapTest
 
 
     @Test
-    @DisplayName("entrySet iterator remove on sealed map throws UnsupportedOperationException")
-    void entrySetIteratorRemoveSealedThrows()
-    {
-      var map = new SortedStringMap<>(Map.of("alpha", "1"), true);
-      var iterator = map.entrySet().iterator();
-
-      iterator.next();
-
-      assertThrows(UnsupportedOperationException.class, iterator::remove);
-      assertEquals(1, map.size());
-    }
-
-
-    @Test
     @DisplayName("entrySet toArray returns all entries")
     @SuppressWarnings("unchecked")
     void entrySetToArray()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
       map.put("bravo", "2");
@@ -1271,7 +1216,7 @@ class SortedStringMapTest
       map.put("delta", "4");
       map.put("echo", "5");
 
-      var array = map.entrySet().toArray();
+      final var array = map.entrySet().toArray();
 
       assertEquals(5, array.length);
       assertEquals("alpha", ((Entry<String,String>)array[0]).getKey());
@@ -1282,7 +1227,7 @@ class SortedStringMapTest
     @DisplayName("entrySet toArray with generator")
     void entrySetToArrayWithGenerator()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
       map.put("bravo", "2");
@@ -1290,7 +1235,7 @@ class SortedStringMapTest
       map.put("delta", "4");
       map.put("echo", "5");
 
-      var array = map.entrySet().toArray(Entry[]::new);
+      final var array = map.entrySet().toArray(Entry[]::new);
 
       assertEquals(5, array.length);
       assertEquals("alpha", array[0].getKey());
@@ -1304,7 +1249,7 @@ class SortedStringMapTest
     @DisplayName("entrySet toString")
     void entrySetToString()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
       map.put("bravo", "2");
@@ -1324,7 +1269,7 @@ class SortedStringMapTest
     @DisplayName("entrySet spliterator characteristics")
     void entrySetSpliterator()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
       map.put("bravo", "2");
@@ -1332,7 +1277,7 @@ class SortedStringMapTest
       map.put("delta", "4");
       map.put("echo", "5");
 
-      var spliterator = map.entrySet().spliterator();
+      final var spliterator = map.entrySet().spliterator();
 
       assertEquals(5, spliterator.estimateSize());
       assertNull(spliterator.trySplit());
@@ -1348,7 +1293,7 @@ class SortedStringMapTest
     @DisplayName("entrySet spliterator tryAdvance")
     void entrySetSpliteratorTryAdvance()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
       map.put("bravo", "2");
@@ -1356,8 +1301,8 @@ class SortedStringMapTest
       map.put("delta", "4");
       map.put("echo", "5");
 
-      var spliterator = map.entrySet().spliterator();
-      var keys = new ArrayList<String>();
+      final var spliterator = map.entrySet().spliterator();
+      final var keys = new ArrayList<String>();
 
       //noinspection StatementWithEmptyBody
       while(spliterator.tryAdvance(e -> keys.add(e.getKey())))
@@ -1371,8 +1316,8 @@ class SortedStringMapTest
     @DisplayName("entrySet spliterator tryAdvance on empty map returns false")
     void entrySetSpliteratorTryAdvanceEmpty()
     {
-      var map = new SortedStringMap<String>();
-      var spliterator = map.entrySet().spliterator();
+      final var map = new SortedStringMap<String>();
+      final var spliterator = map.entrySet().spliterator();
 
       assertFalse(spliterator.tryAdvance(e -> fail("should not be called")));
     }
@@ -1391,7 +1336,7 @@ class SortedStringMapTest
     @DisplayName("Entry getKey and getValue")
     void entryGetKeyAndValue()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
       map.put("bravo", "2");
@@ -1399,7 +1344,7 @@ class SortedStringMapTest
       map.put("delta", "4");
       map.put("echo", "5");
 
-      var entry = map.entrySet().iterator().next();
+      final var entry = map.entrySet().iterator().next();
 
       assertEquals("alpha", entry.getKey());
       assertEquals("1", entry.getValue());
@@ -1407,32 +1352,15 @@ class SortedStringMapTest
 
 
     @Test
-    @DisplayName("Entry setValue on sealed map throws")
-    void entrySetValueSealedThrows()
-    {
-      var map = new SortedStringMap<String>();
-
-      map.put("alpha", "1");
-      map.put("bravo", "2");
-      map.seal();
-
-      var entry = map.entrySet().iterator().next();
-
-      assertThrows(UnsupportedOperationException.class, () -> entry.setValue("11"));
-      assertEquals("1", map.get("alpha"));
-    }
-
-
-    @Test
     @DisplayName("Entry setValue on unsealed map writes through")
     void entrySetValueWritesThrough()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
       map.put("bravo", "2");
 
-      var entry = map.entrySet().iterator().next();
+      final var entry = map.entrySet().iterator().next();
 
       assertEquals("1", entry.setValue("11"));
       assertEquals("11", entry.getValue());
@@ -1450,14 +1378,14 @@ class SortedStringMapTest
     @DisplayName("Entry setValue after removal or sealing throws")
     void entrySetValueAfterRemovalOrSeal()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
       map.put("bravo", "2");
 
-      var iterator = map.entrySet().iterator();
-      var alpha = iterator.next();
-      var bravo = iterator.next();
+      final var iterator = map.entrySet().iterator();
+      final var alpha = iterator.next();
+      final var bravo = iterator.next();
 
       map.remove("alpha");
       assertThrows(IllegalStateException.class, () -> alpha.setValue("11"));
@@ -1474,7 +1402,7 @@ class SortedStringMapTest
     @SuppressWarnings({"MisorderedAssertEqualsArguments", "AssertBetweenInconvertibleTypes"})
     void entryEquals()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
       map.put("bravo", "2");
@@ -1482,7 +1410,7 @@ class SortedStringMapTest
       map.put("delta", "4");
       map.put("echo", "5");
 
-      var entry = map.entrySet().iterator().next();
+      final var entry = map.entrySet().iterator().next();
 
       assertEquals(entry, Map.entry("alpha", "1"));
       assertNotEquals(entry, Map.entry("alpha", "99"));
@@ -1495,12 +1423,12 @@ class SortedStringMapTest
     @DisplayName("Entry hashCode consistent with Map.Entry contract")
     void entryHashCode()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
 
-      var entry = map.entrySet().iterator().next();
-      var expected = "alpha".hashCode() ^ "1".hashCode();
+      final var entry = map.entrySet().iterator().next();
+      final var expected = "alpha".hashCode() ^ "1".hashCode();
 
       assertEquals(expected, entry.hashCode());
     }
@@ -1510,11 +1438,11 @@ class SortedStringMapTest
     @DisplayName("Entry toString")
     void entryToString()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
 
-      var entry = map.entrySet().iterator().next();
+      final var entry = map.entrySet().iterator().next();
 
       assertEquals("alpha=1", entry.toString());
     }
@@ -1534,7 +1462,7 @@ class SortedStringMapTest
     @SuppressWarnings("EqualsWithItself")
     void equalToItself()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
       map.put("bravo", "2");
@@ -1550,7 +1478,7 @@ class SortedStringMapTest
     @DisplayName("Equal to HashMap with same entries")
     void equalToHashMap()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
       map.put("bravo", "2");
@@ -1558,7 +1486,7 @@ class SortedStringMapTest
       map.put("delta", "4");
       map.put("echo", "5");
 
-      var hashMap = new HashMap<String,String>();
+      final var hashMap = new HashMap<String,String>();
 
       hashMap.put("echo", "5");
       hashMap.put("alpha", "1");
@@ -1575,12 +1503,12 @@ class SortedStringMapTest
     @DisplayName("Not equal to map with different size")
     void notEqualDifferentSize()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
       map.put("bravo", "2");
 
-      var other = Map.of("alpha", "1");
+      final var other = Map.of("alpha", "1");
 
       assertNotEquals(map, other);
     }
@@ -1590,7 +1518,7 @@ class SortedStringMapTest
     @DisplayName("Not equal to map with different values")
     void notEqualDifferentValues()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
       map.put("bravo", "2");
@@ -1598,7 +1526,12 @@ class SortedStringMapTest
       map.put("delta", "4");
       map.put("echo", "5");
 
-      var other = Map.of("alpha", "1", "bravo", "2", "charlie", "99", "delta", "4", "echo", "5");
+      final var other = Map.of(
+          "alpha", "1",
+          "bravo", "2",
+          "charlie", "99",
+          "delta", "4",
+          "echo", "5");
 
       assertNotEquals(map, other);
     }
@@ -1609,7 +1542,7 @@ class SortedStringMapTest
     @SuppressWarnings({"MisorderedAssertEqualsArguments", "AssertBetweenInconvertibleTypes"})
     void notEqualToNonMap()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       assertNotEquals(map, "not a map");
     }
@@ -1619,7 +1552,7 @@ class SortedStringMapTest
     @DisplayName("Equal maps with null values")
     void equalWithNullValues()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", null);
       map.put("bravo", "2");
@@ -1627,7 +1560,7 @@ class SortedStringMapTest
       map.put("delta", "4");
       map.put("echo", "5");
 
-      var hashMap = new HashMap<String,String>();
+      final var hashMap = new HashMap<String,String>();
 
       hashMap.put("alpha", null);
       hashMap.put("bravo", "2");
@@ -1643,11 +1576,11 @@ class SortedStringMapTest
     @DisplayName("Not equal when null value vs non-null value")
     void notEqualNullVsNonNull()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", null);
 
-      var other = Map.of("alpha", "1");
+      final var other = Map.of("alpha", "1");
 
       assertNotEquals(map, other);
     }
@@ -1666,7 +1599,7 @@ class SortedStringMapTest
     @DisplayName("hashCode consistent with HashMap")
     void hashCodeConsistentWithHashMap()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
       map.put("bravo", "2");
@@ -1674,7 +1607,7 @@ class SortedStringMapTest
       map.put("delta", "4");
       map.put("echo", "5");
 
-      var hashMap = new HashMap<String,String>();
+      final var hashMap = new HashMap<String,String>();
 
       hashMap.put("alpha", "1");
       hashMap.put("bravo", "2");
@@ -1713,7 +1646,7 @@ class SortedStringMapTest
     @DisplayName("toString for non-empty map in sorted order")
     void toStringNonEmptyMap()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("bravo", "2");
       map.put("alpha", "1");
@@ -1735,8 +1668,13 @@ class SortedStringMapTest
     @DisplayName("putAll from HashMap")
     void putAllFromHashMap()
     {
-      var map = new SortedStringMap<String>();
-      var source = Map.of("echo", "5", "alpha", "1", "charlie", "3", "bravo", "2", "delta", "4");
+      final var map = new SortedStringMap<String>();
+      final var source = Map.of(
+          "echo", "5",
+          "alpha", "1",
+          "charlie", "3",
+          "bravo", "2",
+          "delta", "4");
 
       map.putAll(source);
 
@@ -1746,20 +1684,6 @@ class SortedStringMapTest
       assertEquals("3", map.get("charlie"));
       assertEquals("4", map.get("delta"));
       assertEquals("5", map.get("echo"));
-    }
-
-
-    @Test
-    @DisplayName("putAll on sealed map throws")
-    @SuppressWarnings("RedundantCollectionOperation")
-    void putAllOnSealedMap()
-    {
-      var map = new SortedStringMap<String>();
-
-      map.seal();
-
-      assertThrows(UnsupportedOperationException.class,
-          () -> map.putAll(Map.of("alpha", "1")));
     }
   }
 
@@ -1776,7 +1700,7 @@ class SortedStringMapTest
     @DisplayName("keySet contains all keys")
     void keySetContainsAllKeys()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
       map.put("bravo", "2");
@@ -1784,7 +1708,7 @@ class SortedStringMapTest
       map.put("delta", "4");
       map.put("echo", "5");
 
-      var keySet = map.keySet();
+      final var keySet = map.keySet();
 
       assertEquals(5, keySet.size());
       assertTrue(keySet.contains("alpha"));
@@ -1796,7 +1720,7 @@ class SortedStringMapTest
     @DisplayName("values contains all values")
     void valuesContainsAllValues()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
       map.put("bravo", "2");
@@ -1804,7 +1728,7 @@ class SortedStringMapTest
       map.put("delta", "4");
       map.put("echo", "5");
 
-      var values = map.values();
+      final var values = map.values();
 
       assertEquals(5, values.size());
       assertTrue(values.contains("1"));
@@ -1817,7 +1741,7 @@ class SortedStringMapTest
     @SuppressWarnings({"RedundantCollectionOperation", "SuspiciousMethodCalls"})
     void keySetSortedOrder()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("charlie", "3");
       map.put("alpha", "1");
@@ -1833,7 +1757,7 @@ class SortedStringMapTest
     @SuppressWarnings({"RedundantCollectionOperation", "WriteOnlyObject", "ConstantValue"})
     void keySetRemove()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
       map.put("bravo", "2");
@@ -1846,7 +1770,7 @@ class SortedStringMapTest
       assertTrue(map.keySet().removeIf(k -> k.startsWith("b")));
       assertTrue(map.keySet().retainAll(Set.of("charlie", "delta")));
 
-      var iterator = map.keySet().iterator();
+      final var iterator = map.keySet().iterator();
       assertEquals("charlie", iterator.next());
       iterator.remove();
 
@@ -1861,7 +1785,7 @@ class SortedStringMapTest
     @DisplayName("values remove and removeIf modify the map")
     void valuesRemove()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
       map.put("bravo", "2");
@@ -1872,27 +1796,6 @@ class SortedStringMapTest
 
       assertTrue(map.values().removeIf("1"::equals));
       assertEquals(Map.of("bravo", "2"), map);
-    }
-
-
-    @Test
-    @DisplayName("keySet and values modifications on sealed map throw")
-    @SuppressWarnings({"RedundantCollectionOperation", "WriteOnlyObject"})
-    void sealedViewsThrow()
-    {
-      var map = new SortedStringMap<>(Map.of("alpha", "1", "bravo", "2"), true);
-
-      assertThrows(UnsupportedOperationException.class, () -> map.keySet().remove("alpha"));
-      assertThrows(UnsupportedOperationException.class, () -> map.keySet().remove("charlie"));
-      assertThrows(UnsupportedOperationException.class, () -> map.keySet().removeIf(k -> true));
-      assertThrows(UnsupportedOperationException.class, () -> map.keySet().clear());
-      assertThrows(UnsupportedOperationException.class, () -> map.values().remove("1"));
-
-      var iterator = map.keySet().iterator();
-      iterator.next();
-      assertThrows(UnsupportedOperationException.class, iterator::remove);
-
-      assertEquals(Map.of("alpha", "1", "bravo", "2"), map);
     }
   }
 
@@ -1909,13 +1812,13 @@ class SortedStringMapTest
     @DisplayName("replaceAll replaces all values in sorted key order")
     void replaceAll()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("charlie", "3");
       map.put("alpha", "1");
       map.put("bravo", "2");
 
-      var keys = new ArrayList<String>();
+      final var keys = new ArrayList<String>();
 
       map.replaceAll((k, v) -> {
         keys.add(k);
@@ -1928,21 +1831,10 @@ class SortedStringMapTest
 
 
     @Test
-    @DisplayName("replaceAll on sealed map throws")
-    void replaceAllSealedThrows()
-    {
-      var map = new SortedStringMap<>(Map.of("alpha", "1"), true);
-
-      assertThrows(UnsupportedOperationException.class, () -> map.replaceAll((k, v) -> v));
-      assertEquals("1", map.get("alpha"));
-    }
-
-
-    @Test
     @DisplayName("Default compute and merge operations work on unsealed map")
     void computeAndMerge()
     {
-      var map = new SortedStringMap<Integer>();
+      final var map = new SortedStringMap<Integer>();
 
       map.put("alpha", 1);
       map.merge("alpha", 10, Integer::sum);
@@ -1967,7 +1859,7 @@ class SortedStringMapTest
     @DisplayName("Entries remain sorted after interleaved puts and removes")
     void sortedAfterMixedOperations()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("delta", "4");
       map.put("alpha", "1");
@@ -1990,7 +1882,7 @@ class SortedStringMapTest
     @DisplayName("Re-add removed key maintains sorted order")
     void reAddRemovedKey()
     {
-      var map = new SortedStringMap<String>();
+      final var map = new SortedStringMap<String>();
 
       map.put("alpha", "1");
       map.put("bravo", "2");
