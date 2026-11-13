@@ -430,11 +430,13 @@ final class MessageFormatExceptionTest
 
 
   @Test
-  @DisplayName("with...: copies keep the original stack trace and cause")
+  @DisplayName("with...: copies keep the original stack trace, cause and suppressed exceptions")
   void testWithKeepsStackTrace()
   {
     val cause = new IllegalStateException("cause");
+    val suppressed = new IllegalArgumentException("suppressed");
     val ex = MessageFormatException.of(cause);
+    ex.addSuppressed(suppressed);
     val stackTrace = ex.getStackTrace();
 
     val copy = ex
@@ -445,6 +447,7 @@ final class MessageFormatExceptionTest
 
     assertArrayEquals(stackTrace, copy.getStackTrace());
     assertSame(cause, copy.getCause());
+    assertArrayEquals(new Throwable[] { suppressed }, copy.getSuppressed());
   }
 
 

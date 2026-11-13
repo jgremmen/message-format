@@ -50,7 +50,8 @@ public class MessageFormatException extends MessageException
    * A context key consists of the kind prefix ({@code p} = parameter, {@code pf} = post formatter, {@code t} =
    * template) and a number which is incremented per kind, in the order the context was recorded. The locale has key
    * {@code l} and the code has key {@code c}; if present, they are always the first keys in a sequence, in that order.
-   * Placeholders {@code <key>} in a text are replaced with the associated context value.
+   * Placeholders {@code <key>} in a text are replaced with the associated context value. The texts do not contain the
+   * common prefix {@code "failed to format "}, which is added when the detail message is created.
    * <p>
    * The entry with key {@link #UNRECOGNIZED_KEY} is used if no key sequence matches. Its placeholder {@code <key>} is
    * replaced with the unmatched sequence.
@@ -70,7 +71,7 @@ public class MessageFormatException extends MessageException
 
   static
   {
-    // failed to format ...
+    // "failed to format " is prepended by createMessage()
     MESSAGES.put(UNRECOGNIZED_KEY, "message (unknown key '<key>')");
     MESSAGES.put("", "message");  // default
     MESSAGES.put("c", "message with code '<c>'");  // fallback
@@ -81,28 +82,15 @@ public class MessageFormatException extends MessageException
     MESSAGES.put("p1-p2-t1", "parameter '<p1>' in mapped message of parameter '<p2>' in template '<t1>'");
     MESSAGES.put("p1-pf1", "sub-message parameter '<p1>' of post formatter '<pf1>'");
     MESSAGES.put("p1-pf1-p2", "sub-message parameter '<p1>' of post formatter '<pf1>' in mapped message of parameter '<p2>'");
-    MESSAGES.put("p1-pf1-t1", "failed to format sub-message parameter '<p1>' of post formatter '<pf1>' in template '<t1>'");
-    MESSAGES.put("p1-t1", "failed to format parameter '<p1>' in template '<t1>'");
-    MESSAGES.put("p1-t1-p2", "failed to format parameter '<p1>' in template '<t1>' for mapped message of parameter '<p2>'");
-    MESSAGES.put("pf1", "failed to format post formatter '<pf1>'");
-    MESSAGES.put("pf1-p1", "failed to format post formatter '<pf1>' in mapped message of parameter '<p1>'");
-    MESSAGES.put("pf1-pf2", "failed to format sub-message post formatter '<pf1>' of post formatter '<pf2>'");
-    MESSAGES.put("pf1-t1", "failed to format post formatter '<pf1>' in template '<t1>'");
-    MESSAGES.put("t1", "failed to format template '<t1>'");
-    MESSAGES.put("t1-pf1", "failed to format sub-message template '<t1>' of post formatter '<pf1>'");
-
-/*
-    MESSAGES.put("p1-pf1-pf2", "message ...");
-    MESSAGES.put("p1-t1-pf1", "message ...");
-    MESSAGES.put("pf1-p1-p2", "message ...");
-    MESSAGES.put("pf1-p1-pf2", "message ...");
-    MESSAGES.put("pf1-p1-t1", "message ...");
-    MESSAGES.put("pf1-pf2-p1", "message ...");
-    MESSAGES.put("pf1-pf2-t1", "message ...");
-    MESSAGES.put("pf1-t1-p1", "message ...");
-    MESSAGES.put("pf1-t1-pf2", "message ...");
-    MESSAGES.put("t1-pf1-pf2", "message ...");
- */
+    MESSAGES.put("p1-pf1-t1", "sub-message parameter '<p1>' of post formatter '<pf1>' in template '<t1>'");
+    MESSAGES.put("p1-t1", "parameter '<p1>' in template '<t1>'");
+    MESSAGES.put("p1-t1-p2", "parameter '<p1>' in template '<t1>' for mapped message of parameter '<p2>'");
+    MESSAGES.put("pf1", "post formatter '<pf1>'");
+    MESSAGES.put("pf1-p1", "post formatter '<pf1>' in mapped message of parameter '<p1>'");
+    MESSAGES.put("pf1-pf2", "sub-message post formatter '<pf1>' of post formatter '<pf2>'");
+    MESSAGES.put("pf1-t1", "post formatter '<pf1>' in template '<t1>'");
+    MESSAGES.put("t1", "template '<t1>'");
+    MESSAGES.put("t1-pf1", "sub-message template '<t1>' of post formatter '<pf1>'");
   }
 
 
@@ -152,8 +140,8 @@ public class MessageFormatException extends MessageException
    * far as they are known, honoring the order in which they have been nested. Generated message codes and template
    * names are omitted.
    * <p>
-   * The context keys are concatenated into a sequence (e.g. {@code l-c-p1-t1}) and the longest registered key
-   * sequence that is a prefix of it selects the message text.
+   * The context keys are concatenated into a sequence (e.g. {@code l-c-p1-t1}) and the longest registered key sequence
+   * that is a prefix of it selects the message text.
    *
    * @return  detail message, never {@code null}
    */
@@ -202,10 +190,8 @@ public class MessageFormatException extends MessageException
           .orElseGet(() -> MESSAGES.get(UNRECOGNIZED_KEY).replace("<key>", sequence_));
     }
 
-    final var msg = new StringBuilder(message);
+    final var msg = new StringBuilder("failed to format ").append(message);
 
-    if (msg.indexOf("failed to format ") < 0)
-      msg.insert(0, "failed to format ");
     if (msg.indexOf("<c>") == -1 && get(Kind.CODE) != null)
       msg.insert(0, "message '<c>' ");
     if (get(Kind.LOCALE) != null)
@@ -323,8 +309,8 @@ public class MessageFormatException extends MessageException
 
 
   /**
-   * Returns the name of the post formatter being applied, if available. If multiple post formatters have been
-   * recorded, the innermost one is returned.
+   * Returns the name of the post formatter being applied, if available. If multiple post formatters have been recorded,
+   * the innermost one is returned.
    *
    * @return  post formatter name, or {@code null}
    *
@@ -339,8 +325,8 @@ public class MessageFormatException extends MessageException
   /**
    * Returns a copy of this exception with the given {@code code} added to the formatting context.
    * <p>
-   * The code is recorded only once; if a code is already available or the given code is generated, it is ignored
-   * and this exception is returned.
+   * The code is recorded only once; if a code is already available or the given code is generated, it is ignored and
+   * this exception is returned.
    *
    * @param code  code, not {@code null}
    *
@@ -358,8 +344,7 @@ public class MessageFormatException extends MessageException
    *
    * @param template  template, not {@code null}
    *
-   * @return  new exception based on the current exception with the template added or this exception,
-   *          never {@code null}
+   * @return  new exception based on the current exception with the template added or this exception, never {@code null}
    */
   public @NotNull MessageFormatException withTemplate(@NotNull String template)
   {
@@ -371,8 +356,8 @@ public class MessageFormatException extends MessageException
   /**
    * Returns a copy of this exception with the given {@code locale} added to the formatting context.
    * <p>
-   * The locale is recorded only once; if a locale is already available, the given locale is ignored and this
-   * exception is returned.
+   * The locale is recorded only once; if a locale is already available, the given locale is ignored and this exception
+   * is returned.
    *
    * @param locale  locale, not {@code null}
    *
@@ -410,8 +395,8 @@ public class MessageFormatException extends MessageException
 
 
   /**
-   * Creates a copy of this exception with the given context value added. The copy keeps the cause and the stack trace
-   * of this exception, so the location where the error was originally reported is not lost.
+   * Creates a copy of this exception with the given context value added. The copy keeps the cause, the stack trace and
+   * the suppressed exceptions of this exception, so the location where the error was originally reported is not lost.
    *
    * @param kind   context kind, not {@code null}
    * @param value  context value, not {@code null}
@@ -434,6 +419,9 @@ public class MessageFormatException extends MessageException
     final var copy = new MessageFormatException(List.copyOf(newContext), getCause());
 
     copy.setStackTrace(getStackTrace());
+
+    for(var suppressed: getSuppressed())
+      copy.addSuppressed(suppressed);
 
     return copy;
   }
