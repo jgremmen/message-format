@@ -29,8 +29,8 @@ Consequences:
   `disableAutodetect: true`.
 - If `__emitTokens` throws, highlight.js (in safe mode) falls back to escaped plain text. Errors are
   still caught by the language itself so that partial output isn't lost (see §5).
-- `__emitTokens` was added in highlight.js 11.8.0. The declared minimum is **11.9**, recorded as
-  a peer dependency; 11.8 isn't tested. The dev dependency (11.12.0) is pinned.
+- `__emitTokens` was added in highlight.js 11.8.0. The declared range is **^11.9.0**, recorded as
+  a peer dependency; 11.8 isn't tested, and a new major version may change the hook. The dev dependency (11.12.0) is pinned.
 
 ## 2. Directory layout (`syntax/highlight/`)
 

@@ -25,7 +25,7 @@ the Java parser accepts.
 
 ## Requirements
 
-The language requires highlight.js 11.9 or later, the minimum version declared by the add-on. It drives the
+The language requires highlight.js 11.9 or a later 11.x version, the range declared by the add-on. It drives the
 highlighting through `__emitTokens`, a hook that highlight.js marks as beta. With this hook, a language does its own
 parsing and only uses highlight.js to render the HTML. Because the hook is not yet a stable API, a future
 highlight.js release may change it. The add-on is tested with highlight.js 11.12.0.

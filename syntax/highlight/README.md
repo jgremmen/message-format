@@ -6,7 +6,7 @@ compiled with the ANTLR JavaScript target and fed into highlight.js through its 
 hook. That way the highlighting follows the Java parser, including context-dependent cases such as
 keywords used as names.
 
-Requires **highlight.js 11.9 or later** (the `__emitTokens` hook exists since 11.8, but 11.8 isn't tested). Auto-detection isn't supported, so always specify the language
+Requires **highlight.js 11.9 or a later 11.x version** (the `__emitTokens` hook exists since 11.8, but 11.8 isn't tested). Auto-detection isn't supported, so always specify the language
 (`language-message-format`, or one of the aliases `msgfmt` and `message-format`).
 
 How it works internally (grammar preparation, scope classification, nesting, error handling) is
