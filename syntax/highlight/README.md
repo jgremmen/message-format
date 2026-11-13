@@ -260,7 +260,9 @@ How the build works:
    grammar gets other target-specific code.
 2. `scripts/generate.mjs` runs the ANTLR 4.13.2 tool with the JavaScript target into
    `src/generated/`. The tool comes from `$ANTLR_CLASSPATH` (set by the Gradle build), from
-   `$ANTLR_JAR`, or is downloaded once into `build/`.
+   `$ANTLR_JAR`, or is downloaded once into `build/`. A downloaded jar is verified against the
+   SHA-256 checksum pinned in `scripts/generate.mjs`, which must be added when the ANTLR version
+   changes.
 3. `scripts/build.mjs` bundles `src/` with esbuild into `dist/`.
 
 ### Gradle
