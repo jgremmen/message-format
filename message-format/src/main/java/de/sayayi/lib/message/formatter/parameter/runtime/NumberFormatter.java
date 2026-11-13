@@ -31,11 +31,16 @@ import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.LongAccumulator;
 import java.util.concurrent.atomic.LongAdder;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ClassifierContext.CLASSIFIER_NUMBER;
 import static de.sayayi.lib.message.part.MapKey.MatchResult.Defined.*;
@@ -44,6 +49,7 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.util.MessageUtil.isEmpty;
 import static java.lang.Double.isFinite;
 import static java.lang.Math.signum;
+import static java.text.NumberFormat.*;
 
 
 /**
@@ -128,6 +134,25 @@ public final class NumberFormatter
     extends AbstractParameterFormatter<Number>
     implements MapKeyComparator<Number>
 {
+  /** Maximum number of number formats kept in {@link #numberFormatCache}. */
+  private static final int NUMBER_FORMAT_CACHE_SIZE = 64;
+
+
+  /**
+   * Number formats by format and locale. The least recently used number format is evicted first. As number formats
+   * are not thread-safe, the cached instances are never used for formatting directly, only clones of them.
+   */
+  private final Map<Key,NumberFormat> numberFormatCache = new LinkedHashMap<>(16, 0.75f, true) {
+    @Override
+    protected boolean removeEldestEntry(Map.Entry<Key,NumberFormat> eldest) {
+      return size() > NUMBER_FORMAT_CACHE_SIZE;
+    }
+  };
+
+  /** Lock guarding access to {@link #numberFormatCache}. */
+  private final Lock numberFormatCacheLock = new ReentrantLock();
+
+
   /**
    * {@inheritDoc}
    * <p>
@@ -168,7 +193,7 @@ public final class NumberFormatter
     if ("bool".equals(format))
       return context.format(number, boolean.class);
 
-    if ((format == null || "plain".equals(format)) &&
+    if (isPlainFormat(format) &&
         (number instanceof BigInteger || number instanceof Long || number instanceof Integer ||
          number instanceof Short || number instanceof Byte || number instanceof AtomicInteger ||
          number instanceof AtomicLong || number instanceof LongAdder || number instanceof LongAccumulator))
@@ -179,31 +204,76 @@ public final class NumberFormatter
 
 
   /**
-   * Returns a number format for the given {@code format} and the locale of {@code parameters}.
+   * Returns a number format for the given {@code format} and the locale of {@code parameters}. Number formats are kept
+   * in a bounded cache, so a number format is not created again on every format call.
    *
    * @param format      {@code integer}, {@code percent}, {@code currency}, a custom {@link DecimalFormat} pattern,
    *                    {@code plain} or {@code null} for the default number format
    * @param parameters  parameters providing the locale, not {@code null}
    *
-   * @return  number format, never {@code null}
+   * @return  new number format instance, never {@code null}
+   *
+   * @throws IllegalArgumentException  if {@code format} is not a valid {@link DecimalFormat} pattern
    */
   private @NotNull NumberFormat getFormatter(String format, Parameters parameters)
   {
-    final var locale = parameters.getLocale();
+    final var key = new Key(isPlainFormat(format) ? "" : format, parameters.getLocale());
+    NumberFormat numberFormat;
 
-    if ("integer".equals(format))
-      return NumberFormat.getIntegerInstance(locale);
+    numberFormatCacheLock.lock();
+    try {
+      numberFormat = numberFormatCache.get(key);
+    } finally {
+      numberFormatCacheLock.unlock();
+    }
 
-    if ("percent".equals(format))
-      return NumberFormat.getPercentInstance(locale);
+    if (numberFormat == null)
+    {
+      // create outside the lock; if another thread cached the number format meanwhile, its instance is used
+      final var createdNumberFormat = createFormatter(key.format, key.locale);
 
-    if ("currency".equals(format))
-      return NumberFormat.getCurrencyInstance(locale);
+      numberFormatCacheLock.lock();
+      try {
+        if ((numberFormat = numberFormatCache.putIfAbsent(key, createdNumberFormat)) == null)
+          numberFormat = createdNumberFormat;
+      } finally {
+        numberFormatCacheLock.unlock();
+      }
+    }
 
-    if (!isEmpty(format) && !"plain".equals(format))
-      return new DecimalFormat(format, DecimalFormatSymbols.getInstance(locale));
+    // clone the cached number format, as it is not thread-safe
+    return (NumberFormat)numberFormat.clone();
+  }
 
-    return NumberFormat.getNumberInstance(locale);
+
+  @Contract(pure = true)
+  private static boolean isPlainFormat(String format) {
+    return isEmpty(format) || "plain".equals(format);
+  }
+
+
+  /**
+   * Creates a number format for the given {@code format} and {@code locale}.
+   *
+   * @param format  {@code integer}, {@code percent}, {@code currency}, a custom {@link DecimalFormat} pattern or an
+   *                empty string for the default number format, not {@code null}
+   * @param locale  locale, not {@code null}
+   *
+   * @return  number format, never {@code null}
+   *
+   * @throws IllegalArgumentException  if {@code format} is not a valid {@link DecimalFormat} pattern
+   */
+  @Contract(value = "_, _ -> new", pure = true)
+  private static @NotNull NumberFormat createFormatter(@NotNull String format, @NotNull Locale locale)
+  {
+    return switch(format) {
+      case "integer" -> getIntegerInstance(locale);
+      case "percent" -> getPercentInstance(locale);
+      case "currency" -> getCurrencyInstance(locale);
+      default -> format.isEmpty()
+          ? getNumberInstance(locale)
+          : new DecimalFormat(format, DecimalFormatSymbols.getInstance(locale));
+    };
   }
 
 
@@ -323,5 +393,18 @@ public final class NumberFormatter
     }
 
     return MISMATCH;
+  }
+
+
+
+
+  /**
+   * Key of {@link #numberFormatCache}.
+   *
+   * @param format  {@code integer}, {@code percent}, {@code currency}, a custom {@link DecimalFormat} pattern or an
+   *                empty string for the default number format, not {@code null}
+   * @param locale  locale, not {@code null}
+   */
+  private record Key(@NotNull String format, @NotNull Locale locale) {
   }
 }

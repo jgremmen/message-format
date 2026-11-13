@@ -179,4 +179,21 @@ final class NumberFormatterTest extends AbstractFormatterTest
     assertEquals("other", message.with("x", Float.NaN).format());
     assertEquals("other", message.with("x", 1.5).format());
   }
+
+
+  @Test
+  @DisplayName("Cached number formats are used per format and locale")
+  void testCachedNumberFormats()
+  {
+    val message = MessageSupportFactory
+        .create(createFormatterService(new NumberFormatter()))
+        .message("%{v,number:'#,##0.00'} %{v} %{v,number:percent}");
+
+    for(var n = 0; n < 2; n++)
+    {
+      assertEquals("12.345,68 12.345,678 1.234.568 %", message.with("v", 12345.678).locale(GERMANY).format());
+      assertEquals("12,345.68 12,345.678 1,234,568%", message.with("v", 12345.678).locale(US).format());
+      assertEquals("1,50 1,5 150 %", message.with("v", 1.5).locale(GERMANY).format());
+    }
+  }
 }
