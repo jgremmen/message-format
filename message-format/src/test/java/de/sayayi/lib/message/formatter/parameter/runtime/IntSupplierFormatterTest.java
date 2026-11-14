@@ -15,21 +15,22 @@
  */
 package de.sayayi.lib.message.formatter.parameter.runtime;
 
-import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import lombok.val;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.params.provider.Arguments;
 
+import java.util.Locale;
 import java.util.function.IntSupplier;
+import java.util.stream.Stream;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Integer.MIN_VALUE;
 import static java.util.Locale.ROOT;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 
 /**
@@ -40,33 +41,34 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 @DisplayName("IntSupplier formatter")
 @TestMethodOrder(MethodOrderer.DisplayName.class)
-final class IntSupplierFormatterTest extends AbstractFormatterTest
+final class IntSupplierFormatterTest extends AbstractSupplierFormatterTest
 {
-  @Test
-  void testFormattableTypes() {
-    assertFormatterForType(new IntSupplierFormatter(), IntSupplier.class);
+  @Override
+  protected @NotNull ParameterFormatter createFormatter() {
+    return new IntSupplierFormatter();
   }
 
 
-  @Test
-  void testFormat()
-  {
-    val messageAccessor = createMessageAccessor(ROOT, new IntSupplierFormatter());
+  @Override
+  protected @NotNull Class<?> getFormattableType() {
+    return IntSupplier.class;
+  }
 
-    assertEquals(
-        nullText(),
-        format(messageAccessor, null));
-    assertEquals(
-        noSpaceText("0"),
-        format(messageAccessor, (IntSupplier)() -> 0));
-    assertEquals(
-        noSpaceText(Integer.toString(MAX_VALUE)),
-        format(messageAccessor, (IntSupplier)() -> MAX_VALUE));
-    assertEquals(
-        noSpaceText(Integer.toString(MIN_VALUE)),
-        format(messageAccessor, (IntSupplier)() -> MIN_VALUE));
-    assertEquals(
-        noSpaceText("123456789"),
-        format(messageAccessor, (IntSupplier)() -> 123456789));
+
+  @Override
+  protected @NotNull Locale getLocale() {
+    return ROOT;
+  }
+
+
+  @Override
+  protected @NotNull Stream<Arguments> formattedValues()
+  {
+    return Stream.of(
+        arguments((IntSupplier)() -> 0, noSpaceText("0")),
+        arguments((IntSupplier)() -> MAX_VALUE, noSpaceText(Integer.toString(MAX_VALUE))),
+        arguments((IntSupplier)() -> MIN_VALUE, noSpaceText(Integer.toString(MIN_VALUE))),
+        arguments((IntSupplier)() -> 123456789, noSpaceText("123456789"))
+    );
   }
 }

@@ -40,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class MessageTest
 {
   @Test
-  void testParse1()
+  void testParseTrimsTrailingSpace()
   {
     val messageSupport = MessageSupportFactory.shared();
 

@@ -17,13 +17,11 @@ package de.sayayi.lib.message.internal.part.config;
 
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueNumber;
 import de.sayayi.lib.message.part.TypedValue;
-import de.sayayi.lib.pack.PackOutputStream;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +29,7 @@ import java.util.Set;
 
 import static de.sayayi.lib.message.internal.part.typedvalue.TypedValueBool.FALSE;
 import static de.sayayi.lib.message.internal.part.typedvalue.TypedValueBool.TRUE;
-import static de.sayayi.lib.message.pack.PackConstants.PACK_CONFIG;
+import static de.sayayi.lib.message.util.PackTestSupport.packBytes;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -89,14 +87,7 @@ class MessagePartConfigTest
   }
 
 
-  private static byte[] pack(@NotNull MessagePartConfig config) throws Exception
-  {
-    val bytes = new ByteArrayOutputStream();
-
-    try(val packStream = new PackOutputStream(PACK_CONFIG, 1, false, bytes)) {
-      config.pack(packStream);
-    }
-
-    return bytes.toByteArray();
+  private static byte[] pack(@NotNull MessagePartConfig config) throws Exception {
+    return packBytes(1, config::pack);
   }
 }

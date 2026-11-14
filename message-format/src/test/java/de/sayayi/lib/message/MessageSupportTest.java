@@ -40,6 +40,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static de.sayayi.lib.message.MessageSupportFactory.createDefault;
 import static de.sayayi.lib.message.MessageSupportFactory.shared;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
+import static de.sayayi.lib.message.util.AssertionTestSupport.assertNullRejected;
 import static java.nio.file.Files.writeString;
 import static java.util.Collections.enumeration;
 import static java.util.Locale.GERMANY;
@@ -255,7 +256,8 @@ final class MessageSupportTest
         .addTemplate("tpl", messageFactory.parseTemplate("first"))
         .addTemplate("tpl", messageFactory.parseTemplate("first"));
 
-    assertThrowsExactly(DuplicateTemplateException.class,
+    assertThrowsExactly(
+        DuplicateTemplateException.class,
         () -> messageSupport.addTemplate("tpl", messageFactory.parseTemplate("second")));
     assertEquals("first", messageSupport.message("%[tpl]").format());
   }
@@ -266,10 +268,10 @@ final class MessageSupportTest
   @SuppressWarnings("DataFlowIssue")
   void testAddNullTemplate()
   {
-    val ex = assertThrowsExactly(NullPointerException.class,
-        () -> createDefault().addTemplate("tpl", null));
-
-    assertEquals("template must not be null", ex.getMessage());
+    assertNullRejected(
+        "template must not be null",
+        () -> createDefault()
+            .addTemplate("tpl", null));
   }
 
 
@@ -278,11 +280,10 @@ final class MessageSupportTest
   @SuppressWarnings("DataFlowIssue")
   void testRegisterTemplatesFromNullClassLoader()
   {
-    val ex = assertThrowsExactly(
-        NullPointerException.class,
-        () -> createDefault().registerTemplatesFromService(null));
-
-    assertEquals("classLoader must not be null", ex.getMessage());
+    assertNullRejected(
+        "classLoader must not be null",
+        () -> createDefault()
+            .registerTemplatesFromService(null));
   }
 
 

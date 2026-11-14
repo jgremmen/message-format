@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 @TestMethodOrder(MethodOrderer.DisplayName.class)
 class AbstractAntlr4ParserTest
 {
-  private Calculator calculator;
+  private CalculatorTestParser calculator;
 
 
   @BeforeEach
@@ -44,7 +44,7 @@ class AbstractAntlr4ParserTest
 
     messageSupport.addMessage("div-by-0", "division by zero: %{left} / 0");
 
-    calculator = new Calculator(messageSupport.seal());
+    calculator = new CalculatorTestParser(messageSupport.seal());
   }
 
 

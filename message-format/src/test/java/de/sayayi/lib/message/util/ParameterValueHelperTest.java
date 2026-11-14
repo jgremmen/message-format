@@ -20,6 +20,9 @@ import de.sayayi.lib.message.formatter.parameter.SingletonParameters;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -27,6 +30,7 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 import static de.sayayi.lib.message.util.ParameterValueHelperTest.TestEnum.SOME_VALUE;
 import static java.util.Locale.ROOT;
@@ -34,6 +38,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 
 /**
@@ -159,19 +164,41 @@ class ParameterValueHelperTest
 
 
 
-  // ---- getInt ----
+  // ---- getInt and getLong ----
+
+  /**
+   * Values that {@code getInt} and {@code getLong} convert to the same result.
+   */
+  static Stream<Arguments> numberValues()
+  {
+    return Stream.of(
+        arguments("null", null, null),
+        arguments("Double exact integer", 5.0, 5),
+        arguments("Float exact integer", 5.0f, 5),
+        arguments("Float fractional", 3.7f, null),
+        arguments("BigDecimal exact integer", new BigDecimal("42.00"), 42),
+        arguments("BigDecimal fractional", new BigDecimal("42.99"), null),
+        arguments("BigDecimal exceeding long range", new BigDecimal("99999999999999999999"), null),
+        arguments("Numeric string", "123", 123),
+        arguments("Negative numeric string", "-5", -5),
+        arguments("Non-numeric string", "abc", null),
+        arguments("Empty string", "", null),
+        arguments("Empty OptionalInt", OptionalInt.empty(), null),
+        arguments("Empty OptionalLong", OptionalLong.empty(), null),
+        arguments("Optional wrapping string", Optional.of("88"), 88),
+        arguments("Empty Optional", Optional.empty(), null),
+        arguments("Object", new Object(), null),
+        arguments("Boolean", true, null)
+    );
+  }
+
+
+
 
   @Nested
   @DisplayName("getInt")
   class GetIntTest
   {
-    @Test
-    @DisplayName("null value returns empty")
-    void nullValue() {
-      assertTrue(ParameterValueHelper.getInt(parametersOf("p", null), "p").isEmpty());
-    }
-
-
     @Test
     @DisplayName("missing parameter returns empty")
     void missingParameter() {
@@ -179,217 +206,44 @@ class ParameterValueHelperTest
     }
 
 
-    @Test
-    @DisplayName("Integer value")
-    void integerValue()
+    static Stream<Arguments> intValues()
     {
-      assertEquals(OptionalInt.of(42), ParameterValueHelper.getInt(parametersOf("p", 42), "p"));
-      assertEquals(OptionalInt.of(-1), ParameterValueHelper.getInt(parametersOf("p", -1), "p"));
-      assertEquals(OptionalInt.of(0), ParameterValueHelper.getInt(parametersOf("p", 0), "p"));
+      return Stream.of(
+          arguments("Integer", 42, 42),
+          arguments("Negative integer", -1, -1),
+          arguments("Zero integer", 0, 0),
+          arguments("Long within int range", 100L, 100),
+          arguments("Long exceeding int range", Long.MAX_VALUE, null),
+          arguments("Double fractional", 3.7, null),
+          arguments("BigInteger within int range", BigInteger.valueOf(999), 999),
+          arguments("BigInteger exceeding int range", BigInteger.valueOf(Long.MAX_VALUE), null),
+          arguments("String exceeding int range", "99999999999999", null),
+          arguments("OptionalInt", OptionalInt.of(7), 7),
+          arguments("OptionalLong within int range", OptionalLong.of(10), 10),
+          arguments("OptionalLong exceeding int range", OptionalLong.of(Long.MAX_VALUE), null),
+          arguments("Optional wrapping number", Optional.of(55), 55)
+      );
     }
 
 
-    @Test
-    @DisplayName("Long value within int range")
-    void longValue() {
-      assertEquals(OptionalInt.of(100), ParameterValueHelper.getInt(parametersOf("p", 100L), "p"));
-    }
-
-
-    @Test
-    @DisplayName("Long value exceeding int range returns empty")
-    void longOverflow() {
-      assertTrue(ParameterValueHelper.getInt(parametersOf("p", Long.MAX_VALUE), "p").isEmpty());
-    }
-
-
-    @Test
-    @DisplayName("Double exact integer value")
-    void doubleExactValue() {
-      assertEquals(OptionalInt.of(5), ParameterValueHelper.getInt(parametersOf("p", 5.0), "p"));
-    }
-
-
-    @Test
-    @DisplayName("Double fractional value returns empty")
-    void doubleFractionalValue() {
-      assertTrue(ParameterValueHelper.getInt(parametersOf("p", 3.7), "p").isEmpty());
-    }
-
-
-    @Test
-    @DisplayName("Float exact integer value")
-    void floatExactValue() {
-      assertEquals(OptionalInt.of(5), ParameterValueHelper.getInt(parametersOf("p", 5.0f), "p"));
-    }
-
-
-    @Test
-    @DisplayName("Float fractional value returns empty")
-    void floatFractionalValue() {
-      assertTrue(ParameterValueHelper.getInt(parametersOf("p", 3.7f), "p").isEmpty());
-    }
-
-
-    @Test
-    @DisplayName("BigInteger within int range")
-    void bigIntegerValue()
+    @ParameterizedTest(name = "{0}: {1} -> {2}")
+    @DisplayName("Values are converted to int or return empty")
+    @MethodSource({ "intValues", "de.sayayi.lib.message.util.ParameterValueHelperTest#numberValues" })
+    void valueConversion(@SuppressWarnings("unused") String name, Object value, Number expected)
     {
-      assertEquals(OptionalInt.of(999),
-          ParameterValueHelper.getInt(parametersOf("p", BigInteger.valueOf(999)), "p"));
-    }
-
-
-    @Test
-    @DisplayName("BigInteger exceeding int range returns empty")
-    void bigIntegerOverflow()
-    {
-      var huge = BigInteger.valueOf(Long.MAX_VALUE);
-      assertTrue(ParameterValueHelper.getInt(parametersOf("p", huge), "p").isEmpty());
-    }
-
-
-    @Test
-    @DisplayName("BigDecimal exact integer value")
-    void bigDecimalExactValue()
-    {
-      assertEquals(OptionalInt.of(42),
-          ParameterValueHelper.getInt(parametersOf("p", new BigDecimal("42.00")), "p"));
-    }
-
-
-    @Test
-    @DisplayName("BigDecimal fractional value returns empty")
-    void bigDecimalFractionalValue() {
-      assertTrue(ParameterValueHelper.getInt(parametersOf("p", new BigDecimal("42.99")), "p").isEmpty());
-    }
-
-
-    @Test
-    @DisplayName("BigDecimal exceeding int range returns empty")
-    void bigDecimalOverflow()
-    {
-      var huge = new BigDecimal("99999999999999999999");
-      assertTrue(ParameterValueHelper.getInt(parametersOf("p", huge), "p").isEmpty());
-    }
-
-
-    @Test
-    @DisplayName("Numeric string")
-    void numericString()
-    {
-      assertEquals(OptionalInt.of(123), ParameterValueHelper.getInt(parametersOf("p", "123"), "p"));
-      assertEquals(OptionalInt.of(-5), ParameterValueHelper.getInt(parametersOf("p", "-5"), "p"));
-    }
-
-
-    @Test
-    @DisplayName("Non-numeric string returns empty")
-    void nonNumericString()
-    {
-      assertTrue(ParameterValueHelper.getInt(parametersOf("p", "abc"), "p").isEmpty());
-      assertTrue(ParameterValueHelper.getInt(parametersOf("p", ""), "p").isEmpty());
-    }
-
-
-    @Test
-    @DisplayName("String exceeding int range returns empty")
-    void stringOverflow() {
-      assertTrue(ParameterValueHelper.getInt(parametersOf("p", "99999999999999"), "p").isEmpty());
-    }
-
-
-    @Test
-    @DisplayName("OptionalInt value is passed through")
-    void optionalIntValue()
-    {
-      assertEquals(OptionalInt.of(7),
-          ParameterValueHelper.getInt(parametersOf("p", OptionalInt.of(7)), "p"));
-    }
-
-
-    @Test
-    @DisplayName("Empty OptionalInt returns empty")
-    void emptyOptionalInt() {
-      assertTrue(ParameterValueHelper.getInt(parametersOf("p", OptionalInt.empty()), "p").isEmpty());
-    }
-
-
-    @Test
-    @DisplayName("OptionalLong within int range")
-    void optionalLongValue()
-    {
-      assertEquals(OptionalInt.of(10),
-          ParameterValueHelper.getInt(parametersOf("p", OptionalLong.of(10)), "p"));
-    }
-
-
-    @Test
-    @DisplayName("OptionalLong exceeding int range returns empty")
-    void optionalLongOverflow()
-    {
-      assertTrue(ParameterValueHelper.getInt(
-          parametersOf("p", OptionalLong.of(Long.MAX_VALUE)), "p").isEmpty());
-    }
-
-
-    @Test
-    @DisplayName("Empty OptionalLong returns empty")
-    void emptyOptionalLong() {
-      assertTrue(ParameterValueHelper.getInt(parametersOf("p", OptionalLong.empty()), "p").isEmpty());
-    }
-
-
-    @Test
-    @DisplayName("Optional wrapping number is unwrapped")
-    void optionalWrappedNumber()
-    {
-      assertEquals(OptionalInt.of(55),
-          ParameterValueHelper.getInt(parametersOf("p", Optional.of(55)), "p"));
-    }
-
-
-    @Test
-    @DisplayName("Optional wrapping string is unwrapped")
-    void optionalWrappedString()
-    {
-      assertEquals(OptionalInt.of(88),
-          ParameterValueHelper.getInt(parametersOf("p", Optional.of("88")), "p"));
-    }
-
-
-    @Test
-    @DisplayName("Empty Optional returns empty")
-    void emptyOptional() {
-      assertTrue(ParameterValueHelper.getInt(parametersOf("p", Optional.empty()), "p").isEmpty());
-    }
-
-
-    @Test
-    @DisplayName("Non-convertible type returns empty")
-    void nonConvertibleType()
-    {
-      assertTrue(ParameterValueHelper.getInt(parametersOf("p", new Object()), "p").isEmpty());
-      assertTrue(ParameterValueHelper.getInt(parametersOf("p", true), "p").isEmpty());
+      assertEquals(
+          expected == null ? OptionalInt.empty() : OptionalInt.of(expected.intValue()),
+          ParameterValueHelper.getInt(parametersOf("p", value), "p"));
     }
   }
 
 
 
 
-  // ---- getLong ----
-
   @Nested
   @DisplayName("getLong")
   class GetLongTest
   {
-    @Test
-    @DisplayName("null value returns empty")
-    void nullValue() {
-      assertTrue(ParameterValueHelper.getLong(parametersOf("p", null), "p").isEmpty());
-    }
-
-
     @Test
     @DisplayName("missing parameter returns empty")
     void missingParameter() {
@@ -397,184 +251,31 @@ class ParameterValueHelperTest
     }
 
 
-    @Test
-    @DisplayName("Long value")
-    void longValue()
+    static Stream<Arguments> longValues()
     {
-      assertEquals(OptionalLong.of(42L), ParameterValueHelper.getLong(parametersOf("p", 42L), "p"));
-      assertEquals(OptionalLong.of(Long.MAX_VALUE),
-          ParameterValueHelper.getLong(parametersOf("p", Long.MAX_VALUE), "p"));
+      return Stream.of(
+          arguments("Long", 42L, 42L),
+          arguments("Long maximum", Long.MAX_VALUE, Long.MAX_VALUE),
+          arguments("Integer widened to long", 7, 7),
+          arguments("Double fractional", 3.9, null),
+          arguments("BigInteger within long range", BigInteger.valueOf(123456789L), 123456789L),
+          arguments("BigInteger exceeding long range", BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.ONE), null),
+          arguments("String exceeding long range", "99999999999999999999", null),
+          arguments("OptionalLong", OptionalLong.of(7), 7),
+          arguments("OptionalInt widened to long", OptionalInt.of(10), 10),
+          arguments("Optional wrapping number", Optional.of(55L), 55)
+      );
     }
 
 
-    @Test
-    @DisplayName("Integer value widened to long")
-    void integerValue() {
-      assertEquals(OptionalLong.of(7), ParameterValueHelper.getLong(parametersOf("p", 7), "p"));
-    }
-
-
-    @Test
-    @DisplayName("Double exact integer value")
-    void doubleExactValue() {
-      assertEquals(OptionalLong.of(5), ParameterValueHelper.getLong(parametersOf("p", 5.0), "p"));
-    }
-
-
-    @Test
-    @DisplayName("Double fractional value returns empty")
-    void doubleFractionalValue() {
-      assertTrue(ParameterValueHelper.getLong(parametersOf("p", 3.9), "p").isEmpty());
-    }
-
-
-    @Test
-    @DisplayName("Float exact integer value")
-    void floatExactValue() {
-      assertEquals(OptionalLong.of(5), ParameterValueHelper.getLong(parametersOf("p", 5.0f), "p"));
-    }
-
-
-    @Test
-    @DisplayName("Float fractional value returns empty")
-    void floatFractionalValue() {
-      assertTrue(ParameterValueHelper.getLong(parametersOf("p", 3.7f), "p").isEmpty());
-    }
-
-
-    @Test
-    @DisplayName("BigInteger within long range")
-    void bigIntegerValue()
+    @ParameterizedTest(name = "{0}: {1} -> {2}")
+    @DisplayName("Values are converted to long or return empty")
+    @MethodSource({ "longValues", "de.sayayi.lib.message.util.ParameterValueHelperTest#numberValues" })
+    void valueConversion(@SuppressWarnings("unused") String name, Object value, Number expected)
     {
-      assertEquals(OptionalLong.of(123456789L),
-          ParameterValueHelper.getLong(parametersOf("p", BigInteger.valueOf(123456789L)), "p"));
-    }
-
-
-    @Test
-    @DisplayName("BigInteger exceeding long range returns empty")
-    void bigIntegerOverflow()
-    {
-      var huge = BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.ONE);
-      assertTrue(ParameterValueHelper.getLong(parametersOf("p", huge), "p").isEmpty());
-    }
-
-
-    @Test
-    @DisplayName("BigDecimal exact integer value")
-    void bigDecimalExactValue()
-    {
-      assertEquals(OptionalLong.of(42),
-          ParameterValueHelper.getLong(parametersOf("p", new BigDecimal("42.00")), "p"));
-    }
-
-
-    @Test
-    @DisplayName("BigDecimal fractional value returns empty")
-    void bigDecimalFractionalValue() {
-      assertTrue(ParameterValueHelper.getLong(parametersOf("p", new BigDecimal("42.99")), "p").isEmpty());
-    }
-
-
-    @Test
-    @DisplayName("BigDecimal exceeding long range returns empty")
-    void bigDecimalOverflow()
-    {
-      var huge = new BigDecimal("99999999999999999999");
-      assertTrue(ParameterValueHelper.getLong(parametersOf("p", huge), "p").isEmpty());
-    }
-
-
-    @Test
-    @DisplayName("Numeric string")
-    void numericString()
-    {
-      assertEquals(OptionalLong.of(123), ParameterValueHelper.getLong(parametersOf("p", "123"), "p"));
-      assertEquals(OptionalLong.of(-5), ParameterValueHelper.getLong(parametersOf("p", "-5"), "p"));
-    }
-
-
-    @Test
-    @DisplayName("Non-numeric string returns empty")
-    void nonNumericString()
-    {
-      assertTrue(ParameterValueHelper.getLong(parametersOf("p", "abc"), "p").isEmpty());
-      assertTrue(ParameterValueHelper.getLong(parametersOf("p", ""), "p").isEmpty());
-    }
-
-
-    @Test
-    @DisplayName("String exceeding long range returns empty")
-    void stringOverflow()
-    {
-      assertTrue(ParameterValueHelper.getLong(
-          parametersOf("p", "99999999999999999999"), "p").isEmpty());
-    }
-
-
-    @Test
-    @DisplayName("OptionalLong value is passed through")
-    void optionalLongValue()
-    {
-      assertEquals(OptionalLong.of(7),
-          ParameterValueHelper.getLong(parametersOf("p", OptionalLong.of(7)), "p"));
-    }
-
-
-    @Test
-    @DisplayName("Empty OptionalLong returns empty")
-    void emptyOptionalLong() {
-      assertTrue(ParameterValueHelper.getLong(parametersOf("p", OptionalLong.empty()), "p").isEmpty());
-    }
-
-
-    @Test
-    @DisplayName("OptionalInt value widened to long")
-    void optionalIntValue()
-    {
-      assertEquals(OptionalLong.of(10),
-          ParameterValueHelper.getLong(parametersOf("p", OptionalInt.of(10)), "p"));
-    }
-
-
-    @Test
-    @DisplayName("Empty OptionalInt returns empty")
-    void emptyOptionalInt() {
-      assertTrue(ParameterValueHelper.getLong(parametersOf("p", OptionalInt.empty()), "p").isEmpty());
-    }
-
-
-    @Test
-    @DisplayName("Optional wrapping number is unwrapped")
-    void optionalWrappedNumber()
-    {
-      assertEquals(OptionalLong.of(55),
-          ParameterValueHelper.getLong(parametersOf("p", Optional.of(55L)), "p"));
-    }
-
-
-    @Test
-    @DisplayName("Optional wrapping string is unwrapped")
-    void optionalWrappedString()
-    {
-      assertEquals(OptionalLong.of(88),
-          ParameterValueHelper.getLong(parametersOf("p", Optional.of("88")), "p"));
-    }
-
-
-    @Test
-    @DisplayName("Empty Optional returns empty")
-    void emptyOptional() {
-      assertTrue(ParameterValueHelper.getLong(parametersOf("p", Optional.empty()), "p").isEmpty());
-    }
-
-
-    @Test
-    @DisplayName("Non-convertible type returns empty")
-    void nonConvertibleType()
-    {
-      assertTrue(ParameterValueHelper.getLong(parametersOf("p", new Object()), "p").isEmpty());
-      assertTrue(ParameterValueHelper.getLong(parametersOf("p", true), "p").isEmpty());
+      assertEquals(
+          expected == null ? OptionalLong.empty() : OptionalLong.of(expected.longValue()),
+          ParameterValueHelper.getLong(parametersOf("p", value), "p"));
     }
   }
 

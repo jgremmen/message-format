@@ -18,15 +18,27 @@ package de.sayayi.lib.message.internal.parser;
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.exception.MessageParserException;
 import de.sayayi.lib.message.part.normalizer.LRUMessagePartNormalizer;
-import org.junit.jupiter.api.*;
+import org.intellij.lang.annotations.Language;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.stream.Stream;
+
+import static de.sayayi.lib.message.exception.MessageParserException.Type.MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 
 /**
- * Tests the error messages reported by the message lexer and parser for unrecognized tokens, input mismatches, missing
- * alternatives and unwanted tokens.
+ * Tests the error messages reported by the message lexer, parser and compiler for unrecognized tokens, input
+ * mismatches, missing alternatives, unwanted tokens, duplicate configuration names and template entries, numbers out of
+ * the long range, message values in post formatter configurations and a lone default map entry.
  *
  * @author Jeroen Gremmen
  * @since 0.20.0
@@ -45,50 +57,42 @@ final class MessageErrorTest
   }
 
 
-  @Test
-  @DisplayName("Token recognition message")
-  void tokenRecognitionMessage()
+  static Stream<Arguments> errorMessages()
   {
-    var ex = assertThrowsExactly(MessageParserException.class,
-        () -> COMPILER.compileMessage("%{r{"));
-    assertEquals("message syntax error at '{'", ex.getErrorMessage());
+    return Stream.of(
+        arguments("Token recognition", "%{r{", "message syntax error at '{'"),
+        arguments("Input mismatch", "%{64", "missing parameter name at '64'"),
+        arguments("Input mismatch", "%{p'", "end of message parameter expected at \"'\""),
+        arguments("Input mismatch", "%{p,:", "pre-mature end of message parameter reached; missing default message"),
+        arguments("No viable alternative", "%{r,true:!}", "syntax error in message parameter map element at '!'"),
+        arguments("Unwanted token", "%{r,d:6", "pre-mature end of message parameter reached; missing '}'"),
+        arguments("Duplicate config name", "%{ p1, msg:yes, msg:no }",
+            "duplicate config name 'msg' for parameter 'p1'"),
+        arguments("Number above long range", "%{p,value:9223372036854775808}", "number value out of range"),
+        arguments("Number below long range", "%{p,value:-9223372036854775809}", "number value out of range"),
+        arguments("Post formatter with message config value", "%(clip, 'text', config:'%{message}')",
+            "post-format config 'config' cannot be a message value"),
+        arguments("Default map entry only", "%{ p, :' %{n} items' }",
+            "default map entry can only be used in combination with other map entries"),
+        arguments("Missing template name", "%[ '' ]", "missing template name at \"'\""),
+        arguments("Duplicate template parameter delegate", "%[ xyz, a->b, a->c ]",
+            "duplicate template parameter delegate 'a'"),
+        arguments("Duplicate template default parameter", "%[ xyz, a=true, a=false ]",
+            "duplicate template default parameter 'a'")
+    );
   }
 
 
-  @Test
-  @DisplayName("Input mismatch message")
-  void inputMismatchMessage()
+  @ParameterizedTest(name = "{0}: {1}")
+  @DisplayName("Syntax errors are reported with a descriptive message")
+  @MethodSource("errorMessages")
+  void testErrorMessage(@SuppressWarnings("unused") String name, @Language("MessageFormat") String formatString, String errorMessage)
   {
-    var ex = assertThrowsExactly(MessageParserException.class,
-        () -> COMPILER.compileMessage("%{64"));
-    assertEquals("missing parameter name at '64'", ex.getErrorMessage());
+    final var ex = assertThrowsExactly(
+        MessageParserException.class,
+        () -> COMPILER.compileMessage(formatString));
 
-    ex = assertThrowsExactly(MessageParserException.class,
-        () -> COMPILER.compileMessage("%{p'"));
-    assertEquals("end of message parameter expected at \"'\"", ex.getErrorMessage());
-
-    ex = assertThrowsExactly(MessageParserException.class,
-        () -> COMPILER.compileMessage("%{p,:"));
-    assertEquals("pre-mature end of message parameter reached; missing default message", ex.getErrorMessage());
-  }
-
-
-  @Test
-  @DisplayName("No viable alternative message")
-  void parserNoViableAlternative()
-  {
-    var ex = assertThrowsExactly(MessageParserException.class,
-        () -> COMPILER.compileMessage("%{r,true:!}"));
-    assertEquals("syntax error in message parameter map element at '!'", ex.getErrorMessage());
-  }
-
-
-  @Test
-  @DisplayName("Unwanted token message")
-  void unwantedTokenMessage()
-  {
-    var ex = assertThrowsExactly(MessageParserException.class,
-        () -> COMPILER.compileMessage("%{r,d:6"));
-    assertEquals("pre-mature end of message parameter reached; missing '}'", ex.getErrorMessage());
+    assertEquals(errorMessage, ex.getErrorMessage());
+    assertEquals(MESSAGE, ex.getType());
   }
 }

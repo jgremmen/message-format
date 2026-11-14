@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.OptionalInt;
 import java.util.Set;
 
+import static de.sayayi.lib.message.util.AssertionTestSupport.assertEqualsContract;
 import static java.util.Locale.GERMAN;
 import static java.util.Locale.ITALIAN;
 import static org.junit.jupiter.api.Assertions.*;
@@ -83,11 +84,10 @@ final class MessageParametersTest
   @DisplayName("Equals and hashCode do not depend on the parameter order")
   void testEqualsAndHashCode()
   {
-    val sameParameters = createParameters(ITALIAN, "a", "b", "c", "o");
-
-    assertEquals(parameters, sameParameters);
-    assertEquals(parameters.hashCode(), sameParameters.hashCode());
-    assertNotEquals(parameters, createParameters(GERMAN, "a", "b", "c", "o"));
+    assertEqualsContract(
+        parameters,
+        createParameters(ITALIAN, "a", "b", "c", "o"),
+        createParameters(GERMAN, "a", "b", "c", "o"));
   }
 
 
@@ -111,7 +111,8 @@ final class MessageParametersTest
 
   private static @NotNull MessageParameters createParameters(@NotNull Locale locale, @NotNull String... names)
   {
-    val messageSupport = new MessageSupportImpl(DefaultFormatterService.getSharedInstance(),
+    val messageSupport = new MessageSupportImpl(
+        DefaultFormatterService.getSharedInstance(),
         MessageFactory.getSharedInstance());
     val configurer = messageSupport.new Configurer<>(() -> null);
 

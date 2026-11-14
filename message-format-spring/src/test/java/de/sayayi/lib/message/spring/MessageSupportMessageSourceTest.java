@@ -26,6 +26,7 @@ import org.springframework.context.support.DefaultMessageSourceResolvable;
 
 import java.util.Optional;
 
+import static de.sayayi.lib.message.util.AssertionTestSupport.assertNullRejected;
 import static java.util.Locale.ENGLISH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -132,8 +133,10 @@ final class MessageSupportMessageSourceTest
     val messageSupport = MessageSupportFactory.createDefault();
     messageSupport.addMessage("msg", "hello %{" + parameterPrefix + "1}");
 
-    assertEquals("hello jack", new MessageSupportMessageSource(parameterPrefix, messageSupport)
-        .getMessage("msg", new Object[] { "jack" }, ENGLISH));
+    assertEquals(
+        "hello jack",
+        new MessageSupportMessageSource(parameterPrefix, messageSupport)
+            .getMessage("msg", new Object[] { "jack" }, ENGLISH));
   }
 
 
@@ -144,9 +147,12 @@ final class MessageSupportMessageSourceTest
   {
     val messageSupport = MessageSupportFactory.createDefault();
 
-    val ex = assertThrows(IllegalArgumentException.class,
+    val ex = assertThrows(
+        IllegalArgumentException.class,
         () -> new MessageSupportMessageSource(parameterPrefix, messageSupport));
-    assertEquals("parameterPrefix '" + parameterPrefix + "' must form kebab-case or lower camel-case parameter names",
+
+    assertEquals(
+        "parameterPrefix '" + parameterPrefix + "' must form kebab-case or lower camel-case parameter names",
         ex.getMessage());
   }
 
@@ -156,7 +162,8 @@ final class MessageSupportMessageSourceTest
   @SuppressWarnings("DataFlowIssue")
   void testNullMessageSupport()
   {
-    assertEquals("messageSupport must not be null", assertThrows(NullPointerException.class,
-        () -> new MessageSupportMessageSource("p", null)).getMessage());
+    assertNullRejected(
+        "messageSupport must not be null",
+        () -> new MessageSupportMessageSource("p", null));
   }
 }

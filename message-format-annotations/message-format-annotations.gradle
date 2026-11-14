@@ -46,6 +46,8 @@ dependencies {
   api project(':message-format')
 
   asmToBundle libs.asm
+
+  testImplementation testFixtures(project(':message-format'))
 }
 
 

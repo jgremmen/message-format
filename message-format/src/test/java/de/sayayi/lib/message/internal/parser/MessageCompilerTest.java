@@ -31,11 +31,11 @@ import de.sayayi.lib.message.internal.part.typedvalue.TypedValueNumber;
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.normalizer.LRUMessagePartNormalizer;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
 
 import java.util.Map;
 
-import static de.sayayi.lib.message.exception.MessageParserException.Type.MESSAGE;
 import static de.sayayi.lib.message.internal.part.config.MessagePartConfig.EMPTY_CONFIG;
 import static de.sayayi.lib.message.internal.part.map.MessagePartMap.EMPTY_MAP;
 import static de.sayayi.lib.message.part.TextPartFactory.*;
@@ -70,25 +70,11 @@ final class MessageCompilerTest
   @DisplayName("Text only")
   void testTextOnly()
   {
-    assertArrayEquals(
-        new MessagePart[] { emptyText() },
-        COMPILER.compileMessage("").getMessageParts());
-
-    assertArrayEquals(
-        new MessagePart[] { addSpaces(noSpaceText("a\nb"), false, true) },
-        COMPILER.compileMessage("a\\u000ab ").getMessageParts());
-
-    assertArrayEquals(
-        new MessagePart[] { addSpaces(emptyText(), true, true) },
-        COMPILER.compileMessage("          ").getMessageParts());
-
-    assertArrayEquals(
-        new MessagePart[] { addSpaces(noSpaceText("'\\"), true, false) },
-        COMPILER.compileMessage("  \\'\\\\").getMessageParts());
-
-    assertArrayEquals(
-        new MessagePart[] { noSpaceText("this is a text") },
-        COMPILER.compileMessage("this  is  a  text").getMessageParts());
+    assertCompiles("", emptyText());
+    assertCompiles("a\\u000ab ", addSpaces(noSpaceText("a\nb"), false, true));
+    assertCompiles("          ", addSpaces(emptyText(), true, true));
+    assertCompiles("  \\'\\\\", addSpaces(noSpaceText("'\\"), true, false));
+    assertCompiles("this  is  a  text", noSpaceText("this is a text"));
   }
 
 
@@ -96,9 +82,7 @@ final class MessageCompilerTest
   @DisplayName("Text with lone backslash")
   void testTextLoneBackslash()
   {
-    assertArrayEquals(
-        new MessagePart[] { noSpaceText("C:\\temp \\ x\\") },
-        COMPILER.compileMessage("C:\\temp \\ x\\").getMessageParts());
+    assertCompiles("C:\\temp \\ x\\", noSpaceText("C:\\temp \\ x\\"));
   }
 
 
@@ -106,17 +90,9 @@ final class MessageCompilerTest
   @DisplayName("Text with supplementary characters")
   void testTextSupplementaryCharacters()
   {
-    assertArrayEquals(
-        new MessagePart[] { noSpaceText("Smile 😀 now") },
-        COMPILER.compileMessage("Smile 😀 now").getMessageParts());
-
-    assertArrayEquals(
-        new MessagePart[] { noSpaceText("😀𝔸𐌀") },
-        COMPILER.compileMessage("😀𝔸𐌀").getMessageParts());
-
-    assertArrayEquals(
-        new MessagePart[] { addSpaces(noSpaceText("😀 😀"), true, true) },
-        COMPILER.compileMessage("  😀   😀  ").getMessageParts());
+    assertCompiles("Smile 😀 now", noSpaceText("Smile 😀 now"));
+    assertCompiles("😀𝔸𐌀", noSpaceText("😀𝔸𐌀"));
+    assertCompiles("  😀   😀  ", addSpaces(noSpaceText("😀 😀"), true, true));
   }
 
 
@@ -125,29 +101,21 @@ final class MessageCompilerTest
   void testTextCombiningMarksAndFormatCharacters()
   {
     // NFD-normalised Latin
-    assertArrayEquals(
-        new MessagePart[] { noSpaceText("Cafe\u0301") },
-        COMPILER.compileMessage("Cafe\u0301").getMessageParts());
+    assertCompiles("Cafe\u0301", noSpaceText("Cafe\u0301"));
 
     // Indic scripts (virama U+094D, vowel sign U+093E)
-    assertArrayEquals(
-        new MessagePart[] { noSpaceText("नमस्ते दुनिया") },
-        COMPILER.compileMessage("नमस्ते दुनिया").getMessageParts());
+    assertCompiles("नमस्ते दुनिया", noSpaceText("नमस्ते दुनिया"));
 
     // Thai and Arabic with harakat
-    assertArrayEquals(
-        new MessagePart[] { noSpaceText("สวัสดี مَرْحَبًا") },
-        COMPILER.compileMessage("สวัสดี مَرْحَبًا").getMessageParts());
+    assertCompiles("สวัสดี مَرْحَبًا", noSpaceText("สวัสดี مَرْحَبًا"));
 
     // Emoji with variation selector and ZWJ sequence
-    assertArrayEquals(
-        new MessagePart[] { noSpaceText("\u2764\ufe0f \ud83d\udc68\u200d\ud83d\udc69\u200d\ud83d\udc67") },
-        COMPILER.compileMessage("\u2764\ufe0f \ud83d\udc68\u200d\ud83d\udc69\u200d\ud83d\udc67").getMessageParts());
+    assertCompiles(
+        "\u2764\ufe0f \ud83d\udc68\u200d\ud83d\udc69\u200d\ud83d\udc67",
+        noSpaceText("\u2764\ufe0f \ud83d\udc68\u200d\ud83d\udc69\u200d\ud83d\udc67"));
 
     // ZWNJ, bidi marks and private use characters
-    assertArrayEquals(
-        new MessagePart[] { noSpaceText("می\u200cخواهم \u200ea\u200f \ue000") },
-        COMPILER.compileMessage("می\u200cخواهم \u200ea\u200f \ue000").getMessageParts());
+    assertCompiles("می\u200cخواهم \u200ea\u200f \ue000", noSpaceText("می\u200cخواهم \u200ea\u200f \ue000"));
 
     // Combining mark following a parameter
     final var parts = COMPILER.compileMessage("%{p}\u0301").getMessageParts();
@@ -160,13 +128,8 @@ final class MessageCompilerTest
   @DisplayName("Text with C1 control characters")
   void testTextC1ControlCharacters()
   {
-    assertArrayEquals(
-        new MessagePart[] { noSpaceText("ab") },
-        COMPILER.compileMessage("a\u007f\u0085\u009fb").getMessageParts());
-
-    assertArrayEquals(
-        new MessagePart[] { new ParameterPart("p", false, false) },
-        COMPILER.compileMessage("%{\u0085p\u009f}").getMessageParts());
+    assertCompiles("a\u007f\u0085\u009fb", noSpaceText("ab"));
+    assertCompiles("%{\u0085p\u009f}", new ParameterPart("p", false, false));
   }
 
 
@@ -176,11 +139,9 @@ final class MessageCompilerTest
   {
     for(var value: new String[] { "नमस्ते", "cafe\u0301-au-lait", "می\u200cخواهم" })
     {
-      assertArrayEquals(
-          new MessagePart[] {
-              new ParameterPart("p", new MessagePartConfig(Map.of("default", new TypedValueString(MESSAGE_FACTORY, value))), EMPTY_MAP)
-          },
-          COMPILER.compileMessage("%{ p, default:" + value + " }").getMessageParts());
+      assertCompiles(
+          "%{ p, default:" + value + " }",
+          new ParameterPart("p", new MessagePartConfig(Map.of("default", new TypedValueString(MESSAGE_FACTORY, value))), EMPTY_MAP));
     }
 
     assertThrows(MessageParserException.class, () -> COMPILER.compileMessage("%{ p, default:a\u200eb }"));
@@ -191,17 +152,9 @@ final class MessageCompilerTest
   @DisplayName("Parameter with name only")
   void testParameterWithNameOnly()
   {
-    assertArrayEquals(
-        new MessagePart[] { new ParameterPart("p", false, true) },
-        COMPILER.compileMessage("%{ p } ").getMessageParts());
-
-    assertArrayEquals(
-        new MessagePart[] { new ParameterPart("empty", true, true) },
-        COMPILER.compileMessage(" %{ empty } ").getMessageParts());
-
-    assertArrayEquals(
-        new MessagePart[] { new ParameterPart("test-id", false, false) },
-        COMPILER.compileMessage("%{ test-id }").getMessageParts());
+    assertCompiles("%{ p } ", new ParameterPart("p", false, true));
+    assertCompiles(" %{ empty } ", new ParameterPart("empty", true, true));
+    assertCompiles("%{ test-id }", new ParameterPart("test-id", false, false));
   }
 
 
@@ -210,17 +163,8 @@ final class MessageCompilerTest
   @DisplayName("Parameter format")
   void testParameterFormat()
   {
-    assertArrayEquals(
-        new MessagePart[] {
-            new ParameterPart("p", "bool", false, false, EMPTY_CONFIG, EMPTY_MAP)
-        },
-        COMPILER.compileMessage("%{ p, format:bool }").getMessageParts());
-
-    assertArrayEquals(
-        new MessagePart[] {
-            new ParameterPart("p", "null", false, false, EMPTY_CONFIG, EMPTY_MAP)
-        },
-        COMPILER.compileMessage("%{p,format:null}").getMessageParts());
+    assertCompiles("%{ p, format:bool }", new ParameterPart("p", "bool", false, false, EMPTY_CONFIG, EMPTY_MAP));
+    assertCompiles("%{p,format:null}", new ParameterPart("p", "null", false, false, EMPTY_CONFIG, EMPTY_MAP));
   }
 
 
@@ -229,88 +173,44 @@ final class MessageCompilerTest
   @DisplayName("Parameter with named configuration")
   void testParameterWithNamedConfiguration()
   {
-    assertArrayEquals(
-        new MessagePart[] {
-            new ParameterPart("p", new MessagePartConfig(Map.of("charset", TypedValueBool.FALSE)), EMPTY_MAP)
-        },
-        COMPILER.compileMessage("%{ p, charset:false }").getMessageParts());
+    assertCompiles(
+        "%{ p, charset:false }",
+        new ParameterPart("p", new MessagePartConfig(Map.of("charset", TypedValueBool.FALSE)), EMPTY_MAP));
 
-    assertArrayEquals(
-        new MessagePart[] {
-            new ParameterPart("p", new MessagePartConfig(Map.of("charset", TypedValueBool.TRUE)), EMPTY_MAP)
-        },
-        COMPILER.compileMessage("%{ p, charset:true }").getMessageParts());
+    assertCompiles(
+        "%{ p, charset:true }",
+        new ParameterPart("p", new MessagePartConfig(Map.of("charset", TypedValueBool.TRUE)), EMPTY_MAP));
 
-    assertArrayEquals(
-        new MessagePart[] {
-            new ParameterPart("p", new MessagePartConfig(Map.of("clip", new TypedValueNumber(-5))), EMPTY_MAP)
-        },
-        COMPILER.compileMessage("%{ p, clip:-5 }").getMessageParts());
+    assertCompiles(
+        "%{ p, clip:-5 }",
+        new ParameterPart("p", new MessagePartConfig(Map.of("clip", new TypedValueNumber(-5))), EMPTY_MAP));
 
-    assertArrayEquals(
-        new MessagePart[] {
-            new ParameterPart("p", new MessagePartConfig(Map.of("default", new TypedValueString(MESSAGE_FACTORY, "yes"))), EMPTY_MAP)
-        },
-        COMPILER.compileMessage("%{ p, default:'yes' }").getMessageParts());
+    assertCompiles(
+        "%{ p, default:'yes' }",
+        new ParameterPart("p", new MessagePartConfig(Map.of("default", new TypedValueString(MESSAGE_FACTORY, "yes"))), EMPTY_MAP));
 
-    assertArrayEquals(
-        new MessagePart[] {
-            new ParameterPart("p", new MessagePartConfig(Map.of("default", new TypedValueString(MESSAGE_FACTORY, "no"))), EMPTY_MAP)
-        },
-        COMPILER.compileMessage("%{ p, default:no }").getMessageParts());
+    assertCompiles(
+        "%{ p, default:no }",
+        new ParameterPart("p", new MessagePartConfig(Map.of("default", new TypedValueString(MESSAGE_FACTORY, "no"))), EMPTY_MAP));
 
-    assertArrayEquals(
-        new MessagePart[] {
-            new ParameterPart("p",
-                new MessagePartConfig(Map.of("msg", new TypedValueMessage(COMPILER.compileMessage(" %{q}")))),
-                EMPTY_MAP)
-        },
-        COMPILER.compileMessage("%{ p, msg:' %{q}' }").getMessageParts());
-
-    var mpe = assertThrowsExactly(
-        MessageParserException.class,
-        () -> COMPILER.compileMessage("%{ p1, msg:yes, msg:no }").getMessageParts());
-    assertEquals("duplicate config name 'msg' for parameter 'p1'", mpe.getErrorMessage());
-    assertEquals(MESSAGE, mpe.getType());
+    assertCompiles(
+        "%{ p, msg:' %{q}' }",
+        new ParameterPart("p",
+            new MessagePartConfig(Map.of("msg", new TypedValueMessage(COMPILER.compileMessage(" %{q}")))),
+            EMPTY_MAP));
   }
 
 
   @Test
-  @DisplayName("Numeric configuration values must fit in a long")
+  @DisplayName("Numeric configuration values accept the full long range")
   void testNumericConfigurationLongRange()
   {
-    assertArrayEquals(
-        new MessagePart[] {
-            new ParameterPart("p", new MessagePartConfig(Map.of(
-                "min", new TypedValueNumber(Long.MIN_VALUE),
-                "max", new TypedValueNumber(Long.MAX_VALUE)
-            )), EMPTY_MAP)
-        },
-        COMPILER.compileMessage(
-            "%{p,min:-9223372036854775808,max:9223372036854775807}").getMessageParts());
-
-    for(var number: new String[] { "9223372036854775808", "-9223372036854775809" })
-    {
-      var mpe = assertThrowsExactly(
-          MessageParserException.class,
-          () -> COMPILER.compileMessage("%{p,value:" + number + "}"));
-
-      assertEquals("number value out of range", mpe.getErrorMessage());
-      assertEquals(MESSAGE, mpe.getType());
-    }
-  }
-
-
-  @Test
-  @DisplayName("Post formatter with message configuration value")
-  void testPostFormatterWithMessageConfigValue()
-  {
-    var mpe = assertThrowsExactly(
-        MessageParserException.class,
-        () -> COMPILER.compileMessage("%(clip, 'text', config:'%{message}')"));
-
-    assertEquals("post-format config 'config' cannot be a message value", mpe.getErrorMessage());
-    assertEquals(MESSAGE, mpe.getType());
+    assertCompiles(
+        "%{p,min:-9223372036854775808,max:9223372036854775807}",
+        new ParameterPart("p", new MessagePartConfig(Map.of(
+            "min", new TypedValueNumber(Long.MIN_VALUE),
+            "max", new TypedValueNumber(Long.MAX_VALUE)
+        )), EMPTY_MAP));
   }
 
 
@@ -318,17 +218,15 @@ final class MessageCompilerTest
   @DisplayName("Parameter with 'null' configuration key")
   void testParameterWithNullKey()
   {
-    assertArrayEquals(
-        MessageBuilder.create().parameter("p").mapNull().message("msg").build().getMessageParts(),
-        COMPILER.compileMessage("%{ p, =null:msg }").getMessageParts());
+    assertCompiles(
+        "%{ p, =null:msg }",
+        MessageBuilder.create().parameter("p").mapNull().message("msg").build().getMessageParts());
 
-    assertArrayEquals(
-        new MessagePart[] {
-            new ParameterPart("p", EMPTY_CONFIG, new MessagePartMap(Map.of(
-                MapKeyNull.NE, new TypedValueMessage(COMPILER.compileMessage("msg %{n}"))
-            )))
-        },
-        COMPILER.compileMessage("%{ p, !null:'msg %{n}' }").getMessageParts());
+    assertCompiles(
+        "%{ p, !null:'msg %{n}' }",
+        new ParameterPart("p", EMPTY_CONFIG, new MessagePartMap(Map.of(
+            MapKeyNull.NE, new TypedValueMessage(COMPILER.compileMessage("msg %{n}"))
+        ))));
   }
 
 
@@ -336,21 +234,17 @@ final class MessageCompilerTest
   @DisplayName("Parameter with 'empty' configuration key")
   void testParameterWithEmptyKey()
   {
-    assertArrayEquals(
-        new MessagePart[] {
-            new ParameterPart("p", EMPTY_CONFIG, new MessagePartMap(Map.of(
-                MapKeyEmpty.EQ, new TypedValueMessage(COMPILER.compileMessage("msg"))
-            )))
-        },
-        COMPILER.compileMessage("%{ p, empty:msg }").getMessageParts());
+    assertCompiles(
+        "%{ p, empty:msg }",
+        new ParameterPart("p", EMPTY_CONFIG, new MessagePartMap(Map.of(
+            MapKeyEmpty.EQ, new TypedValueMessage(COMPILER.compileMessage("msg"))
+        ))));
 
-    assertArrayEquals(
-        new MessagePart[] {
-            new ParameterPart("p", EMPTY_CONFIG, new MessagePartMap(Map.of(
-                MapKeyEmpty.NE, new TypedValueMessage(COMPILER.compileMessage("msg %{n}"))
-            )))
-        },
-        COMPILER.compileMessage("%{ p, <>empty:'msg %{n}' }").getMessageParts());
+    assertCompiles(
+        "%{ p, <>empty:'msg %{n}' }",
+        new ParameterPart("p", EMPTY_CONFIG, new MessagePartMap(Map.of(
+            MapKeyEmpty.NE, new TypedValueMessage(COMPILER.compileMessage("msg %{n}"))
+        ))));
   }
 
 
@@ -358,17 +252,15 @@ final class MessageCompilerTest
   @DisplayName("Parameter with boolean configuration key")
   void testParameterWithBooleanKey()
   {
-    assertArrayEquals(
-        MessageBuilder.create().parameter("p").mapBool(true).message("msg").build().getMessageParts(),
-        COMPILER.compileMessage("%{ p, true:msg }").getMessageParts());
+    assertCompiles(
+        "%{ p, true:msg }",
+        MessageBuilder.create().parameter("p").mapBool(true).message("msg").build().getMessageParts());
 
-    assertArrayEquals(
-        new MessagePart[] {
-            new ParameterPart("p", EMPTY_CONFIG, new MessagePartMap(Map.of(
-                MapKeyBool.FALSE, new TypedValueMessage(COMPILER.compileMessage("msg %{n}"))
-            )))
-        },
-        COMPILER.compileMessage("%{ p, false:'msg %{n}' }").getMessageParts());
+    assertCompiles(
+        "%{ p, false:'msg %{n}' }",
+        new ParameterPart("p", EMPTY_CONFIG, new MessagePartMap(Map.of(
+            MapKeyBool.FALSE, new TypedValueMessage(COMPILER.compileMessage("msg %{n}"))
+        ))));
   }
 
 
@@ -376,33 +268,33 @@ final class MessageCompilerTest
   @DisplayName("Parameter with number configuration key")
   void testParameterWithNumberKey()
   {
-    assertArrayEquals(
-        MessageBuilder.create().parameter("p").mapNumber(16).message("msg1").build().getMessageParts(),
-        COMPILER.compileMessage("%{ p, 16:msg1 }").getMessageParts());
+    assertCompiles(
+        "%{ p, 16:msg1 }",
+        MessageBuilder.create().parameter("p").mapNumber(16).message("msg1").build().getMessageParts());
 
-    assertArrayEquals(
-        MessageBuilder.create().parameter("p").mapNumber(-16).message(" msg 2 ").build().getMessageParts(),
-        COMPILER.compileMessage("%{ p, =-16:\" msg 2 \" }").getMessageParts());
+    assertCompiles(
+        "%{ p, =-16:\" msg 2 \" }",
+        MessageBuilder.create().parameter("p").mapNumber(-16).message(" msg 2 ").build().getMessageParts());
 
-    assertArrayEquals(
-        MessageBuilder.create().parameter("p").mapNumber(1000).lt().message("msg3").build().getMessageParts(),
-        COMPILER.compileMessage("%{ p, < 1000:msg3 }").getMessageParts());
+    assertCompiles(
+        "%{ p, < 1000:msg3 }",
+        MessageBuilder.create().parameter("p").mapNumber(1000).lt().message("msg3").build().getMessageParts());
 
-    assertArrayEquals(
-        MessageBuilder.create().parameter("p").mapNumber(0).lte().message("msg4").build().getMessageParts(),
-        COMPILER.compileMessage("%{ p,<=0:msg4 }").getMessageParts());
+    assertCompiles(
+        "%{ p,<=0:msg4 }",
+        MessageBuilder.create().parameter("p").mapNumber(0).lte().message("msg4").build().getMessageParts());
 
-    assertArrayEquals(
-        MessageBuilder.create().parameter("p").mapNumber(1).ne().message("msg5").build().getMessageParts(),
-        COMPILER.compileMessage("%{ p,<>1:msg5 }").getMessageParts());
+    assertCompiles(
+        "%{ p,<>1:msg5 }",
+        MessageBuilder.create().parameter("p").mapNumber(1).ne().message("msg5").build().getMessageParts());
 
-    assertArrayEquals(
-        MessageBuilder.create().parameter("p").mapNumber(123456789).gt().message("msg6").build().getMessageParts(),
-        COMPILER.compileMessage("%{ p,>123456789:msg6 }").getMessageParts());
+    assertCompiles(
+        "%{ p,>123456789:msg6 }",
+        MessageBuilder.create().parameter("p").mapNumber(123456789).gt().message("msg6").build().getMessageParts());
 
-    assertArrayEquals(
-        MessageBuilder.create().parameter("p").mapNumber(-987654321).gte().message(" msg 7").build().getMessageParts(),
-        COMPILER.compileMessage("%{ p, >= -987654321:\" msg 7\" }").getMessageParts());
+    assertCompiles(
+        "%{ p, >= -987654321:\" msg 7\" }",
+        MessageBuilder.create().parameter("p").mapNumber(-987654321).gte().message(" msg 7").build().getMessageParts());
   }
 
 
@@ -410,33 +302,33 @@ final class MessageCompilerTest
   @DisplayName("Parameter with string configuration key")
   void testParameterWithStringKey()
   {
-    assertArrayEquals(
-        MessageBuilder.create().parameter("p").mapString("AA").message("msg1").build().getMessageParts(),
-        COMPILER.compileMessage("%{ p, 'AA':msg1 }").getMessageParts());
+    assertCompiles(
+        "%{ p, 'AA':msg1 }",
+        MessageBuilder.create().parameter("p").mapString("AA").message("msg1").build().getMessageParts());
 
-    assertArrayEquals(
-        MessageBuilder.create().parameter("p").mapString("B").message(" msg 2 ").build().getMessageParts(),
-        COMPILER.compileMessage("%{ p, = 'B':\" msg 2 \" }").getMessageParts());
+    assertCompiles(
+        "%{ p, = 'B':\" msg 2 \" }",
+        MessageBuilder.create().parameter("p").mapString("B").message(" msg 2 ").build().getMessageParts());
 
-    assertArrayEquals(
-        MessageBuilder.create().parameter("p").mapString("CC").lt().message("msg3").build().getMessageParts(),
-        COMPILER.compileMessage("%{ p, < 'CC':msg3 }").getMessageParts());
+    assertCompiles(
+        "%{ p, < 'CC':msg3 }",
+        MessageBuilder.create().parameter("p").mapString("CC").lt().message("msg3").build().getMessageParts());
 
-    assertArrayEquals(
-        MessageBuilder.create().parameter("p").mapString("D").lte().message("msg4").build().getMessageParts(),
-        COMPILER.compileMessage("%{ p,<='D':msg4 }").getMessageParts());
+    assertCompiles(
+        "%{ p,<='D':msg4 }",
+        MessageBuilder.create().parameter("p").mapString("D").lte().message("msg4").build().getMessageParts());
 
-    assertArrayEquals(
-        MessageBuilder.create().parameter("p").mapString("EE").ne().message("msg5").build().getMessageParts(),
-        COMPILER.compileMessage("%{ p,<>'EE':msg5 }").getMessageParts());
+    assertCompiles(
+        "%{ p,<>'EE':msg5 }",
+        MessageBuilder.create().parameter("p").mapString("EE").ne().message("msg5").build().getMessageParts());
 
-    assertArrayEquals(
-        MessageBuilder.create().parameter("p").mapString("FFF").gt().message("msg6").build().getMessageParts(),
-        COMPILER.compileMessage("%{ p,>'FFF':msg6 }").getMessageParts());
+    assertCompiles(
+        "%{ p,>'FFF':msg6 }",
+        MessageBuilder.create().parameter("p").mapString("FFF").gt().message("msg6").build().getMessageParts());
 
-    assertArrayEquals(
-        MessageBuilder.create().parameter("p").mapString("GG").gte().message(" msg 7").build().getMessageParts(),
-        COMPILER.compileMessage("%{ p, >= \"GG\":\" msg 7\" }").getMessageParts());
+    assertCompiles(
+        "%{ p, >= \"GG\":\" msg 7\" }",
+        MessageBuilder.create().parameter("p").mapString("GG").gte().message(" msg 7").build().getMessageParts());
   }
 
 
@@ -444,18 +336,13 @@ final class MessageCompilerTest
   @DisplayName("Parameter with default map value")
   void testParameterWithDefaultMapValue()
   {
-    assertArrayEquals(
+    assertCompiles(
+        "%{ p, 4:four, :test }",
         MessageBuilder
             .create()
             .parameter("p").mapNumber(4).message("four").mapDefault().message("test")
             .build()
-            .getMessageParts(),
-        COMPILER.compileMessage("%{ p, 4:four, :test }").getMessageParts());
-
-    var mpe = assertThrowsExactly(
-        MessageParserException.class,
-        () -> COMPILER.compileMessage("%{ p, :' %{n} items' }"));
-    assertEquals("default map entry can only be used in combination with other map entries", mpe.getErrorMessage());
+            .getMessageParts());
   }
 
 
@@ -463,15 +350,7 @@ final class MessageCompilerTest
   @DisplayName("Template with name only")
   void testTemplateWithNameOnly()
   {
-    assertArrayEquals(
-        new MessagePart[] { new TemplatePart("pq", false, true, Map.of(), Map.of()) },
-        COMPILER.compileMessage("%[pq] ").getMessageParts());
-
-    var mpe = assertThrowsExactly(
-        MessageParserException.class,
-        () -> COMPILER.compileMessage("%[ '' ]"));
-    assertEquals("missing template name at \"'\"", mpe.getErrorMessage());
-    assertEquals(MESSAGE, mpe.getType());
+    assertCompiles("%[pq] ", new TemplatePart("pq", false, true, Map.of(), Map.of()));
   }
 
 
@@ -479,16 +358,10 @@ final class MessageCompilerTest
   @DisplayName("Template with parameter delegate")
   void testTemplateWithParameterDelegate()
   {
-    assertArrayEquals(
+    assertCompiles(
+        "%[pq,a->b,c->d] ",
         new MessagePart[] { new TemplatePart("pq", false, true,
-            Map.of(), Map.of("a", "b", "c", "d")) },
-        COMPILER.compileMessage("%[pq,a->b,c->d] ").getMessageParts());
-
-    var mpe = assertThrowsExactly(
-        MessageParserException.class,
-        () -> COMPILER.compileMessage("%[ xyz, a->b, a->c ]"));
-    assertEquals("duplicate template parameter delegate 'a'", mpe.getErrorMessage());
-    assertEquals(MESSAGE, mpe.getType());
+            Map.of(), Map.of("a", "b", "c", "d")) });
   }
 
 
@@ -496,19 +369,17 @@ final class MessageCompilerTest
   @DisplayName("Template with default parameter values")
   void testTemplateWithDefaultParameterValues()
   {
-    assertArrayEquals(
+    assertCompiles(
+        "%[pq,a=true,c='C'] ",
         new MessagePart[] { new TemplatePart("pq", false, true,
             Map.of(
                 "a", TypedValueBool.TRUE,
                 "c", new TypedValueString(MESSAGE_FACTORY, "C")
-            ), Map.of()) },
-        COMPILER.compileMessage("%[pq,a=true,c='C'] ").getMessageParts());
+            ), Map.of()) });
+  }
 
-    //noinspection UnreachableTemplateEntry
-    var mpe = assertThrowsExactly(
-        MessageParserException.class,
-        () -> COMPILER.compileMessage("%[ xyz, a=true, a=false ]"));
-    assertEquals("duplicate template default parameter 'a'", mpe.getErrorMessage());
-    assertEquals(MESSAGE, mpe.getType());
+
+  private static void assertCompiles(@NotNull String formatString, @NotNull MessagePart... expectedParts) {
+    assertArrayEquals(expectedParts, COMPILER.compileMessage(formatString).getMessageParts());
   }
 }

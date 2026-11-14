@@ -18,6 +18,7 @@ package de.sayayi.plugin.gradle.message;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.MessageSupportFactory;
 import lombok.val;
+import org.gradle.testkit.runner.BuildResult;
 import org.gradle.testkit.runner.GradleRunner;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -38,11 +39,8 @@ import java.util.stream.Stream;
 
 import static java.nio.file.Files.*;
 import static java.util.Objects.requireNonNull;
-import static org.gradle.testkit.runner.TaskOutcome.FAILED;
-import static org.gradle.testkit.runner.TaskOutcome.SUCCESS;
-import static org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.gradle.testkit.runner.TaskOutcome.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
@@ -99,18 +97,12 @@ final class PluginTest
   @DisplayName("Pack task without sources")
   void testNoSources() throws IOException
   {
-    val result = GradleRunner.create()
-        .withProjectDir(testProjectDir)
-        .withArguments("messageFormatPack")
-        .withPluginClasspath()
+    val result = runner("messageFormatPack")
         .withDebug(true)
-        .forwardOutput()
         .build();
 
-    assertEquals(SUCCESS, requireNonNull(result.task(":messageFormatPack")).getOutcome());
-    assertTrue(packFile.isFile() && packFile.canRead());
+    val pack = assertPackTaskSucceeded(result);
 
-    val pack = readMessagePack(packFile);
     assertEquals(Set.of(), pack.getMessageCodes());
     assertEquals(Set.of(), pack.getTemplateNames());
   }
@@ -123,18 +115,12 @@ final class PluginTest
     copy(getResource("test-source-1.java"),
         new File(testPackageDir, "Source1.java").toPath());
 
-    val result = GradleRunner.create()
-        .withProjectDir(testProjectDir)
-        .withArguments("messageFormatPack")
-        .withPluginClasspath()
+    val result = runner("messageFormatPack")
         .withDebug(true)
-        .forwardOutput()
         .build();
 
-    assertEquals(SUCCESS, requireNonNull(result.task(":messageFormatPack")).getOutcome());
-    assertTrue(packFile.isFile() && packFile.canRead());
+    val pack = assertPackTaskSucceeded(result);
 
-    val pack = readMessagePack(packFile);
     assertEquals(4, pack.getMessageCodes().size());
     assertEquals(Set.of(), pack.getTemplateNames());
   }
@@ -155,18 +141,12 @@ final class PluginTest
     copy(getResource("test-source-1.java"),
         new File(testPackageDir, "Source1.java").toPath());
 
-    val result = GradleRunner.create()
-        .withProjectDir(testProjectDir)
-        .withArguments("messageFormatPack")
-        .withPluginClasspath()
+    val result = runner("messageFormatPack")
         .withDebug(true)
-        .forwardOutput()
         .build();
 
-    assertEquals(SUCCESS, requireNonNull(result.task(":messageFormatPack")).getOutcome());
-    assertTrue(packFile.isFile() && packFile.canRead());
+    val pack = assertPackTaskSucceeded(result);
 
-    val pack = readMessagePack(packFile);
     assertEquals(Set.of("MSG-INNER1"), pack.getMessageCodes());
     assertEquals(Set.of(), pack.getTemplateNames());
   }
@@ -192,18 +172,12 @@ final class PluginTest
     copy(getResource("test-source-1.java"),
         new File(testPackageDir, "Source1.java").toPath());
 
-    val result = GradleRunner.create()
-        .withProjectDir(testProjectDir)
-        .withArguments("messageFormatPack")
-        .withPluginClasspath()
+    val result = runner("messageFormatPack")
         .withDebug(true)
-        .forwardOutput()
         .build();
 
-    assertEquals(SUCCESS, requireNonNull(result.task(":messageFormatPack")).getOutcome());
-    assertTrue(packFile.isFile() && packFile.canRead());
+    val pack = assertPackTaskSucceeded(result);
 
-    val pack = readMessagePack(packFile);
     assertEquals(Set.of("MSG-INNER1"), pack.getMessageCodes());
     assertEquals(Set.of(), pack.getTemplateNames());
   }
@@ -229,18 +203,12 @@ final class PluginTest
     copy(getResource("test-source-1.java"),
         new File(testPackageDir, "Source1.java").toPath());
 
-    val result = GradleRunner.create()
-        .withProjectDir(testProjectDir)
-        .withArguments("messageFormatPack")
-        .withPluginClasspath()
+    val result = runner("messageFormatPack")
         .withDebug(true)
-        .forwardOutput()
         .build();
 
-    assertEquals(SUCCESS, requireNonNull(result.task(":messageFormatPack")).getOutcome());
-    assertTrue(packFile.isFile() && packFile.canRead());
+    val pack = assertPackTaskSucceeded(result);
 
-    val pack = readMessagePack(packFile);
     assertEquals(Set.of("MSG1", "MSG-INNER1"), pack.getMessageCodes());
     assertEquals(Set.of(), pack.getTemplateNames());
   }
@@ -271,12 +239,8 @@ final class PluginTest
     copy(getResource("test-source-2.java"),
         new File(testPackageDir, "Source2.java").toPath());
 
-    val runner = GradleRunner.create()
-        .withProjectDir(testProjectDir)
-        .withArguments("messageFormatPack")
-        .withPluginClasspath()
-        .withDebug(true)
-        .forwardOutput();
+    val runner = runner("messageFormatPack")
+        .withDebug(true);
     val result = success
         ? runner.build()
         : runner.buildAndFail();
@@ -303,17 +267,11 @@ final class PluginTest
     copy(getResource("test-source-1.java"),
         new File(testPackageDir, "Source1.java").toPath());
 
-    val result = GradleRunner.create()
-        .withProjectDir(testProjectDir)
-        .withArguments("messageFormatPack")
-        .withPluginClasspath()
+    val result = runner("messageFormatPack")
         .withDebug(true)
-        .forwardOutput()
         .build();
 
-    assertEquals(SUCCESS, requireNonNull(result.task(":messageFormatPack")).getOutcome());
-    assertTrue(packFile.isFile() && packFile.canRead());
-    assertTrue(readMessagePack(packFile).getMessageCodes().size() > 0);
+    assertFalse(assertPackTaskSucceeded(result).getMessageCodes().isEmpty());
   }
 
 
@@ -329,12 +287,7 @@ final class PluginTest
     {
       writeBuildGradle(List.of("messageFormat.messages.duplicateStrategy = " + duplicateStrategy));
 
-      val result = GradleRunner.create()
-          .withProjectDir(testProjectDir)
-          .withArguments("messageFormatPack")
-          .withPluginClasspath()
-          .forwardOutput()
-          .build();
+      val result = runner("messageFormatPack").build();
 
       assertEquals(duplicateStrategy.equals("'fail'") ? SUCCESS : UP_TO_DATE,
           requireNonNull(result.task(":messageFormatPack")).getOutcome(), duplicateStrategy);
@@ -348,12 +301,7 @@ final class PluginTest
   {
     writeBuildGradle(List.of("messageFormat.messages.duplicateStrategy = 'unknown'"));
 
-    val result = GradleRunner.create()
-        .withProjectDir(testProjectDir)
-        .withArguments("messageFormatPack")
-        .withPluginClasspath()
-        .forwardOutput()
-        .buildAndFail();
+    val result = runner("messageFormatPack").buildAndFail();
 
     assertTrue(result.getOutput().contains("Unknown duplicates strategy: unknown"));
   }
@@ -368,12 +316,7 @@ final class PluginTest
     copy(getResource("test-source-1.java"),
         new File(testPackageDir, "Source1.java").toPath());
 
-    val result = GradleRunner.create()
-        .withProjectDir(testProjectDir)
-        .withArguments("messageFormatPack")
-        .withPluginClasspath()
-        .forwardOutput()
-        .buildAndFail();
+    val result = runner("messageFormatPack").buildAndFail();
 
     assertTrue(result.getOutput().contains("Invalid include regular expression '[invalid'"));
   }
@@ -396,16 +339,36 @@ final class PluginTest
     copy(getResource("test-source-2.java"),
         new File(testPackageDir, "Source2.java").toPath());
 
-    val result = GradleRunner.create()
-        .withProjectDir(testProjectDir)
-        .withArguments("jar")
-        .withPluginClasspath()
+    val result = runner("jar")
         .withDebug(true)
-        .forwardOutput()
         .build();
 
     assertEquals(SUCCESS, requireNonNull(result.task(":jar")).getOutcome());
     assertEquals(SUCCESS, requireNonNull(result.task(":messageFormatPack")).getOutcome());
+  }
+
+
+  @Contract(pure = true)
+  private @NotNull GradleRunner runner(@NotNull String... arguments)
+  {
+    return GradleRunner
+        .create()
+        .withProjectDir(testProjectDir)
+        .withArguments(arguments)
+        .withPluginClasspath()
+        .forwardOutput();
+  }
+
+
+  /**
+   * Asserts that the pack task succeeded and wrote a readable pack file, and returns the messages of the pack.
+   */
+  private @NotNull MessageAccessor assertPackTaskSucceeded(@NotNull BuildResult result) throws IOException
+  {
+    assertEquals(SUCCESS, requireNonNull(result.task(":messageFormatPack")).getOutcome());
+    assertTrue(packFile.isFile() && packFile.canRead());
+
+    return readMessagePack(packFile);
   }
 
 

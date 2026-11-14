@@ -17,6 +17,7 @@ package de.sayayi.lib.message.formatter.parameter.runtime.extra;
 
 import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
+import de.sayayi.lib.message.util.IsolatingTestClassLoader;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
@@ -24,19 +25,18 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.ref.WeakReference;
-import java.util.Set;
 
+import static de.sayayi.lib.message.util.AssertionTestSupport.assertGarbageCollected;
 import static de.sayayi.lib.message.util.ConcurrentTestSupport.runConcurrently;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static java.util.Objects.requireNonNull;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 
 /**
@@ -144,25 +144,17 @@ final class AnnotationFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Formatted annotations do not prevent their class loader from being unloaded")
-  @SuppressWarnings("BusyWait")
   void testAnnotationTypeNotRetained() throws Exception
   {
-    val classLoaderRef = formatAnnotationFromIsolatingClassLoader(messageSupport);
-
-    for(var n = 0; n < 50 && classLoaderRef.get() != null; n++)
-    {
-      System.gc();
-      Thread.sleep(10);
-    }
-
-    assertNull(classLoaderRef.get(), "class loader of a formatted annotation has not been garbage collected");
+    assertGarbageCollected(formatAnnotationFromIsolatingClassLoader(messageSupport),
+        "class loader of a formatted annotation has not been garbage collected");
   }
 
 
   private static @NotNull WeakReference<ClassLoader> formatAnnotationFromIsolatingClassLoader(
       @NotNull MessageSupport context) throws ClassNotFoundException
   {
-    val classLoader = new IsolatingClassLoader();
+    val classLoader = new IsolatingTestClassLoader(IsolatedAnnotation.class, IsolatedAnnotated.class);
     val annotatedType = classLoader.loadClass(IsolatedAnnotated.class.getName());
     val annotation = annotatedType.getDeclaredAnnotations()[0];
 
@@ -205,44 +197,5 @@ final class AnnotationFormatterTest extends AbstractFormatterTest
   /** Type annotated with {@link IsolatedAnnotation}, loaded by an isolating class loader. */
   @IsolatedAnnotation(name = "isolated")
   public static final class IsolatedAnnotated {
-  }
-
-
-
-
-  /** Class loader defining its own copies of {@link IsolatedAnnotation} and {@link IsolatedAnnotated}. */
-  private static final class IsolatingClassLoader extends ClassLoader
-  {
-    private static final Set<String> ISOLATED_NAMES = Set.of(
-        IsolatedAnnotation.class.getName(),
-        IsolatedAnnotated.class.getName());
-
-
-    private IsolatingClassLoader() {
-      super(AnnotationFormatterTest.class.getClassLoader());
-    }
-
-
-    @Override
-    protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException
-    {
-      if (!ISOLATED_NAMES.contains(name))
-        return super.loadClass(name, resolve);
-
-      synchronized(getClassLoadingLock(name)) {
-        var type = findLoadedClass(name);
-        if (type == null)
-        {
-          try(val in = getParent().getResourceAsStream(name.replace('.', '/') + ".class")) {
-            val bytes = requireNonNull(in).readAllBytes();
-            type = defineClass(name, bytes, 0, bytes.length);
-          } catch(IOException ex) {
-            throw new ClassNotFoundException(name, ex);
-          }
-        }
-
-        return type;
-      }
-    }
   }
 }

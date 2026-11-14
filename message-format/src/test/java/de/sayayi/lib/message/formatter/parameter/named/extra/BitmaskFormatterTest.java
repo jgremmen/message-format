@@ -20,14 +20,20 @@ import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.parameter.runtime.BitSetFormatter;
 import de.sayayi.lib.message.formatter.parameter.runtime.NumberFormatter;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
+import org.intellij.lang.annotations.Language;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.math.BigInteger;
+import java.util.stream.Stream;
 
 import static java.math.BigInteger.ONE;
 import static java.util.Locale.ROOT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 
 /**
@@ -54,202 +60,90 @@ final class BitmaskFormatterTest extends AbstractFormatterTest
   }
 
 
-  @Test
-  @DisplayName("Long value with lsb1st ordering")
-  void testLongLsb1st()
+  @SuppressWarnings("UnnecessaryUnicodeEscape")
+  static Stream<Arguments> bitmasks()
   {
     // 0x8000_0000_0000_00A5L = bits 0, 2, 5, 7, 63 are set
-    assertEquals("b0, b2, b5, b7 and b63", messageSupport
-        .message("%{v,format:bitmask,bitset:lsb-set,list-sep-last:' and ',0:b0,2:b2,5:b5,7:b7,63:b63}")
-        .with("v", 0x8000_0000_0000_00A5L)
-        .format());
-  }
-
-
-  @Test
-  @DisplayName("Long value with msb1st ordering")
-  void testLongMsb1st()
-  {
-    // 0x8000_0000_0000_00A5L = bits 0, 2, 5, 7, 63 are set
-    assertEquals("b63, b7, b5, b2, b0", messageSupport
-        .message("%{v,format:bitmask,bitset:msb-set,0:b0,2:b2,5:b5,7:b7,63:b63}")
-        .with("v", 0x8000_0000_0000_00A5L)
-        .format());
-  }
-
-
-  @Test
-  @DisplayName("Int value with lsb1st ordering")
-  void testIntLsb1st()
-  {
+    final var longValue = 0x8000_0000_0000_00A5L;
     // 0x8000_00C3 = bits 0, 1, 6, 7, 31 are set
-    assertEquals("b0, b1, b6, b7, b31", messageSupport
-        .message("%{v,format:bitmask,bitset:lsb-set,0:b0,1:b1,6:b6,7:b7,31:b31}")
-        .with("v", (int)0x8000_00C3L)
-        .format());
-  }
-
-
-  @Test
-  @DisplayName("Int value with msb1st ordering")
-  void testIntMsb1st()
-  {
-    // 0x8000_00C3 = bits 0, 1, 6, 7, 31 are set
-    assertEquals("b31, b7, b6, b1, b0", messageSupport
-        .message("%{v,format:bitmask,bitset:msb-set,0:b0,1:b1,6:b6,7:b7,31:b31}")
-        .with("v", (int)0x8000_00C3L)
-        .format());
-  }
-
-
-  @Test
-  @DisplayName("Short value with lsb1st ordering")
-  void testShortLsb1st()
-  {
+    final var intValue = (int)0x8000_00C3L;
     // 0x800A = bits 1, 3, 15 are set
-    assertEquals("b1, b3, b15", messageSupport
-        .message("%{v,format:bitmask,bitset:lsb-set,0:b0,1:b1,2:b2,3:b3,15:b15}")
-        .with("v", (short)0x800A)
-        .format());
-  }
-
-
-  @Test
-  @DisplayName("Short value with msb1st ordering")
-  void testShortMsb1st()
-  {
-    // 0x800A = bits 1, 3, 15 are set
-    assertEquals("b15, b3, b1", messageSupport
-        .message("%{v,format:bitmask,bitset:msb-set,0:b0,1:b1,2:b2,3:b3,15:b15}")
-        .with("v", (short)0x800A)
-        .format());
-  }
-
-
-  @Test
-  @DisplayName("Byte value with lsb1st ordering")
-  void testByteLsb1st()
-  {
+    final var shortValue = (short)0x800A;
     // 0x95 = 0b1001_0101 = bits 0, 2, 4, 7 are set
-    assertEquals("b0, b2, b4, b7", messageSupport
-        .message("%{v,format:bitmask,bitset:lsb-set,0:b0,2:b2,4:b4,7:b7}")
-        .with("v", (byte)0x95)
-        .format());
-  }
-
-
-  @Test
-  @DisplayName("Byte value with msb1st ordering")
-  void testByteMsb1st()
-  {
-    // 0x95 = 0b1001_0101 = bits 0, 2, 4, 7 are set
-    assertEquals("b7, b4, b2, b0", messageSupport
-        .message("%{v,format:bitmask,bitset:msb-set,0:b0,2:b2,4:b4,7:b7}")
-        .with("v", (byte)0x95)
-        .format());
-  }
-
-
-  @Test
-  @DisplayName("Char value with lsb1st ordering")
-  @SuppressWarnings("UnnecessaryUnicodeEscape")
-  void testCharLsb1st()
-  {
+    final var byteValue = (byte)0x95;
     // '\u8041' = bits 0, 6, 15 are set
-    assertEquals("b0, b6, b15", messageSupport
-        .message("%{v,format:bitmask,bitset:lsb-set,0:b0,1:b1,6:b6,7:b7,15:b15,16:b16}")
-        .with("v", '\u8041')
-        .format());
-  }
-
-
-  @Test
-  @DisplayName("Char value with msb1st ordering")
-  @SuppressWarnings("UnnecessaryUnicodeEscape")
-  void testCharMsb1st()
-  {
-    // '\u8041' = bits 0, 6, 15 are set
-    assertEquals("b15, b6, b0", messageSupport
-        .message("%{v,format:bitmask,bitset:msb-set,0:b0,1:b1,6:b6,7:b7,15:b15,16:b16}")
-        .with("v", '\u8041')
-        .format());
-  }
-
-
-  @Test
-  @DisplayName("BigInteger value exceeding long range with lsb1st ordering")
-  void testBigIntegerLsb1st()
-  {
+    final var charValue = '\u8041';
     // 2^64 + 2^1 + 2^0 = a value exceeding Long.MAX_VALUE with bits 0, 1, 64 set
     final var bigValue = ONE.shiftLeft(64).or(BigInteger.valueOf(3));
 
-    assertEquals("b0, b1, b64", messageSupport
-        .message("%{v,format:bitmask,bitset:lsb-set,0:b0,1:b1,2:b2,64:b64}")
-        .with("v", bigValue)
-        .format());
+    return Stream.of(
+        arguments("Long value with lsb1st ordering",
+            "%{v,format:bitmask,bitset:lsb-set,list-sep-last:' and ',0:b0,2:b2,5:b5,7:b7,63:b63}", longValue,
+            "b0, b2, b5, b7 and b63"),
+        arguments("Long value with msb1st ordering",
+            "%{v,format:bitmask,bitset:msb-set,0:b0,2:b2,5:b5,7:b7,63:b63}", longValue,
+            "b63, b7, b5, b2, b0"),
+        arguments("Int value with lsb1st ordering",
+            "%{v,format:bitmask,bitset:lsb-set,0:b0,1:b1,6:b6,7:b7,31:b31}", intValue,
+            "b0, b1, b6, b7, b31"),
+        arguments("Int value with msb1st ordering",
+            "%{v,format:bitmask,bitset:msb-set,0:b0,1:b1,6:b6,7:b7,31:b31}", intValue,
+            "b31, b7, b6, b1, b0"),
+        arguments("Short value with lsb1st ordering",
+            "%{v,format:bitmask,bitset:lsb-set,0:b0,1:b1,2:b2,3:b3,15:b15}", shortValue,
+            "b1, b3, b15"),
+        arguments("Short value with msb1st ordering",
+            "%{v,format:bitmask,bitset:msb-set,0:b0,1:b1,2:b2,3:b3,15:b15}", shortValue,
+            "b15, b3, b1"),
+        arguments("Byte value with lsb1st ordering",
+            "%{v,format:bitmask,bitset:lsb-set,0:b0,2:b2,4:b4,7:b7}", byteValue,
+            "b0, b2, b4, b7"),
+        arguments("Byte value with msb1st ordering",
+            "%{v,format:bitmask,bitset:msb-set,0:b0,2:b2,4:b4,7:b7}", byteValue,
+            "b7, b4, b2, b0"),
+        arguments("Char value with lsb1st ordering",
+            "%{v,format:bitmask,bitset:lsb-set,0:b0,1:b1,6:b6,7:b7,15:b15,16:b16}", charValue,
+            "b0, b6, b15"),
+        arguments("Char value with msb1st ordering",
+            "%{v,format:bitmask,bitset:msb-set,0:b0,1:b1,6:b6,7:b7,15:b15,16:b16}", charValue,
+            "b15, b6, b0"),
+        arguments("BigInteger value exceeding long range with lsb1st ordering",
+            "%{v,format:bitmask,bitset:lsb-set,0:b0,1:b1,2:b2,64:b64}", bigValue,
+            "b0, b1, b64"),
+        arguments("BigInteger value exceeding long range with msb1st ordering",
+            "%{v,format:bitmask,bitset:msb-set,0:b0,1:b1,2:b2,64:b64}", bigValue,
+            "b64, b1, b0"),
+        // -1 as int = 0xFFFFFFFF = all 32 bits set
+        arguments("Negative int value preserves unsigned bit pattern",
+            "%{v,format:bitmask,bitset:lsb-set,0:b0,7:b7,15:b15,31:b31}", -1,
+            "b0, b7, b15, b31"),
+        // -1 as byte = 0xFF = all 8 bits set
+        arguments("Negative byte value preserves unsigned bit pattern",
+            "%{v,format:bitmask,bitset:lsb-set,0:b0,1:b1,2:b2,3:b3,4:b4,5:b5,6:b6,7:b7}", (byte)-1,
+            "b0, b1, b2, b3, b4, b5, b6, b7"),
+        // -1 as short = 0xFFFF = all 16 bits set
+        arguments("Negative short value preserves unsigned bit pattern",
+            "%{v,format:bitmask,bitset:lsb-set,0:b0,7:b7,15:b15}", (short)-1,
+            "b0, b7, b15"),
+        // 2^100 + 2^0 = bits 0 and 100 set
+        arguments("BigInteger with high bit set far beyond long range",
+            "%{v,format:bitmask,bitset:msb-set,0:b0,100:b100}", ONE.shiftLeft(100).or(ONE),
+            "b100, b0")
+    );
   }
 
 
-  @Test
-  @DisplayName("BigInteger value exceeding long range with msb1st ordering")
-  void testBigIntegerMsb1st()
+  @ParameterizedTest(name = "{0}")
+  @DisplayName("Bits are formatted in the configured order")
+  @MethodSource("bitmasks")
+  void testBitmask(@SuppressWarnings("unused") String name, @Language("MessageFormat") String formatString,
+                   Object value, String expected)
   {
-    // 2^64 + 2^1 + 2^0 = a value exceeding Long.MAX_VALUE with bits 0, 1, 64 set
-    final var bigValue = ONE.shiftLeft(64).or(BigInteger.valueOf(3));
-
-    assertEquals("b64, b1, b0", messageSupport
-        .message("%{v,format:bitmask,bitset:msb-set,0:b0,1:b1,2:b2,64:b64}")
-        .with("v", bigValue)
-        .format());
-  }
-
-
-  @Test
-  @DisplayName("Negative int value preserves unsigned bit pattern")
-  void testNegativeInt()
-  {
-    // -1 as int = 0xFFFFFFFF = all 32 bits set
-    assertEquals("b0, b7, b15, b31", messageSupport
-        .message("%{v,format:bitmask,bitset:lsb-set,0:b0,7:b7,15:b15,31:b31}")
-        .with("v", -1)
-        .format());
-  }
-
-
-  @Test
-  @DisplayName("Negative byte value preserves unsigned bit pattern")
-  void testNegativeByte()
-  {
-    // -1 as byte = 0xFF = all 8 bits set
-    assertEquals("b0, b1, b2, b3, b4, b5, b6, b7", messageSupport
-        .message("%{v,format:bitmask,bitset:lsb-set,0:b0,1:b1,2:b2,3:b3,4:b4,5:b5,6:b6,7:b7}")
-        .with("v", (byte)-1)
-        .format());
-  }
-
-
-  @Test
-  @DisplayName("Negative short value preserves unsigned bit pattern")
-  void testNegativeShort()
-  {
-    // -1 as short = 0xFFFF = all 16 bits set
-    assertEquals("b0, b7, b15", messageSupport
-        .message("%{v,format:bitmask,bitset:lsb-set,0:b0,7:b7,15:b15}")
-        .with("v", (short)-1)
-        .format());
-  }
-
-
-  @Test
-  @DisplayName("BigInteger with high bit set far beyond long range")
-  void testBigIntegerHighBit()
-  {
-    // 2^100 + 2^0 = bits 0 and 100 set
-    final var bigValue = ONE.shiftLeft(100).or(ONE);
-
-    assertEquals("b100, b0", messageSupport
-        .message("%{v,format:bitmask,bitset:msb-set,0:b0,100:b100}")
-        .with("v", bigValue)
-        .format());
+    assertEquals(
+        expected,
+        messageSupport
+            .message(formatString)
+            .with("v", value)
+            .format());
   }
 }

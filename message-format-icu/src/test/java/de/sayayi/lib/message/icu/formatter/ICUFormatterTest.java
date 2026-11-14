@@ -20,6 +20,8 @@ import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import lombok.val;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
 
 import java.util.Date;
@@ -60,7 +62,7 @@ final class ICUFormatterTest extends AbstractFormatterTest
   void testPlural()
   {
     val msg = messageSupport
-        .message("%{unused,format:icu,icu:'{count, plural, one {# item} other {# items}}'}");
+        .message(icu("{count, plural, one {# item} other {# items}}"));
 
     assertEquals("1 item", msg.with("count", 1).format());
     assertEquals("0 items", msg.with("count", 0).format());
@@ -74,7 +76,7 @@ final class ICUFormatterTest extends AbstractFormatterTest
   void testSelect()
   {
     val msg = messageSupport
-        .message("%{unused,format:icu,icu:'{gender, select, male {He} female {She} other {They}} liked your post.'}");
+        .message(icu("{gender, select, male {He} female {She} other {They}} liked your post."));
 
     assertEquals("He liked your post.", msg.with("gender", "male").format());
     assertEquals("She liked your post.", msg.with("gender", "female").format());
@@ -88,7 +90,7 @@ final class ICUFormatterTest extends AbstractFormatterTest
   void testSelectOrdinal()
   {
     val msg = messageSupport
-        .message("%{unused,format:icu,icu:'{rank, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}'}");
+        .message(icu("{rank, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}"));
 
     assertEquals("1st", msg.with("rank", 1).format());
     assertEquals("2nd", msg.with("rank", 2).format());
@@ -107,7 +109,7 @@ final class ICUFormatterTest extends AbstractFormatterTest
   {
     // Welsh has rich ordinal categories: zero, one, two, few, many, other
     val msg = messageSupport
-        .message("%{unused,format:icu,icu:'{rank, selectordinal, zero {#ain} one {#af} two {#ail} few {#ydd} many {#ed} other {#fed}}'}")
+        .message(icu("{rank, selectordinal, zero {#ain} one {#af} two {#ail} few {#ydd} many {#ed} other {#fed}}"))
         .locale(forLanguageTag("cy"));
 
     assertEquals("0ain", msg.with("rank", 0).format());
@@ -127,14 +129,14 @@ final class ICUFormatterTest extends AbstractFormatterTest
   void testNumberFormat()
   {
     val msg = messageSupport
-        .message("%{unused,format:icu,icu:'{amount, number, currency}'}")
+        .message(icu("{amount, number, currency}"))
         .locale(US);
 
     assertEquals("$1,234.56", msg.with("amount", 1234.56).format());
     assertEquals("$0.99", msg.with("amount", 0.99).format());
 
     val percentMsg = messageSupport
-        .message("%{unused,format:icu,icu:'{ratio, number, percent}'}")
+        .message(icu("{ratio, number, percent}"))
         .locale(US);
 
     assertEquals("75%", percentMsg.with("ratio", 0.75).format());
@@ -160,7 +162,7 @@ final class ICUFormatterTest extends AbstractFormatterTest
   void testMultipleParameters()
   {
     val msg = messageSupport
-        .message("%{unused,format:icu,icu:'{name} has {count, plural, one {# cat} other {# cats}}'}");
+        .message(icu("{name} has {count, plural, one {# cat} other {# cats}}"));
 
     assertEquals("Alice has 1 cat", msg.with("name", "Alice").with("count", 1).format());
     assertEquals("Bob has 3 cats", msg.with("name", "Bob").with("count", 3).format());
@@ -173,7 +175,7 @@ final class ICUFormatterTest extends AbstractFormatterTest
   void testLocaleSensitivePlural()
   {
     val msg = messageSupport
-        .message("%{unused,format:icu,icu:'{count, plural, one {# plik} few {# pliki} many {# plików} other {# pliku}}'}")
+        .message(icu("{count, plural, one {# plik} few {# pliki} many {# plików} other {# pliku}}"))
         .locale(forLanguageTag("pl"));
 
     assertEquals("1 plik", msg.with("count", 1).format());
@@ -192,12 +194,12 @@ final class ICUFormatterTest extends AbstractFormatterTest
     val date = new Date(2026 - 1900, JANUARY, 15, 10, 30, 0);
 
     val msg = messageSupport
-        .message("%{unused,format:icu,icu:'{when, date, short}'}");
+        .message(icu("{when, date, short}"));
 
     assertEquals("1/15/26", msg.with("when", date).format());
 
     val longMsg = messageSupport
-        .message("%{unused,format:icu,icu:'{when, date, long}'}");
+        .message(icu("{when, date, long}"));
 
     assertEquals("January 15, 2026", longMsg.with("when", date).format());
   }
@@ -208,7 +210,7 @@ final class ICUFormatterTest extends AbstractFormatterTest
   void testChoiceFormat()
   {
     val msg = messageSupport
-        .message("%{unused,format:icu,icu:'{temp, choice, 0#freezing|30#warm|40#hot}'}");
+        .message(icu("{temp, choice, 0#freezing|30#warm|40#hot}"));
 
     assertEquals("freezing", msg.with("temp", 0).format());
     assertEquals("freezing", msg.with("temp", 15).format());
@@ -224,11 +226,20 @@ final class ICUFormatterTest extends AbstractFormatterTest
   void testPluralWithOffset()
   {
     val msg = messageSupport
-        .message("%{unused,format:icu,icu:'{guests, plural, offset:1 =0 {Nobody is attending} =1 {Only {name} is attending} one {{name} and # other person are attending} other {{name} and # other people are attending}}'}");
+        .message(icu("{guests, plural, offset:1 =0 {Nobody is attending} =1 {Only {name} is attending} one {{name} and # other person are attending} other {{name} and # other people are attending}}"));
 
     assertEquals("Nobody is attending", msg.with("guests", 0).with("name", "Alice").format());
     assertEquals("Only Alice is attending", msg.with("guests", 1).with("name", "Alice").format());
     assertEquals("Alice and 1 other person are attending", msg.with("guests", 2).with("name", "Alice").format());
     assertEquals("Alice and 4 other people are attending", msg.with("guests", 5).with("name", "Alice").format());
+  }
+
+
+  /**
+   * Returns a format string which formats the parameters of the message with the given ICU message pattern.
+   */
+  @Contract(pure = true)
+  private static @NotNull String icu(@NotNull String pattern) {
+    return "%{unused,format:icu,icu:'" + pattern + "'}";
   }
 }

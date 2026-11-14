@@ -15,22 +15,25 @@
  */
 package de.sayayi.lib.message.formatter.parameter.runtime;
 
-import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import lombok.val;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.params.provider.Arguments;
 
+import java.util.Locale;
 import java.util.function.LongSupplier;
+import java.util.stream.Stream;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 import static java.lang.Long.MAX_VALUE;
 import static java.lang.Long.MIN_VALUE;
 import static java.util.Locale.ENGLISH;
 import static java.util.Locale.ROOT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 
 /**
@@ -42,34 +45,35 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 @DisplayName("LongSupplier formatter")
 @TestMethodOrder(MethodOrderer.DisplayName.class)
-final class LongSupplierFormatterTest extends AbstractFormatterTest
+final class LongSupplierFormatterTest extends AbstractSupplierFormatterTest
 {
-  @Test
-  void testFormattableTypes() {
-    assertFormatterForType(new LongSupplierFormatter(), LongSupplier.class);
+  @Override
+  protected @NotNull ParameterFormatter createFormatter() {
+    return new LongSupplierFormatter();
   }
 
 
-  @Test
-  void testFormat()
-  {
-    val messageAccessor = createMessageAccessor(ROOT, new LongSupplierFormatter());
+  @Override
+  protected @NotNull Class<?> getFormattableType() {
+    return LongSupplier.class;
+  }
 
-    assertEquals(
-        nullText(),
-        format(messageAccessor, null));
-    assertEquals(
-        noSpaceText("0"),
-        format(messageAccessor, (LongSupplier)() -> 0));
-    assertEquals(
-        noSpaceText(Long.toString(MAX_VALUE)),
-        format(messageAccessor, (LongSupplier)() -> MAX_VALUE));
-    assertEquals(
-        noSpaceText(Long.toString(MIN_VALUE)),
-        format(messageAccessor, (LongSupplier)() -> MIN_VALUE));
-    assertEquals(
-        noSpaceText("123456789"),
-        format(messageAccessor, (LongSupplier)() -> 123456789L));
+
+  @Override
+  protected @NotNull Locale getLocale() {
+    return ROOT;
+  }
+
+
+  @Override
+  protected @NotNull Stream<Arguments> formattedValues()
+  {
+    return Stream.of(
+        arguments((LongSupplier)() -> 0, noSpaceText("0")),
+        arguments((LongSupplier)() -> MAX_VALUE, noSpaceText(Long.toString(MAX_VALUE))),
+        arguments((LongSupplier)() -> MIN_VALUE, noSpaceText(Long.toString(MIN_VALUE))),
+        arguments((LongSupplier)() -> 123456789L, noSpaceText("123456789"))
+    );
   }
 
 

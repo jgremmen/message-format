@@ -21,10 +21,11 @@ import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import de.sayayi.lib.message.formatter.parameter.runtime.NumberFormatter;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import de.sayayi.lib.message.util.Calculator;
 import de.sayayi.lib.message.util.CalculatorLexer;
 import de.sayayi.lib.message.util.CalculatorParser;
+import de.sayayi.lib.message.util.CalculatorTestParser;
 import org.antlr.v4.runtime.Token;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -61,10 +62,12 @@ final class TokenFormatterTest extends AbstractFormatterTest
 
     messageSupport = configurableMessageSupport.seal();
 
-    // Use Calculator to produce a SyntaxErrorException containing a Token.
+    // Use CalculatorTestParser to produce a SyntaxErrorException containing a Token.
     // "3 4" has a missing operator between numbers, so '4' at column 2 is the error token.
-    token = assertThrowsExactly(SyntaxErrorException.class,
-        () -> new Calculator(messageSupport).calculate("3 4")).getStartToken();
+    token = assertThrowsExactly(
+        SyntaxErrorException.class,
+        () -> new CalculatorTestParser(messageSupport).calculate("3 4"))
+        .getStartToken();
   }
 
 
@@ -88,8 +91,12 @@ final class TokenFormatterTest extends AbstractFormatterTest
   @DisplayName("Format token type")
   void testFormatType()
   {
-    assertEquals(Integer.toString(CalculatorParser.NUMBER),
-        messageSupport.message("%{t,token:'type'}").with("t", token).format());
+    assertEquals(
+        Integer.toString(CalculatorParser.NUMBER),
+        messageSupport
+            .message("%{t,token:'type'}")
+            .with("t", token)
+            .format());
   }
 
 
@@ -97,29 +104,51 @@ final class TokenFormatterTest extends AbstractFormatterTest
   @DisplayName("Format token channel")
   void testFormatChannel()
   {
-    assertEquals(Integer.toString(CalculatorLexer.DEFAULT_TOKEN_CHANNEL),
-        messageSupport.message("%{t,token:'channel'}").with("t", token).format());
+    assertEquals(
+        Integer.toString(CalculatorLexer.DEFAULT_TOKEN_CHANNEL),
+        messageSupport
+            .message("%{t,token:'channel'}")
+            .with("t", token)
+            .format());
   }
 
 
   @Test
   @DisplayName("Format token line")
-  void testFormatLine() {
-    assertEquals("1", messageSupport.message("%{t,token:'line'}").with("t", token).format());
+  void testFormatLine()
+  {
+    assertEquals(
+        "1",
+        messageSupport
+            .message("%{t,token:'line'}")
+            .with("t", token)
+            .format());
   }
 
 
   @Test
   @DisplayName("Format token column")
-  void testFormatColumn() {
-    assertEquals("2", messageSupport.message("%{t,token:'column'}").with("t", token).format());
+  void testFormatColumn()
+  {
+    assertEquals(
+        "2",
+        messageSupport
+            .message("%{t,token:'column'}")
+            .with("t", token)
+            .format());
   }
 
 
   @Test
   @DisplayName("Format token position (line:column)")
-  void testFormatPosition() {
-    assertEquals("1:2", messageSupport.message("%{t,token:'position'}").with("t", token).format());
+  void testFormatPosition()
+  {
+    assertEquals(
+        "1:2",
+        messageSupport
+            .message("%{t,token:'position'}")
+            .with("t", token)
+            .format());
   }
 
 
@@ -127,19 +156,25 @@ final class TokenFormatterTest extends AbstractFormatterTest
   @DisplayName("Format token position without column (line)")
   void testFormatPositionNoColumn()
   {
-    final var mockToken = mock(Token.class);
-
-    when(mockToken.getLine()).thenReturn(5);
-    when(mockToken.getCharPositionInLine()).thenReturn(-1);
-
-    assertEquals("5", messageSupport.message("%{t,token:'position'}").with("t", mockToken).format());
+    assertEquals(
+        "5",
+        messageSupport
+            .message("%{t,token:'position'}")
+            .with("t", token(5, -1))
+            .format());
   }
 
 
   @Test
   @DisplayName("Format token with invalid token config returns null text")
-  void testFormatInvalidConfig() {
-    assertEquals("", messageSupport.message("%{t,token:'invalid'}").with("t", token).format());
+  void testFormatInvalidConfig()
+  {
+    assertEquals(
+        "",
+        messageSupport
+            .message("%{t,token:'invalid'}")
+            .with("t", token)
+            .format());
   }
 
 
@@ -154,7 +189,7 @@ final class TokenFormatterTest extends AbstractFormatterTest
     void testTokenAtStart()
     {
       // "/" is an invalid start token at column 0
-      var calculator = new Calculator(messageSupport);
+      var calculator = new CalculatorTestParser(messageSupport);
       var ex = assertThrowsExactly(SyntaxErrorException.class, () -> calculator.calculate("/"));
       var startToken = ex.getStartToken();
 
@@ -185,14 +220,9 @@ final class TokenFormatterTest extends AbstractFormatterTest
     @DisplayName("Custom position format with line only")
     void testCustomPositionFormatLineOnly()
     {
-      final var mockToken = mock(Token.class);
-
-      when(mockToken.getLine()).thenReturn(42);
-      when(mockToken.getCharPositionInLine()).thenReturn(7);
-
       assertEquals("line 42", messageSupport
           .message("%{t,token:position,token-position-format:'line %{line}'}")
-          .with("t", mockToken).format());
+          .with("t", token(42, 7)).format());
     }
 
 
@@ -200,14 +230,9 @@ final class TokenFormatterTest extends AbstractFormatterTest
     @DisplayName("Custom position format with line and column")
     void testCustomPositionFormat()
     {
-      final var mockToken = mock(Token.class);
-
-      when(mockToken.getLine()).thenReturn(3);
-      when(mockToken.getCharPositionInLine()).thenReturn(12);
-
       assertEquals("(3, 12)", messageSupport
           .message("%{t,token:position,token-position-format:'(%{line}, %{column})'}")
-          .with("t", mockToken).format());
+          .with("t", token(3, 12)).format());
     }
 
 
@@ -215,14 +240,9 @@ final class TokenFormatterTest extends AbstractFormatterTest
     @DisplayName("Custom position format when token has no column")
     void testCustomPositionFormatNoColumn()
     {
-      final var mockToken = mock(Token.class);
-
-      when(mockToken.getLine()).thenReturn(5);
-      when(mockToken.getCharPositionInLine()).thenReturn(-1);
-
       assertEquals("(5, )", messageSupport
           .message("%{t,token:position,token-position-format:'(%{line}, %{column})'}")
-          .with("t", mockToken).format());
+          .with("t", token(5, -1)).format());
     }
 
 
@@ -230,14 +250,9 @@ final class TokenFormatterTest extends AbstractFormatterTest
     @DisplayName("Custom position format with no line yields empty")
     void testCustomPositionFormatNoLine()
     {
-      final var mockToken = mock(Token.class);
-
-      when(mockToken.getLine()).thenReturn(0);
-      when(mockToken.getCharPositionInLine()).thenReturn(5);
-
       assertEquals("", messageSupport
           .message("%{t,token:position,token-position-format:'%{line}-%{column}'}")
-          .with("t", mockToken).format());
+          .with("t", token(0, 5)).format());
     }
 
 
@@ -245,15 +260,23 @@ final class TokenFormatterTest extends AbstractFormatterTest
     @DisplayName("Custom position format with adjusted 1st-line and 1st-column")
     void testCustomPositionFormatAdjusted()
     {
-      final var mockToken = mock(Token.class);
-
-      when(mockToken.getLine()).thenReturn(1);
-      when(mockToken.getCharPositionInLine()).thenReturn(0);
-
       assertEquals("0/1", messageSupport
           .message("%{t,token:'position',token-position-format:'%{line}/%{column}',token-1st-line:0,token-1st-column:1}")
-          .with("t", mockToken)
+          .with("t", token(1, 0))
           .format());
     }
+  }
+
+
+
+
+  private static @NotNull Token token(int line, int column)
+  {
+    final var token = mock(Token.class);
+
+    when(token.getLine()).thenReturn(line);
+    when(token.getCharPositionInLine()).thenReturn(column);
+
+    return token;
   }
 }

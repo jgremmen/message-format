@@ -29,13 +29,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static de.sayayi.lib.message.util.PackTestSupport.packRoundTrip;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
@@ -81,12 +80,9 @@ final class IterableFormatterTest extends AbstractFormatterTest
     // the string value survives a pack round trip
     messageSupport.addMessage("MSG", "%{c,list-value:'<\\%{value}>'}");
 
-    val pack = new ByteArrayOutputStream();
-    messageSupport.exportMessages(pack);
-
-    val importedMessageSupport = MessageSupportFactory
-        .create(formatterService)
-        .importMessages(new ByteArrayInputStream(pack.toByteArray()));
+    val importedMessageSupport = packRoundTrip(
+        messageSupport,
+        () -> MessageSupportFactory.create(formatterService));
 
     assertEquals(
         "<%{value}>, <%{value}>",

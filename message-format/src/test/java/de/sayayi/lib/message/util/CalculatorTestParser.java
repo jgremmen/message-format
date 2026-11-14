@@ -34,7 +34,7 @@ import static de.sayayi.lib.message.util.CalculatorParser.*;
  * @author Jeroen Gremmen
  * @since 0.24.0
  */
-public final class Calculator extends AbstractAntlr4Parser
+public final class CalculatorTestParser extends AbstractAntlr4Parser
 {
   private static final SyntaxErrorFormatter SYNTAX_ERROR_FORMATTER =
       new GenericSyntaxErrorFormatter(1, 0, 0, 2);
@@ -54,7 +54,7 @@ public final class Calculator extends AbstractAntlr4Parser
   };
 
 
-  public Calculator(@NotNull MessageSupport messageSupport) {
+  public CalculatorTestParser(@NotNull MessageSupport messageSupport) {
     super(SYNTAX_ERROR_FORMATTER, messageSupport);
   }
 
@@ -77,7 +77,7 @@ public final class Calculator extends AbstractAntlr4Parser
 
     @Override
     public Vocabulary getVocabulary() {
-      return Calculator.VOCABULARY;
+      return CalculatorTestParser.VOCABULARY;
     }
   }
 
@@ -93,7 +93,7 @@ public final class Calculator extends AbstractAntlr4Parser
 
     @Override
     public Vocabulary getVocabulary() {
-      return Calculator.VOCABULARY;
+      return CalculatorTestParser.VOCABULARY;
     }
   }
 

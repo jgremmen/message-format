@@ -34,6 +34,7 @@ import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
 
 import static de.sayayi.lib.message.part.normalizer.MessagePartNormalizer.PASS_THROUGH;
+import static de.sayayi.lib.message.util.AssertionTestSupport.assertNullRejected;
 import static de.sayayi.lib.message.util.ConcurrentTestSupport.runConcurrently;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Locale.JAPANESE;
@@ -67,11 +68,9 @@ final class MessageFactoryTest
   @SuppressWarnings("DataFlowIssue")
   void testNullNormalizer()
   {
-    final var ex = assertThrowsExactly(
-        NullPointerException.class,
+    assertNullRejected(
+        "messagePartNormalizer must not be null",
         () -> new MessageFactory(null, 16));
-
-    assertEquals("messagePartNormalizer must not be null", ex.getMessage());
   }
 
 
@@ -96,11 +95,13 @@ final class MessageFactoryTest
   void testSyntaxError()
   {
     // lexer error
-    assertThrows(MessageParserException.class,
+    assertThrows(
+        MessageParserException.class,
         () -> MessageFactory.getSharedInstance().parseMessage("%{x,{true false:1}"));
 
     // parser error
-    assertThrows(MessageParserException.class,
+    assertThrows(
+        MessageParserException.class,
         () -> MessageFactory.getSharedInstance().parseMessage("%{x,true false:1}"));
   }
 
@@ -110,7 +111,6 @@ final class MessageFactoryTest
   void testParseMessageCacheHit()
   {
     final var factory = new MessageFactory(PASS_THROUGH, 8);
-
     final var msg1 = factory.parseMessage("hello %{name}");
     final var msg2 = factory.parseMessage("hello %{name}");
 
@@ -135,8 +135,8 @@ final class MessageFactoryTest
   void testParseMessageCacheEvictsLRU()
   {
     final var factory = new MessageFactory(PASS_THROUGH, 2);
-
     final var messageA = factory.parseMessage("a");
+
     factory.parseMessage("b");
     factory.parseMessage("c"); // should evict "a"
 

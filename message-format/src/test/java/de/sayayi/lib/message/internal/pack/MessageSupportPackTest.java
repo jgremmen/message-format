@@ -20,7 +20,6 @@ import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.exception.DuplicateMessageException;
-import de.sayayi.lib.pack.PackOutputStream;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
@@ -34,12 +33,12 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.IntFunction;
 import java.util.stream.IntStream;
 
 import static de.sayayi.lib.message.Message.Parameters;
-import static de.sayayi.lib.message.pack.PackConstants.PACK_CONFIG;
+import static de.sayayi.lib.message.util.PackTestSupport.packBytes;
+import static de.sayayi.lib.message.util.PackTestSupport.packRoundTrip;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Locale.*;
 import static java.util.stream.Collectors.joining;
@@ -87,16 +86,7 @@ final class MessageSupportPackTest
   @DisplayName("Import exported messages and templates")
   void testExportImport() throws IOException
   {
-    val pack = new ByteArrayOutputStream();
-
-    messageSupport.exportMessages(pack);
-
-    val messageSupportCloned = MessageSupportFactory.createGeneric();
-
-    try(val packStream = new ByteArrayInputStream(pack.toByteArray())) {
-      messageSupportCloned.importMessages(packStream);
-    }
-
+    val messageSupportCloned = packRoundTrip(messageSupport, MessageSupportFactory::createGeneric);
     val messageAccessor = messageSupport.getMessageAccessor();
     val messageAccessorCloned = messageSupportCloned.getMessageAccessor();
 
@@ -124,14 +114,7 @@ final class MessageSupportPackTest
 
     cms.addMessage(cms.getMessageAccessor().getMessageFactory().parseMessage("MSG-DEFAULT", localizedMessages));
 
-    val pack = new ByteArrayOutputStream();
-    cms.exportMessages(pack);
-
-    val imported = MessageSupportFactory.createGeneric();
-    try(val packStream = new ByteArrayInputStream(pack.toByteArray())) {
-      imported.importMessages(packStream);
-    }
-
+    val imported = packRoundTrip(cms, MessageSupportFactory::createGeneric);
     final var importedMessageAccessor = imported.getMessageAccessor();
     var importedMessage = importedMessageAccessor.getMessageByCode("MSG-DEFAULT");
     var localizedBundle = assertInstanceOf(LocaleAware.class, importedMessage);
@@ -155,13 +138,7 @@ final class MessageSupportPackTest
   @DisplayName("Export maximum number of messages")
   void testExportMaxMessageCount() throws IOException
   {
-    val pack = new ByteArrayOutputStream();
-    messageSupportWithMessages(0xffff).exportMessages(pack);
-
-    val imported = MessageSupportFactory.createGeneric();
-    try(val packStream = new ByteArrayInputStream(pack.toByteArray())) {
-      imported.importMessages(packStream);
-    }
+    val imported = packRoundTrip(messageSupportWithMessages(0xffff), MessageSupportFactory::createGeneric);
 
     assertEquals(0xffff, imported.getMessageAccessor().getMessageCodes().size());
   }
@@ -171,27 +148,18 @@ final class MessageSupportPackTest
   @DisplayName("Export and import close the stream")
   void testStreamsClosed() throws IOException
   {
-    val packClosed = new AtomicBoolean();
-    val pack = new ByteArrayOutputStream() {
-      @Override
-      public void close() {
-        packClosed.set(true);
-      }
-    };
+    val pack = new CloseRecordingOutputStream();
 
     messageSupport.exportMessages(pack);
-    assertTrue(packClosed.get());
+    assertTrue(pack.closed);
 
-    val packStreamClosed = new AtomicBoolean();
-    val packStream = new ByteArrayInputStream(pack.toByteArray()) {
-      @Override
-      public void close() {
-        packStreamClosed.set(true);
-      }
-    };
+    val packStream = new CloseRecordingInputStream(pack.toByteArray());
 
-    MessageSupportFactory.createGeneric().importMessages(packStream);
-    assertTrue(packStreamClosed.get());
+    MessageSupportFactory
+        .createGeneric()
+        .importMessages(packStream);
+
+    assertTrue(packStream.closed);
   }
 
 
@@ -199,16 +167,14 @@ final class MessageSupportPackTest
   @DisplayName("Import closes the stream if the pack is invalid")
   void testImportFailureClosesStream()
   {
-    val closed = new AtomicBoolean();
-    val packStream = new ByteArrayInputStream("not a message pack".getBytes(UTF_8)) {
-      @Override
-      public void close() {
-        closed.set(true);
-      }
-    };
+    val packStream = new CloseRecordingInputStream("not a message pack".getBytes(UTF_8));
 
-    assertThrows(IOException.class, () -> MessageSupportFactory.createGeneric().importMessages(packStream));
-    assertTrue(closed.get());
+    assertThrows(
+        IOException.class,
+        () -> MessageSupportFactory
+            .createGeneric()
+            .importMessages(packStream));
+    assertTrue(packStream.closed);
   }
 
 
@@ -216,16 +182,16 @@ final class MessageSupportPackTest
   @DisplayName("Import rejects a pack with an unsupported version")
   void testImportUnsupportedVersion() throws IOException
   {
-    val pack = new ByteArrayOutputStream();
-
-    try(val packStream = new PackOutputStream(PACK_CONFIG, PackSupport.VERSION + 1, false, pack)) {
+    val pack = packBytes(PackSupport.VERSION + 1, packStream -> {
       packStream.writeUnsignedShort(0);  // messages
       packStream.writeUnsignedShort(0);  // templates
-    }
+    });
 
-    val ex = assertThrows(IOException.class, () -> MessageSupportFactory
-        .createGeneric()
-        .importMessages(new ByteArrayInputStream(pack.toByteArray())));
+    val ex = assertThrows(
+        IOException.class,
+        () -> MessageSupportFactory
+            .createGeneric()
+            .importMessages(new ByteArrayInputStream(pack)));
 
     assertTrue(ex.getMessage().contains("unsupported pack version " + (PackSupport.VERSION + 1)));
   }
@@ -235,19 +201,21 @@ final class MessageSupportPackTest
   @DisplayName("Import rejects a pack with an invalid message type")
   void testImportInvalidMessageType() throws IOException
   {
-    val pack = new ByteArrayOutputStream();
-
-    try(val packStream = new PackOutputStream(PACK_CONFIG, PackSupport.VERSION, false, pack)) {
+    val pack = packBytes(PackSupport.VERSION, packStream -> {
       packStream.writeUnsignedShort(1);  // messages
       packStream.writeSmall(7, 3);       // invalid message type
       packStream.writeUnsignedShort(0);  // templates
-    }
+    });
 
-    val ex = assertThrows(StreamCorruptedException.class, () -> MessageSupportFactory
-        .createGeneric()
-        .importMessages(new ByteArrayInputStream(pack.toByteArray())));
+    val ex = assertThrows(
+        StreamCorruptedException.class,
+        () -> MessageSupportFactory
+            .createGeneric()
+            .importMessages(new ByteArrayInputStream(pack)));
 
-    assertInstanceOf(IllegalStateException.class, ex.getCause());
+    assertInstanceOf(
+        IllegalStateException.class,
+        ex.getCause());
   }
 
 
@@ -255,19 +223,21 @@ final class MessageSupportPackTest
   @DisplayName("Import rejects a pack with a missing template name")
   void testImportMissingTemplateName() throws IOException
   {
-    val pack = new ByteArrayOutputStream();
-
-    try(val packStream = new PackOutputStream(PACK_CONFIG, PackSupport.VERSION, false, pack)) {
+    val pack = packBytes(PackSupport.VERSION, packStream -> {
       packStream.writeUnsignedShort(0);  // messages
       packStream.writeUnsignedShort(1);  // templates
       packStream.writeString(null);      // template name
-    }
+    });
 
-    val ex = assertThrows(StreamCorruptedException.class, () -> MessageSupportFactory
-        .createGeneric()
-        .importMessages(new ByteArrayInputStream(pack.toByteArray())));
+    val ex = assertThrows(
+        StreamCorruptedException.class,
+        () -> MessageSupportFactory
+            .createGeneric()
+            .importMessages(new ByteArrayInputStream(pack)));
 
-    assertInstanceOf(NullPointerException.class, ex.getCause());
+    assertInstanceOf(
+        NullPointerException.class,
+        ex.getCause());
   }
 
 
@@ -281,9 +251,11 @@ final class MessageSupportPackTest
     val bytes = pack.toByteArray();
     val truncated = Arrays.copyOf(bytes, bytes.length / 2);
 
-    assertThrows(IOException.class, () -> MessageSupportFactory
-        .createGeneric()
-        .importMessages(new ByteArrayInputStream(truncated)));
+    assertThrows(
+        IOException.class,
+        () -> MessageSupportFactory
+            .createGeneric()
+            .importMessages(new ByteArrayInputStream(truncated)));
   }
 
 
@@ -294,9 +266,12 @@ final class MessageSupportPackTest
     val pack = new ByteArrayOutputStream();
     messageSupport.exportMessages(pack);
 
-    val cms = MessageSupportFactory.createGeneric().addMessage("MSG-002", "Different");
+    val cms = MessageSupportFactory
+        .createGeneric()
+        .addMessage("MSG-002", "Different");
 
-    assertThrows(DuplicateMessageException.class,
+    assertThrows(
+        DuplicateMessageException.class,
         () -> cms.importMessages(new ByteArrayInputStream(pack.toByteArray())));
   }
 
@@ -306,18 +281,12 @@ final class MessageSupportPackTest
   void testExportTooManyMessages()
   {
     val cms = messageSupportWithMessages(0x10000);
-    val closed = new AtomicBoolean();
-    val pack = new ByteArrayOutputStream() {
-      @Override
-      public void close() {
-        closed.set(true);
-      }
-    };
+    val pack = new CloseRecordingOutputStream();
     val ex = assertThrows(IOException.class, () -> cms.exportMessages(pack));
 
     assertTrue(ex.getMessage().contains("messages"));
     assertEquals(0, pack.size());
-    assertTrue(closed.get());
+    assertTrue(pack.closed);
 
     // filtering below the limit makes the export succeed
     assertDoesNotThrow(() -> cms.exportMessages(new ByteArrayOutputStream(), false,
@@ -371,7 +340,9 @@ final class MessageSupportPackTest
     assertDoesNotThrow(() -> cms.exportMessages(new ByteArrayOutputStream(), false, "MSG-255"::equals,
         null));
 
-    val ex = assertThrows(IOException.class, () -> cms.exportMessages(new ByteArrayOutputStream()));
+    val ex = assertThrows(
+        IOException.class,
+        () -> cms.exportMessages(new ByteArrayOutputStream()));
     assertTrue(ex.getMessage().contains("255 parts"));
   }
 
@@ -423,17 +394,58 @@ final class MessageSupportPackTest
         () -> messageSupport.exportMessages(new ByteArrayOutputStream(), false, code::equals, null),
         code);
 
-    assertTrue(ex.getMessage().contains(expectedMessage), ex.getMessage());
+    assertTrue(
+        ex.getMessage().contains(expectedMessage),
+        ex.getMessage());
   }
 
 
-  private static @NotNull String elements(int count, @NotNull IntFunction<String> element) {
-    return IntStream.range(0, count).mapToObj(element).collect(joining(","));
+  private static @NotNull String elements(int count, @NotNull IntFunction<String> element)
+  {
+    return IntStream
+        .range(0, count)
+        .mapToObj(element)
+        .collect(joining(","));
   }
 
 
   // private use language codes qaa..qtz
   private static @NotNull Locale locale(int n) {
     return Locale.of("q" + (char)('a' + n / 26) + (char)('a' + n % 26));
+  }
+
+
+
+
+  /** Byte array output stream recording whether it has been closed. */
+  private static final class CloseRecordingOutputStream extends ByteArrayOutputStream
+  {
+    private boolean closed;
+
+
+    @Override
+    public void close() {
+      closed = true;
+    }
+  }
+
+
+
+
+  /** Byte array input stream recording whether it has been closed. */
+  private static final class CloseRecordingInputStream extends ByteArrayInputStream
+  {
+    private boolean closed;
+
+
+    private CloseRecordingInputStream(byte @NotNull [] bytes) {
+      super(bytes);
+    }
+
+
+    @Override
+    public void close() {
+      closed = true;
+    }
   }
 }

@@ -3,12 +3,12 @@
 // `UPDATE_SNAPSHOTS=1 node --test test/` (or `npm run test:update`) to regenerate the snapshots.
 
 import assert from 'node:assert/strict';
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
-import { describe, it } from 'node:test';
-import { fileURLToPath } from 'node:url';
+import {existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync} from 'node:fs';
+import {dirname, join, resolve} from 'node:path';
+import {describe, it} from 'node:test';
+import {fileURLToPath} from 'node:url';
 
-import { balanced, highlight, textOf } from './helpers.js';
+import {assertRoundTrip, highlight} from './helpers.js';
 
 
 const testDir = dirname(fileURLToPath(import.meta.url));
@@ -65,8 +65,7 @@ for(const { name, messages } of corpus())
       it(key, () => {
         const html = actual[key] = highlight(message);
 
-        assert.equal(textOf(html), message);
-        assert.ok(balanced(html), html);
+        assertRoundTrip(html, message);
 
         if (!update)
           assert.equal(html, snapshot[key], `snapshot ${name}/${key} differs (UPDATE_SNAPSHOTS=1 to update)`);

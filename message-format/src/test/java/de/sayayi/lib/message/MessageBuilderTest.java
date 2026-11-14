@@ -25,12 +25,17 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import static de.sayayi.lib.message.MessageSupportFactory.shared;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 
 /**
@@ -58,12 +63,8 @@ class MessageBuilderTest
               .mapBool(false).message(b -> b.text("no"))
           .build();
 
-      assertEquals("%{flag,true:yes,false:no}", message.asFormatString(UTF_8));
-
-      final var messageSupport = shared();
-
-      assertEquals("yes", messageSupport.message(message).with("flag", true).format());
-      assertEquals("no", messageSupport.message(message).with("flag", false).format());
+      assertMessage(message, "%{flag,true:yes,false:no}", "yes", "flag", true);
+      assertEquals("no", shared().message(message).with("flag", false).format());
     }
 
 
@@ -79,12 +80,8 @@ class MessageBuilderTest
               .mapDefault().message(b -> b.text("Hello").parameter("name").spaceBefore())
           .build();
 
-      assertEquals("%{name,format:choice,null:stranger,:'Hello %{name}'}", message.asFormatString(UTF_8));
-
-      final var messageSupport = shared();
-
-      assertEquals("Hello World", messageSupport.message(message).with("name", "World").format());
-      assertEquals("stranger", messageSupport.message(message).with("name", null).format());
+      assertMessage(message, "%{name,format:choice,null:stranger,:'Hello %{name}'}", "Hello World", "name", "World");
+      assertEquals("stranger", shared().message(message).with("name", null).format());
     }
 
 
@@ -100,12 +97,8 @@ class MessageBuilderTest
               .mapDefault().message(b -> b.parameter("count").text(" items").spaceBefore())
           .build();
 
-      assertEquals("%{count,format:choice,1:'one item',:'%{count} items'}", message.asFormatString(UTF_8));
-
-      final var messageSupport = shared();
-
-      assertEquals("one item", messageSupport.message(message).with("count", 1).format());
-      assertEquals("5 items", messageSupport.message(message).with("count", 5).format());
+      assertMessage(message, "%{count,format:choice,1:'one item',:'%{count} items'}", "one item", "count", 1);
+      assertEquals("5 items", shared().message(message).with("count", 5).format());
     }
 
 
@@ -121,12 +114,8 @@ class MessageBuilderTest
               .mapDefault().message(b -> b.text("Unknown color"))
           .build();
 
-      assertEquals("%{color,format:choice,'red':'Red color',:'Unknown color'}", message.asFormatString(UTF_8));
-
-      final var messageSupport = shared();
-
-      assertEquals("Red color", messageSupport.message(message).with("color", "red").format());
-      assertEquals("Unknown color", messageSupport.message(message).with("color", "blue").format());
+      assertMessage(message, "%{color,format:choice,'red':'Red color',:'Unknown color'}", "Red color", "color", "red");
+      assertEquals("Unknown color", shared().message(message).with("color", "blue").format());
     }
 
 
@@ -141,12 +130,8 @@ class MessageBuilderTest
               .mapDefault().message(b -> b.parameter("value"))
           .build();
 
-      assertEquals("%{value,null:nothing,:'%{value}'}", message.asFormatString(UTF_8));
-
-      final var messageSupport = shared();
-
-      assertEquals("nothing", messageSupport.message(message).with("value", null).format());
-      assertEquals("hello", messageSupport.message(message).with("value", "hello").format());
+      assertMessage(message, "%{value,null:nothing,:'%{value}'}", "nothing", "value", null);
+      assertEquals("hello", shared().message(message).with("value", "hello").format());
     }
 
 
@@ -161,12 +146,8 @@ class MessageBuilderTest
               .mapDefault().message(b -> b.parameter("text"))
           .build();
 
-      assertEquals("%{text,empty:'(empty)',:'%{text}'}", message.asFormatString(UTF_8));
-
-      final var messageSupport = shared();
-
-      assertEquals("(empty)", messageSupport.message(message).with("text", "").format());
-      assertEquals("hi", messageSupport.message(message).with("text", "hi").format());
+      assertMessage(message, "%{text,empty:'(empty)',:'%{text}'}", "(empty)", "text", "");
+      assertEquals("hi", shared().message(message).with("text", "hi").format());
     }
 
 
@@ -183,13 +164,9 @@ class MessageBuilderTest
               .mapDefault().message(b -> b.text("zero"))
           .build();
 
-      assertEquals("%{n,format:choice,<0:negative,>0:positive,:zero}", message.asFormatString(UTF_8));
-
-      final var messageSupport = shared();
-
-      assertEquals("negative", messageSupport.message(message).with("n", -5).format());
-      assertEquals("positive", messageSupport.message(message).with("n", 10).format());
-      assertEquals("zero", messageSupport.message(message).with("n", 0).format());
+      assertMessage(message, "%{n,format:choice,<0:negative,>0:positive,:zero}", "negative", "n", -5);
+      assertEquals("positive", shared().message(message).with("n", 10).format());
+      assertEquals("zero", shared().message(message).with("n", 0).format());
     }
 
 
@@ -225,8 +202,7 @@ class MessageBuilderTest
       assertEquals(1, message.getMessageParts().length);
       assertInstanceOf(MessagePart.Text.class, message.getMessageParts()[0]);
 
-      assertEquals("Hello World", message.asFormatString(UTF_8));
-      assertEquals("Hello World", shared().message(message).format());
+      assertMessage(message, "Hello World", "Hello World");
     }
 
 
@@ -243,8 +219,7 @@ class MessageBuilderTest
 
       assertEquals(1, message.getMessageParts().length);
 
-      assertEquals("one two three", message.asFormatString(UTF_8));
-      assertEquals("one two three", shared().message(message).format());
+      assertMessage(message, "one two three", "one two three");
     }
 
 
@@ -262,8 +237,7 @@ class MessageBuilderTest
       // text + parameter + text = 3 parts
       assertEquals(3, message.getMessageParts().length);
 
-      assertEquals("Hello %{name}!", message.asFormatString(UTF_8));
-      assertEquals("Hello Alice!", shared().message(message).with("name", "Alice").format());
+      assertMessage(message, "Hello %{name}!", "Hello Alice!", "name", "Alice");
     }
 
 
@@ -284,9 +258,11 @@ class MessageBuilderTest
       // "Dear customer" (merged) + parameter + ", welcome back!" (merged) = 3 parts
       assertEquals(3, message.getMessageParts().length);
 
-      assertEquals("Dear customer %{name}, welcome back!", message.asFormatString(UTF_8));
-      assertEquals("Dear customer Alice, welcome back!",
-          shared().message(message).with("name", "Alice").format());
+      assertMessage(
+          message,
+          "Dear customer %{name}, welcome back!",
+          "Dear customer Alice, welcome back!",
+          "name", "Alice");
     }
 
 
@@ -301,8 +277,7 @@ class MessageBuilderTest
 
       assertEquals(1, message.getMessageParts().length);
 
-      assertEquals("solo", message.asFormatString(UTF_8));
-      assertEquals("solo", shared().message(message).format());
+      assertMessage(message, "solo", "solo");
     }
 
 
@@ -318,8 +293,7 @@ class MessageBuilderTest
 
       assertEquals(1, message.getMessageParts().length);
 
-      assertEquals("left right", message.asFormatString(UTF_8));
-      assertEquals("left right", shared().message(message).format());
+      assertMessage(message, "left right", "left right");
     }
 
 
@@ -338,9 +312,7 @@ class MessageBuilderTest
       // parameter + ", and " (merged) + parameter = 3 parts
       assertEquals(3, message.getMessageParts().length);
 
-      assertEquals("%{a}, and %{b}", message.asFormatString(UTF_8));
-      assertEquals("1, and 2",
-          shared().message(message).with("a", 1).with("b", 2).format());
+      assertMessage(message, "%{a}, and %{b}", "1, and 2", "a", 1, "b", 2);
     }
   }
 
@@ -392,8 +364,7 @@ class MessageBuilderTest
 
       final var message = assertInstanceOf(MessageTemplate.class, template).getMessage();
 
-      assertEquals("Hello %{name}!", message.asFormatString(UTF_8));
-      assertEquals("Hello Alice!", shared().message(message).with("name", "Alice").format());
+      assertMessage(message, "Hello %{name}!", "Hello Alice!", "name", "Alice");
     }
 
 
@@ -505,8 +476,7 @@ class MessageBuilderTest
               .configString("case", "upper")
           .build();
 
-      assertEquals("%(case,'hello world',case:upper)", message.asFormatString(UTF_8));
-      assertEquals("HELLO WORLD", shared().message(message).format());
+      assertMessage(message, "%(case,'hello world',case:upper)", "HELLO WORLD");
     }
 
 
@@ -521,8 +491,7 @@ class MessageBuilderTest
               .configString("case", "upper")
           .build();
 
-      assertEquals("%(case,'hello world',case:upper)", message.asFormatString(UTF_8));
-      assertEquals("HELLO WORLD", shared().message(message).format());
+      assertMessage(message, "%(case,'hello world',case:upper)", "HELLO WORLD");
     }
 
 
@@ -537,8 +506,7 @@ class MessageBuilderTest
               .configString("case", "upper")
           .build();
 
-      assertEquals("%(case,'Hello %{name}',case:upper)", message.asFormatString(UTF_8));
-      assertEquals("HELLO ALICE", shared().message(message).with("name", "Alice").format());
+      assertMessage(message, "%(case,'Hello %{name}',case:upper)", "HELLO ALICE", "name", "Alice");
     }
 
 
@@ -553,8 +521,7 @@ class MessageBuilderTest
               .configString("case", "upper")
           .build();
 
-      assertEquals("%(case,'hello world',case:upper)", message.asFormatString(UTF_8));
-      assertEquals("HELLO WORLD", shared().message(message).format());
+      assertMessage(message, "%(case,'hello world',case:upper)", "HELLO WORLD");
     }
 
 
@@ -569,8 +536,7 @@ class MessageBuilderTest
               .configString("case", "upper")
           .build();
 
-      assertEquals("%(case,'Hello %{name}',case:upper)", message.asFormatString(UTF_8));
-      assertEquals("HELLO ALICE", shared().message(message).with("name", "Alice").format());
+      assertMessage(message, "%(case,'Hello %{name}',case:upper)", "HELLO ALICE", "name", "Alice");
     }
 
 
@@ -651,8 +617,7 @@ class MessageBuilderTest
           .text("!")
           .build();
 
-      assertEquals("Result: %(case,'hello',case:upper)!", message.asFormatString(UTF_8));
-      assertEquals("Result: HELLO!", shared().message(message).format());
+      assertMessage(message, "Result: %(case,'hello',case:upper)!", "Result: HELLO!");
     }
 
 
@@ -792,7 +757,7 @@ class MessageBuilderTest
   class TemplateBuilderWithDefaultParameterTest
   {
     @Test
-    @DisplayName("withDefaultParameter(String, String) provides string default")
+    @DisplayName("withDefaultParameter(String, String) provides string default, overridden by explicit parameter")
     void testWithDefaultParameterString()
     {
       final var cms = createMessageSupportWithTemplate("greeting", "Hello %{name}");
@@ -803,20 +768,6 @@ class MessageBuilderTest
           .build();
 
       assertEquals("Hello World", cms.message(message).format());
-    }
-
-
-    @Test
-    @DisplayName("withDefaultParameter(String, String) is overridden by explicit parameter")
-    void testWithDefaultParameterStringOverridden()
-    {
-      final var cms = createMessageSupportWithTemplate("greeting", "Hello %{name}");
-      final var message = MessageBuilder
-          .create()
-          .template("greeting")
-              .withDefaultParameter("name", "World")
-          .build();
-
       assertEquals("Hello Alice", cms.message(message).with("name", "Alice").format());
     }
 
@@ -827,34 +778,22 @@ class MessageBuilderTest
     {
       final var cms = createMessageSupportWithTemplate("status",
           "%{active,true:enabled,false:disabled}");
-      final var message = MessageBuilder
+
+      assertEquals("enabled", cms.message(MessageBuilder
           .create()
           .template("status")
               .withDefaultParameter("active", true)
-          .build();
-
-      assertEquals("enabled", cms.message(message).format());
-    }
-
-
-    @Test
-    @DisplayName("withDefaultParameter(String, boolean) false value")
-    void testWithDefaultParameterBooleanFalse()
-    {
-      final var cms = createMessageSupportWithTemplate("status",
-          "%{active,true:enabled,false:disabled}");
-      final var message = MessageBuilder
+          .build()).format());
+      assertEquals("disabled", cms.message(MessageBuilder
           .create()
           .template("status")
               .withDefaultParameter("active", false)
-          .build();
-
-      assertEquals("disabled", cms.message(message).format());
+          .build()).format());
     }
 
 
     @Test
-    @DisplayName("withDefaultParameter(String, long) provides numeric default")
+    @DisplayName("withDefaultParameter(String, long) provides numeric default, overridden by explicit parameter")
     void testWithDefaultParameterLong()
     {
       final var cms = createMessageSupportWithTemplate("count-msg",
@@ -866,21 +805,6 @@ class MessageBuilderTest
           .build();
 
       assertEquals("42 items", cms.message(message).format());
-    }
-
-
-    @Test
-    @DisplayName("withDefaultParameter(String, long) is overridden by explicit parameter")
-    void testWithDefaultParameterLongOverridden()
-    {
-      final var cms = createMessageSupportWithTemplate("count-msg",
-          "%{count,format:choice,1:'one item',:'%{count} items'}");
-      final var message = MessageBuilder
-          .create()
-          .template("count-msg")
-              .withDefaultParameter("count", 42)
-          .build();
-
       assertEquals("one item", cms.message(message).with("count", 1).format());
     }
 
@@ -1008,87 +932,60 @@ class MessageBuilderTest
   @DisplayName("Builder reuse after build()")
   class BuilderReuseTest
   {
-    @Test
-    @DisplayName("Calling build() twice throws IllegalStateException")
-    void testBuildTwiceThrows()
+    static Stream<Arguments> operationsAfterBuild()
     {
-      final var builder = MessageBuilder.create().text("hello");
-
-      builder.build();
-
-      assertThrows(IllegalStateException.class, builder::build);
+      return Stream.of(
+          reuse("Calling build() twice throws IllegalStateException",
+              MessageBuilder::build, MessageBuilder::build),
+          reuse("Calling buildWithCode() after build() throws IllegalStateException",
+              MessageBuilder::build, builder -> builder.buildWithCode("MSG-001")),
+          reuse("Calling buildAsTemplate() after buildWithCode() throws IllegalStateException",
+              builder -> builder.buildWithCode("MSG-001"), MessageBuilder::buildAsTemplate),
+          reuse("Calling text() after build() throws IllegalStateException",
+              MessageBuilder::build, builder -> builder.text("world")),
+          reuse("Calling parameter() after build() throws IllegalStateException",
+              MessageBuilder::build, builder -> builder.parameter("name")),
+          reuse("Calling postFormatter() after build() throws IllegalStateException",
+              MessageBuilder::build, builder -> builder.postFormatter("upper-case")),
+          reuse("Calling template() after build() throws IllegalStateException",
+              MessageBuilder::build, builder -> builder.template("greeting"))
+      );
     }
 
 
-    @Test
-    @DisplayName("Calling buildWithCode() after build() throws IllegalStateException")
-    void testBuildWithCodeAfterBuildThrows()
+    @ParameterizedTest(name = "{0}")
+    @DisplayName("Builder methods throw IllegalStateException after the message has been built")
+    @MethodSource("operationsAfterBuild")
+    void testOperationAfterBuildThrows(@SuppressWarnings("unused") String name, Consumer<MessageBuilder> finisher,
+                                       Consumer<MessageBuilder> operation)
     {
       final var builder = MessageBuilder.create().text("hello");
 
-      builder.build();
+      finisher.accept(builder);
 
-      assertThrows(IllegalStateException.class, () -> builder.buildWithCode("MSG-001"));
+      assertThrows(IllegalStateException.class, () -> operation.accept(builder));
     }
 
 
-    @Test
-    @DisplayName("Calling buildAsTemplate() after buildWithCode() throws IllegalStateException")
-    void testBuildAsTemplateAfterBuildWithCodeThrows()
-    {
-      final var builder = MessageBuilder.create().text("hello");
-
-      builder.buildWithCode("MSG-001");
-
-      assertThrows(IllegalStateException.class, builder::buildAsTemplate);
+    private static Arguments reuse(String name, Consumer<MessageBuilder> finisher,
+                                   Consumer<MessageBuilder> operation) {
+      return arguments(name, finisher, operation);
     }
+  }
 
 
-    @Test
-    @DisplayName("Calling text() after build() throws IllegalStateException")
-    void testTextAfterBuildThrows()
-    {
-      final var builder = MessageBuilder.create().text("hello");
-
-      builder.build();
-
-      assertThrows(IllegalStateException.class, () -> builder.text("world"));
-    }
 
 
-    @Test
-    @DisplayName("Calling parameter() after build() throws IllegalStateException")
-    void testParameterAfterBuildThrows()
-    {
-      final var builder = MessageBuilder.create().text("hello");
+  private static void assertMessage(@NotNull Message message, @NotNull String formatString, @NotNull String formatted,
+                                    @NotNull Object... parameters)
+  {
+    assertEquals(formatString, message.asFormatString(UTF_8));
 
-      builder.build();
+    final var configurer = shared().message(message);
 
-      assertThrows(IllegalStateException.class, () -> builder.parameter("name"));
-    }
+    for(var n = 0; n < parameters.length; n += 2)
+      configurer.with((String)parameters[n], parameters[n + 1]);
 
-
-    @Test
-    @DisplayName("Calling postFormatter() after build() throws IllegalStateException")
-    void testPostFormatterAfterBuildThrows()
-    {
-      final var builder = MessageBuilder.create().text("hello");
-
-      builder.build();
-
-      assertThrows(IllegalStateException.class, () -> builder.postFormatter("upper-case"));
-    }
-
-
-    @Test
-    @DisplayName("Calling template() after build() throws IllegalStateException")
-    void testTemplateAfterBuildThrows()
-    {
-      final var builder = MessageBuilder.create().text("hello");
-
-      builder.build();
-
-      assertThrows(IllegalStateException.class, () -> builder.template("greeting"));
-    }
+    assertEquals(formatted, configurer.format());
   }
 }

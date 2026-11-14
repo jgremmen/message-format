@@ -24,7 +24,8 @@ import org.junit.jupiter.api.TestMethodOrder;
 
 import java.lang.annotation.Annotation;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static de.sayayi.lib.message.util.AssertionTestSupport.assertEqualsContract;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
@@ -51,9 +52,9 @@ final class SyntheticAnnotationTest
     };
 
     assertEquals(text, other);
-    assertEquals(new SyntheticText("de", "Hallo", ""), text);
-    assertEquals(new SyntheticText("de", "Hallo", "").hashCode(), text.hashCode());
-    assertNotEquals(new SyntheticText("en", "Hallo", ""), text);
+    assertEqualsContract(text,
+        new SyntheticText("de", "Hallo", ""),
+        new SyntheticText("en", "Hallo", ""));
     assertEquals(
         ((127 * "locale".hashCode()) ^ "de".hashCode()) +
         ((127 * "text".hashCode()) ^ "Hallo".hashCode()) +
@@ -66,13 +67,11 @@ final class SyntheticAnnotationTest
   @DisplayName("Synthetic message definitions compare texts element-wise")
   void testMessageDef()
   {
-    val def1 = new SyntheticMessageDef("MSG", "", new Text[] { new SyntheticText("de", "Hallo", null) });
-    val def2 = new SyntheticMessageDef("MSG", "", new Text[] { new SyntheticText("de", "Hallo", null) });
-
-    assertEquals(def1, def2);
-    assertEquals(def1.hashCode(), def2.hashCode());
-    assertNotEquals(new SyntheticMessageDef("MSG", "", new Text[0]), def1);
-    assertNotEquals(new SyntheticMessageDef("MSG2", "", new Text[] { new SyntheticText("de", "Hallo", null) }), def1);
+    assertEqualsContract(
+        new SyntheticMessageDef("MSG", "", new Text[] { new SyntheticText("de", "Hallo", null) }),
+        new SyntheticMessageDef("MSG", "", new Text[] { new SyntheticText("de", "Hallo", null) }),
+        new SyntheticMessageDef("MSG", "", new Text[0]),
+        new SyntheticMessageDef("MSG2", "", new Text[] { new SyntheticText("de", "Hallo", null) }));
   }
 
 
@@ -80,12 +79,10 @@ final class SyntheticAnnotationTest
   @DisplayName("Synthetic template definitions compare texts element-wise")
   void testTemplateDef()
   {
-    val def1 = new SyntheticTemplateDef("tpl", "", new Text[] { new SyntheticText("de", "Hallo", null) });
-    val def2 = new SyntheticTemplateDef("tpl", "", new Text[] { new SyntheticText("de", "Hallo", null) });
-
-    assertEquals(def1, def2);
-    assertEquals(def1.hashCode(), def2.hashCode());
-    assertNotEquals(new SyntheticTemplateDef("tpl", "", new Text[0]), def1);
+    assertEqualsContract(
+        new SyntheticTemplateDef("tpl", "", new Text[] { new SyntheticText("de", "Hallo", null) }),
+        new SyntheticTemplateDef("tpl", "", new Text[] { new SyntheticText("de", "Hallo", null) }),
+        new SyntheticTemplateDef("tpl", "", new Text[0]));
   }
 
 

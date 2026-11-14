@@ -17,6 +17,7 @@ package de.sayayi.lib.message.internal.formatter;
 
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.parameter.runtime.ArrayFormatter;
+import de.sayayi.lib.message.util.IsolatingTestClassLoader;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
@@ -24,15 +25,14 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import static de.sayayi.lib.message.util.AssertionTestSupport.assertGarbageCollected;
 import static java.time.Duration.ofSeconds;
-import static java.util.Objects.requireNonNull;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -99,9 +99,9 @@ final class FormatterCacheTest
   void lookupSameClassNameDifferentClassLoaders() throws Exception
   {
     val cache = new FormatterCache(8);
-    val type1 = new IsolatingClassLoader().loadClass(SameNameType.class.getName());
-    val type2 = new IsolatingClassLoader().loadClass(SameNameType.class.getName());
-    val type3 = new IsolatingClassLoader().loadClass(SameNameType.class.getName());
+    val type1 = new IsolatingTestClassLoader(SameNameType.class).loadClass(SameNameType.class.getName());
+    val type2 = new IsolatingTestClassLoader(SameNameType.class).loadClass(SameNameType.class.getName());
+    val type3 = new IsolatingTestClassLoader(SameNameType.class).loadClass(SameNameType.class.getName());
     val pf1 = new ParameterFormatter[] { new ArrayFormatter() };
     val pf2 = new ParameterFormatter[] { new ArrayFormatter() };
     val pf3 = new ParameterFormatter[] { new ArrayFormatter() };
@@ -133,31 +133,24 @@ final class FormatterCacheTest
 
 
   @Test
-  @SuppressWarnings("BusyWait")
   @DisplayName("Cached types do not prevent their class loader from being unloaded")
   void lookupDoesNotRetainClassLoader() throws Exception
   {
     val cache = new FormatterCache(8);
-    val classLoaderRef = cacheTypeFromIsolatingClassLoader(cache);
 
-    for(var n = 0; n < 50 && classLoaderRef.get() != null; n++)
-    {
-      System.gc();
-      Thread.sleep(10);
-    }
-
-    assertNull(classLoaderRef.get(), "class loader of a cached type has not been garbage collected");
+    assertGarbageCollected(cacheTypeFromIsolatingClassLoader(cache),
+        "class loader of a cached type has not been garbage collected");
 
     // the cache is still usable and a newly loaded type with the same name gets its own entry
     val pf = new ParameterFormatter[] { new ArrayFormatter() };
-    assertSame(pf, cache.lookup(new IsolatingClassLoader().loadClass(SameNameType.class.getName()), t -> pf));
+    assertSame(pf, cache.lookup(new IsolatingTestClassLoader(SameNameType.class).loadClass(SameNameType.class.getName()), t -> pf));
   }
 
 
   private static @NotNull WeakReference<ClassLoader> cacheTypeFromIsolatingClassLoader(@NotNull FormatterCache cache)
       throws ClassNotFoundException
   {
-    val classLoader = new IsolatingClassLoader();
+    val classLoader = new IsolatingTestClassLoader(SameNameType.class);
     val type = classLoader.loadClass(SameNameType.class.getName());
     val pf = new ParameterFormatter[] { new ArrayFormatter() };
 
@@ -172,40 +165,5 @@ final class FormatterCacheTest
 
   /** Type loaded by multiple class loaders, resulting in different classes with the same name. */
   public static final class SameNameType {
-  }
-
-
-
-
-  /** Class loader defining its own copy of {@link SameNameType}. */
-  private static final class IsolatingClassLoader extends ClassLoader
-  {
-    private IsolatingClassLoader() {
-      super(FormatterCacheTest.class.getClassLoader());
-    }
-
-
-    @Override
-    protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException
-    {
-      if (!name.equals(SameNameType.class.getName()))
-        return super.loadClass(name, resolve);
-
-      synchronized(getClassLoadingLock(name))
-      {
-        var type = findLoadedClass(name);
-        if (type == null)
-        {
-          try(val in = getParent().getResourceAsStream(name.replace('.', '/') + ".class")) {
-            val bytes = requireNonNull(in).readAllBytes();
-            type = defineClass(name, bytes, 0, bytes.length);
-          } catch(IOException ex) {
-            throw new ClassNotFoundException(name, ex);
-          }
-        }
-
-        return type;
-      }
-    }
   }
 }

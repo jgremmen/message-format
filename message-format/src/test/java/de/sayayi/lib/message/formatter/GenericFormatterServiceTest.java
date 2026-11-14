@@ -25,6 +25,7 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
+import static de.sayayi.lib.message.util.AssertionTestSupport.assertNullRejected;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -43,10 +44,9 @@ final class GenericFormatterServiceTest
   @SuppressWarnings("DataFlowIssue")
   void testAddNullPostFormatter()
   {
-    val ex = assertThrowsExactly(NullPointerException.class,
+    assertNullRejected(
+        "postFormatter must not be null",
         () -> new GenericFormatterService().addPostFormatter(null));
-
-    assertEquals("postFormatter must not be null", ex.getMessage());
   }
 
 
@@ -55,10 +55,10 @@ final class GenericFormatterServiceTest
   void testAddPostFormatterWithoutName()
   {
     val formatterService = new GenericFormatterService();
-    val ex = assertThrowsExactly(NullPointerException.class,
-        () -> formatterService.addPostFormatter(new NamelessPostFormatter()));
 
-    assertEquals("name of post formatter NamelessPostFormatter must not be null", ex.getMessage());
+    assertNullRejected(
+        "name of post formatter NamelessPostFormatter must not be null",
+        () -> formatterService.addPostFormatter(new NamelessPostFormatter()));
     assertTrue(formatterService.getPostFormatters().isEmpty());
   }
 

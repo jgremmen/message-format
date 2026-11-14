@@ -21,9 +21,16 @@ import de.sayayi.lib.message.formatter.GenericFormatterService;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import lombok.val;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.util.Map;
+import java.util.stream.Stream;
 
 import static java.util.Locale.ENGLISH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 
 /**
@@ -52,219 +59,71 @@ final class ICUPersonFormatterTest extends AbstractFormatterTest
   }
 
 
-  @Test
-  @DisplayName("Full name with defaults")
-  void testFullNameDefaults()
+  static Stream<Arguments> personNames()
   {
-    val msg = messageSupport
-        .message("%{unused,format:icu-person}")
-        .with("given-name", "John")
-        .with("family-name", "Smith");
+    final var johnSmith = Map.of("given-name", "John", "family-name", "Smith");
+    final var johnMichaelSmith = Map.of("given-name", "John", "middle-name", "Michael", "family-name", "Smith");
+    final var drJohnSmith = Map.of("prefix", "Dr.", "given-name", "John", "family-name", "Smith");
+    final var johnSmithJr = Map.of("given-name", "John", "family-name", "Smith", "suffix", "Jr.");
 
-    assertEquals("John Smith", msg.format());
+    return Stream.of(
+        arguments("Full name with defaults",
+            "", johnSmith, "John Smith"),
+        arguments("Given name as initial, full family name",
+            ",given-format:initial,family-format:full", johnSmith, "J. Smith"),
+        arguments("Full given name, family name as initial",
+            ",given-format:full,family-format:initial", johnSmith, "John S."),
+        arguments("Surname-first order",
+            ",order:surname-first", johnSmith, "Smith John"),
+        arguments("Sorting order",
+            ",order:sorting", johnSmith, "Smith, John"),
+        arguments("Full name with middle name",
+            ",middle-format:full", johnMichaelSmith, "John Michael Smith"),
+        arguments("Middle name as initial",
+            ",middle-format:initial", johnMichaelSmith, "John M. Smith"),
+        arguments("Middle name excluded",
+            ",middle-format:none", johnMichaelSmith, "John Smith"),
+        arguments("With prefix",
+            ",prefix-format:full", drJohnSmith, "Dr. John Smith"),
+        arguments("Prefix excluded",
+            ",prefix-format:none", drJohnSmith, "John Smith"),
+        arguments("With suffix",
+            ",suffix-format:full", johnSmithJr, "John Smith Jr."),
+        arguments("Suffix excluded",
+            ",suffix-format:none", johnSmithJr, "John Smith"),
+        arguments("Given name only",
+            ",family-format:none", johnSmith, "John"),
+        arguments("Family name only",
+            ",given-format:none", johnSmith, "Smith"),
+        arguments("All initials",
+            ",given-format:initial,middle-format:initial,family-format:initial", johnMichaelSmith, "J. M. S."),
+        arguments("Sorting order with initials",
+            ",order:sorting,given-format:initial,family-format:full", johnSmith, "Smith, J."),
+        arguments("Full name with all parts",
+            ",middle-format:full,prefix-format:full,suffix-format:full",
+            Map.of("prefix", "Mr.", "given-name", "James", "middle-name", "Earl", "family-name", "Carter",
+                "suffix", "Jr."),
+            "Mr. James Earl Carter Jr."),
+        arguments("Surname-first with prefix and suffix",
+            ",order:surname-first,middle-format:initial,prefix-format:full,suffix-format:full",
+            Map.of("prefix", "Dr.", "given-name", "Jane", "middle-name", "Marie", "family-name", "Doe",
+                "suffix", "Ph.D."),
+            "Doe Dr. Jane M. Ph.D.")
+    );
   }
 
 
-  @Test
-  @DisplayName("Given name as initial, full family name")
-  void testGivenInitialFamilyFull()
+  @ParameterizedTest(name = "{0}")
+  @DisplayName("Person names are formatted according to the configuration")
+  @MethodSource("personNames")
+  void testPersonName(@SuppressWarnings("unused") String name, String configuration, Map<String,String> names,
+                      String expected)
   {
-    val msg = messageSupport
-        .message("%{unused,format:icu-person,given-format:initial,family-format:full}")
-        .with("given-name", "John")
-        .with("family-name", "Smith");
+    val msg = messageSupport.message("%{unused,format:icu-person" + configuration + "}");
 
-    assertEquals("J. Smith", msg.format());
-  }
+    names.forEach(msg::with);
 
-
-  @Test
-  @DisplayName("Full given name, family name as initial")
-  void testGivenFullFamilyInitial()
-  {
-    val msg = messageSupport
-        .message("%{unused,format:icu-person,given-format:full,family-format:initial}")
-        .with("given-name", "John")
-        .with("family-name", "Smith");
-
-    assertEquals("John S.", msg.format());
-  }
-
-
-  @Test
-  @DisplayName("Surname-first order")
-  void testSurnameFirst()
-  {
-    val msg = messageSupport
-        .message("%{unused,format:icu-person,order:surname-first}")
-        .with("given-name", "John")
-        .with("family-name", "Smith");
-
-    assertEquals("Smith John", msg.format());
-  }
-
-
-  @Test
-  @DisplayName("Sorting order")
-  void testSortingOrder()
-  {
-    val msg = messageSupport
-        .message("%{unused,format:icu-person,order:sorting}")
-        .with("given-name", "John")
-        .with("family-name", "Smith");
-
-    assertEquals("Smith, John", msg.format());
-  }
-
-
-  @Test
-  @DisplayName("Full name with middle name")
-  void testFullNameWithMiddle()
-  {
-    val msg = messageSupport
-        .message("%{unused,format:icu-person,middle-format:full}")
-        .with("given-name", "John")
-        .with("middle-name", "Michael")
-        .with("family-name", "Smith");
-
-    assertEquals("John Michael Smith", msg.format());
-  }
-
-
-  @Test
-  @DisplayName("Middle name as initial")
-  void testMiddleInitial()
-  {
-    val msg = messageSupport
-        .message("%{unused,format:icu-person,middle-format:initial}")
-        .with("given-name", "John")
-        .with("middle-name", "Michael")
-        .with("family-name", "Smith");
-
-    assertEquals("John M. Smith", msg.format());
-  }
-
-
-  @Test
-  @DisplayName("Middle name excluded")
-  void testMiddleNone()
-  {
-    val msg = messageSupport
-        .message("%{unused,format:icu-person,middle-format:none}")
-        .with("given-name", "John")
-        .with("middle-name", "Michael")
-        .with("family-name", "Smith");
-
-    assertEquals("John Smith", msg.format());
-  }
-
-
-  @Test
-  @DisplayName("With prefix")
-  void testWithPrefix()
-  {
-    val msg = messageSupport
-        .message("%{unused,format:icu-person,prefix-format:full}")
-        .with("prefix", "Dr.")
-        .with("given-name", "John")
-        .with("family-name", "Smith");
-
-    assertEquals("Dr. John Smith", msg.format());
-  }
-
-
-  @Test
-  @DisplayName("Prefix excluded")
-  void testPrefixNone()
-  {
-    val msg = messageSupport
-        .message("%{unused,format:icu-person,prefix-format:none}")
-        .with("prefix", "Dr.")
-        .with("given-name", "John")
-        .with("family-name", "Smith");
-
-    assertEquals("John Smith", msg.format());
-  }
-
-
-  @Test
-  @DisplayName("With suffix")
-  void testWithSuffix()
-  {
-    val msg = messageSupport
-        .message("%{unused,format:icu-person,suffix-format:full}")
-        .with("given-name", "John")
-        .with("family-name", "Smith")
-        .with("suffix", "Jr.");
-
-    assertEquals("John Smith Jr.", msg.format());
-  }
-
-
-  @Test
-  @DisplayName("Suffix excluded")
-  void testSuffixNone()
-  {
-    val msg = messageSupport
-        .message("%{unused,format:icu-person,suffix-format:none}")
-        .with("given-name", "John")
-        .with("family-name", "Smith")
-        .with("suffix", "Jr.");
-
-    assertEquals("John Smith", msg.format());
-  }
-
-
-  @Test
-  @DisplayName("Given name only")
-  void testGivenNameOnly()
-  {
-    val msg = messageSupport
-        .message("%{unused,format:icu-person,family-format:none}")
-        .with("given-name", "John")
-        .with("family-name", "Smith");
-
-    assertEquals("John", msg.format());
-  }
-
-
-  @Test
-  @DisplayName("Family name only")
-  void testFamilyNameOnly()
-  {
-    val msg = messageSupport
-        .message("%{unused,format:icu-person,given-format:none}")
-        .with("given-name", "John")
-        .with("family-name", "Smith");
-
-    assertEquals("Smith", msg.format());
-  }
-
-
-  @Test
-  @DisplayName("All initials")
-  void testAllInitials()
-  {
-    val msg = messageSupport
-        .message("%{unused,format:icu-person,given-format:initial,middle-format:initial,family-format:initial}")
-        .with("given-name", "John")
-        .with("middle-name", "Michael")
-        .with("family-name", "Smith");
-
-    assertEquals("J. M. S.", msg.format());
-  }
-
-
-  @Test
-  @DisplayName("Sorting order with initials")
-  void testSortingWithInitials()
-  {
-    val msg = messageSupport
-        .message("%{unused,format:icu-person,order:sorting,given-format:initial,family-format:full}")
-        .with("given-name", "John")
-        .with("family-name", "Smith");
-
-    assertEquals("Smith, J.", msg.format());
+    assertEquals(expected, msg.format());
   }
 
 
@@ -278,37 +137,5 @@ final class ICUPersonFormatterTest extends AbstractFormatterTest
         .with("family-name", null);
 
     assertEquals("unknown", msg.format());
-  }
-
-
-  @Test
-  @DisplayName("Full name with all parts")
-  void testFullNameAllParts()
-  {
-    val msg = messageSupport
-        .message("%{unused,format:icu-person,middle-format:full,prefix-format:full,suffix-format:full}")
-        .with("prefix", "Mr.")
-        .with("given-name", "James")
-        .with("middle-name", "Earl")
-        .with("family-name", "Carter")
-        .with("suffix", "Jr.");
-
-    assertEquals("Mr. James Earl Carter Jr.", msg.format());
-  }
-
-
-  @Test
-  @DisplayName("Surname-first with prefix and suffix")
-  void testSurnameFirstWithPrefixSuffix()
-  {
-    val msg = messageSupport
-        .message("%{unused,format:icu-person,order:surname-first,middle-format:initial,prefix-format:full,suffix-format:full}")
-        .with("prefix", "Dr.")
-        .with("given-name", "Jane")
-        .with("middle-name", "Marie")
-        .with("family-name", "Doe")
-        .with("suffix", "Ph.D.");
-
-    assertEquals("Doe Dr. Jane M. Ph.D.", msg.format());
   }
 }

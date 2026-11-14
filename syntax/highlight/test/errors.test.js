@@ -1,10 +1,7 @@
 import assert from 'node:assert/strict';
-import { describe, it, mock } from 'node:test';
+import {describe, it, mock} from 'node:test';
 
-import hljs from 'highlight.js/lib/core';
-
-import { createMessageFormat } from '../src/index.js';
-import { balanced, highlight, textOf } from './helpers.js';
+import {assertRoundTrip, highlight, highlighter} from './helpers.js';
 
 
 const INVALID = [
@@ -40,10 +37,7 @@ describe('invalid input', () => {
       const warn = mock.method(console, 'warn');
 
       try {
-        const html = highlight(message);
-
-        assert.equal(textOf(html), message);
-        assert.ok(balanced(html), html);
+        assertRoundTrip(highlight(message), message);
         assert.equal(log.mock.callCount() + error.mock.callCount() + warn.mock.callCount(), 0);
       } finally {
         mock.restoreAll();
@@ -62,10 +56,7 @@ describe('invalid input', () => {
 
 
 describe('markErrors option', () => {
-  const marked = hljs.newInstance();
-  marked.registerLanguage('message-format', createMessageFormat({ markErrors: true }));
-
-  const highlightMarked = code => marked.highlight(code, { language: 'message-format' }).value;
+  const highlightMarked = highlighter({ markErrors: true });
 
   it('marks characters rejected by the lexer', () =>
     assert.ok(highlightMarked('%{p,@}').includes('<span class="hljs-deletion">@</span>')));
@@ -78,12 +69,7 @@ describe('markErrors option', () => {
 
   it('keeps the round trip invariant', () => {
     for(const message of INVALID)
-    {
-      const html = highlightMarked(message);
-
-      assert.equal(textOf(html), message);
-      assert.ok(balanced(html), html);
-    }
+      assertRoundTrip(highlightMarked(message), message);
   });
 });
 
@@ -94,13 +80,12 @@ describe('robustness', () => {
     for(let n = 0; n < 2000; n++)
       message = `%{p,:'${message}'}`;
 
-    const html = highlight(message);
-    assert.equal(textOf(html), message);
+    assertRoundTrip(highlight(message), message);
   });
 
   it('long messages', () => {
     const message = '%{p}.'.repeat(5000);
 
-    assert.equal(textOf(highlight(message)), message);
+    assertRoundTrip(highlight(message), message);
   });
 });

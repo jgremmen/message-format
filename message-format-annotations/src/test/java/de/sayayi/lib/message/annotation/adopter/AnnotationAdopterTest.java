@@ -38,7 +38,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.function.ThrowingConsumer;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
@@ -51,8 +55,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
+import java.util.stream.Stream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.Files.createDirectories;
@@ -60,6 +66,7 @@ import static java.nio.file.Files.createTempFile;
 import static java.util.Locale.*;
 import static java.util.Objects.requireNonNull;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.objectweb.asm.Opcodes.*;
 
 
@@ -73,25 +80,41 @@ import static org.objectweb.asm.Opcodes.*;
 @TestMethodOrder(MethodOrderer.DisplayName.class)
 class AnnotationAdopterTest
 {
-  @Test
-  @DisplayName("adopt(Class<?> type)")
-  void testAdoptType()
+  static Stream<Arguments> entryPoints()
   {
-    val cms = newMessageSupport();
-
-    new AnnotationAdopter(cms).adopt(AnnotationsFixture.class);
-    verifyFixture(cms.getMessageAccessor());
+    return Stream.of(
+        entryPoint("adopt(Class<?> type)",
+            adopter -> adopter.adopt(AnnotationsFixture.class),
+            AnnotationAdopterTest::verifyFixture),
+        entryPoint("adopt(Path classFile)",
+            adopter -> adopter.adopt(classFilePath(AnnotationsFixture.class)),
+            AnnotationAdopterTest::verifyFixture),
+        entryPoint("adopt(File classFile)",
+            adopter -> adopter.adopt(classFilePath(AnnotationsFixture.class).toFile()),
+            AnnotationAdopterTest::verifyFixture),
+        entryPoint("adopt(Class<?> innerType)",
+            adopter -> adopter.adopt(AnnotationsFixture.InnerRecord.class),
+            AnnotationAdopterTest::verifyInnerRecordFixture),
+        entryPoint("adopt(Path innerClassFile)",
+            adopter -> adopter.adopt(classFilePath(AnnotationsFixture.InnerRecord.class)),
+            AnnotationAdopterTest::verifyInnerRecordFixture),
+        entryPoint("adopt(byte[] classFileContent)",
+            adopter -> adopter.adopt(Files.readAllBytes(classFilePath(AnnotationsFixture.class))),
+            AnnotationAdopterTest::verifyFixture)
+    );
   }
 
 
-  @Test
-  @DisplayName("adopt(Path classFile)")
-  void testAdoptPath() throws Exception
+  @ParameterizedTest(name = "{0}")
+  @DisplayName("adopt entry points adopt the fixture messages and templates")
+  @MethodSource("entryPoints")
+  void testAdoptEntryPoint(@SuppressWarnings("unused") String name, ThrowingConsumer<AnnotationAdopter> adopt,
+                           Consumer<MessageAccessor> verification) throws Throwable
   {
     val cms = newMessageSupport();
 
-    new AnnotationAdopter(cms).adopt(classFilePath(AnnotationsFixture.class));
-    verifyFixture(cms.getMessageAccessor());
+    adopt.accept(new AnnotationAdopter(cms));
+    verification.accept(cms.getMessageAccessor());
   }
 
 
@@ -105,35 +128,21 @@ class AnnotationAdopterTest
 
     val accessor = cms.getMessageAccessor();
     assertTrue(accessor.hasMessageWithCode("control-msg"));
-    assertEquals("Control message", accessor.getMessageByCode("control-msg").asFormatString(UTF_8));
+    assertEquals(
+        "Control message",
+        accessor
+            .getMessageByCode("control-msg")
+            .asFormatString(UTF_8));
     assertTrue(accessor.hasTemplateWithName("control-tmpl"));
-    assertEquals("Control template",
-        ((MessageTemplate)accessor.getTemplateByName("control-tmpl")).getMessage().asFormatString(UTF_8));
+    assertEquals(
+        "Control template",
+        ((MessageTemplate)accessor
+            .getTemplateByName("control-tmpl"))
+            .getMessage()
+            .asFormatString(UTF_8));
 
     assertFalse(accessor.hasMessageWithCode("synthetic-msg"));
     assertFalse(accessor.hasTemplateWithName("synthetic-tmpl"));
-  }
-
-
-  @Test
-  @DisplayName("adopt(Class<?> innerType)")
-  void testAdoptInnerType()
-  {
-    val cms = newMessageSupport();
-
-    new AnnotationAdopter(cms).adopt(AnnotationsFixture.InnerRecord.class);
-    verifyInnerRecordFixture(cms.getMessageAccessor());
-  }
-
-
-  @Test
-  @DisplayName("adopt(Path innerClassFile)")
-  void testAdoptInnerPath() throws Exception
-  {
-    val cms = newMessageSupport();
-
-    new AnnotationAdopter(cms).adopt(classFilePath(AnnotationsFixture.InnerRecord.class));
-    verifyInnerRecordFixture(cms.getMessageAccessor());
   }
 
 
@@ -143,9 +152,9 @@ class AnnotationAdopterTest
   {
     val cms = newMessageSupport();
 
-    new AnnotationAdopter(cms).adopt(
-        AnnotationsFixture.class.getClassLoader(),
-        Set.of(AnnotationsFixture.class.getPackageName()));
+    new AnnotationAdopter(cms)
+        .adopt(AnnotationsFixture.class.getClassLoader(), Set.of(AnnotationsFixture.class.getPackageName()));
+
     verifyFixture(cms.getMessageAccessor());
     verifyInnerRecordFixture(cms.getMessageAccessor());
   }
@@ -377,16 +386,14 @@ class AnnotationAdopterTest
 
 
   @Test
-  @DisplayName("adopt(byte[] classFileContent)")
-  void testAdoptClassFileContent() throws Exception
+  @DisplayName("adopt(byte[] classFileContent) rejects invalid class file content")
+  void testAdoptInvalidClassFileContent()
   {
-    val cms = newMessageSupport();
-
-    new AnnotationAdopter(cms).adopt(Files.readAllBytes(classFilePath(AnnotationsFixture.class)));
-    verifyFixture(cms.getMessageAccessor());
-
-    assertThrows(MessageAdopterException.class, () -> new AnnotationAdopter(newMessageSupport()).adopt(new byte[0]));
-    assertThrows(MessageAdopterException.class,
+    assertThrows(
+        MessageAdopterException.class,
+        () -> new AnnotationAdopter(newMessageSupport()).adopt(new byte[0]));
+    assertThrows(
+        MessageAdopterException.class,
         () -> new AnnotationAdopter(newMessageSupport()).adopt("not a class file".getBytes(UTF_8)));
   }
 
@@ -426,10 +433,23 @@ class AnnotationAdopterTest
     assertTrue(accessor.hasMessageWithCode("MSG-D3"));
     val msg3 = accessor.getMessageByCode("MSG-D3");
     assertInstanceOf(LocaleAware.class, msg3);
-    val locMessages3 = ((LocaleAware) msg3).getLocalizedMessages();
-    assertEquals("EN direct msg 3", locMessages3.get(ENGLISH).asFormatString(UTF_8));
-    assertEquals("DE direct msg 3", locMessages3.get(GERMAN).asFormatString(UTF_8));
-    assertEquals("FR direct msg 3", locMessages3.get(FRENCH).asFormatString(UTF_8));
+
+    val locMessages3 = ((LocaleAware)msg3).getLocalizedMessages();
+    assertEquals(
+        "EN direct msg 3",
+        locMessages3
+            .get(ENGLISH)
+            .asFormatString(UTF_8));
+    assertEquals(
+        "DE direct msg 3",
+        locMessages3
+            .get(GERMAN)
+            .asFormatString(UTF_8));
+    assertEquals(
+        "FR direct msg 3",
+        locMessages3
+            .get(FRENCH)
+            .asFormatString(UTF_8));
   }
 
 
@@ -460,20 +480,43 @@ class AnnotationAdopterTest
     val accessor = cms.getMessageAccessor();
 
     assertTrue(accessor.hasTemplateWithName("tmpl-d1"));
-    assertEquals("Direct template 1",
-        ((MessageTemplate)accessor.getTemplateByName("tmpl-d1")).getMessage().asFormatString(UTF_8));
+    assertEquals(
+        "Direct template 1",
+        ((MessageTemplate)accessor
+            .getTemplateByName("tmpl-d1"))
+            .getMessage()
+            .asFormatString(UTF_8));
 
     assertTrue(accessor.hasTemplateWithName("tmpl-d2"));
-    assertEquals("Direct template 2",
-        ((MessageTemplate)accessor.getTemplateByName("tmpl-d2")).getMessage().asFormatString(UTF_8));
+    assertEquals(
+        "Direct template 2",
+        ((MessageTemplate)accessor
+            .getTemplateByName("tmpl-d2"))
+            .getMessage()
+            .asFormatString(UTF_8));
 
     assertTrue(accessor.hasTemplateWithName("tmpl-d3"));
-    val tmpl3 = ((MessageTemplate)accessor.getTemplateByName("tmpl-d3")).getMessage();
+    val tmpl3 = ((MessageTemplate)accessor
+        .getTemplateByName("tmpl-d3"))
+        .getMessage();
     assertInstanceOf(LocaleAware.class, tmpl3);
-    val locTemplates3 = ((LocaleAware) tmpl3).getLocalizedMessages();
-    assertEquals("EN direct tmpl 3", locTemplates3.get(ENGLISH).asFormatString(UTF_8));
-    assertEquals("DE direct tmpl 3", locTemplates3.get(GERMAN).asFormatString(UTF_8));
-    assertEquals("FR direct tmpl 3", locTemplates3.get(FRENCH).asFormatString(UTF_8));
+
+    val locTemplates3 = ((LocaleAware)tmpl3).getLocalizedMessages();
+    assertEquals(
+        "EN direct tmpl 3",
+        locTemplates3
+            .get(ENGLISH)
+            .asFormatString(UTF_8));
+    assertEquals(
+        "DE direct tmpl 3",
+        locTemplates3
+            .get(GERMAN)
+            .asFormatString(UTF_8));
+    assertEquals(
+        "FR direct tmpl 3",
+        locTemplates3
+            .get(FRENCH)
+            .asFormatString(UTF_8));
   }
 
 
@@ -498,30 +541,67 @@ class AnnotationAdopterTest
     assertEquals(
         Set.of(ROOT, GERMAN, GERMANY, CANADA_FRENCH, Locale.forLanguageTag("zh-Hant-TW")),
         localizedMessages.keySet());
-    assertEquals("de-DE", localizedMessages.get(GERMANY).asFormatString(UTF_8));
-    assertEquals("de-DE", cms.code("MSG-L1").locale(GERMANY).format());
-    assertEquals("root", cms.code("MSG-L1").locale(ITALIAN).format());
+    assertEquals(
+        "de-DE",
+        localizedMessages
+            .get(GERMANY)
+            .asFormatString(UTF_8));
+    assertEquals(
+        "de-DE",
+        cms
+            .code("MSG-L1")
+            .locale(GERMANY)
+            .format());
+    assertEquals(
+        "root",
+        cms
+            .code("MSG-L1")
+            .locale(ITALIAN)
+            .format());
   }
 
 
-  @Test
-  @DisplayName("adopt(MessageDef) rejects invalid locales")
-  void testAdoptMessageDefInvalidLocale()
+  static Stream<Arguments> invalidLocales()
   {
-    for(var locale: List.of("de_DE", "fr_CA", "not a locale", "de-"))
-    {
-      val adopter = new AnnotationAdopter(newMessageSupport());
-      val messageDef = new SyntheticMessageDef("MSG-INVALID", "",
-          new SyntheticText[] {
-              new SyntheticText("en", "English", ""),
-              new SyntheticText(locale, "Other", "")
-          });
+    final var messageDefs = Stream
+        .of("de_DE", "fr_CA", "not a locale", "de-")
+        .map(locale -> invalidLocale("adopt(MessageDef) with locale '" + locale + "'",
+            adopter -> adopter.adopt(new SyntheticMessageDef("MSG-INVALID", "",
+                new SyntheticText[] {
+                    new SyntheticText("en", "English", ""),
+                    new SyntheticText(locale, "Other", "")
+                })),
+            "'" + locale + "'", "message 'MSG-INVALID'"));
 
-      val message =
-          assertThrows(MessageAdopterException.class, () -> adopter.adopt(messageDef), locale).getMessage();
-      assertTrue(message.contains("'" + locale + "'"), message);
-      assertTrue(message.contains("message 'MSG-INVALID'"), message);
-    }
+    return Stream.concat(messageDefs, Stream.of(
+        invalidLocale("adopt(TemplateDef) with locale 'en_GB'",
+            adopter -> adopter.adopt(new SyntheticTemplateDef("tmpl-invalid", "",
+                new SyntheticText[] {
+                    new SyntheticText("en_GB", "English", ""),
+                    new SyntheticText("de", "Deutsch", "")
+                })),
+            "'en_GB'", "template 'tmpl-invalid'"),
+        invalidLocale("adopt(Class<?> type) with invalid message locale",
+            adopter -> adopter.adopt(InvalidMessageLocaleFixture.class)),
+        invalidLocale("adopt(Class<?> type) with invalid template locale",
+            adopter -> adopter.adopt(InvalidTemplateLocaleFixture.class))
+    ));
+  }
+
+
+  @ParameterizedTest(name = "{0}")
+  @DisplayName("adopt entry points reject invalid locales")
+  @MethodSource("invalidLocales")
+  void testAdoptInvalidLocale(@SuppressWarnings("unused") String name, ThrowingConsumer<AnnotationAdopter> adopt,
+                              String[] expectedMessageParts)
+  {
+    val adopter = new AnnotationAdopter(newMessageSupport());
+    val message = assertThrows(
+        MessageAdopterException.class,
+        () -> adopt.accept(adopter)).getMessage();
+
+    for(val expectedMessagePart: expectedMessageParts)
+      assertTrue(message.contains(expectedMessagePart), message);
   }
 
 
@@ -541,36 +621,14 @@ class AnnotationAdopterTest
         ((LocaleAware)((MessageTemplate)cms.getMessageAccessor().getTemplateByName("tmpl-l1")).getMessage())
             .getLocalizedMessages();
 
-    assertEquals(Set.of(ENGLISH, UK), localizedTemplates.keySet());
-    assertEquals("en-GB", localizedTemplates.get(UK).asFormatString(UTF_8));
-  }
-
-
-  @Test
-  @DisplayName("adopt(TemplateDef) rejects invalid locales")
-  void testAdoptTemplateDefInvalidLocale()
-  {
-    val adopter = new AnnotationAdopter(newMessageSupport());
-    val templateDef = new SyntheticTemplateDef("tmpl-invalid", "",
-        new SyntheticText[] {
-            new SyntheticText("en_GB", "English", ""),
-            new SyntheticText("de", "Deutsch", "")
-        });
-
-    val ex = assertThrows(MessageAdopterException.class, () -> adopter.adopt(templateDef));
-    assertTrue(ex.getMessage().contains("'en_GB'"), ex.getMessage());
-    assertTrue(ex.getMessage().contains("template 'tmpl-invalid'"), ex.getMessage());
-  }
-
-
-  @Test
-  @DisplayName("adopt(Class<?> type) rejects invalid locales")
-  void testAdoptTypeInvalidLocale()
-  {
-    assertThrows(MessageAdopterException.class,
-        () -> new AnnotationAdopter(newMessageSupport()).adopt(InvalidMessageLocaleFixture.class));
-    assertThrows(MessageAdopterException.class,
-        () -> new AnnotationAdopter(newMessageSupport()).adopt(InvalidTemplateLocaleFixture.class));
+    assertEquals(
+        Set.of(ENGLISH, UK),
+        localizedTemplates.keySet());
+    assertEquals(
+        "en-GB",
+        localizedTemplates
+            .get(UK)
+            .asFormatString(UTF_8));
   }
 
 
@@ -603,6 +661,19 @@ class AnnotationAdopterTest
     } finally {
       sharedJarFile.close();
     }
+  }
+
+
+  private static @NotNull Arguments entryPoint(@NotNull String name, @NotNull ThrowingConsumer<AnnotationAdopter> adopt,
+                                               @NotNull Consumer<MessageAccessor> verification) {
+    return arguments(name, adopt, verification);
+  }
+
+
+  private static @NotNull Arguments invalidLocale(@NotNull String name,
+                                                  @NotNull ThrowingConsumer<AnnotationAdopter> adopt,
+                                                  @NotNull String... expectedMessageParts) {
+    return arguments(name, adopt, expectedMessageParts);
   }
 
 

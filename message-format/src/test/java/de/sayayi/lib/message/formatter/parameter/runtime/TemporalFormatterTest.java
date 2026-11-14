@@ -19,14 +19,17 @@ import de.sayayi.lib.message.internal.part.TextPart;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import lombok.val;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.util.DefaultTimeZone;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.time.*;
 import java.time.temporal.Temporal;
-import java.util.TimeZone;
 import java.util.stream.Stream;
 
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
@@ -45,14 +48,9 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
  */
 @DisplayName("Temporal formatter")
 @TestMethodOrder(MethodOrderer.DisplayName.class)
+@DefaultTimeZone("Europe/Berlin")
 final class TemporalFormatterTest extends AbstractFormatterTest
 {
-  @BeforeAll
-  static void init() {
-    TimeZone.setDefault(TimeZone.getTimeZone("Europe/Berlin"));
-  }
-
-
   @Test
   @DisplayName("Reports the supported temporal types")
   void testFormattableTypes()

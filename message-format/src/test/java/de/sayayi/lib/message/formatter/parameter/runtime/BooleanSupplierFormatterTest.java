@@ -15,19 +15,20 @@
  */
 package de.sayayi.lib.message.formatter.parameter.runtime;
 
-import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import lombok.val;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.params.provider.Arguments;
 
+import java.util.Locale;
 import java.util.function.BooleanSupplier;
+import java.util.stream.Stream;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 import static java.util.Locale.ROOT;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 
 /**
@@ -38,21 +39,32 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 @DisplayName("BooleanSupplier formatter")
 @TestMethodOrder(MethodOrderer.DisplayName.class)
-final class BooleanSupplierFormatterTest extends AbstractFormatterTest
+final class BooleanSupplierFormatterTest extends AbstractSupplierFormatterTest
 {
-  @Test
-  public void testFormattableTypes() {
-    assertFormatterForType(new BooleanSupplierFormatter(), BooleanSupplier.class);
+  @Override
+  protected @NotNull ParameterFormatter createFormatter() {
+    return new BooleanSupplierFormatter();
   }
 
 
-  @Test
-  public void testFormat()
-  {
-    val messageAccessor = createMessageAccessor(ROOT, new BooleanSupplierFormatter());
+  @Override
+  protected @NotNull Class<?> getFormattableType() {
+    return BooleanSupplier.class;
+  }
 
-    assertEquals(nullText(), format(messageAccessor, null));
-    assertEquals(noSpaceText("true"), format(messageAccessor, (BooleanSupplier)() -> true));
-    assertEquals(noSpaceText("false"), format(messageAccessor, (BooleanSupplier)() -> false));
+
+  @Override
+  protected @NotNull Locale getLocale() {
+    return ROOT;
+  }
+
+
+  @Override
+  protected @NotNull Stream<Arguments> formattedValues()
+  {
+    return Stream.of(
+        arguments((BooleanSupplier)() -> true, noSpaceText("true")),
+        arguments((BooleanSupplier)() -> false, noSpaceText("false"))
+    );
   }
 }

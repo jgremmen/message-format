@@ -42,6 +42,8 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 @TestMethodOrder(MethodOrderer.DisplayName.class)
 final class MatchResultFormatterTest extends AbstractFormatterTest
 {
+  private static final Pattern VERSION_PATTERN = Pattern.compile("[vV]?(?<major>\\d+)(\\.(?<minor>\\d+))?");
+
   private MessageSupport context;
 
 
@@ -76,8 +78,7 @@ final class MatchResultFormatterTest extends AbstractFormatterTest
   @MethodSource("groupNumbers")
   void testFormatGroupNumber(@Language("MessageFormat") String formatString, String expected)
   {
-    final var pattern = Pattern.compile("[vV]?(?<major>\\d+)(\\.(?<minor>\\d+))?");
-    final var matcher = pattern.matcher("v5.12");
+    final var matcher = VERSION_PATTERN.matcher("v5.12");
 
     assertEquals(
         expected,
@@ -104,8 +105,7 @@ final class MatchResultFormatterTest extends AbstractFormatterTest
   @MethodSource("groupNames")
   void testFormatGroupName(@Language("MessageFormat") String formatString, String expected)
   {
-    final var pattern = Pattern.compile("[vV]?(?<major>\\d+)(\\.(?<minor>\\d+))?");
-    final var matcher = pattern.matcher("v5.12");
+    final var matcher = VERSION_PATTERN.matcher("v5.12");
 
     assertEquals(
         expected,
@@ -120,8 +120,7 @@ final class MatchResultFormatterTest extends AbstractFormatterTest
   @DisplayName("Formats the whole match by default")
   void testFormat()
   {
-    final var pattern = Pattern.compile("[vV]?(?<major>\\d+)(\\.(?<minor>\\d+))?");
-    final var matcher = pattern.matcher("v4.999");
+    final var matcher = VERSION_PATTERN.matcher("v4.999");
 
     assertEquals(
         "v4.999",

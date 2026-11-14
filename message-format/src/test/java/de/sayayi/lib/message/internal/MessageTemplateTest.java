@@ -24,11 +24,11 @@ import org.junit.jupiter.api.TestMethodOrder;
 import java.util.Map;
 import java.util.Set;
 
+import static de.sayayi.lib.message.util.AssertionTestSupport.assertNullRejected;
 import static java.util.Arrays.stream;
 import static java.util.Locale.*;
 import static java.util.stream.Collectors.toSet;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 
 
 /**
@@ -45,8 +45,12 @@ final class MessageTemplateTest
   @DisplayName("toString() of a template with a single message")
   void testToString()
   {
-    assertEquals("Template(\"Hello %{name}\")",
-        MessageFactory.getSharedInstance().parseTemplate("Hello %{name}").toString());
+    assertEquals(
+        "Template(\"Hello %{name}\")",
+        MessageFactory
+            .getSharedInstance()
+            .parseTemplate("Hello %{name}")
+            .toString());
   }
 
 
@@ -62,7 +66,8 @@ final class MessageTemplateTest
 
     assertEquals("Template(", string.substring(0, 9));
     assertEquals(")", string.substring(string.length() - 1));
-    assertEquals(Set.of("en=\"Hello %{name}\"", "de-DE=\"Hallo %{name}\"", "ROOT=\"Hi\""),
+    assertEquals(
+        Set.of("en=\"Hello %{name}\"", "de-DE=\"Hallo %{name}\"", "ROOT=\"Hi\""),
         stream(string.substring(9, string.length() - 1).split(",")).collect(toSet()));
   }
 
@@ -72,7 +77,8 @@ final class MessageTemplateTest
   @SuppressWarnings("DataFlowIssue")
   void testNullMessage()
   {
-    assertEquals("message must not be null",
-        assertThrowsExactly(NullPointerException.class, () -> new MessageTemplate(null)).getMessage());
+    assertNullRejected(
+        "message must not be null",
+        () -> new MessageTemplate(null));
   }
 }

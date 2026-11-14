@@ -16,11 +16,12 @@
 package de.sayayi.lib.message.adopter;
 
 import de.sayayi.lib.message.Message;
+import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.exception.MessageAdopterException;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
+import org.junit.jupiter.api.util.DefaultLocale;
 
 import java.util.*;
 
@@ -52,11 +53,7 @@ final class ResourceBundleAdopterTest
 
     adopter.adoptTemplates(ResourceBundle.getBundle(TEMPLATE_BUNDLE, ENGLISH));
 
-    assertEquals("Hello, Alice!", messageSupport
-        .message("%[greeting]")
-        .with("name", "Alice")
-        .locale(ENGLISH)
-        .format());
+    assertEquals("Hello, Alice!", greeting(messageSupport, ENGLISH));
   }
 
 
@@ -71,16 +68,8 @@ final class ResourceBundleAdopterTest
         ResourceBundle.getBundle(TEMPLATE_BUNDLE, ENGLISH),
         ResourceBundle.getBundle(TEMPLATE_BUNDLE, GERMAN)));
 
-    assertEquals("Hello, Alice!", messageSupport
-        .message("%[greeting]")
-        .with("name", "Alice")
-        .locale(ENGLISH)
-        .format());
-    assertEquals("Hallo, Alice!", messageSupport
-        .message("%[greeting]")
-        .with("name", "Alice")
-        .locale(GERMAN)
-        .format());
+    assertEquals("Hello, Alice!", greeting(messageSupport, ENGLISH));
+    assertEquals("Hallo, Alice!", greeting(messageSupport, GERMAN));
   }
 
 
@@ -93,10 +82,7 @@ final class ResourceBundleAdopterTest
 
     adopter.adoptTemplates(TEMPLATE_BUNDLE, Set.of(ENGLISH, GERMAN), getClass().getClassLoader());
 
-    assertEquals("Hallo, Alice!", messageSupport.message("%[greeting]")
-        .with("name", "Alice")
-        .locale(GERMAN)
-        .format());
+    assertEquals("Hallo, Alice!", greeting(messageSupport, GERMAN));
   }
 
 
@@ -119,23 +105,19 @@ final class ResourceBundleAdopterTest
     adopter.adoptTemplates(TEMPLATE_BUNDLE, Set.of(ENGLISH, GERMAN));
 
     assertEquals(List.of(TEMPLATE_BUNDLE), baseNames);
-    assertEquals("Hallo, Alice!", messageSupport.message("%[greeting]")
-        .with("name", "Alice")
-        .locale(GERMAN)
-        .format());
+    assertEquals("Hallo, Alice!", greeting(messageSupport, GERMAN));
   }
 
 
   @Test
   @DisplayName("Throw if only the base bundle exists for a requested locale")
+  @DefaultLocale("de")
   void throwsForMissingLocaleWithBaseBundle()
   {
     final var adopter = new ResourceBundleAdopter(createDefault());
 
-    withDefaultLocale(GERMAN, () -> {
-      assertThrows(MessageAdopterException.class, () -> adopter.adopt(MESSAGE_BUNDLE, Set.of(FRENCH)));
-      assertThrows(MessageAdopterException.class, () -> adopter.adoptTemplates(MESSAGE_BUNDLE, Set.of(FRENCH)));
-    });
+    assertThrows(MessageAdopterException.class, () -> adopter.adopt(MESSAGE_BUNDLE, Set.of(FRENCH)));
+    assertThrows(MessageAdopterException.class, () -> adopter.adoptTemplates(MESSAGE_BUNDLE, Set.of(FRENCH)));
   }
 
 
@@ -152,14 +134,13 @@ final class ResourceBundleAdopterTest
 
   @Test
   @DisplayName("Throw if only the default locale bundle exists for a requested locale")
+  @DefaultLocale("en")
   void throwsForMissingLocaleWithDefaultLocaleBundle()
   {
     final var adopter = new ResourceBundleAdopter(createDefault());
 
-    withDefaultLocale(ENGLISH, () -> {
-      assertThrows(MessageAdopterException.class, () -> adopter.adopt(TEMPLATE_BUNDLE, Set.of(FRENCH)));
-      assertThrows(MessageAdopterException.class, () -> adopter.adoptTemplates(TEMPLATE_BUNDLE, Set.of(FRENCH)));
-    });
+    assertThrows(MessageAdopterException.class, () -> adopter.adopt(TEMPLATE_BUNDLE, Set.of(FRENCH)));
+    assertThrows(MessageAdopterException.class, () -> adopter.adoptTemplates(TEMPLATE_BUNDLE, Set.of(FRENCH)));
   }
 
 
@@ -181,20 +162,17 @@ final class ResourceBundleAdopterTest
   }
 
 
-  private static Set<Locale> getLocales(Message message) {
-    return assertInstanceOf(Message.LocaleAware.class, message).getLocales();
+  private static String greeting(MessageSupport messageSupport, Locale locale)
+  {
+    return messageSupport
+        .message("%[greeting]")
+        .with("name", "Alice")
+        .locale(locale)
+        .format();
   }
 
 
-  private static void withDefaultLocale(Locale locale, Executable executable)
-  {
-    final var defaultLocale = Locale.getDefault();
-
-    try {
-      Locale.setDefault(locale);
-      assertDoesNotThrow(executable);
-    } finally {
-      Locale.setDefault(defaultLocale);
-    }
+  private static Set<Locale> getLocales(Message message) {
+    return assertInstanceOf(Message.LocaleAware.class, message).getLocales();
   }
 }

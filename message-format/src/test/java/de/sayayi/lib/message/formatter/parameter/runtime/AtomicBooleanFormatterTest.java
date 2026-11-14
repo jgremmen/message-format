@@ -15,19 +15,20 @@
  */
 package de.sayayi.lib.message.formatter.parameter.runtime;
 
-import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import lombok.val;
+import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.params.provider.Arguments;
 
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Stream;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
-import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 import static java.util.Locale.GERMANY;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 
 /**
@@ -38,21 +39,32 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 @DisplayName("AtomicBoolean formatter")
 @TestMethodOrder(MethodOrderer.DisplayName.class)
-final class AtomicBooleanFormatterTest extends AbstractFormatterTest
+final class AtomicBooleanFormatterTest extends AbstractSupplierFormatterTest
 {
-  @Test
-  void testFormattableTypes() {
-    assertFormatterForType(new AtomicBooleanFormatter(), AtomicBoolean.class);
+  @Override
+  protected @NotNull ParameterFormatter createFormatter() {
+    return new AtomicBooleanFormatter();
   }
 
 
-  @Test
-  void testFormat()
-  {
-    val messageAccessor = createMessageAccessor(GERMANY, new AtomicBooleanFormatter());
+  @Override
+  protected @NotNull Class<?> getFormattableType() {
+    return AtomicBoolean.class;
+  }
 
-    assertEquals(nullText(), format(messageAccessor, null));
-    assertEquals(noSpaceText("true"), format(messageAccessor, new AtomicBoolean(true)));
-    assertEquals(noSpaceText("false"), format(messageAccessor, new AtomicBoolean(false)));
+
+  @Override
+  protected @NotNull Locale getLocale() {
+    return GERMANY;
+  }
+
+
+  @Override
+  protected @NotNull Stream<Arguments> formattedValues()
+  {
+    return Stream.of(
+        arguments(new AtomicBoolean(true), noSpaceText("true")),
+        arguments(new AtomicBoolean(false), noSpaceText("false"))
+    );
   }
 }

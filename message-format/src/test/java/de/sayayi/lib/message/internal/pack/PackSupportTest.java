@@ -16,18 +16,17 @@
 package de.sayayi.lib.message.internal.pack;
 
 import de.sayayi.lib.pack.PackInputStream;
-import de.sayayi.lib.pack.PackOutputStream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Random;
 
 import static de.sayayi.lib.message.pack.PackConstants.PACK_CONFIG;
+import static de.sayayi.lib.message.util.PackTestSupport.packBytes;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
@@ -67,14 +66,10 @@ final class PackSupportTest
           ? random.nextInt(1_000_000) : random.nextLong();
     }
 
-    final var byteStream = new ByteArrayOutputStream();
-
-    try(var packStream = new PackOutputStream(PACK_CONFIG, false, byteStream)) {
+    final var packed = packBytes(packStream -> {
       for(var number: numbers)
         PackSupport.packLongVar(number, packStream);
-    }
-
-    final var packed = byteStream.toByteArray();
+    });
 
     try(var packStream = new PackInputStream(PACK_CONFIG, new ByteArrayInputStream(packed))) {
       for(var number: numbers)

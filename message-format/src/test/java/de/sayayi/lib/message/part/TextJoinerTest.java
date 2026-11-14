@@ -17,6 +17,7 @@ package de.sayayi.lib.message.part;
 
 import de.sayayi.lib.message.part.MessagePart.Text;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -91,8 +92,7 @@ final class TextJoinerTest
         .add(" ")
         .add("1 ");
 
-    assertEquals(noSpaceText("Test 1"), joiner.asNoSpaceText());
-    assertEquals(spacedText(" Test 1 "), joiner.asSpacedText());
+    assertJoined(joiner, "Test 1", " Test 1 ");
   }
 
 
@@ -119,8 +119,7 @@ final class TextJoinerTest
 
     joiner.add("a     b   c");
 
-    assertEquals(noSpaceText("a b c"), joiner.asNoSpaceText());
-    assertEquals(spacedText("a b c"), joiner.asSpacedText());
+    assertJoined(joiner, "a b c", "a b c");
   }
 
 
@@ -132,8 +131,7 @@ final class TextJoinerTest
 
     joiner.add("  hello  ");
 
-    assertEquals(spacedText(" hello "), joiner.asSpacedText());
-    assertEquals(noSpaceText("hello"), joiner.asNoSpaceText());
+    assertJoined(joiner, "hello", " hello ");
   }
 
 
@@ -162,8 +160,7 @@ final class TextJoinerTest
         .addNoSpace("  b  ");
 
     // no space was preserved between the two additions
-    assertEquals(noSpaceText("ab"), joiner.asNoSpaceText());
-    assertEquals(spacedText("ab"), joiner.asSpacedText());
+    assertJoined(joiner, "ab", "ab");
   }
 
 
@@ -190,8 +187,7 @@ final class TextJoinerTest
 
     joiner.add("a   b  ".toCharArray());
 
-    assertEquals(noSpaceText("a b"), joiner.asNoSpaceText());
-    assertEquals(spacedText("a b "), joiner.asSpacedText());
+    assertJoined(joiner, "a b", "a b ");
   }
 
 
@@ -203,8 +199,7 @@ final class TextJoinerTest
 
     joiner.add('a').add('b').add('c');
 
-    assertEquals(noSpaceText("abc"), joiner.asNoSpaceText());
-    assertEquals(spacedText("abc"), joiner.asSpacedText());
+    assertJoined(joiner, "abc", "abc");
   }
 
 
@@ -216,8 +211,7 @@ final class TextJoinerTest
 
     joiner.add('a').add(' ').add('b');
 
-    assertEquals(noSpaceText("a b"), joiner.asNoSpaceText());
-    assertEquals(spacedText("a b"), joiner.asSpacedText());
+    assertJoined(joiner, "a b", "a b");
   }
 
 
@@ -242,8 +236,7 @@ final class TextJoinerTest
     // non-breaking space, tab and carriage return are all space characters
     joiner.add('a').add('\u00a0').add('\t').add('\r').add('b');
 
-    assertEquals(noSpaceText("a b"), joiner.asNoSpaceText());
-    assertEquals(spacedText("a b"), joiner.asSpacedText());
+    assertJoined(joiner, "a b", "a b");
   }
 
 
@@ -267,8 +260,7 @@ final class TextJoinerTest
 
     joiner.add(spacedText(" x"));
 
-    assertEquals(spacedText(" x"), joiner.asSpacedText());
-    assertEquals(noSpaceText("x"), joiner.asNoSpaceText());
+    assertJoined(joiner, "x", " x");
   }
 
 
@@ -280,8 +272,7 @@ final class TextJoinerTest
 
     joiner.add(spacedText("x "));
 
-    assertEquals(spacedText("x "), joiner.asSpacedText());
-    assertEquals(noSpaceText("x"), joiner.asNoSpaceText());
+    assertJoined(joiner, "x", "x ");
   }
 
 
@@ -295,8 +286,7 @@ final class TextJoinerTest
         .add(spacedText("a "))
         .add(spacedText(" b"));
 
-    assertEquals(noSpaceText("a b"), joiner.asNoSpaceText());
-    assertEquals(spacedText("a b"), joiner.asSpacedText());
+    assertJoined(joiner, "a b", "a b");
   }
 
 
@@ -311,8 +301,7 @@ final class TextJoinerTest
         .add(spacedText(" "))
         .add(noSpaceText("b"));
 
-    assertEquals(noSpaceText("a b"), joiner.asNoSpaceText());
-    assertEquals(spacedText("a b"), joiner.asSpacedText());
+    assertJoined(joiner, "a b", "a b");
   }
 
 
@@ -342,7 +331,13 @@ final class TextJoinerTest
         .add(setSpaces(emptyText(), true, true))
         .add(noSpaceText("b"));
 
-    assertEquals(noSpaceText("a b"), joiner.asNoSpaceText());
-    assertEquals(spacedText("a b"), joiner.asSpacedText());
+    assertJoined(joiner, "a b", "a b");
+  }
+
+
+  private static void assertJoined(@NotNull TextJoiner joiner, @NotNull String noSpace, @NotNull String spaced)
+  {
+    assertEquals(noSpaceText(noSpace), joiner.asNoSpaceText());
+    assertEquals(spacedText(spaced), joiner.asSpacedText());
   }
 }

@@ -67,17 +67,8 @@ final class GeoFormatterTest extends AbstractFormatterTest
   @DisplayName("Rounds degree values")
   void testDmsSplitterDegree()
   {
-    double[] dms;
-
-    dms = GeoFormatter.dmsSplitter(new Format(), dms(124, 30));
-    assertEquals(125.0, dms[0], 1e-3);
-    assertEquals(0.0, dms[1], 1e-3);
-    assertEquals(0.0, dms[2], 1e-3);
-
-    dms = GeoFormatter.dmsSplitter(new Format(), dms(127, 29));
-    assertEquals(127.0, dms[0], 1e-3);
-    assertEquals(0.0, dms[1], 1e-3);
-    assertEquals(0.0, dms[2], 1e-3);
+    assertDms(GeoFormatter.dmsSplitter(new Format(), dms(124, 30)), 125.0, 0.0, 0.0);
+    assertDms(GeoFormatter.dmsSplitter(new Format(), dms(127, 29)), 127.0, 0.0, 0.0);
   }
 
 
@@ -96,11 +87,7 @@ final class GeoFormatterTest extends AbstractFormatterTest
   @MethodSource("minutePrecisions")
   void testDmsSplitterMinute(int minuteDigits, double value, double degree, double minutes, double seconds)
   {
-    val dms = GeoFormatter.dmsSplitter(new Format(null, minuteDigits, -1), value);
-
-    assertEquals(degree, dms[0], 1e-3);
-    assertEquals(minutes, dms[1], 1e-3);
-    assertEquals(seconds, dms[2], 1e-3);
+    assertDms(GeoFormatter.dmsSplitter(new Format(null, minuteDigits, -1), value), degree, minutes, seconds);
   }
 
 
@@ -256,5 +243,13 @@ final class GeoFormatterTest extends AbstractFormatterTest
     assertEquals(secondDigits, fmt.secondDigits);
     assertEquals(zeroPadMinutes, fmt.zeroPadMinutes);
     assertEquals(zeroPadSeconds, fmt.zeroPadSeconds);
+  }
+
+
+  private static void assertDms(double[] actual, double degree, double minutes, double seconds)
+  {
+    assertEquals(degree, actual[0], 1e-3);
+    assertEquals(minutes, actual[1], 1e-3);
+    assertEquals(seconds, actual[2], 1e-3);
   }
 }

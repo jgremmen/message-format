@@ -1,16 +1,23 @@
+import assert from 'node:assert/strict';
+
 import hljs from 'highlight.js/lib/core';
 
-import messageFormat from '../src/index.js';
+import {createMessageFormat} from '../src/index.js';
 
 
-hljs.registerLanguage('message-format', messageFormat);
-
-
-/** Highlights `code` and returns the HTML. */
-export function highlight(code)
+/** Returns a function which highlights code with the language created with `options` and returns the HTML. */
+export function highlighter(options)
 {
-  return hljs.highlight(code, { language: 'message-format' }).value;
+  const instance = hljs.newInstance();
+
+  instance.registerLanguage('message-format', createMessageFormat(options));
+
+  return code => instance.highlight(code, { language: 'message-format' }).value;
 }
+
+
+/** Highlights `code` with the default options and returns the HTML. */
+export const highlight = highlighter();
 
 
 /** Returns the text content of highlighted HTML. */
@@ -36,4 +43,12 @@ export function balanced(html)
       return false;
 
   return depth === 0;
+}
+
+
+/** Asserts that `html` reproduces `message` as text and has balanced spans. */
+export function assertRoundTrip(html, message)
+{
+  assert.equal(textOf(html), message);
+  assert.ok(balanced(html), html);
 }

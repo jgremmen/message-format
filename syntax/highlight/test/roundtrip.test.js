@@ -1,7 +1,6 @@
-import assert from 'node:assert/strict';
-import { describe, it } from 'node:test';
+import {describe, it} from 'node:test';
 
-import { balanced, highlight, textOf } from './helpers.js';
+import {assertRoundTrip, highlight} from './helpers.js';
 
 
 const MESSAGES = [
@@ -21,10 +20,5 @@ const MESSAGES = [
 
 describe('round trip', () => {
   for(const message of MESSAGES)
-    it(JSON.stringify(message), () => {
-      const html = highlight(message);
-
-      assert.equal(textOf(html), message);
-      assert.ok(balanced(html), html);
-    });
+    it(JSON.stringify(message), () => assertRoundTrip(highlight(message), message));
 });

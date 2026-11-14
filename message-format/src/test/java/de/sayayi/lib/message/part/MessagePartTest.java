@@ -32,6 +32,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import static de.sayayi.lib.message.util.AssertionTestSupport.assertEqualsContract;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -80,9 +81,7 @@ final class MessagePartTest
     val part2 = firstPart(messageFactory.parseMessage(format));
 
     assertNotSame(part1, part2);
-    assertEquals(part1, part2);
-    assertEquals(part2, part1);
-    assertEquals(part1.hashCode(), part2.hashCode());
+    assertEqualsContract(part1, part2);
   }
 
 
