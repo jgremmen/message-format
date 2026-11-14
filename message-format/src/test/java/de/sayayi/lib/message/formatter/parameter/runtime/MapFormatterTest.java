@@ -15,7 +15,6 @@
  */
 package de.sayayi.lib.message.formatter.parameter.runtime;
 
-import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.parameter.named.BoolFormatter;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import lombok.val;
@@ -54,17 +53,26 @@ final class MapFormatterTest extends AbstractFormatterTest
   @DisplayName("Key/value separator")
   void testSeparator()
   {
-    val message = MessageSupportFactory
-        .create(createFormatterService(new MapFormatter(), new ArrayFormatter()))
-        .setLocale(UK)
+    val message = createMessageSupport(UK, new MapFormatter(), new ArrayFormatter())
         .message("%{map1} %{map2,map-kv:'%{key}   -> %{value}'} %{map3,map-kv:' %{key}:  %{value} '}");
 
-    assertEquals("key=value",
-        message.with("map1", Map.of("key", "value")).format());
-    assertEquals("key -> value",
-        message.clear().with("map2", Map.of("key", "value")).format());
-    assertEquals("key: value",
-        message.clear().with("map3", Map.of("key", "value")).format());
+    assertEquals(
+        "key=value",
+        message
+            .with("map1", Map.of("key", "value"))
+            .format());
+    assertEquals(
+        "key -> value",
+        message
+            .clear()
+            .with("map2", Map.of("key", "value"))
+            .format());
+    assertEquals(
+        "key: value",
+        message
+            .clear()
+            .with("map3", Map.of("key", "value"))
+            .format());
   }
 
 
@@ -72,15 +80,20 @@ final class MapFormatterTest extends AbstractFormatterTest
   @DisplayName("Null key and value with/without configuration")
   void testNullKeyValue()
   {
-    val message = MessageSupportFactory
-        .create(createFormatterService(new MapFormatter(), new ArrayFormatter()))
-        .setLocale(UK)
+    val message = createMessageSupport(UK, new MapFormatter(), new ArrayFormatter())
         .message("%{map1} %{map2,map-kv:'%{key,null:key}=%{value,null:value}'}");
 
-    assertEquals("(null)=(null)", message
-        .with("map1", singletonMap(null, null)).format());
-    assertEquals("key=value",
-        message.clear().with("map2", singletonMap(null, null)).format());
+    assertEquals(
+        "(null)=(null)",
+        message
+            .with("map1", singletonMap(null, null))
+            .format());
+    assertEquals(
+        "key=value",
+        message
+            .clear()
+            .with("map2", singletonMap(null, null))
+            .format());
   }
 
 
@@ -88,22 +101,28 @@ final class MapFormatterTest extends AbstractFormatterTest
   @DisplayName("Empty map")
   void testEmpty()
   {
-    val messageSupport = MessageSupportFactory
-        .create(createFormatterService(new MapFormatter(), new ArrayFormatter()))
-        .setLocale(UK);
+    val messageSupport = createMessageSupport(UK, new MapFormatter(), new ArrayFormatter());
     val parameters = Map.<String,Object>of("map", Map.of());
 
-    assertEquals("", messageSupport.message("%{map}").with(parameters).format());
-    assertEquals("empty", messageSupport.message("%{map,empty:empty}").with(parameters).format());
+    assertEquals(
+        "",
+        messageSupport
+            .message("%{map}")
+            .with(parameters)
+            .format());
+    assertEquals(
+        "empty",
+        messageSupport
+            .message("%{map,empty:empty}")
+            .with(parameters)
+            .format());
   }
 
 
   @Test
   void testMultiEntry()
   {
-    val message = MessageSupportFactory
-        .create(createFormatterService(new MapFormatter(), new ArrayFormatter(), new NumberFormatter()))
-        .setLocale(UK)
+    val message = createMessageSupport(UK, new MapFormatter(), new ArrayFormatter(), new NumberFormatter())
         .message("%{map,map-kv:'%{key} -> %{value,number:\"0000\"}',list-sep:', ',list-sep-last:' and '}");
 
     val map = new LinkedHashMap<String,Integer>();
@@ -111,8 +130,11 @@ final class MapFormatterTest extends AbstractFormatterTest
     map.put("map2", -1234);
     map.put("map3", 8);
 
-    assertEquals("map1 -> 0001, map2 -> -1234 and map3 -> 0008",
-        message.with("map", map).format());
+    assertEquals(
+        "map1 -> 0001, map2 -> -1234 and map3 -> 0008",
+        message
+            .with("map", map)
+            .format());
   }
 
 
@@ -120,8 +142,7 @@ final class MapFormatterTest extends AbstractFormatterTest
   @DisplayName("Custom key format")
   void testKeyFormat()
   {
-    val message = MessageSupportFactory
-        .create(createFormatterService(new MapFormatter(), new ArrayFormatter(), new BoolFormatter()))
+    val message = createMessageSupport(new MapFormatter(), new ArrayFormatter(), new BoolFormatter())
         .message("%{map,map-kv:'%{key,format:bool}:%{value}',list-sep:' / '}");
 
     val map = new LinkedHashMap<Integer,Integer>();
@@ -129,7 +150,10 @@ final class MapFormatterTest extends AbstractFormatterTest
     map.put(0, -1234);
     map.put(-4, 0);
 
-    assertEquals("true:1 / false:-1234 / true:0",
-        message.with("map", map).format());
+    assertEquals(
+        "true:1 / false:-1234 / true:0",
+        message
+            .with("map", map)
+            .format());
   }
 }

@@ -16,14 +16,19 @@
 package de.sayayi.lib.message.formatter.parameter.runtime.extra;
 
 import de.sayayi.lib.message.MessageSupport;
-import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
+import org.intellij.lang.annotations.Language;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 
 /**
@@ -42,62 +47,87 @@ final class MatchResultFormatterTest extends AbstractFormatterTest
 
   @BeforeEach
   void init() {
-    context = MessageSupportFactory.create(createFormatterService(new MatchResultFormatter()));
+    context = createMessageSupport(new MatchResultFormatter());
   }
 
 
   @Test
+  @DisplayName("Formattable types")
   void testFormattableTypes() {
     assertFormatterForType(new MatchResultFormatter(), Matcher.class);
   }
 
 
-  @Test
-  void testFormatGroupNumber()
+  static Stream<Arguments> groupNumbers()
+  {
+    return Stream.of(
+        arguments("%{m,matcher:0}", "v5.12"),
+        arguments("%{m,matcher:1}", "5"),
+        arguments("%{m,matcher:2}", ".12"),
+        arguments("%{m,matcher:3}", "12"),
+        arguments("%{m,matcher:-1}", ""),
+        arguments("%{m,matcher:800}", "")
+    );
+  }
+
+
+  @ParameterizedTest(name = "{0} -> {1}")
+  @DisplayName("Formats a group selected by number")
+  @MethodSource("groupNumbers")
+  void testFormatGroupNumber(@Language("MessageFormat") String formatString, String expected)
   {
     final var pattern = Pattern.compile("[vV]?(?<major>\\d+)(\\.(?<minor>\\d+))?");
     final var matcher = pattern.matcher("v5.12");
 
-    assertEquals("v5.12", context.message("%{m,matcher:0}")
-        .with("m", matcher).format());
-    assertEquals("5", context.message("%{m,matcher:1}")
-        .with("m", matcher).format());
-    assertEquals(".12", context.message("%{m,matcher:2}")
-        .with("m", matcher).format());
-    assertEquals("12", context.message("%{m,matcher:3}")
-        .with("m", matcher).format());
-
-    assertEquals("", context.message("%{m,matcher:-1}")
-        .with("m", matcher).format());
-    assertEquals("", context.message("%{m,matcher:800}")
-        .with("m", matcher).format());
+    assertEquals(
+        expected,
+        context
+            .message(formatString)
+            .with("m", matcher)
+            .format());
   }
 
 
-  @Test
-  void testFormatGroupName()
+  static Stream<Arguments> groupNames()
+  {
+    return Stream.of(
+        arguments("%{m,matcher:'major'}", "5"),
+        arguments("%{m,matcher:'minor'}", "12"),
+        arguments("%{m,matcher:'haha'}", ""),
+        arguments("%{m,matcher:''}", "")
+    );
+  }
+
+
+  @ParameterizedTest(name = "{0} -> {1}")
+  @DisplayName("Formats a group selected by name")
+  @MethodSource("groupNames")
+  void testFormatGroupName(@Language("MessageFormat") String formatString, String expected)
   {
     final var pattern = Pattern.compile("[vV]?(?<major>\\d+)(\\.(?<minor>\\d+))?");
     final var matcher = pattern.matcher("v5.12");
 
-    assertEquals("5", context.message("%{m,matcher:'major'}")
-        .with("m", matcher).format());
-    assertEquals("12", context.message("%{m,matcher:'minor'}")
-        .with("m", matcher).format());
-
-    assertEquals("", context.message("%{m,matcher:'haha'}")
-        .with("m", matcher).format());
-    assertEquals("", context.message("%{m,matcher:''}")
-        .with("m", matcher).format());
+    assertEquals(
+        expected,
+        context
+            .message(formatString)
+            .with("m", matcher)
+            .format());
   }
 
 
   @Test
+  @DisplayName("Formats the whole match by default")
   void testFormat()
   {
     final var pattern = Pattern.compile("[vV]?(?<major>\\d+)(\\.(?<minor>\\d+))?");
     final var matcher = pattern.matcher("v4.999");
 
-    assertEquals("v4.999", context.message("%{m}").with("m", matcher).format());
+    assertEquals(
+        "v4.999",
+        context
+            .message("%{m}")
+            .with("m", matcher)
+            .format());
   }
 }

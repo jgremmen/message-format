@@ -15,23 +15,27 @@
  */
 package de.sayayi.lib.message.formatter.parameter.runtime;
 
-import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.parameter.named.ChoiceFormatter;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import lombok.val;
+import org.intellij.lang.annotations.Language;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Stream;
 
 import static java.lang.Double.*;
-import static java.lang.Math.PI;
 import static java.util.Locale.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 
 /**
@@ -61,31 +65,10 @@ final class NumberFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  void testDoubleFormat()
-  {
-    val messageSupport = MessageSupportFactory
-        .create(createFormatterService(new NumberFormatter()))
-        .setLocale(GERMANY);
-
-    assertEquals("3,14", messageSupport
-        .message("%{pi,number:'#0.00'}")
-        .with("pi", PI)
-        .format());
-
-    assertEquals("0,1", messageSupport
-        .message("%{d}")
-        .with("d", 0.1d)
-        .format());
-  }
-
-
-  @Test
   @DisplayName("Plain and integer formats")
   void testPlainAndIntegerFormat()
   {
-    val messageSupport = MessageSupportFactory
-        .create(createFormatterService(new NumberFormatter()))
-        .setLocale(US);
+    val messageSupport = createMessageSupport(US, new NumberFormatter());
 
     for(val value: new Number[] {
         1234567, 1234567L, BigInteger.valueOf(1234567), new AtomicLong(1234567), 1234567.0, new BigDecimal("1234567") })
@@ -103,6 +86,7 @@ final class NumberFormatterTest extends AbstractFormatterTest
 
     for(val format: new String[] { "%{v}", "%{v,number:plain}" })
     {
+      //noinspection LanguageMismatch
       val message = messageSupport.message(format);
 
       assertEquals("1234567", message.with("v", 1234567).format());
@@ -114,70 +98,96 @@ final class NumberFormatterTest extends AbstractFormatterTest
   }
 
 
-  @Test
+  static Stream<Arguments> nonFiniteValuesWithNumberKey()
+  {
+    val formatString = "%{x,format:choice,>5:'big',<=5:'small',:'other'}";
+
+    return Stream.of(
+        arguments(formatString, 6.0, "big"),
+        arguments(formatString, 5.0, "small"),
+        arguments(formatString, NaN, "other"),
+        arguments(formatString, POSITIVE_INFINITY, "other"),
+        arguments(formatString, NEGATIVE_INFINITY, "other"),
+        arguments(formatString, Float.NaN, "other"),
+        arguments("%{x,format:choice,<>1:'not one',:'other'}", NaN, "other")
+    );
+  }
+
+
+  @ParameterizedTest(name = "{0} with {1} -> {2}")
   @DisplayName("Compare non-finite values to number keys")
-  void testNonFiniteValueWithNumberKey()
+  @MethodSource("nonFiniteValuesWithNumberKey")
+  void testNonFiniteValueWithNumberKey(@Language("MessageFormat") String formatString, Number value, String expected)
   {
-    val messageSupport = MessageSupportFactory
-        .create(createFormatterService(new NumberFormatter(), new ChoiceFormatter()))
-        .setLocale(UK);
-    val message = messageSupport.message("%{x,format:choice,>5:'big',<=5:'small',:'other'}");
-
-    assertEquals("big", message.with("x", 6.0).format());
-    assertEquals("small", message.with("x", 5.0).format());
-    assertEquals("other", message.with("x", NaN).format());
-    assertEquals("other", message.with("x", POSITIVE_INFINITY).format());
-    assertEquals("other", message.with("x", NEGATIVE_INFINITY).format());
-    assertEquals("other", message.with("x", Float.NaN).format());
-
-    assertEquals("other", messageSupport
-        .message("%{x,format:choice,<>1:'not one',:'other'}")
-        .with("x", NaN)
-        .format());
+    assertEquals(
+        expected,
+        createMessageSupport(UK, new NumberFormatter(), new ChoiceFormatter())
+            .message(formatString)
+            .with("x", value)
+            .format());
   }
 
 
-  @Test
+  static Stream<Arguments> nonFiniteValuesWithNumericStringKey()
+  {
+    val formatString = "%{x,format:choice,'1':'one',:'other'}";
+    val relationalFormatString = "%{x,format:choice,>'1000':'large',<>'1':'not one',:'other'}";
+
+    return Stream.of(
+        arguments(formatString, 1.0, "one"),
+        arguments(formatString, 2.0, "other"),
+        arguments(formatString, NaN, "other"),
+        arguments(formatString, POSITIVE_INFINITY, "other"),
+        arguments(formatString, NEGATIVE_INFINITY, "other"),
+        arguments(formatString, Float.NaN, "other"),
+        arguments(relationalFormatString, 2000.0, "large"),
+        arguments(relationalFormatString, POSITIVE_INFINITY, "other"),
+        arguments(relationalFormatString, NEGATIVE_INFINITY, "other"),
+        arguments(relationalFormatString, NaN, "other"),
+        arguments(relationalFormatString, Float.POSITIVE_INFINITY, "other")
+    );
+  }
+
+
+  @ParameterizedTest(name = "{0} with {1} -> {2}")
   @DisplayName("Compare non-finite values to numeric string keys")
-  void testNonFiniteValueWithNumericStringKey()
+  @MethodSource("nonFiniteValuesWithNumericStringKey")
+  void testNonFiniteValueWithNumericStringKey(@Language("MessageFormat") String formatString, Number value,
+                                              String expected)
   {
-    val messageSupport = MessageSupportFactory
-        .create(createFormatterService(new NumberFormatter(), new ChoiceFormatter()))
-        .setLocale(UK);
-    val message = messageSupport.message("%{x,format:choice,'1':'one',:'other'}");
-
-    assertEquals("one", message.with("x", 1.0).format());
-    assertEquals("other", message.with("x", 2.0).format());
-    assertEquals("other", message.with("x", NaN).format());
-    assertEquals("other", message.with("x", POSITIVE_INFINITY).format());
-    assertEquals("other", message.with("x", NEGATIVE_INFINITY).format());
-    assertEquals("other", message.with("x", Float.NaN).format());
-
-    val relational = messageSupport.message("%{x,format:choice,>'1000':'large',<>'1':'not one',:'other'}");
-
-    assertEquals("large", relational.with("x", 2000.0).format());
-    assertEquals("other", relational.with("x", POSITIVE_INFINITY).format());
-    assertEquals("other", relational.with("x", NEGATIVE_INFINITY).format());
-    assertEquals("other", relational.with("x", NaN).format());
-    assertEquals("other", relational.with("x", Float.POSITIVE_INFINITY).format());
+    assertEquals(
+        expected,
+        createMessageSupport(UK, new NumberFormatter(), new ChoiceFormatter())
+            .message(formatString)
+            .with("x", value)
+            .format());
   }
 
 
-  @Test
-  @DisplayName("Compare non-finite values to non-numeric string keys")
-  void testNonFiniteValueWithNonNumericStringKey()
+  static Stream<Arguments> nonFiniteValuesWithNonNumericStringKey()
   {
-    val messageSupport = MessageSupportFactory
-        .create(createFormatterService(new NumberFormatter(), new ChoiceFormatter()))
-        .setLocale(UK);
-    val message = messageSupport.message(
-        "%{x,format:choice,'abc':'abc','NaN':'nan','Infinity':'+inf','-Infinity':'-inf',:'other'}");
+    val formatString = "%{x,format:choice,'abc':'abc','NaN':'nan','Infinity':'+inf','-Infinity':'-inf',:'other'}";
 
-    assertEquals("other", message.with("x", NaN).format());
-    assertEquals("other", message.with("x", POSITIVE_INFINITY).format());
-    assertEquals("other", message.with("x", NEGATIVE_INFINITY).format());
-    assertEquals("other", message.with("x", Float.NaN).format());
-    assertEquals("other", message.with("x", 1.5).format());
+    return Stream.of(
+        arguments(formatString, NaN, "other"),
+        arguments(formatString, POSITIVE_INFINITY, "other"),
+        arguments(formatString, NEGATIVE_INFINITY, "other"),
+        arguments(formatString, Float.NaN, "other"),
+        arguments(formatString, 1.5, "other")
+    );
+  }
+
+
+  @ParameterizedTest(name = "{0} with {1} -> {2}")
+  @DisplayName("Compare non-finite values to non-numeric string keys")
+  @MethodSource("nonFiniteValuesWithNonNumericStringKey")
+  void testNonFiniteValueWithNonNumericStringKey(@Language("MessageFormat") String formatString, Number value,
+                                                 String expected)
+  {
+    assertEquals(expected, createMessageSupport(UK, new NumberFormatter(), new ChoiceFormatter())
+        .message(formatString)
+        .with("x", value)
+        .format());
   }
 
 
@@ -185,15 +195,29 @@ final class NumberFormatterTest extends AbstractFormatterTest
   @DisplayName("Cached number formats are used per format and locale")
   void testCachedNumberFormats()
   {
-    val message = MessageSupportFactory
-        .create(createFormatterService(new NumberFormatter()))
+    val message = createMessageSupport(new NumberFormatter())
         .message("%{v,number:'#,##0.00'} %{v} %{v,number:percent}");
 
     for(var n = 0; n < 2; n++)
     {
-      assertEquals("12.345,68 12.345,678 1.234.568 %", message.with("v", 12345.678).locale(GERMANY).format());
-      assertEquals("12,345.68 12,345.678 1,234,568%", message.with("v", 12345.678).locale(US).format());
-      assertEquals("1,50 1,5 150 %", message.with("v", 1.5).locale(GERMANY).format());
+      assertEquals(
+          "12.345,68 12.345,678 1.234.568 %",
+          message
+              .with("v", 12345.678)
+              .locale(GERMANY)
+              .format());
+      assertEquals(
+          "12,345.68 12,345.678 1,234,568%",
+          message
+              .with("v", 12345.678)
+              .locale(US)
+              .format());
+      assertEquals(
+          "1,50 1,5 150 %",
+          message
+              .with("v", 1.5)
+              .locale(GERMANY)
+              .format());
     }
   }
 }

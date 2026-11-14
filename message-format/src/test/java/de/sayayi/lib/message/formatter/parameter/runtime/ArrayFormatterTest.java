@@ -23,7 +23,6 @@ import de.sayayi.lib.message.formatter.parameter.named.BoolFormatter;
 import de.sayayi.lib.message.internal.part.TextPart;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueMessage;
-import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.TypedValue;
 import lombok.val;
@@ -33,7 +32,6 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -108,8 +106,11 @@ final class ArrayFormatterTest extends AbstractFormatterTest
       }
     });
 
-    assertEquals(new TextPart("1, 1, 0, 1, 0, 0, 0"), format(messageAccessor,
-        new boolean[] { true, true, false, true, false, false, false }, "bool-binary"));
+    assertEquals(
+        new TextPart("1, 1, 0, 1, 0, 0, 0"),
+        format(messageAccessor,
+            new boolean[] { true, true, false, true, false, false, false },
+            "bool-binary"));
   }
 
 
@@ -125,15 +126,17 @@ final class ArrayFormatterTest extends AbstractFormatterTest
     val messageFactory = messageAccessor.getMessageFactory();
 
     assertEquals(new TextPart("12, -7, 99"), format(messageAccessor, new int[] { 12, -7, 99 }));
-
-    assertEquals(new TextPart("1, -7, 248"), format(messageAccessor, new int[] { 1, -7, 248 },
-        Map.of("number", new TypedValueString(messageFactory, "##00")), Map.of()));
+    assertEquals(new TextPart("1, -7, 248"), format(messageAccessor, new int[] { 1, -7, 248 }, "number", "##00"));
 
     formatterService.addFormatter(new NumberFormatter());
 
-    assertEquals(new TextPart("01, -07, 248"), format(messageAccessor, new int[] { 1, -7, 248 },
-        Map.of("list-value", new TypedValueMessage(messageFactory.parseMessage("%{value,number:'##00'}"))),
-        Map.of()));
+    assertEquals(
+        new TextPart("01, -07, 248"),
+        format(
+            messageAccessor,
+            new int[] { 1, -7, 248 },
+            Map.of("list-value", new TypedValueMessage(messageFactory.parseMessage("%{value,number:'##00'}"))),
+            Map.of()));
 
     formatterService.addFormatter(new NamedParameterFormatter() {
       @Override
@@ -157,8 +160,10 @@ final class ArrayFormatterTest extends AbstractFormatterTest
       }
     });
 
-    assertEquals(new TextPart("0x40, 0xda, 0x2e"),
-        format(messageAccessor, new int[] { 64, 218, 46 },
+    assertEquals(
+        new TextPart("0x40, 0xda, 0x2e"),
+        format(messageAccessor,
+            new int[] { 64, 218, 46 },
             Map.of("list-value", new TypedValueMessage(messageFactory.parseMessage("%{value,format:hex}"))),
             Map.of()));
   }
@@ -178,13 +183,20 @@ final class ArrayFormatterTest extends AbstractFormatterTest
         .getMessageAccessor();
     val messageFactory = messageAccessor.getMessageFactory();
 
-    val map = new HashMap<String,TypedValue<?>>();
-    map.put("list-value",
+    val map = Map.<String,TypedValue<?>>of(
+        "list-value",
         new TypedValueMessage(messageFactory.parseMessage("%{value,number:'0000',true:wahr,false:falsch}")));
 
-    assertEquals(new TextPart("Test, wahr, -0006"), format(messageAccessor,
-        new Object[] { "Test", true, null, -6 }, map, Map.of()));
-    assertEquals(new TextPart("this, is, a, test"), format(messageAccessor,
-        new Object[] { null, "this", null, "is", null, "a", null, "test" }));
+    assertEquals(
+        new TextPart("Test, wahr, -0006"),
+        format(
+            messageAccessor,
+            new Object[] { "Test", true, null, -6 }, map,
+            Map.of()));
+    assertEquals(
+        new TextPart("this, is, a, test"),
+        format(
+            messageAccessor,
+            new Object[] { null, "this", null, "is", null, "a", null, "test" }));
   }
 }

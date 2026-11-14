@@ -16,19 +16,26 @@
 package de.sayayi.lib.message.formatter.parameter.runtime.extra;
 
 import de.sayayi.lib.message.MessageSupport;
-import de.sayayi.lib.message.MessageSupportFactory;
-import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import lombok.val;
-import org.junit.jupiter.api.*;
+import org.intellij.lang.annotations.Language;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.StringReader;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 
 /**
@@ -41,20 +48,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @TestMethodOrder(MethodOrderer.DisplayName.class)
 final class NodeFormatterTest extends AbstractFormatterTest
 {
-  private MessageSupport messageSupport;
-
-
-  @BeforeEach
-  void init()
-  {
-    val formatterService = new DefaultFormatterService();
-    formatterService.addFormatter(new NodeFormatter());
-
-    messageSupport = MessageSupportFactory.create(formatterService);
-  }
+  private final MessageSupport messageSupport = createDefaultMessageSupport(new NodeFormatter());
 
 
   @Test
+  @DisplayName("Formattable types")
   void testFormattableTypes()
   {
     assertFormatterForType(new NodeFormatter(), Element.class);
@@ -62,25 +60,40 @@ final class NodeFormatterTest extends AbstractFormatterTest
   }
 
 
-  @Test
-  @DisplayName("Format XPath of elements and attributes")
-  void testFormat() throws Exception
+  static Stream<Arguments> formattedNodes() throws Exception
   {
-    val document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(
-        "<catalog><book id='1'/><book id='2'><title/></book></catalog>")));
-    val book = (Element)document.getElementsByTagName("book").item(1);
+    val document = DocumentBuilderFactory
+        .newInstance()
+        .newDocumentBuilder()
+        .parse(new InputSource(new StringReader(
+            "<catalog><book id='1'/><book id='2'><title/></book></catalog>")));
+    val book = (Element)document
+        .getElementsByTagName("book")
+        .item(1);
 
-    assertEquals("//catalog", messageSupport.message("%{node}").with("node", document.getDocumentElement()).format());
-    assertEquals("Invalid element: //catalog/book[2]",
-        messageSupport.message("Invalid element: %{node}").with("node", book).format());
-    assertEquals("Invalid attribute: //catalog/book[2]/@id",
-        messageSupport.message("Invalid attribute: %{node}").with("node", book.getAttributeNode("id")).format());
-    assertEquals("//catalog/book[2]/title",
-        messageSupport.message("%{node}").with("node", book.getFirstChild()).format());
-    assertEquals("//catalog/book[1]",
-        messageSupport.message("%{node}").with("node", document.getElementsByTagName("book").item(0)).format());
-    assertEquals("document root",
-        messageSupport.message("%{node,null:'document root'}").with("node", (Element)null).format());
+    return Stream.of(
+        arguments("%{node}", document.getDocumentElement(), "//catalog"),
+        arguments("Invalid element: %{node}", book, "Invalid element: //catalog/book[2]"),
+        arguments("Invalid attribute: %{node}", book.getAttributeNode("id"),
+            "Invalid attribute: //catalog/book[2]/@id"),
+        arguments("%{node}", book.getFirstChild(), "//catalog/book[2]/title"),
+        arguments("%{node}", document.getElementsByTagName("book").item(0), "//catalog/book[1]"),
+        arguments("%{node,null:'document root'}", null, "document root")
+    );
+  }
+
+
+  @ParameterizedTest(name = "{0} -> {2}")
+  @DisplayName("Format XPath of elements and attributes")
+  @MethodSource("formattedNodes")
+  void testFormat(@Language("MessageFormat") String formatString, org.w3c.dom.Node node, String expected)
+  {
+    assertEquals(
+        expected,
+        messageSupport
+            .message(formatString)
+            .with("node", node)
+            .format());
   }
 
 
@@ -99,6 +112,11 @@ final class NodeFormatterTest extends AbstractFormatterTest
       path.append("/element").append(n);
     }
 
-    assertEquals(path.toString(), messageSupport.message("%{node}").with("node", node).format());
+    assertEquals(
+        path.toString(),
+        messageSupport
+            .message("%{node}")
+            .with("node", node)
+            .format());
   }
 }

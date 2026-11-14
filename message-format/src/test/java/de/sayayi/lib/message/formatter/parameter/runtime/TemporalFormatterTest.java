@@ -15,22 +15,25 @@
  */
 package de.sayayi.lib.message.formatter.parameter.runtime;
 
-import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.internal.part.TextPart;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import lombok.val;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.time.*;
-import java.util.Map;
+import java.time.temporal.Temporal;
 import java.util.TimeZone;
+import java.util.stream.Stream;
 
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static java.util.Locale.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 
 /**
@@ -60,127 +63,130 @@ final class TemporalFormatterTest extends AbstractFormatterTest
   }
 
 
-  @Test
+  static Stream<Arguments> localDateStyles()
+  {
+    return Stream.of(
+        arguments("short", noSpaceText("17.08.72")),
+        arguments("medium", noSpaceText("17.08.1972")),
+        arguments("long", noSpaceText("17. August 1972")),
+        arguments("full", noSpaceText("Donnerstag, 17. August 1972")),
+        arguments("date", noSpaceText("17.08.1972")),
+        arguments("time", emptyText())
+    );
+  }
+
+
+  @ParameterizedTest(name = "{0} -> {1}")
   @DisplayName("Formats local dates using localized styles")
-  void testLocalDate()
+  @MethodSource("localDateStyles")
+  void testLocalDate(String style, Text expected)
   {
-    val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new TemporalFormatter()))
-        .setLocale(GERMANY)
-        .getMessageAccessor();
-    val messageFactory = messageAccessor.getMessageFactory();
-    val date = LocalDate.of(1972, 8, 17);
-
-    assertEquals(noSpaceText("17.08.72"), format(messageAccessor, date,
-        Map.of("date", new TypedValueString(messageFactory, "short")), Map.of()));
-    assertEquals(noSpaceText("17.08.1972"), format(messageAccessor, date,
-        Map.of("date", new TypedValueString(messageFactory, "medium")), Map.of()));
-    assertEquals(noSpaceText("17. August 1972"), format(messageAccessor, date,
-        Map.of("date", new TypedValueString(messageFactory, "long")), Map.of()));
-    assertEquals(noSpaceText("Donnerstag, 17. August 1972"), format(messageAccessor, date,
-        Map.of("date", new TypedValueString(messageFactory, "full")), Map.of()));
-    assertEquals(noSpaceText("17.08.1972"), format(messageAccessor, date,
-        Map.of("date", new TypedValueString(messageFactory, "date")), Map.of()));
-
-    assertEquals(emptyText(), format(messageAccessor, date,
-        Map.of("date", new TypedValueString(messageFactory, "time")), Map.of()));
+    assertEquals(
+        expected,
+        format(
+            createMessageAccessor(GERMANY, new TemporalFormatter()),
+            LocalDate.of(1972, 8, 17), "date", style));
   }
 
 
-  @Test
+  static Stream<Arguments> localTimeStyles()
+  {
+    return Stream.of(
+        arguments("short", new TextPart("16:34")),
+        arguments("medium", new TextPart("16:34:11")),
+        arguments("long", new TextPart("16:34:11 MEZ")),
+        arguments("full", new TextPart("16:34:11 Mitteleuropäische Zeit")),
+        arguments("time", new TextPart("16:34:11")),
+        arguments("date", Text.EMPTY)
+    );
+  }
+
+
+  @ParameterizedTest(name = "{0} -> {1}")
   @DisplayName("Formats local times using localized styles")
-  void testLocalTime()
+  @MethodSource("localTimeStyles")
+  void testLocalTime(String style, Text expected)
   {
-    val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new TemporalFormatter()))
-        .setLocale(GERMANY)
-        .getMessageAccessor();
-    val messageFactory = messageAccessor.getMessageFactory();
-    val time = LocalTime.of(16, 34, 11, 672000000);
-
-    assertEquals(new TextPart("16:34"), format(messageAccessor, time,
-        Map.of("date", new TypedValueString(messageFactory, "short")), Map.of()));
-    assertEquals(new TextPart("16:34:11"), format(messageAccessor, time,
-        Map.of("date", new TypedValueString(messageFactory, "medium")), Map.of()));
-    assertEquals(new TextPart("16:34:11 MEZ"), format(messageAccessor, time,
-        Map.of("date", new TypedValueString(messageFactory, "long")), Map.of()));
-    assertEquals(new TextPart("16:34:11 Mitteleuropäische Zeit"), format(messageAccessor, time,
-        Map.of("date", new TypedValueString(messageFactory, "full")), Map.of()));
-    assertEquals(new TextPart("16:34:11"), format(messageAccessor, time,
-        Map.of("date", new TypedValueString(messageFactory, "time")), Map.of()));
-
-    assertEquals(Text.EMPTY, format(messageAccessor, time,
-        Map.of("date", new TypedValueString(messageFactory, "date")), Map.of()));
+    assertEquals(
+        expected,
+        format(
+            createMessageAccessor(GERMANY, new TemporalFormatter()),
+            LocalTime.of(16, 34, 11, 672000000), "date", style));
   }
 
 
-  @Test
+  static Stream<Arguments> dateTimeStyles()
+  {
+    return Stream.of(
+        arguments("short", new TextPart("17/08/1972, 02:40")),
+        arguments("medium", new TextPart("17 Aug 1972, 02:40:23")),
+        arguments("long", new TextPart("17 August 1972, 02:40:23 CET")),
+        arguments("full", new TextPart("Thursday, 17 August 1972, 02:40:23 Central European Standard Time")),
+        arguments("date", new TextPart("17 Aug 1972")),
+        arguments("time", new TextPart("02:40:23"))
+    );
+  }
+
+
+  @ParameterizedTest(name = "{0} -> {1}")
   @DisplayName("Formats local date-times using localized styles")
-  void testDateTime()
+  @MethodSource("dateTimeStyles")
+  void testDateTime(String style, Text expected)
   {
-    val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new TemporalFormatter()))
-        .setLocale(UK)
-        .getMessageAccessor();
-    val messageFactory = messageAccessor.getMessageFactory();
-    val datetime = LocalDateTime.of(1972, 8, 17, 2, 40, 23, 833000000);
-
-    assertEquals(new TextPart("17/08/1972, 02:40"), format(messageAccessor, datetime,
-        Map.of("date", new TypedValueString(messageFactory, "short")), Map.of()));
-    assertEquals(new TextPart("17 Aug 1972, 02:40:23"), format(messageAccessor, datetime,
-        Map.of("date", new TypedValueString(messageFactory, "medium")), Map.of()));
-    assertEquals(new TextPart("17 August 1972, 02:40:23 CET"), format(messageAccessor, datetime,
-        Map.of("date", new TypedValueString(messageFactory, "long")), Map.of()));
-    assertEquals(new TextPart("Thursday, 17 August 1972, 02:40:23 Central European Standard Time"),
-        format(messageAccessor, datetime,
-            Map.of("date", new TypedValueString(messageFactory, "full")), Map.of()));
-
-    assertEquals(new TextPart("17 Aug 1972"), format(messageAccessor, datetime,
-        Map.of("date", new TypedValueString(messageFactory, "date")), Map.of()));
-    assertEquals(new TextPart("02:40:23"), format(messageAccessor, datetime,
-        Map.of("date", new TypedValueString(messageFactory, "time")), Map.of()));
+    assertEquals(
+        expected,
+        format(
+            createMessageAccessor(UK, new TemporalFormatter()),
+            LocalDateTime.of(1972, 8, 17, 2, 40, 23, 833000000), "date", style));
   }
 
 
-  @Test
+  static Stream<Arguments> customPatterns()
+  {
+    return Stream.of(
+        arguments("dd MMMM", new TextPart("17 août")),
+        arguments("EEE EEEE", new TextPart("jeu. jeudi")),
+        arguments("HH:mm:ss,SSS", new TextPart("02:40:23,833"))
+    );
+  }
+
+
+  @ParameterizedTest(name = "{0} -> {1}")
   @DisplayName("Formats temporal values with custom patterns")
-  void testCustomPattern()
+  @MethodSource("customPatterns")
+  void testCustomPattern(String pattern, Text expected)
   {
-    val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new TemporalFormatter()))
-        .setLocale(FRANCE)
-        .getMessageAccessor();
-    val messageFactory = messageAccessor.getMessageFactory();
-    val datetime = LocalDateTime.of(1972, 8, 17, 2, 40, 23, 833000000);
-
-    assertEquals(new TextPart("17 août"), format(messageAccessor, datetime,
-        Map.of("date", new TypedValueString(messageFactory, "dd MMMM")), Map.of()));
-    assertEquals(new TextPart("jeu. jeudi"), format(messageAccessor, datetime,
-        Map.of("date", new TypedValueString(messageFactory, "EEE EEEE")), Map.of()));
-    assertEquals(new TextPart("02:40:23,833"), format(messageAccessor, datetime,
-        Map.of("date", new TypedValueString(messageFactory, "HH:mm:ss,SSS")), Map.of()));
+    assertEquals(
+        expected,
+        format(
+            createMessageAccessor(FRANCE, new TemporalFormatter()),
+            LocalDateTime.of(1972, 8, 17, 2, 40, 23, 833000000), "date", pattern));
   }
 
 
-  @Test
-  @DisplayName("Preserves explicit zones and uses the system zone for instants")
-  void testExplicitZones()
+  static Stream<Arguments> explicitZones()
   {
-    val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new TemporalFormatter()))
-        .setLocale(UK)
-        .getMessageAccessor();
-    val messageFactory = messageAccessor.getMessageFactory();
+    return Stream.of(
+        arguments(ZonedDateTime.of(2024, 1, 15, 12, 30, 0, 0, ZoneId.of("America/New_York")),
+            "yyyy-MM-dd HH:mm XXX VV", new TextPart("2024-01-15 12:30 -05:00 America/New_York")),
+        arguments(OffsetDateTime.parse("2024-01-15T12:30-05:00"),
+            "yyyy-MM-dd HH:mm XXX", new TextPart("2024-01-15 12:30 -05:00")),
+        arguments(Instant.parse("2024-01-15T12:30:00Z"),
+            "yyyy-MM-dd HH:mm XXX VV", new TextPart("2024-01-15 13:30 +01:00 Europe/Berlin"))
+    );
+  }
 
-    assertEquals(new TextPart("2024-01-15 12:30 -05:00 America/New_York"),
-        format(messageAccessor, ZonedDateTime.of(2024, 1, 15, 12, 30, 0, 0, ZoneId.of("America/New_York")),
-            Map.of("date", new TypedValueString(messageFactory, "yyyy-MM-dd HH:mm XXX VV")), Map.of()));
-    assertEquals(new TextPart("2024-01-15 12:30 -05:00"),
-        format(messageAccessor, OffsetDateTime.parse("2024-01-15T12:30-05:00"),
-            Map.of("date", new TypedValueString(messageFactory, "yyyy-MM-dd HH:mm XXX")), Map.of()));
-    assertEquals(new TextPart("2024-01-15 13:30 +01:00 Europe/Berlin"),
-        format(messageAccessor, Instant.parse("2024-01-15T12:30:00Z"),
-            Map.of("date", new TypedValueString(messageFactory, "yyyy-MM-dd HH:mm XXX VV")), Map.of()));
+
+  @ParameterizedTest(name = "{0} with {1} -> {2}")
+  @DisplayName("Preserves explicit zones and uses the system zone for instants")
+  @MethodSource("explicitZones")
+  void testExplicitZones(Temporal temporal, String pattern, Text expected)
+  {
+    assertEquals(
+        expected,
+        format(
+            createMessageAccessor(UK, new TemporalFormatter()),
+            temporal, "date", pattern));
   }
 
 
@@ -188,16 +194,15 @@ final class TemporalFormatterTest extends AbstractFormatterTest
   @DisplayName("Formats temporal values through the message formatter")
   void testFormatter()
   {
-    val messageSupport = MessageSupportFactory
-        .create(createFormatterService(new TemporalFormatter()));
-
-    assertEquals("17 aug 1972 16:45 14:23:01 2019-02-19 feb", messageSupport
-        .message("%{a} %{b,date:'short'} %{c,date:'time'} %{c,date:'yyyy-MM-dd MMM'}")
-        .with("a", LocalDate.of(1972, 8, 17))
-        .with("b", LocalTime.of(16, 45, 9, 123))
-        .with("c", LocalDateTime.of(2019, 2, 19, 14, 23, 1, 9))
-        .locale("nl")
-        .format());
+    assertEquals(
+        "17 aug 1972 16:45 14:23:01 2019-02-19 feb",
+        createMessageSupport(new TemporalFormatter())
+            .message("%{a} %{b,date:'short'} %{c,date:'time'} %{c,date:'yyyy-MM-dd MMM'}")
+            .with("a", LocalDate.of(1972, 8, 17))
+            .with("b", LocalTime.of(16, 45, 9, 123))
+            .with("c", LocalDateTime.of(2019, 2, 19, 14, 23, 1, 9))
+            .locale("nl")
+            .format());
   }
 
 
@@ -205,11 +210,7 @@ final class TemporalFormatterTest extends AbstractFormatterTest
   @DisplayName("Formats partial temporals as empty text if fields are missing")
   void testPartialTemporalMissingFields()
   {
-    val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new TemporalFormatter()))
-        .setLocale(GERMANY)
-        .getMessageAccessor();
-    val messageFactory = messageAccessor.getMessageFactory();
+    val messageAccessor = createMessageAccessor(GERMANY, new TemporalFormatter());
 
     for(val temporal: new Object[] { Year.of(2024), YearMonth.of(2024, 3) })
     {
@@ -218,14 +219,16 @@ final class TemporalFormatterTest extends AbstractFormatterTest
       for(val style: new String[] { "short", "medium", "long", "full", "date", "time" })
       {
         assertEquals(emptyText(), format(messageAccessor, temporal,
-            Map.of("date", new TypedValueString(messageFactory, style)), Map.of()), () -> temporal + " " + style);
+            "date", style), () -> temporal + " " + style);
       }
     }
 
-    assertEquals(emptyText(), format(messageAccessor, LocalTime.of(16, 45),
-        Map.of("date", new TypedValueString(messageFactory, "yyyy")), Map.of()));
-    assertEquals(emptyText(), format(messageAccessor, LocalDate.of(2024, 3, 15),
-        Map.of("date", new TypedValueString(messageFactory, "HH:mm")), Map.of()));
+    assertEquals(
+        emptyText(),
+        format(messageAccessor, LocalTime.of(16, 45), "date", "yyyy"));
+    assertEquals(
+        emptyText(),
+        format(messageAccessor, LocalDate.of(2024, 3, 15), "date", "HH:mm"));
   }
 
 
@@ -233,16 +236,14 @@ final class TemporalFormatterTest extends AbstractFormatterTest
   @DisplayName("Formats partial temporals with patterns using supported fields")
   void testPartialTemporalSupportedFields()
   {
-    val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new TemporalFormatter()))
-        .setLocale(GERMANY)
-        .getMessageAccessor();
-    val messageFactory = messageAccessor.getMessageFactory();
+    val messageAccessor = createMessageAccessor(GERMANY, new TemporalFormatter());
 
-    assertEquals(new TextPart("2024"), format(messageAccessor, Year.of(2024),
-        Map.of("date", new TypedValueString(messageFactory, "yyyy")), Map.of()));
-    assertEquals(new TextPart("März 2024"), format(messageAccessor, YearMonth.of(2024, 3),
-        Map.of("date", new TypedValueString(messageFactory, "MMMM yyyy")), Map.of()));
+    assertEquals(
+        new TextPart("2024"),
+        format(messageAccessor, Year.of(2024), "date", "yyyy"));
+    assertEquals(
+        new TextPart("März 2024"),
+        format(messageAccessor, YearMonth.of(2024, 3), "date", "MMMM yyyy"));
   }
 
 
@@ -250,12 +251,11 @@ final class TemporalFormatterTest extends AbstractFormatterTest
   @DisplayName("Formats as empty text for an invalid pattern")
   void testInvalidPattern()
   {
-    val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new TemporalFormatter()))
-        .getMessageAccessor();
+    val messageAccessor = createMessageAccessor(new TemporalFormatter());
 
-    assertEquals(emptyText(), format(messageAccessor, LocalDate.of(2024, 3, 15),
-        Map.of("date", new TypedValueString(messageAccessor.getMessageFactory(), "yyyy-bb")), Map.of()));
+    assertEquals(
+        emptyText(),
+        format(messageAccessor, LocalDate.of(2024, 3, 15), "date", "yyyy-bb"));
   }
 
 
@@ -263,8 +263,7 @@ final class TemporalFormatterTest extends AbstractFormatterTest
   @DisplayName("Formats messages with partial temporals without throwing")
   void testFormatterPartialTemporal()
   {
-    val messageSupport = MessageSupportFactory
-        .create(createFormatterService(new TemporalFormatter()));
+    val messageSupport = createMessageSupport(new TemporalFormatter());
 
     assertEquals("[] [] [2024]", messageSupport
         .message("[%{y}] [%{ym,date:short}] [%{y,date:'yyyy'}]")

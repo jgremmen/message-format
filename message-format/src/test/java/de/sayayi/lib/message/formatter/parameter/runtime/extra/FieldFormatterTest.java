@@ -16,7 +16,6 @@
 package de.sayayi.lib.message.formatter.parameter.runtime.extra;
 
 import de.sayayi.lib.message.MessageSupport;
-import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import lombok.val;
 import org.junit.jupiter.api.*;
@@ -43,7 +42,7 @@ final class FieldFormatterTest extends AbstractFormatterTest
 
   @BeforeEach
   void init() {
-    context = MessageSupportFactory.create(createFormatterService(new FieldFormatter()));
+    context = createMessageSupport(new FieldFormatter());
   }
 
 
@@ -58,10 +57,30 @@ final class FieldFormatterTest extends AbstractFormatterTest
   {
     val v1 = Dummy.class.getDeclaredField("v1");
 
-    assertEquals("boolean[]", context.message("%{f,field:T}").with("f", v1).format());
-    assertEquals("v1", context.message("%{f,field:N}").with("f", v1).format());
-    assertEquals("private static boolean[] v1", context.message("%{f}").with("f", v1).format());
-    assertEquals("boolean[] v1", context.message("%{f,field:TN}").with("f", v1).format());
+    assertEquals(
+        "boolean[]",
+        context
+            .message("%{f,field:T}")
+            .with("f", v1)
+            .format());
+    assertEquals(
+        "v1",
+        context
+            .message("%{f,field:N}")
+            .with("f", v1)
+            .format());
+    assertEquals(
+        "private static boolean[] v1",
+        context
+            .message("%{f}")
+            .with("f", v1)
+            .format());
+    assertEquals(
+        "boolean[] v1",
+        context
+            .message("%{f,field:TN}")
+            .with("f", v1)
+            .format());
   }
 
 
@@ -70,12 +89,30 @@ final class FieldFormatterTest extends AbstractFormatterTest
   {
     val v2 = Dummy.class.getDeclaredField("v2");
 
-    assertEquals("Map<String, Integer>", context.message("%{f,field:Tju}").with("f", v2).format());
-    assertEquals("v2", context.message("%{f,field:N}").with("f", v2).format());
-    assertEquals("public final java.util.Map<String, Integer> v2",
-        context.message("%{f,field:'jTMN'}").with("f", v2).format());
-    assertEquals("java.util.Map<java.lang.String, java.lang.Integer> v2",
-        context.message("%{f,field:TN}").with("f", v2).format());
+    assertEquals(
+        "Map<String, Integer>",
+        context
+            .message("%{f,field:Tju}")
+            .with("f", v2)
+            .format());
+    assertEquals(
+        "v2",
+        context
+            .message("%{f,field:N}")
+            .with("f", v2)
+            .format());
+    assertEquals(
+        "public final java.util.Map<String, Integer> v2",
+        context
+            .message("%{f,field:'jTMN'}")
+            .with("f", v2)
+            .format());
+    assertEquals(
+        "java.util.Map<java.lang.String, java.lang.Integer> v2",
+        context
+            .message("%{f,field:TN}")
+            .with("f", v2)
+            .format());
   }
 
 

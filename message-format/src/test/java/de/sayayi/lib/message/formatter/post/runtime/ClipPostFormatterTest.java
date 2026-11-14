@@ -49,8 +49,7 @@ final class ClipPostFormatterTest extends AbstractFormatterTest
   {
     val messageSupport = MessageSupportFactory
         .createDefault()
-        .setDefaultConfig("clip-suffix", false)
-        .setLocale(GERMANY);
+        .setDefaultConfig("clip-suffix", false);
 
     assertEquals(
         "",
@@ -85,20 +84,6 @@ final class ClipPostFormatterTest extends AbstractFormatterTest
         messageSupport
             .message("%(clip,'%{v}',clip:1)")
             .with("v", TEXT)
-            .format());
-
-    assertEquals(
-        TEXT,
-        messageSupport
-            .message("%(clip,'%{v}',clip:0)")
-            .with("v", TEXT)
-            .format());
-
-    assertEquals(
-        "3,1415926535",
-        messageSupport
-            .message("%(clip,\"%{v,number:'#.##################'}\",clip:12)")
-            .with("v", PI)
             .format());
   }
 

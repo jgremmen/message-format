@@ -16,15 +16,22 @@
 package de.sayayi.lib.message.formatter.parameter.named.extra;
 
 import de.sayayi.lib.message.MessageSupport;
-import de.sayayi.lib.message.MessageSupportFactory;
-import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import lombok.val;
-import org.junit.jupiter.api.*;
+import org.intellij.lang.annotations.Language;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.util.stream.Stream;
 
 import static java.util.Locale.GERMANY;
 import static java.util.Locale.US;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 
 /**
@@ -38,38 +45,31 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SuppressWarnings("removal")
 final class FileSizeFormatterTest extends AbstractFormatterTest
 {
-  private MessageSupport messageSupport;
+  private final MessageSupport messageSupport = createDefaultMessageSupport(new FileSizeFormatter());
 
 
-  @BeforeEach
-  void init()
+  static Stream<Arguments> unitAndScale()
   {
-    val formatterService = new DefaultFormatterService();
-    formatterService.addFormatter(new FileSizeFormatter());
-
-    messageSupport = MessageSupportFactory.create(formatterService);
+    return Stream.of(
+        arguments("%{s,format:filesize}", 0, "0B"),
+        arguments("%{s,format:filesize}", 999, "999B"),
+        arguments("%{s,format:filesize}", 1000, "1.0KB"),
+        arguments("%{s,format:filesize}", 1234567, "1.2MB"),
+        arguments("%{s,format:filesize,scale:2,space:true}", 1234567, "1.23 MB"),
+        arguments("%{s,format:filesize,scale:3}", 999_999, "999.999KB"),
+        arguments("%{s,format:filesize}", 999_950, "1.0MB"),
+        arguments("%{s,format:filesize,scale:0}", 1_000_000_000_000_000L, "1PB"));
   }
 
 
-  @Test
+  @ParameterizedTest(name = "{1} with {0} -> {2}")
   @DisplayName("Select unit and scale")
-  void testFormat()
+  @MethodSource("unitAndScale")
+  void testFormat(@Language("MessageFormat") String formatString, Number size, String expected)
   {
-    assertEquals("0B", messageSupport.message("%{s,format:filesize}").with("s", 0).locale(US).format());
-    assertEquals("999B", messageSupport.message("%{s,format:filesize}").with("s", 999).locale(US).format());
-    assertEquals("1.0KB", messageSupport.message("%{s,format:filesize}").with("s", 1000).locale(US).format());
-    assertEquals("1.2MB", messageSupport.message("%{s,format:filesize}").with("s", 1234567).locale(US).format());
-    assertEquals("1.23 MB", messageSupport
-        .message("%{s,format:filesize,scale:2,space:true}")
-        .with("s", 1234567)
-        .locale(US)
-        .format());
-    assertEquals("999.999KB",
-        messageSupport.message("%{s,format:filesize,scale:3}").with("s", 999_999).locale(US).format());
-    assertEquals("1.0MB", messageSupport.message("%{s,format:filesize}").with("s", 999_950).locale(US).format());
-    assertEquals("1PB", messageSupport
-        .message("%{s,format:filesize,scale:0}")
-        .with("s", 1_000_000_000_000_000L)
+    assertEquals(expected, messageSupport
+        .message(formatString)
+        .with("s", size)
         .locale(US)
         .format());
   }
@@ -79,12 +79,18 @@ final class FileSizeFormatterTest extends AbstractFormatterTest
   @DisplayName("Replace unit by map message and match null")
   void testUnitMessageAndNull()
   {
-    assertEquals("5 Gigabyte", messageSupport
-        .message("%{s,format:filesize,scale:0,'GB':' Gigabyte'}")
-        .with("s", 5_000_000_000L)
-        .locale(GERMANY)
-        .format());
-    assertEquals("Size: unknown",
-        messageSupport.message("Size: %{s,format:filesize,null:'unknown'}").with("s", null).format());
+    assertEquals(
+        "5 Gigabyte",
+        messageSupport
+            .message("%{s,format:filesize,scale:0,'GB':' Gigabyte'}")
+            .with("s", 5_000_000_000L)
+            .locale(GERMANY)
+            .format());
+    assertEquals(
+        "Size: unknown",
+        messageSupport
+            .message("Size: %{s,format:filesize,null:'unknown'}")
+            .with("s", null)
+            .format());
   }
 }

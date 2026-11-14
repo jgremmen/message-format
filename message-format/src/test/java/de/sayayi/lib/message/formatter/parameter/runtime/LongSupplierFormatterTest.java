@@ -15,22 +15,20 @@
  */
 package de.sayayi.lib.message.formatter.parameter.runtime;
 
-import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import java.util.Map;
 import java.util.function.LongSupplier;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 import static java.lang.Long.MAX_VALUE;
 import static java.lang.Long.MIN_VALUE;
+import static java.util.Locale.ENGLISH;
 import static java.util.Locale.ROOT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -55,10 +53,7 @@ final class LongSupplierFormatterTest extends AbstractFormatterTest
   @Test
   void testFormat()
   {
-    val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new LongSupplierFormatter()))
-        .setLocale(ROOT)
-        .getMessageAccessor();
+    val messageAccessor = createMessageAccessor(ROOT, new LongSupplierFormatter());
 
     assertEquals(
         nullText(),
@@ -82,18 +77,12 @@ final class LongSupplierFormatterTest extends AbstractFormatterTest
   @DisplayName("Supplied value is formatted by the number formatter")
   void testNumberFormat()
   {
-    val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new NumberFormatter(), new LongSupplierFormatter()))
-        .setLocale("en")
-        .getMessageAccessor();
-    val messageFactory = messageAccessor.getMessageFactory();
-
     assertEquals(
         noSpaceText("1,234,567,890"),
         format(
-            messageAccessor,
+            createMessageAccessor(ENGLISH, new NumberFormatter(), new LongSupplierFormatter()),
             (LongSupplier)() -> 1234567890L,
-            Map.of("number", new TypedValueString(messageFactory, "###,###,###,###")),
-            Map.of()));
+            "number",
+            "###,###,###,###"));
   }
 }

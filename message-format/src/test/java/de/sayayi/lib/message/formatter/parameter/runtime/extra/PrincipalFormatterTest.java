@@ -16,11 +16,12 @@
 package de.sayayi.lib.message.formatter.parameter.runtime.extra;
 
 import de.sayayi.lib.message.MessageSupport;
-import de.sayayi.lib.message.MessageSupportFactory;
-import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import lombok.val;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import javax.security.auth.x500.X500Principal;
 import java.security.Principal;
@@ -38,17 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @TestMethodOrder(MethodOrderer.DisplayName.class)
 final class PrincipalFormatterTest extends AbstractFormatterTest
 {
-  private MessageSupport messageSupport;
-
-
-  @BeforeEach
-  void init()
-  {
-    val formatterService = new DefaultFormatterService();
-    formatterService.addFormatter(new PrincipalFormatter());
-
-    messageSupport = MessageSupportFactory.create(formatterService);
-  }
+  private final MessageSupport messageSupport = createDefaultMessageSupport(new PrincipalFormatter());
 
 
   @Test
@@ -61,12 +52,18 @@ final class PrincipalFormatterTest extends AbstractFormatterTest
   @DisplayName("Format principal name")
   void testFormat()
   {
-    assertEquals("Signed by CN=Alice,O=Example", messageSupport
-        .message("Signed by %{user}")
-        .with("user", new X500Principal("CN=Alice,O=Example"))
-        .format());
-    assertEquals("Logged in as guest",
-        messageSupport.message("Logged in as %{user,null:'guest'}").with("user", null).format());
+    assertEquals(
+        "Signed by CN=Alice,O=Example",
+        messageSupport
+            .message("Signed by %{user}")
+            .with("user", new X500Principal("CN=Alice,O=Example"))
+            .format());
+    assertEquals(
+        "Logged in as guest",
+        messageSupport
+            .message("Logged in as %{user,null:'guest'}")
+            .with("user", null)
+            .format());
   }
 
 
@@ -78,7 +75,15 @@ final class PrincipalFormatterTest extends AbstractFormatterTest
     final Principal bob = () -> "bob";
     val message = messageSupport.message("%{user,format:choice,'admin':'Administrator',:'Regular user'}");
 
-    assertEquals("Administrator", message.with("user", admin).format());
-    assertEquals("Regular user", message.with("user", bob).format());
+    assertEquals(
+        "Administrator",
+        message
+            .with("user", admin)
+            .format());
+    assertEquals(
+        "Regular user",
+        message
+            .with("user", bob)
+            .format());
   }
 }

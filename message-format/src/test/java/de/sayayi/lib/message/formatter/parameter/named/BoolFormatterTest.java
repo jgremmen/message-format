@@ -34,8 +34,7 @@ import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.TextPartFactory.nullText;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
-import static java.util.Locale.ENGLISH;
-import static java.util.Locale.GERMAN;
+import static java.util.Locale.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
@@ -61,10 +60,7 @@ final class BoolFormatterTest extends AbstractFormatterTest
   @Test
   void testFormat()
   {
-    val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new BoolFormatter()))
-        .setLocale("de-DE")
-        .getMessageAccessor();
+    val messageAccessor = createMessageAccessor(GERMANY, new BoolFormatter());
 
     val map = new HashMap<MapKey,TypedValue.MessageValue>();
     map.put(MapKeyBool.TRUE, new TypedValueMessage(messageAccessor.getMessageFactory().parseMessage("wahr")));
@@ -81,9 +77,7 @@ final class BoolFormatterTest extends AbstractFormatterTest
   @Test
   void testFormatter()
   {
-    val messageSupport = MessageSupportFactory
-        .create(createFormatterService(new BoolFormatter()))
-        .setLocale(ENGLISH);
+    val messageSupport = createMessageSupport(ENGLISH, new BoolFormatter());
 
     assertEquals("false true 1234 true no 3.14", messageSupport
         .message("%{a} %{b} %{c} %{c,format:bool} %{d,format:bool,true:'yes',false:'no'} %{e}")
@@ -99,9 +93,7 @@ final class BoolFormatterTest extends AbstractFormatterTest
   @Test
   void testNamedFormatter()
   {
-    val messageSupport = MessageSupportFactory
-        .create(createFormatterService(new BoolFormatter()))
-        .setLocale(GERMAN);
+    val messageSupport = createMessageSupport(GERMAN, new BoolFormatter());
 
     val msg = messageSupport.message("%{b,format:bool,null:'<unknown>',true:'yes',false:'no'}").getMessage();
 

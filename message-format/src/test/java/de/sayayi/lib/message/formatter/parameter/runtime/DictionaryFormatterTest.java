@@ -16,7 +16,6 @@
 package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.MessageSupport;
-import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.parameter.named.StringFormatter;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import lombok.val;
@@ -45,9 +44,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @TestMethodOrder(MethodOrderer.DisplayName.class)
 final class DictionaryFormatterTest extends AbstractFormatterTest
 {
-  private final MessageSupport messageSupport = MessageSupportFactory
-      .create(createFormatterService(
-          new DictionaryFormatter(), new MapFormatter(), new IterableFormatter(), new StringFormatter()));
+  private final MessageSupport messageSupport = createMessageSupport(
+      new DictionaryFormatter(),
+      new MapFormatter(),
+      new IterableFormatter(),
+      new StringFormatter());
 
 
   @Test
@@ -65,10 +66,17 @@ final class DictionaryFormatterTest extends AbstractFormatterTest
     ht.put("color", "red");
     ht.put("shape", "circle");
 
-    val result = messageSupport.message("%{ht}").with("ht", ht).format();
+    val result = messageSupport
+        .message("%{ht}")
+        .with("ht", ht)
+        .format();
 
-    assertTrue(result.contains("color=red"), "expected 'color=red' in: " + result);
-    assertTrue(result.contains("shape=circle"), "expected 'shape=circle' in: " + result);
+    assertTrue(
+        result.contains("color=red"),
+        "expected 'color=red' in: " + result);
+    assertTrue(
+        result.contains("shape=circle"),
+        "expected 'shape=circle' in: " + result);
   }
 
 
@@ -80,8 +88,18 @@ final class DictionaryFormatterTest extends AbstractFormatterTest
     ht.put("color", "red");
     ht.put("shape", "circle");
 
-    assertEquals("red", messageSupport.message("%{ht,key:'color'}").with("ht", ht).format());
-    assertEquals("circle", messageSupport.message("%{ht,key:'shape'}").with("ht", ht).format());
+    assertEquals(
+        "red",
+        messageSupport
+            .message("%{ht,key:'color'}")
+            .with("ht", ht)
+            .format());
+    assertEquals(
+        "circle",
+        messageSupport
+            .message("%{ht,key:'shape'}")
+            .with("ht", ht)
+            .format());
   }
 
 
@@ -92,7 +110,12 @@ final class DictionaryFormatterTest extends AbstractFormatterTest
     val ht = new Hashtable<String,String>();
     ht.put("color", "red");
 
-    assertEquals("", messageSupport.message("%{ht,key:'missing'}").with("ht", ht).format());
+    assertEquals(
+        "",
+        messageSupport
+            .message("%{ht,key:'missing'}")
+            .with("ht", ht)
+            .format());
   }
 
 
@@ -104,10 +127,17 @@ final class DictionaryFormatterTest extends AbstractFormatterTest
     props.setProperty("host", "localhost");
     props.setProperty("port", "8080");
 
-    val result = messageSupport.message("%{p}").with("p", props).format();
+    val result = messageSupport
+        .message("%{p}")
+        .with("p", props)
+        .format();
 
-    assertTrue(result.contains("host=localhost"), "expected 'host=localhost' in: " + result);
-    assertTrue(result.contains("port=8080"), "expected 'port=8080' in: " + result);
+    assertTrue(
+        result.contains("host=localhost"),
+        "expected 'host=localhost' in: " + result);
+    assertTrue(
+        result.contains("port=8080"),
+        "expected 'port=8080' in: " + result);
   }
 
 
@@ -119,8 +149,18 @@ final class DictionaryFormatterTest extends AbstractFormatterTest
     props.setProperty("host", "localhost");
     props.setProperty("port", "8080");
 
-    assertEquals("localhost", messageSupport.message("%{p,key:'host'}").with("p", props).format());
-    assertEquals("8080", messageSupport.message("%{p,key:'port'}").with("p", props).format());
+    assertEquals(
+        "localhost",
+        messageSupport
+            .message("%{p,key:'host'}")
+            .with("p", props)
+            .format());
+    assertEquals(
+        "8080",
+        messageSupport
+            .message("%{p,key:'port'}")
+            .with("p", props)
+            .format());
   }
 
 
@@ -128,8 +168,12 @@ final class DictionaryFormatterTest extends AbstractFormatterTest
   @DisplayName("Custom Dictionary without key config uses toString")
   void testCustomDictionaryNoKey()
   {
-    assertEquals("MyDictionary", messageSupport
-        .message("%{d}").with("d", new MyDictionary()).format());
+    assertEquals(
+        "MyDictionary",
+        messageSupport
+            .message("%{d}")
+            .with("d", new MyDictionary())
+            .format());
   }
 
 
@@ -137,10 +181,18 @@ final class DictionaryFormatterTest extends AbstractFormatterTest
   @DisplayName("Custom Dictionary with key config returns value")
   void testCustomDictionaryKeyLookup()
   {
-    assertEquals("apple", messageSupport
-        .message("%{d,key:'fruit'}").with("d", new MyDictionary()).format());
-    assertEquals("carrot", messageSupport
-        .message("%{d,key:'veggie'}").with("d", new MyDictionary()).format());
+    assertEquals(
+        "apple",
+        messageSupport
+            .message("%{d,key:'fruit'}")
+            .with("d", new MyDictionary())
+            .format());
+    assertEquals(
+        "carrot",
+        messageSupport
+            .message("%{d,key:'veggie'}")
+            .with("d", new MyDictionary())
+            .format());
   }
 
 
@@ -148,8 +200,12 @@ final class DictionaryFormatterTest extends AbstractFormatterTest
   @DisplayName("Custom Dictionary with missing key returns empty")
   void testCustomDictionaryMissingKey()
   {
-    assertEquals("", messageSupport
-        .message("%{d,key:'missing'}").with("d", new MyDictionary()).format());
+    assertEquals(
+        "",
+        messageSupport
+            .message("%{d,key:'missing'}")
+            .with("d", new MyDictionary())
+            .format());
   }
 
 

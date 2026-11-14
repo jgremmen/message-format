@@ -18,7 +18,6 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import lombok.val;
 import org.junit.jupiter.api.*;
 
@@ -27,7 +26,10 @@ import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.time.Instant;
 import java.time.InstantSource;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -51,12 +53,8 @@ final class ToTemporalDelegateTest extends AbstractFormatterTest
 
 
   @BeforeEach
-  void init()
-  {
-    messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new TemporalFormatter(), new ToTemporalDelegate()))
-        .setLocale(GERMANY)
-        .getMessageAccessor();
+  void init() {
+    messageAccessor = createMessageAccessor(GERMANY, new TemporalFormatter(), new ToTemporalDelegate());
   }
 
 
@@ -67,8 +65,9 @@ final class ToTemporalDelegateTest extends AbstractFormatterTest
   {
     val date = new Date(2024 - 1900, Calendar.NOVEMBER, 9);
 
-    assertEquals(noSpaceText("09.11.2024, 00:00:00"), format(messageAccessor, date,
-        Map.of("date", new TypedValueString(messageAccessor.getMessageFactory(), "medium")), Map.of()));
+    assertEquals(
+        noSpaceText("09.11.2024, 00:00:00"),
+        format(messageAccessor, date, "date", "medium"));
   }
 
 
@@ -79,8 +78,9 @@ final class ToTemporalDelegateTest extends AbstractFormatterTest
     val sqlDate = java.sql.Date.valueOf("2024-11-09");
 
     // a java.util.Date with the medium style includes the time: "09.11.2024, 00:00:00"
-    assertEquals(noSpaceText("09.11.2024"), format(messageAccessor, sqlDate,
-        Map.of("date", new TypedValueString(messageAccessor.getMessageFactory(), "medium")), Map.of()));
+    assertEquals(
+        noSpaceText("09.11.2024"),
+        format(messageAccessor, sqlDate, "date", "medium"));
   }
 
 
@@ -91,8 +91,9 @@ final class ToTemporalDelegateTest extends AbstractFormatterTest
     val sqlTime = java.sql.Time.valueOf("23:36:04");
 
     // a java.util.Date with the medium style includes the date: "01.01.1970, 23:36:04"
-    assertEquals(noSpaceText("23:36:04"), format(messageAccessor, sqlTime,
-        Map.of("date", new TypedValueString(messageAccessor.getMessageFactory(), "medium")), Map.of()));
+    assertEquals(
+        noSpaceText("23:36:04"),
+        format(messageAccessor, sqlTime, "date", "medium"));
   }
 
 
@@ -106,8 +107,9 @@ final class ToTemporalDelegateTest extends AbstractFormatterTest
     calendar.clear();
     calendar.set(2024, Calendar.NOVEMBER, 9, 8, 30, 0);
 
-    assertEquals(noSpaceText("2024-11-09 08:30 " + zone.getID()), format(messageAccessor, calendar,
-        Map.of("date", new TypedValueString(messageAccessor.getMessageFactory(), "yyyy-MM-dd HH:mm VV")), Map.of()));
+    assertEquals(
+        noSpaceText("2024-11-09 08:30 " + zone.getID()),
+        format(messageAccessor, calendar, "date", "yyyy-MM-dd HH:mm VV"));
   }
 
 
@@ -126,7 +128,10 @@ final class ToTemporalDelegateTest extends AbstractFormatterTest
         .start();
     val output = new String(process.getInputStream().readAllBytes(), UTF_8);
 
-    assertEquals(0, process.waitFor(), output);
+    assertEquals(
+        0,
+        process.waitFor(),
+        output);
     assertEquals("""
         java.sql module: false
         java.sql.Date: not loadable
@@ -134,7 +139,8 @@ final class ToTemporalDelegateTest extends AbstractFormatterTest
         Calendar: 2024-11-09 23:36:04
         FileTime: 2024-11-09 23:36:04
         InstantSource: 2024-11-09 23:36:04
-        """, output.replace(System.lineSeparator(), "\n"));
+        """,
+        output.replace(System.lineSeparator(), "\n"));
   }
 
 
@@ -145,6 +151,7 @@ final class ToTemporalDelegateTest extends AbstractFormatterTest
    * It formats the legacy date/time types handled by {@link ToTemporalDelegate} using the default formatters and prints
    * one line per value.
    */
+  @SuppressWarnings("JavaPrintToLogpoint")
   public static final class WithoutJavaSqlMain
   {
     public static void main(String[] args)
@@ -165,7 +172,7 @@ final class ToTemporalDelegateTest extends AbstractFormatterTest
       calendar.setTimeInMillis(instant.toEpochMilli());
 
       System.out.println("Date: " + message.with("d", Date.from(instant)).format());
-      System.out.println("Calendar: " + message.with("d", (Calendar)calendar).format());
+      System.out.println("Calendar: " + message.with("d", calendar).format());
       System.out.println("FileTime: " + message.with("d", FileTime.from(instant)).format());
       System.out.println("InstantSource: " + message.with("d", InstantSource.fixed(instant)).format());
     }

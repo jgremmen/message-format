@@ -16,18 +16,25 @@
 package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.MessageSupport;
-import de.sayayi.lib.message.MessageSupportFactory;
-import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.formatter.parameter.named.ClassifierFormatter;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import lombok.val;
-import org.junit.jupiter.api.*;
+import org.intellij.lang.annotations.Language;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 
 /**
@@ -41,17 +48,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @TestMethodOrder(MethodOrderer.DisplayName.class)
 final class SupplierFormatterTest extends AbstractFormatterTest
 {
-  private MessageSupport messageSupport;
-
-
-  @BeforeEach
-  void init()
-  {
-    val formatterService = new DefaultFormatterService();
-    formatterService.addFormatter(new ClassifierFormatter());
-
-    messageSupport = MessageSupportFactory.create(formatterService);
-  }
+  private final MessageSupport messageSupport = createDefaultMessageSupport(new ClassifierFormatter());
 
 
   @Test
@@ -66,43 +63,37 @@ final class SupplierFormatterTest extends AbstractFormatterTest
   {
     final Supplier<List<String>> names = () -> List.of("alice", "bob", "carol");
 
-    assertEquals("Users: alice, bob and carol", messageSupport
-        .message("Users: %{names,list-sep-last:' and '}")
-        .with("names", names)
-        .format());
+    assertEquals(
+        "Users: alice, bob and carol",
+        messageSupport
+            .message("Users: %{names,list-sep-last:' and '}")
+            .with("names", names)
+            .format());
   }
 
 
-  @Test
-  @DisplayName("Map keys and size are based on the supplied value")
-  void testMapKeysAndSize()
+  static Stream<Arguments> suppliedValues()
   {
-    final Supplier<String> empty = () -> "";
-    final Supplier<Integer> one = () -> 1;
-    final Supplier<Boolean> yes = () -> true;
-    final Supplier<String> text = () -> "abc";
-    final Supplier<List<String>> list = () -> List.of("a", "b", "c");
+    return Stream.of(
+        arguments("%{v,empty:'no comment'}", (Supplier<String>)() -> "", "no comment"),
+        arguments("%{v,1:one,:other}", (Supplier<Integer>)() -> 1, "one"),
+        arguments("%{v,true:yes,false:no}", (Supplier<Boolean>)() -> true, "yes"),
+        arguments("%{v,format:choice,'abc':ABC,:other}", (Supplier<String>)() -> "abc", "ABC"),
+        arguments("%{v,format:size}", (Supplier<List<String>>)() -> List.of("a", "b", "c"), "3"));
+  }
 
-    assertEquals("no comment", messageSupport
-        .message("%{c,empty:'no comment'}")
-        .with("c", empty)
-        .format());
-    assertEquals("one", messageSupport
-        .message("%{n,1:one,:other}")
-        .with("n", one)
-        .format());
-    assertEquals("yes", messageSupport
-        .message("%{b,true:yes,false:no}")
-        .with("b", yes)
-        .format());
-    assertEquals("ABC", messageSupport
-        .message("%{s,format:choice,'abc':ABC,:other}")
-        .with("s", text)
-        .format());
-    assertEquals("3", messageSupport
-        .message("%{l,format:size}")
-        .with("l", list)
-        .format());
+
+  @ParameterizedTest(name = "{0} -> {2}")
+  @DisplayName("Map keys and size are based on the supplied value")
+  @MethodSource("suppliedValues")
+  void testMapKeysAndSize(@Language("MessageFormat") String formatString, Supplier<?> supplier, String expected)
+  {
+    assertEquals(
+        expected,
+        messageSupport
+            .message(formatString)
+            .with("v", supplier)
+            .format());
   }
 
 
@@ -112,14 +103,18 @@ final class SupplierFormatterTest extends AbstractFormatterTest
   {
     final Supplier<List<String>> list = () -> List.of("a", "b");
 
-    assertEquals("deferred", messageSupport
-        .message("%{v,format:classifier,'supplier':'deferred','list':'a list'}")
-        .with("v", list)
-        .format());
-    assertEquals("a list", messageSupport
-        .message("%{v,format:classifier,'string':'text','list':'a list'}")
-        .with("v", list)
-        .format());
+    assertEquals(
+        "deferred",
+        messageSupport
+          .message("%{v,format:classifier,'supplier':'deferred','list':'a list'}")
+          .with("v", list)
+          .format());
+    assertEquals(
+        "a list",
+        messageSupport
+          .message("%{v,format:classifier,'string':'text','list':'a list'}")
+          .with("v", list)
+          .format());
   }
 
 
@@ -133,10 +128,14 @@ final class SupplierFormatterTest extends AbstractFormatterTest
       return List.of("a", "b");
     };
 
-    assertEquals("a, b 2 some", messageSupport
-        .message("%{l} %{l,format:size} %{l,empty:none,!empty:some}")
-        .with("l", list)
-        .format());
-    assertEquals(1, calls.get());
+    assertEquals(
+        "a, b 2 some",
+        messageSupport
+          .message("%{l} %{l,format:size} %{l,empty:none,!empty:some}")
+          .with("l", list)
+          .format());
+    assertEquals(
+        1,
+        calls.get());
   }
 }

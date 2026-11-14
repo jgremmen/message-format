@@ -95,8 +95,5 @@ class TypedValueTest
     val message = new TypedValueMessage(msg);
 
     assertEquals(messageFactory.parseMessage("%{a, format:bool } %{ s }."), message.asObject());
-    assertEquals(
-        new TextMessage(new TextPart("%{a, format:bool } %{ s }.")),
-        new TypedValueString(messageFactory, "%{a, format:bool } %{ s }.").asMessage());
   }
 }

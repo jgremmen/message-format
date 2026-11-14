@@ -16,9 +16,7 @@
 package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.MessageFactory;
-import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -52,45 +50,52 @@ final class EnumFormatterTest extends AbstractFormatterTest
   @Test
   void testFormat()
   {
-    val messageSupport = MessageSupportFactory
-        .create(createFormatterService(new EnumFormatter()))
-        .setLocale(ROOT);
+    val messageSupport = createMessageSupport(ROOT, new EnumFormatter());
     val messageAccessor = messageSupport.getMessageAccessor();
-    val messageFactory = messageAccessor.getMessageFactory();
 
-    assertEquals(noSpaceText("3"), format(messageAccessor, MyEnum.DD,
-        Map.of("enum", new TypedValueString(messageFactory, "ordinal")), Map.of()));
+    assertEquals(
+        noSpaceText("3"),
+        format(messageAccessor, MyEnum.DD, "enum", "ordinal"));
 
     messageSupport.setDefaultConfig("enum", "ordinal");
-    assertEquals(noSpaceText("0"), format(messageAccessor, MyEnum.AA));
+    assertEquals(
+        noSpaceText("0"),
+        format(messageAccessor, MyEnum.AA));
   }
 
 
   @Test
   void testMapWithoutDefault()
   {
-    val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new EnumFormatter()))
-        .getMessageAccessor();
+    val messageAccessor = createMessageAccessor(new EnumFormatter());
 
-    assertEquals("upper", MessageFactory.getSharedInstance().parseMessage("%{e,>'C':upper,<'C':lower}")
-        .format(messageAccessor, Map.of("e", MyEnum.CC)));
+    assertEquals(
+        "upper",
+        MessageFactory
+            .getSharedInstance()
+            .parseMessage("%{e,>'C':upper,<'C':lower}")
+            .format(messageAccessor, Map.of("e", MyEnum.CC)));
 
-    assertEquals("", MessageFactory.getSharedInstance().parseMessage("%{e,>'C':upper}")
-        .format(messageAccessor, Map.of("e", MyEnum.AA)));
+    assertEquals(
+        "",
+        MessageFactory
+            .getSharedInstance()
+            .parseMessage("%{e,>'C':upper}")
+            .format(messageAccessor, Map.of("e", MyEnum.AA)));
   }
 
 
   @Test
   void testMapWithDefault()
   {
-    val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new EnumFormatter()))
-        .getMessageAccessor();
+    val messageAccessor = createMessageAccessor(new EnumFormatter());
 
-    assertEquals("C or D", MessageFactory.getSharedInstance()
-        .parseMessage("%{e,'AA':A,'BB':B,:'C or D'}")
-        .format(messageAccessor, Map.of("e", MyEnum.CC)));
+    assertEquals(
+        "C or D",
+        MessageFactory
+            .getSharedInstance()
+            .parseMessage("%{e,'AA':A,'BB':B,:'C or D'}")
+            .format(messageAccessor, Map.of("e", MyEnum.CC)));
   }
 
 

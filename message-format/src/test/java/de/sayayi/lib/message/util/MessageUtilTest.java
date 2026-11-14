@@ -24,6 +24,8 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -46,399 +48,153 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.DisplayName.class)
 final class MessageUtilTest
 {
-  @Test
-  @DisplayName("valid kebab-case names")
-  void testIsKebabCaseNameValid()
+  @ParameterizedTest(name = "\"{0}\"")
+  @DisplayName("Name predicates")
+  @CsvSource(delimiter = '|', textBlock = """
+      # name                           | kebab | camel | kebab or camel | name
+
+      # kebab and lower camel case
+      word                             | true  | true  | true           | true
+      a                                | true  | true  | true           | true
+      test                             | true  | true  | true           | true
+      test123                          | true  | true  | true           | true
+      abc123                           | true  | true  | true           | true
+      variable                         | true  | true  | true           | true
+      var2                             | true  | true  | true           | true
+      version1                         | true  | true  | true           | true
+      lowercase                        | true  | true  | true           | true
+      alllowercase                     | true  | true  | true           | true
+      name                             | true  | true  | true           | true
+      ä1                               | true  | true  | true           | true
+
+      # kebab case only
+      kebab-case                       | true  | false | true           | true
+      hello-world                      | true  | false | true           | true
+      my-variable-name                 | true  | false | true           | true
+      a-b                              | true  | false | true           | true
+      one-two-three-four               | true  | false | true           | true
+      var-123                          | true  | false | true           | true
+      my-var-2                         | true  | false | true           | true
+      test-1-2-3                       | true  | false | true           | true
+      version-1                        | true  | false | true           | true
+      v1-alpha                         | true  | false | true           | true
+      item-42-test                     | true  | false | true           | true
+      this-is-a-long-kebab-case-name   | true  | false | true           | true
+      api-v2-endpoint                  | true  | false | true           | true
+      user-id-123                      | true  | false | true           | true
+      a1-b2-c3                         | true  | false | true           | true
+      test-name                        | true  | false | true           | true
+      test-123                         | true  | false | true           | true
+      var-2                            | true  | false | true           | true
+      test-id                          | true  | false | true           | true
+
+      # lower camel case only
+      camelCase                        | false | true  | true           | true
+      helloWorld                       | false | true  | true           | true
+      myVariableName                   | false | true  | true           | true
+      aB                               | false | true  | true           | true
+      oneTwoThreeFour                  | false | true  | true           | true
+      myVar2                           | false | true  | true           | true
+      v1Alpha                          | false | true  | true           | true
+      item42Test                       | false | true  | true           | true
+      a1B2C3                           | false | true  | true           | true
+      test1Test2                       | false | true  | true           | true
+      thisIsALongLowerCamelCaseName    | false | true  | true           | true
+      apiV2Endpoint                    | false | true  | true           | true
+      userId123                        | false | true  | true           | true
+      getHTTPResponse                  | false | true  | true           | true
+      parseXMLDocument                 | false | true  | true           | true
+
+      # names only
+      Word                             | false | false | false          | true
+      Kebab-case                       | false | false | false          | true
+      Hello-world                      | false | false | false          | true
+      Test                             | false | false | false          | true
+      PascalCase                       | false | false | false          | true
+      kebab-Case                       | false | false | false          | true
+      kebAb-case                       | false | false | false          | true
+      UPPER                            | false | false | false          | true
+      mixed-Case-name                  | false | false | false          | true
+      test_case                        | false | false | false          | true
+      CamelCase                        | false | false | false          | true
+      HelloWorld                       | false | false | false          | true
+      snake_case                       | false | false | false          | true
+      hello_world                      | false | false | false          | true
+      test_name                        | false | false | false          | true
+      my_variable                      | false | false | false          | true
+      UPPERCASE                        | false | false | false          | true
+      ALL_CAPS                         | false | false | false          | true
+      Test123                          | false | false | false          | true
+      test_Case                        | false | false | false          | true
+      test-Case                        | false | false | false          | true
+      test-Name                        | false | false | false          | true
+      snake_case_2                     | false | false | false          | true
+      नाम                              | false | false | false          | true
+      cafe\u0301                       | false | false | false          | true
+      a-\u0301                         | false | false | false          | true
+      می\u200cخواهم                    | false | false | false          | true
+      a\u200db                         | false | false | false          | true
+
+      # invalid for all predicates
+      ''                               | false | false | false          | false
+      -word                            | false | false | false          | false
+      -kebab-case                      | false | false | false          | false
+      -test                            | false | false | false          | false
+      1word                            | false | false | false          | false
+      123test                          | false | false | false          | false
+      9-lives                          | false | false | false          | false
+      word-                            | false | false | false          | false
+      kebab-case-                      | false | false | false          | false
+      test-                            | false | false | false          | false
+      a-                               | false | false | false          | false
+      kebab--case                      | false | false | false          | false
+      hello--world                     | false | false | false          | false
+      test--123                        | false | false | false          | false
+      a--b                             | false | false | false          | false
+      one---two                        | false | false | false          | false
+      hello world                      | false | false | false          | false
+      test.name                        | false | false | false          | false
+      test@name                        | false | false | false          | false
+      test$name                        | false | false | false          | false
+      test#name                        | false | false | false          | false
+      test!                            | false | false | false          | false
+      test?                            | false | false | false          | false
+      test/name                        | false | false | false          | false
+      test\\name                       | false | false | false          | false
+      test:name                        | false | false | false          | false
+      test;name                        | false | false | false          | false
+      test,name                        | false | false | false          | false
+      -                                | false | false | false          | false
+      --                               | false | false | false          | false
+      123                              | false | false | false          | false
+      Test-                            | false | false | false          | false
+      -Test                            | false | false | false          | false
+      test--case-                      | false | false | false          | false
+      -test-case                       | false | false | false          | false
+      9lives                           | false | false | false          | false
+      42answer                         | false | false | false          | false
+      test name                        | false | false | false          | false
+      a b                              | false | false | false          | false
+      test(name)                       | false | false | false          | false
+      test[name]                       | false | false | false          | false
+      test{name}                       | false | false | false          | false
+      42                               | false | false | false          | false
+      1a                               | false | false | false          | false
+      -a                               | false | false | false          | false
+      a.b                              | false | false | false          | false
+      \u0301a                          | false | false | false          | false
+      \u200da                          | false | false | false          | false
+      a\u200eb                         | false | false | false          | false
+      a\u202eb                         | false | false | false          | false
+      a\u00adb                         | false | false | false          | false
+      """)
+  void testNamePredicates(String name, boolean kebab, boolean camel, boolean kebabOrCamel, boolean isName)
   {
-    // Simple single word
-    assertTrue(isKebabCaseName("word"));
-    assertTrue(isKebabCaseName("a"));
-    assertTrue(isKebabCaseName("test"));
-
-    // With hyphens
-    assertTrue(isKebabCaseName("kebab-case"));
-    assertTrue(isKebabCaseName("hello-world"));
-    assertTrue(isKebabCaseName("my-variable-name"));
-    assertTrue(isKebabCaseName("a-b"));
-    assertTrue(isKebabCaseName("one-two-three-four"));
-
-    // With digits
-    assertTrue(isKebabCaseName("test123"));
-    assertTrue(isKebabCaseName("abc123"));
-    assertTrue(isKebabCaseName("var-123"));
-    assertTrue(isKebabCaseName("my-var-2"));
-    assertTrue(isKebabCaseName("test-1-2-3"));
-    assertTrue(isKebabCaseName("version-1"));
-    assertTrue(isKebabCaseName("v1-alpha"));
-    assertTrue(isKebabCaseName("item-42-test"));
-
-    // Complex valid examples
-    assertTrue(isKebabCaseName("this-is-a-long-kebab-case-name"));
-    assertTrue(isKebabCaseName("api-v2-endpoint"));
-    assertTrue(isKebabCaseName("user-id-123"));
-    assertTrue(isKebabCaseName("a1-b2-c3"));
-  }
-
-
-  @Test
-  @DisplayName("invalid kebab-case names")
-  void testIsKebabCaseNameInvalid()
-  {
-    // Empty string
-    assertFalse(isKebabCaseName(""));
-
-    // Starting with uppercase
-    assertFalse(isKebabCaseName("Word"));
-    assertFalse(isKebabCaseName("Kebab-case"));
-    assertFalse(isKebabCaseName("Hello-world"));
-    assertFalse(isKebabCaseName("Test"));
-
-    // Starting with hyphen
-    assertFalse(isKebabCaseName("-word"));
-    assertFalse(isKebabCaseName("-kebab-case"));
-    assertFalse(isKebabCaseName("-test"));
-
-    // Starting with digit
-    assertFalse(isKebabCaseName("1word"));
-    assertFalse(isKebabCaseName("123test"));
-    assertFalse(isKebabCaseName("9-lives"));
-
-    // Ending with hyphen
-    assertFalse(isKebabCaseName("word-"));
-    assertFalse(isKebabCaseName("kebab-case-"));
-    assertFalse(isKebabCaseName("test-"));
-    assertFalse(isKebabCaseName("a-"));
-
-    // Consecutive hyphens
-    assertFalse(isKebabCaseName("kebab--case"));
-    assertFalse(isKebabCaseName("hello--world"));
-    assertFalse(isKebabCaseName("test--123"));
-    assertFalse(isKebabCaseName("a--b"));
-    assertFalse(isKebabCaseName("one---two"));
-
-    // With uppercase letters
-    assertFalse(isKebabCaseName("camelCase"));
-    assertFalse(isKebabCaseName("PascalCase"));
-    assertFalse(isKebabCaseName("kebab-Case"));
-    assertFalse(isKebabCaseName("kebAb-case"));
-    assertFalse(isKebabCaseName("UPPER"));
-    assertFalse(isKebabCaseName("mixed-Case-name"));
-
-    // With special characters
-    assertFalse(isKebabCaseName("test_case"));
-    assertFalse(isKebabCaseName("hello world"));
-    assertFalse(isKebabCaseName("test.name"));
-    assertFalse(isKebabCaseName("test@name"));
-    assertFalse(isKebabCaseName("test$name"));
-    assertFalse(isKebabCaseName("test#name"));
-    assertFalse(isKebabCaseName("test!"));
-    assertFalse(isKebabCaseName("test?"));
-    assertFalse(isKebabCaseName("test/name"));
-    assertFalse(isKebabCaseName("test\\name"));
-    assertFalse(isKebabCaseName("test:name"));
-    assertFalse(isKebabCaseName("test;name"));
-    assertFalse(isKebabCaseName("test,name"));
-
-    // Just hyphens or digits
-    assertFalse(isKebabCaseName("-"));
-    assertFalse(isKebabCaseName("--"));
-    assertFalse(isKebabCaseName("123"));
-
-    // Mixed invalid cases
-    assertFalse(isKebabCaseName("Test-"));
-    assertFalse(isKebabCaseName("-Test"));
-    assertFalse(isKebabCaseName("test--case-"));
-    assertFalse(isKebabCaseName("-test-case"));
-  }
-
-
-  @Test
-  @DisplayName("valid lower camel-case names")
-  void testIsLowerCamelCaseNameValid()
-  {
-    // Simple single word
-    assertTrue(isLowerCamelCaseName("word"));
-    assertTrue(isLowerCamelCaseName("a"));
-    assertTrue(isLowerCamelCaseName("test"));
-    assertTrue(isLowerCamelCaseName("variable"));
-
-    // Camel case
-    assertTrue(isLowerCamelCaseName("camelCase"));
-    assertTrue(isLowerCamelCaseName("helloWorld"));
-    assertTrue(isLowerCamelCaseName("myVariableName"));
-    assertTrue(isLowerCamelCaseName("aB"));
-    assertTrue(isLowerCamelCaseName("oneTwoThreeFour"));
-
-    // With digits
-    assertTrue(isLowerCamelCaseName("test123"));
-    assertTrue(isLowerCamelCaseName("abc123"));
-    assertTrue(isLowerCamelCaseName("var2"));
-    assertTrue(isLowerCamelCaseName("myVar2"));
-    assertTrue(isLowerCamelCaseName("version1"));
-    assertTrue(isLowerCamelCaseName("v1Alpha"));
-    assertTrue(isLowerCamelCaseName("item42Test"));
-    assertTrue(isLowerCamelCaseName("a1B2C3"));
-    assertTrue(isLowerCamelCaseName("test1Test2"));
-
-    // Complex valid examples
-    assertTrue(isLowerCamelCaseName("thisIsALongLowerCamelCaseName"));
-    assertTrue(isLowerCamelCaseName("apiV2Endpoint"));
-    assertTrue(isLowerCamelCaseName("userId123"));
-    assertTrue(isLowerCamelCaseName("getHTTPResponse"));
-    assertTrue(isLowerCamelCaseName("parseXMLDocument"));
-
-    // All lowercase
-    assertTrue(isLowerCamelCaseName("lowercase"));
-    assertTrue(isLowerCamelCaseName("alllowercase"));
-  }
-
-
-  @Test
-  @DisplayName("invalid lower camel-case names")
-  void testIsLowerCamelCaseNameInvalid()
-  {
-    // Empty string
-    assertFalse(isLowerCamelCaseName(""));
-
-    // Starting with uppercase (PascalCase)
-    assertFalse(isLowerCamelCaseName("Word"));
-    assertFalse(isLowerCamelCaseName("CamelCase"));
-    assertFalse(isLowerCamelCaseName("HelloWorld"));
-    assertFalse(isLowerCamelCaseName("Test"));
-    assertFalse(isLowerCamelCaseName("PascalCase"));
-
-    // Starting with digit
-    assertFalse(isLowerCamelCaseName("1word"));
-    assertFalse(isLowerCamelCaseName("123test"));
-    assertFalse(isLowerCamelCaseName("9lives"));
-    assertFalse(isLowerCamelCaseName("42answer"));
-
-    // With hyphens
-    assertFalse(isLowerCamelCaseName("kebab-case"));
-    assertFalse(isLowerCamelCaseName("hello-world"));
-    assertFalse(isLowerCamelCaseName("test-name"));
-    assertFalse(isLowerCamelCaseName("a-b"));
-
-    // With underscores
-    assertFalse(isLowerCamelCaseName("snake_case"));
-    assertFalse(isLowerCamelCaseName("hello_world"));
-    assertFalse(isLowerCamelCaseName("test_name"));
-    assertFalse(isLowerCamelCaseName("my_variable"));
-
-    // With spaces
-    assertFalse(isLowerCamelCaseName("hello world"));
-    assertFalse(isLowerCamelCaseName("test name"));
-    assertFalse(isLowerCamelCaseName("a b"));
-
-    // With special characters
-    assertFalse(isLowerCamelCaseName("test.name"));
-    assertFalse(isLowerCamelCaseName("test@name"));
-    assertFalse(isLowerCamelCaseName("test$name"));
-    assertFalse(isLowerCamelCaseName("test#name"));
-    assertFalse(isLowerCamelCaseName("test!"));
-    assertFalse(isLowerCamelCaseName("test?"));
-    assertFalse(isLowerCamelCaseName("test/name"));
-    assertFalse(isLowerCamelCaseName("test\\name"));
-    assertFalse(isLowerCamelCaseName("test:name"));
-    assertFalse(isLowerCamelCaseName("test;name"));
-    assertFalse(isLowerCamelCaseName("test,name"));
-    assertFalse(isLowerCamelCaseName("test(name)"));
-    assertFalse(isLowerCamelCaseName("test[name]"));
-    assertFalse(isLowerCamelCaseName("test{name}"));
-
-    // Just digits or special characters
-    assertFalse(isLowerCamelCaseName("123"));
-    assertFalse(isLowerCamelCaseName("42"));
-
-    // All uppercase
-    assertFalse(isLowerCamelCaseName("UPPERCASE"));
-    assertFalse(isLowerCamelCaseName("ALL_CAPS"));
-
-    // Mixed invalid cases
-    assertFalse(isLowerCamelCaseName("Test123"));
-    assertFalse(isLowerCamelCaseName("test_Case"));
-    assertFalse(isLowerCamelCaseName("test-Case"));
-  }
-
-
-  @Test
-  @DisplayName("valid kebab- or lower camel-case names")
-  void testIsKebabOrLowerCamelCaseNameValid()
-  {
-    // Simple single word (valid for both)
-    assertTrue(isKebabOrLowerCamelCaseName("word"));
-    assertTrue(isKebabOrLowerCamelCaseName("a"));
-    assertTrue(isKebabOrLowerCamelCaseName("test"));
-    assertTrue(isKebabOrLowerCamelCaseName("variable"));
-
-    // Valid kebab-case names
-    assertTrue(isKebabOrLowerCamelCaseName("kebab-case"));
-    assertTrue(isKebabOrLowerCamelCaseName("hello-world"));
-    assertTrue(isKebabOrLowerCamelCaseName("my-variable-name"));
-    assertTrue(isKebabOrLowerCamelCaseName("a-b"));
-    assertTrue(isKebabOrLowerCamelCaseName("one-two-three-four"));
-    assertTrue(isKebabOrLowerCamelCaseName("test-123"));
-    assertTrue(isKebabOrLowerCamelCaseName("var-2"));
-    assertTrue(isKebabOrLowerCamelCaseName("a1-b2-c3"));
-    assertTrue(isKebabOrLowerCamelCaseName("api-v2-endpoint"));
-
-    // Valid lower camel-case names
-    assertTrue(isKebabOrLowerCamelCaseName("camelCase"));
-    assertTrue(isKebabOrLowerCamelCaseName("helloWorld"));
-    assertTrue(isKebabOrLowerCamelCaseName("myVariableName"));
-    assertTrue(isKebabOrLowerCamelCaseName("aB"));
-    assertTrue(isKebabOrLowerCamelCaseName("oneTwoThreeFour"));
-    assertTrue(isKebabOrLowerCamelCaseName("test123"));
-    assertTrue(isKebabOrLowerCamelCaseName("var2"));
-    assertTrue(isKebabOrLowerCamelCaseName("a1B2C3"));
-    assertTrue(isKebabOrLowerCamelCaseName("apiV2Endpoint"));
-
-    // With digits (valid for both)
-    assertTrue(isKebabOrLowerCamelCaseName("test123"));
-    assertTrue(isKebabOrLowerCamelCaseName("abc123"));
-    assertTrue(isKebabOrLowerCamelCaseName("version1"));
-    assertTrue(isKebabOrLowerCamelCaseName("v1Alpha"));
-    assertTrue(isKebabOrLowerCamelCaseName("v1-alpha"));
-
-    // Complex valid examples
-    assertTrue(isKebabOrLowerCamelCaseName("thisIsALongLowerCamelCaseName"));
-    assertTrue(isKebabOrLowerCamelCaseName("this-is-a-long-kebab-case-name"));
-    assertTrue(isKebabOrLowerCamelCaseName("userId123"));
-    assertTrue(isKebabOrLowerCamelCaseName("user-id-123"));
-  }
-
-
-  @Test
-  @DisplayName("invalid kebab- or lower camel-case names")
-  void testIsKebabOrLowerCamelCaseNameInvalid()
-  {
-    // Empty string
-    assertFalse(isKebabOrLowerCamelCaseName(""));
-
-    // Starting with uppercase (PascalCase)
-    assertFalse(isKebabOrLowerCamelCaseName("Word"));
-    assertFalse(isKebabOrLowerCamelCaseName("CamelCase"));
-    assertFalse(isKebabOrLowerCamelCaseName("HelloWorld"));
-    assertFalse(isKebabOrLowerCamelCaseName("Kebab-case"));
-    assertFalse(isKebabOrLowerCamelCaseName("Hello-world"));
-    assertFalse(isKebabOrLowerCamelCaseName("PascalCase"));
-
-    // Starting with hyphen
-    assertFalse(isKebabOrLowerCamelCaseName("-word"));
-    assertFalse(isKebabOrLowerCamelCaseName("-kebab-case"));
-    assertFalse(isKebabOrLowerCamelCaseName("-test"));
-
-    // Starting with digit
-    assertFalse(isKebabOrLowerCamelCaseName("1word"));
-    assertFalse(isKebabOrLowerCamelCaseName("123test"));
-    assertFalse(isKebabOrLowerCamelCaseName("9-lives"));
-    assertFalse(isKebabOrLowerCamelCaseName("9lives"));
-    assertFalse(isKebabOrLowerCamelCaseName("42answer"));
-
-    // Ending with hyphen (kebab-case specific)
-    assertFalse(isKebabOrLowerCamelCaseName("word-"));
-    assertFalse(isKebabOrLowerCamelCaseName("kebab-case-"));
-    assertFalse(isKebabOrLowerCamelCaseName("test-"));
-    assertFalse(isKebabOrLowerCamelCaseName("a-"));
-
-    // Consecutive hyphens (kebab-case specific)
-    assertFalse(isKebabOrLowerCamelCaseName("kebab--case"));
-    assertFalse(isKebabOrLowerCamelCaseName("hello--world"));
-    assertFalse(isKebabOrLowerCamelCaseName("test--123"));
-    assertFalse(isKebabOrLowerCamelCaseName("a--b"));
-    assertFalse(isKebabOrLowerCamelCaseName("one---two"));
-
-    // Uppercase in kebab-case (mixing formats)
-    assertFalse(isKebabOrLowerCamelCaseName("kebab-Case"));
-    assertFalse(isKebabOrLowerCamelCaseName("kebAb-case"));
-    assertFalse(isKebabOrLowerCamelCaseName("mixed-Case-name"));
-    assertFalse(isKebabOrLowerCamelCaseName("test-Name"));
-
-    // With underscores
-    assertFalse(isKebabOrLowerCamelCaseName("snake_case"));
-    assertFalse(isKebabOrLowerCamelCaseName("hello_world"));
-    assertFalse(isKebabOrLowerCamelCaseName("test_name"));
-    assertFalse(isKebabOrLowerCamelCaseName("test_Case"));
-
-    // With spaces
-    assertFalse(isKebabOrLowerCamelCaseName("hello world"));
-    assertFalse(isKebabOrLowerCamelCaseName("test name"));
-    assertFalse(isKebabOrLowerCamelCaseName("a b"));
-
-    // With special characters
-    assertFalse(isKebabOrLowerCamelCaseName("test.name"));
-    assertFalse(isKebabOrLowerCamelCaseName("test@name"));
-    assertFalse(isKebabOrLowerCamelCaseName("test$name"));
-    assertFalse(isKebabOrLowerCamelCaseName("test#name"));
-    assertFalse(isKebabOrLowerCamelCaseName("test!"));
-    assertFalse(isKebabOrLowerCamelCaseName("test?"));
-    assertFalse(isKebabOrLowerCamelCaseName("test/name"));
-    assertFalse(isKebabOrLowerCamelCaseName("test\\name"));
-    assertFalse(isKebabOrLowerCamelCaseName("test:name"));
-    assertFalse(isKebabOrLowerCamelCaseName("test;name"));
-    assertFalse(isKebabOrLowerCamelCaseName("test,name"));
-
-    // Just hyphens or digits
-    assertFalse(isKebabOrLowerCamelCaseName("-"));
-    assertFalse(isKebabOrLowerCamelCaseName("--"));
-    assertFalse(isKebabOrLowerCamelCaseName("123"));
-    assertFalse(isKebabOrLowerCamelCaseName("42"));
-
-    // All uppercase
-    assertFalse(isKebabOrLowerCamelCaseName("UPPERCASE"));
-    assertFalse(isKebabOrLowerCamelCaseName("UPPER"));
-
-    // Mixed invalid cases
-    assertFalse(isKebabOrLowerCamelCaseName("Test-"));
-    assertFalse(isKebabOrLowerCamelCaseName("-Test"));
-    assertFalse(isKebabOrLowerCamelCaseName("test--case-"));
-    assertFalse(isKebabOrLowerCamelCaseName("-test-case"));
-    assertFalse(isKebabOrLowerCamelCaseName("Test123"));
-    assertFalse(isKebabOrLowerCamelCaseName("test-Case"));
-  }
-
-
-  @Test
-  @DisplayName("valid names")
-  void testIsNameValid()
-  {
-    assertTrue(isName("a"));
-    assertTrue(isName("name"));
-    assertTrue(isName("test-id"));
-    assertTrue(isName("snake_case_2"));
-    assertTrue(isName("ä1"));
-
-    // Combining marks
-    assertTrue(isName("नाम"));
-    assertTrue(isName("cafe\u0301"));
-    assertTrue(isName("a-\u0301"));
-
-    // Zero width non-joiner/joiner
-    assertTrue(isName("می\u200cخواهم"));
-    assertTrue(isName("a\u200db"));
-  }
-
-
-  @Test
-  @DisplayName("invalid names")
-  void testIsNameInvalid()
-  {
-    assertFalse(isName(""));
-    assertFalse(isName("1a"));
-    assertFalse(isName("-a"));
-    assertFalse(isName("a-"));
-    assertFalse(isName("a--b"));
-    assertFalse(isName("a b"));
-    assertFalse(isName("a.b"));
-
-    // Combining mark or joiner must not start a name
-    assertFalse(isName("\u0301a"));
-    assertFalse(isName("\u200da"));
-
-    // Other format characters are not allowed
-    assertFalse(isName("a\u200eb"));
-    assertFalse(isName("a\u202eb"));
-    assertFalse(isName("a\u00adb"));
+    assertAll(
+        () -> assertEquals(kebab, isKebabCaseName(name), "isKebabCaseName"),
+        () -> assertEquals(camel, isLowerCamelCaseName(name), "isLowerCamelCaseName"),
+        () -> assertEquals(kebabOrCamel, isKebabOrLowerCamelCaseName(name), "isKebabOrLowerCamelCaseName"),
+        () -> assertEquals(isName, isName(name), "isName"));
   }
 
 

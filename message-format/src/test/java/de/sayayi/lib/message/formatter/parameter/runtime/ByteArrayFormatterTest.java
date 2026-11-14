@@ -19,7 +19,6 @@ import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.parameter.named.SizeFormatter;
 import de.sayayi.lib.message.internal.part.TextPart;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -63,17 +62,19 @@ final class ByteArrayFormatterTest extends AbstractFormatterTest
         .create(formatterService)
         .setLocale("de-DE")
         .getMessageAccessor();
-    val messageFactory = messageAccessor.getMessageFactory();
 
-    assertEquals(new TextPart("Größe"),
-        format(messageAccessor, "Größe".getBytes(ISO_8859_1),
-            Map.of("bytes", new TypedValueString(messageFactory, "iso-8859-1")), Map.of()));
-    assertEquals(new TextPart("Größe"), format(messageAccessor, "Größe".getBytes(UTF_8),
-        Map.of("bytes", new TypedValueString(messageFactory, "utf-8")), Map.of()));
-    assertEquals(new TextPart("Größe"), format(messageAccessor, "Größe".getBytes(),
-        Map.of("bytes", new TypedValueString(messageFactory, "")), Map.of()));
-    assertEquals(new TextPart("Größe"), format(messageAccessor, "Größe".getBytes(),
-        Map.of("bytes", new TypedValueString(messageFactory, "AA-bb")), Map.of()));
+    assertEquals(
+        new TextPart("Größe"),
+        format(messageAccessor, "Größe".getBytes(ISO_8859_1), "bytes", "iso-8859-1"));
+    assertEquals(
+        new TextPart("Größe"),
+        format(messageAccessor, "Größe".getBytes(UTF_8), "bytes", "utf-8"));
+    assertEquals(
+        new TextPart("Größe"),
+        format(messageAccessor, "Größe".getBytes(), "bytes", ""));
+    assertEquals(
+        new TextPart("Größe"),
+        format(messageAccessor, "Größe".getBytes(), "bytes", "AA-bb"));
   }
 
 
@@ -86,8 +87,7 @@ final class ByteArrayFormatterTest extends AbstractFormatterTest
         .setLocale(ROOT)
         .getMessageAccessor();
 
-    assertEquals(EMPTY, format(messageAccessor, "".getBytes(UTF_8),
-        Map.of("bytes", new TypedValueString(messageAccessor.getMessageFactory(), "utf-8")), Map.of()));
+    assertEquals(EMPTY, format(messageAccessor, "".getBytes(UTF_8), "bytes", "utf-8"));
   }
 
 
@@ -100,8 +100,9 @@ final class ByteArrayFormatterTest extends AbstractFormatterTest
         .setLocale("de-DE")
         .getMessageAccessor();
 
-    assertThrowsExactly(IllegalCharsetNameException.class, () -> format(messageAccessor, "Größe".getBytes(),
-        Map.of("bytes", new TypedValueString(messageAccessor.getMessageFactory(), "XYZ&%")), Map.of()));
+    assertThrowsExactly(
+        IllegalCharsetNameException.class,
+        () -> format(messageAccessor, "Größe".getBytes(), "bytes", "XYZ&%"));
   }
 
 
@@ -113,8 +114,9 @@ final class ByteArrayFormatterTest extends AbstractFormatterTest
         .create(formatterService)
         .getMessageAccessor();
 
-    assertEquals(new TextPart("R3LDtsOfZQ=="), format(messageAccessor, "Größe".getBytes(),
-        Map.of("bytes", new TypedValueString(messageAccessor.getMessageFactory(), "base64")), Map.of()));
+    assertEquals(
+        new TextPart("R3LDtsOfZQ=="),
+        format(messageAccessor, "Größe".getBytes(), "bytes", "base64"));
   }
 
 
@@ -126,11 +128,13 @@ final class ByteArrayFormatterTest extends AbstractFormatterTest
         .create(formatterService)
         .getMessageAccessor();
 
-    assertEquals(new TextPart(
-        "VGhpcyBhcHBlYXJzIHRvIGJlIGEgdmVyeSBsb25nIHRleHQgd2l0aCBhIHNpbmdsZSBsaW5lZmVl\nZCE="),
-        format(messageAccessor,
+    assertEquals(
+        new TextPart("VGhpcyBhcHBlYXJzIHRvIGJlIGEgdmVyeSBsb25nIHRleHQgd2l0aCBhIHNpbmdsZSBsaW5lZmVl\nZCE="),
+        format(
+            messageAccessor,
             "This appears to be a very long text with a single linefeed!".getBytes(),
-            Map.of("bytes", new TypedValueString(messageAccessor.getMessageFactory(), "base64-lf")), Map.of()));
+            "bytes",
+            "base64-lf"));
   }
 
 
@@ -145,7 +149,8 @@ final class ByteArrayFormatterTest extends AbstractFormatterTest
         .setLocale("de-DE")
         .getMessageAccessor();
 
-    assertEquals(new TextPart("71, 114, -61, -74, -61, -97, 101"),
+    assertEquals(
+        new TextPart("71, 114, -61, -74, -61, -97, 101"),
         format(messageAccessor, "Größe".getBytes(UTF_8), Map.of(), Map.of()));
   }
 
@@ -159,7 +164,11 @@ final class ByteArrayFormatterTest extends AbstractFormatterTest
             new ArrayFormatter(),
             new ByteArrayFormatter()));
 
-    assertEquals("2", messageSupport.message("%{c,format:size}")
-        .with("c", new byte[] { 'a', 'b' }).format());
+    assertEquals(
+        "2",
+        messageSupport
+            .message("%{c,format:size}")
+            .with("c", new byte[] { 'a', 'b' })
+            .format());
   }
 }

@@ -16,7 +16,6 @@
 package de.sayayi.lib.message.formatter.parameter.runtime.extra;
 
 import de.sayayi.lib.message.MessageSupport;
-import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
@@ -51,6 +50,9 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.DisplayName.class)
 final class AnnotationFormatterTest extends AbstractFormatterTest
 {
+  private final MessageSupport messageSupport = createMessageSupport(new AnnotationFormatter());
+
+
   @Test
   void testFormattableTypes() {
     assertFormatterForType(new AnnotationFormatter(), Annotation.class);
@@ -61,22 +63,22 @@ final class AnnotationFormatterTest extends AbstractFormatterTest
   @MyAnnotation(value = 56, name = "Annotation", chars = { 'A', 'b', 'C' })
   void testAnnotation() throws ReflectiveOperationException
   {
-    val context = MessageSupportFactory
-        .create(createFormatterService(new AnnotationFormatter()));
-
     val annotation = AnnotationFormatterTest.class
         .getDeclaredMethod("testAnnotation").getAnnotation(MyAnnotation.class);
 
-    assertEquals('@' + getClass().getName() +
-        ".MyAnnotation(value=56, name=\"Annotation\", chars={'A', 'b', 'C'})", context
-        .message("%{ann}")
-        .with("ann", annotation)
-        .format());
+    assertEquals(
+        '@' + getClass().getName() + ".MyAnnotation(value=56, name=\"Annotation\", chars={'A', 'b', 'C'})",
+        messageSupport
+            .message("%{ann}")
+            .with("ann", annotation)
+            .format());
 
-    assertEquals("AbC", context
-        .message("%{ann,annotation:chars}")
-        .with("ann", annotation)
-        .format());
+    assertEquals(
+        "AbC",
+        messageSupport
+            .message("%{ann,annotation:chars}")
+            .with("ann", annotation)
+            .format());
   }
 
 
@@ -85,31 +87,35 @@ final class AnnotationFormatterTest extends AbstractFormatterTest
   @MyAnnotation(value = 7, name = "Unknown", chars = {})
   void testUnknownElement() throws ReflectiveOperationException
   {
-    val context = MessageSupportFactory
-        .create(createFormatterService(new AnnotationFormatter()));
-
     val annotation = AnnotationFormatterTest.class
-        .getDeclaredMethod("testUnknownElement").getAnnotation(MyAnnotation.class);
+        .getDeclaredMethod("testUnknownElement")
+        .getAnnotation(MyAnnotation.class);
 
     // unknown elements are not cached, so the second lookup must give the same result
     for(var n = 0; n < 2; n++)
     {
-      assertEquals(annotation.toString(), context
-          .message("%{ann,annotation:unknown}")
-          .with("ann", annotation)
-          .format());
+      assertEquals(
+          annotation.toString(),
+          messageSupport
+              .message("%{ann,annotation:unknown}")
+              .with("ann", annotation)
+              .format());
     }
 
     // methods inherited from Annotation are not annotation elements
-    assertEquals(annotation.toString(), context
-        .message("%{ann,annotation:hashCode}")
-        .with("ann", annotation)
-        .format());
+    assertEquals(
+        annotation.toString(),
+        messageSupport
+            .message("%{ann,annotation:hashCode}")
+            .with("ann", annotation)
+            .format());
 
-    assertEquals("Unknown", context
-        .message("%{ann,annotation:name}")
-        .with("ann", annotation)
-        .format());
+    assertEquals(
+        "Unknown",
+        messageSupport
+            .message("%{ann,annotation:name}")
+            .with("ann", annotation)
+            .format());
   }
 
 
@@ -118,19 +124,19 @@ final class AnnotationFormatterTest extends AbstractFormatterTest
   @MyAnnotation(value = 42, name = "Concurrent", chars = { 'x', 'y' })
   void testConcurrentFormatting() throws Exception
   {
-    val context = MessageSupportFactory
-        .create(createFormatterService(new AnnotationFormatter()));
-
     val annotation = AnnotationFormatterTest.class
-        .getDeclaredMethod("testConcurrentFormatting").getAnnotation(MyAnnotation.class);
+        .getDeclaredMethod("testConcurrentFormatting")
+        .getAnnotation(MyAnnotation.class);
 
     runConcurrently(8, thread -> {
       for(var n = 0; n < 500; n++)
       {
-        assertEquals("Concurrent 42 xy", context
-            .message("%{ann,annotation:name} %{ann,annotation:value} %{ann,annotation:chars}")
-            .with("ann", annotation)
-            .format());
+        assertEquals(
+            "Concurrent 42 xy",
+            messageSupport
+                .message("%{ann,annotation:name} %{ann,annotation:value} %{ann,annotation:chars}")
+                .with("ann", annotation)
+                .format());
       }
     });
   }
@@ -141,8 +147,7 @@ final class AnnotationFormatterTest extends AbstractFormatterTest
   @SuppressWarnings("BusyWait")
   void testAnnotationTypeNotRetained() throws Exception
   {
-    val context = MessageSupportFactory.create(createFormatterService(new AnnotationFormatter()));
-    val classLoaderRef = formatAnnotationFromIsolatingClassLoader(context);
+    val classLoaderRef = formatAnnotationFromIsolatingClassLoader(messageSupport);
 
     for(var n = 0; n < 50 && classLoaderRef.get() != null; n++)
     {
@@ -162,10 +167,12 @@ final class AnnotationFormatterTest extends AbstractFormatterTest
     val annotation = annotatedType.getDeclaredAnnotations()[0];
 
     assertNotSame(IsolatedAnnotation.class, annotation.annotationType());
-    assertEquals("isolated", context
-        .message("%{ann,annotation:name}")
-        .with("ann", annotation)
-        .format());
+    assertEquals(
+        "isolated",
+        context
+            .message("%{ann,annotation:name}")
+            .with("ann", annotation)
+            .format());
 
     return new WeakReference<>(classLoader);
   }
@@ -206,8 +213,9 @@ final class AnnotationFormatterTest extends AbstractFormatterTest
   /** Class loader defining its own copies of {@link IsolatedAnnotation} and {@link IsolatedAnnotated}. */
   private static final class IsolatingClassLoader extends ClassLoader
   {
-    private static final Set<String> ISOLATED_NAMES =
-        Set.of(IsolatedAnnotation.class.getName(), IsolatedAnnotated.class.getName());
+    private static final Set<String> ISOLATED_NAMES = Set.of(
+        IsolatedAnnotation.class.getName(),
+        IsolatedAnnotated.class.getName());
 
 
     private IsolatingClassLoader() {
@@ -221,8 +229,7 @@ final class AnnotationFormatterTest extends AbstractFormatterTest
       if (!ISOLATED_NAMES.contains(name))
         return super.loadClass(name, resolve);
 
-      synchronized(getClassLoadingLock(name))
-      {
+      synchronized(getClassLoadingLock(name)) {
         var type = findLoadedClass(name);
         if (type == null)
         {

@@ -15,7 +15,6 @@
  */
 package de.sayayi.lib.message.internal.part.parameter;
 
-import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.parameter.NamedParameterFormatter;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
@@ -23,8 +22,9 @@ import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.util.NoSuchElementException;
 
@@ -43,31 +43,22 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @TestMethodOrder(MethodOrderer.DisplayName.class)
 final class ParameterFormatterContextImplTest extends AbstractFormatterTest
 {
-  @Test
+  @ParameterizedTest(name = "{0}")
   @DisplayName("Named formatter delegating past the end of the chain names type and format")
-  void testNamedFormatterDelegatesPastEnd()
+  @CsvSource(nullValues = "null", textBlock = """
+      text | java.lang.String
+      null | null
+      """, delimiter = '|')
+  void testNamedFormatterDelegatesPastEnd(String value, String type)
   {
-    val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new DelegatingFormatter()))
-        .getMessageAccessor();
+    val messageAccessor = createMessageAccessor(new DelegatingFormatter());
 
-    val ex = assertThrows(NoSuchElementException.class,
-        () -> format(messageAccessor, "text", "delegating"));
-    assertEquals("no further formatter for type java.lang.String (format: delegating)", ex.getMessage());
-  }
-
-
-  @Test
-  @DisplayName("Named formatter delegating past the end of the chain for a null value")
-  void testNamedFormatterDelegatesPastEndForNull()
-  {
-    val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new DelegatingFormatter()))
-        .getMessageAccessor();
-
-    val ex = assertThrows(NoSuchElementException.class,
-        () -> format(messageAccessor, (Object)null, "delegating"));
-    assertEquals("no further formatter for type null (format: delegating)", ex.getMessage());
+    val ex = assertThrows(
+        NoSuchElementException.class,
+        () -> format(messageAccessor, value, "delegating"));
+    assertEquals(
+        "no further formatter for type " + type + " (format: delegating)",
+        ex.getMessage());
   }
 
 

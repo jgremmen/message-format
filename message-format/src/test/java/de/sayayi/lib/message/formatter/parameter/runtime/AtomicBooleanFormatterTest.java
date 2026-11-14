@@ -15,7 +15,6 @@
  */
 package de.sayayi.lib.message.formatter.parameter.runtime;
 
-import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
@@ -27,6 +26,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.TextPartFactory.nullText;
+import static java.util.Locale.GERMANY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
@@ -49,10 +49,7 @@ final class AtomicBooleanFormatterTest extends AbstractFormatterTest
   @Test
   void testFormat()
   {
-    val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new AtomicBooleanFormatter()))
-        .setLocale("de-DE")
-        .getMessageAccessor();
+    val messageAccessor = createMessageAccessor(GERMANY, new AtomicBooleanFormatter());
 
     assertEquals(nullText(), format(messageAccessor, null));
     assertEquals(noSpaceText("true"), format(messageAccessor, new AtomicBoolean(true)));

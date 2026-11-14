@@ -15,9 +15,7 @@
  */
 package de.sayayi.lib.message.formatter.parameter.runtime;
 
-import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -28,7 +26,6 @@ import org.junit.jupiter.api.condition.OS;
 
 import java.io.File;
 import java.nio.file.Paths;
-import java.util.Map;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.TextPartFactory.nullText;
@@ -51,21 +48,24 @@ final class PathFormatterTest extends AbstractFormatterTest
   @DisplayName("Format File")
   void formatFile()
   {
-    val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new PathFormatter(), new IterableFormatter()))
-        .setLocale(ROOT)
-        .getMessageAccessor();
-    val messageFactory = messageAccessor.getMessageFactory();
+    val messageAccessor = createMessageAccessor(ROOT, new PathFormatter(), new IterableFormatter());
     val f = new File("/path1/path2/filename.ext");
 
-    assertEquals(nullText(), format(messageAccessor, null));
-    assertEquals(noSpaceText("/path1/path2/filename.ext"), format(messageAccessor, f));
-    assertEquals(noSpaceText("filename.ext"), format(messageAccessor, f,
-        Map.of("path", new TypedValueString(messageFactory, "name")), Map.of()));
-    assertEquals(noSpaceText("/path1/path2"), format(messageAccessor, f,
-        Map.of("path", new TypedValueString(messageFactory, "parent")), Map.of()));
-    assertEquals(noSpaceText("ext"), format(messageAccessor, f,
-        Map.of("path", new TypedValueString(messageFactory, "extension")), Map.of()));
+    assertEquals(
+        nullText(),
+        format(messageAccessor, null));
+    assertEquals(
+        noSpaceText("/path1/path2/filename.ext"),
+        format(messageAccessor, f));
+    assertEquals(
+        noSpaceText("filename.ext"),
+        format(messageAccessor, f, "path", "name"));
+    assertEquals(
+        noSpaceText("/path1/path2"),
+        format(messageAccessor, f, "path", "parent"));
+    assertEquals(
+        noSpaceText("ext"),
+        format(messageAccessor, f, "path", "extension"));
   }
 
 
@@ -73,13 +73,11 @@ final class PathFormatterTest extends AbstractFormatterTest
   @DisplayName("Format path file extension")
   void formatPathFileExtension()
   {
-    val context = MessageSupportFactory
-        .create(createFormatterService(new IterableFormatter(), new PathFormatter()))
-        .setLocale(ROOT);
-
-    assertEquals("file.jpg = image/jpeg", context
-        .message("%{f,path:name}  =  %{f,path:extension,'jpg':'image/jpeg'}")
-        .with("f", Paths.get("/test/file.jpg"))
-        .format());
+    assertEquals(
+        "file.jpg = image/jpeg",
+        createMessageSupport(ROOT, new IterableFormatter(), new PathFormatter())
+            .message("%{f,path:name}  =  %{f,path:extension,'jpg':'image/jpeg'}")
+            .with("f", Paths.get("/test/file.jpg"))
+            .format());
   }
 }

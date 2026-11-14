@@ -380,7 +380,7 @@ class MessageBuilderTest
 
 
     @Test
-    @DisplayName("Template with parameter part")
+    @DisplayName("Template with parameter part formats correctly")
     void testTemplateWithParameter()
     {
       final Template template = MessageBuilder
@@ -392,24 +392,8 @@ class MessageBuilderTest
 
       final var message = assertInstanceOf(MessageTemplate.class, template).getMessage();
 
-      assertEquals("Hello %{name}!", message.asFormatString(java.nio.charset.StandardCharsets.UTF_8));
-    }
-
-
-    @Test
-    @DisplayName("Template wraps a message that formats correctly")
-    void testTemplateFormatsCorrectly()
-    {
-      final Template template = MessageBuilder
-          .create()
-          .text("Welcome")
-          .parameter("user").spaceBefore()
-          .buildAsTemplate();
-
-      final var message = assertInstanceOf(MessageTemplate.class, template).getMessage();
-
-      assertEquals("Welcome Alice",
-          shared().message(message).with("user", "Alice").format());
+      assertEquals("Hello %{name}!", message.asFormatString(UTF_8));
+      assertEquals("Hello Alice!", shared().message(message).with("name", "Alice").format());
     }
 
 

@@ -15,24 +15,27 @@
  */
 package de.sayayi.lib.message.formatter.parameter.named.extra;
 
-import de.sayayi.lib.message.MessageSupportFactory;
+import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.exception.MessageFormatException;
 import de.sayayi.lib.message.formatter.parameter.named.extra.GeoFormatter.Format;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.HashMap;
-import java.util.Map;
+import java.util.Locale;
+import java.util.stream.Stream;
 
-import static de.sayayi.lib.message.Message.Parameters;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static java.util.Locale.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 
 /**
@@ -47,6 +50,9 @@ import static org.junit.jupiter.api.Assertions.*;
 @SuppressWarnings("UnnecessaryUnicodeEscape")
 final class GeoFormatterTest extends AbstractFormatterTest
 {
+  private final MessageSupport messageSupport = createMessageSupport(ENGLISH, new GeoFormatter());
+
+
   private static double dms(int degree, int minutes) {
     return degree + minutes / 60.0;
   }
@@ -75,71 +81,47 @@ final class GeoFormatterTest extends AbstractFormatterTest
   }
 
 
-  @Test
-  @DisplayName("Rounds minute values to the configured precision")
-  void testDmsSplitterMinute()
+  static Stream<Arguments> minutePrecisions()
   {
-    double[] dms;
-
-    dms = GeoFormatter.dmsSplitter(
-        new Format(null, 0, -1),
-        dms(4, 30, 30, 0));
-    assertEquals(4.0, dms[0], 1e-3);
-    assertEquals(31.0, dms[1], 1e-3);
-    assertEquals(0.0, dms[2], 1e-3);
-
-    dms = GeoFormatter.dmsSplitter(
-        new Format(null, 3, -1),
-        dms(4, 30, 10, 0));
-    assertEquals(4.0, dms[0], 1e-3);
-    assertEquals(30.167, dms[1], 1e-3);
-    assertEquals(0.0, dms[2], 1e-3);
-
-    dms = GeoFormatter.dmsSplitter(
-        new Format(null, 2, -1),
-        dms(4, 30, 10, 0));
-    assertEquals(4.0, dms[0], 1e-3);
-    assertEquals(30.17, dms[1], 1e-3);
-    assertEquals(0.0, dms[2], 1e-3);
-
-    dms = GeoFormatter.dmsSplitter(
-        new Format(null, 1, -1),
-        dms(4, 30, 10, 0));
-    assertEquals(4.0, dms[0], 1e-3);
-    assertEquals(30.2, dms[1], 1e-3);
-    assertEquals(0.0, dms[2], 1e-3);
+    return Stream.of(
+        arguments(0, dms(4, 30, 30, 0), 4.0, 31.0, 0.0),
+        arguments(3, dms(4, 30, 10, 0), 4.0, 30.167, 0.0),
+        arguments(2, dms(4, 30, 10, 0), 4.0, 30.17, 0.0),
+        arguments(1, dms(4, 30, 10, 0), 4.0, 30.2, 0.0));
   }
 
 
-  @Test
-  @DisplayName("Formats longitude values using predefined formats")
-  void testFormatLongitude()
+  @ParameterizedTest(name = "{0} minute digits -> {2}, {3}, {4}")
+  @DisplayName("Rounds minute values to the configured precision")
+  @MethodSource("minutePrecisions")
+  void testDmsSplitterMinute(int minuteDigits, double value, double degree, double minutes, double seconds)
   {
-    val messageAccessor = MessageSupportFactory
-        .create(createFormatterService(new GeoFormatter()))
-        .setLocale(ROOT)
-        .getMessageAccessor();
-    val messageFactory = messageAccessor.getMessageFactory();
+    val dms = GeoFormatter.dmsSplitter(new Format(null, minuteDigits, -1), value);
 
-    // short-longitude
-    assertEquals(noSpaceText("4\u00b048'E"), format(messageAccessor, dms(4, 48),
-        Map.of("geo", new TypedValueString(messageFactory, "short-longitude")), Map.of(), "geo"));
+    assertEquals(degree, dms[0], 1e-3);
+    assertEquals(minutes, dms[1], 1e-3);
+    assertEquals(seconds, dms[2], 1e-3);
+  }
 
-    // longitude
-    assertEquals(noSpaceText("19\u00b00'0\"W"), format(messageAccessor, -dms(18, 59, 59, 501),
-        Map.of("geo", new TypedValueString(messageFactory, "longitude")), Map.of(), "geo"));
 
-    // medium-longitude
-    assertEquals(noSpaceText("18\u00b059'59,9\"E"),
-        format(messageAccessor, Parameters.empty(GERMANY),
-            dms(18, 59, 59, 891),
-            Map.of("geo", new TypedValueString(messageFactory, "medium-longitude")), Map.of(), "geo"));
+  static Stream<Arguments> predefinedLongitudeFormats()
+  {
+    return Stream.of(
+        arguments("short-longitude", ROOT, dms(4, 48), "4\u00b048'E"),
+        arguments("longitude", ROOT, -dms(18, 59, 59, 501), "19\u00b00'0\"W"),
+        arguments("medium-longitude", GERMANY, dms(18, 59, 59, 891), "18\u00b059'59,9\"E"),
+        arguments("long-longitude", UK, -dms(18, 59, 59, 891), "18\u00b059'59.891\"W"));
+  }
 
-    // long-longitude
-    assertEquals(noSpaceText("18\u00b059'59.891\"W"),
-        format(messageAccessor, Parameters.empty(UK),
-            -dms(18, 59, 59, 891),
-            Map.of("geo", new TypedValueString(messageFactory, "long-longitude")), Map.of(), "geo"));
+
+  @ParameterizedTest(name = "{0} -> {3}")
+  @DisplayName("Formats longitude values using predefined formats")
+  @MethodSource("predefinedLongitudeFormats")
+  void testFormatLongitude(String geoFormat, Locale locale, double value, String expected)
+  {
+    assertEquals(
+        noSpaceText(expected),
+        format(createMessageAccessor(locale, new GeoFormatter()), value, "geo", geoFormat, "geo"));
   }
 
 
@@ -147,33 +129,38 @@ final class GeoFormatterTest extends AbstractFormatterTest
   @DisplayName("Formats coordinates using predefined and custom formats")
   void testFormatter()
   {
-    val messageSupport = MessageSupportFactory
-        .create(createFormatterService(new GeoFormatter()))
-        .setLocale(ENGLISH);
     val parameters = new HashMap<String,Object>();
 
     parameters.put("lat", dms(51, 34, 9, 0));
     parameters.put("lon", dms(4, 48));
 
-    assertEquals("coordinates 4\u00b048'0\"E, 51\u00b034'9\"N", messageSupport
-        .message("coordinates %{lon,geo:longitude}, %{lat,geo:latitude}")
-        .with(parameters)
-        .format());
+    assertEquals(
+        "coordinates 4\u00b048'0\"E, 51\u00b034'9\"N",
+        messageSupport
+            .message("coordinates %{lon,geo:longitude}, %{lat,geo:latitude}")
+            .with(parameters)
+            .format());
 
-    assertEquals("coordinates 4\u00b048.0' E, 51\u00b034'9.000\"N", messageSupport
-        .message("coordinates %{lon,geo:'dM LO'}, %{lat,geo:long-latitude}")
-        .with(parameters)
-        .format());
+    assertEquals(
+        "coordinates 4\u00b048.0' E, 51\u00b034'9.000\"N",
+        messageSupport
+            .message("coordinates %{lon,geo:'dM LO'}, %{lat,geo:long-latitude}")
+            .with(parameters)
+            .format());
 
-    assertEquals("51\u00b034'09\"N", messageSupport
-        .message("%{lat,geo:'d0m0sLA'}")
-        .with(parameters)
-        .format());
+    assertEquals(
+        "51\u00b034'09\"N",
+        messageSupport
+            .message("%{lat,geo:'d0m0sLA'}")
+            .with(parameters)
+            .format());
 
-    assertEquals("", messageSupport
-        .message("%{test,format:geo,geo:'d0m0sLA'}")
-        .with(parameters)
-        .format());
+    assertEquals(
+        "",
+        messageSupport
+            .message("%{test,format:geo,geo:'d0m0sLA'}")
+            .with(parameters)
+            .format());
   }
 
 
@@ -181,20 +168,23 @@ final class GeoFormatterTest extends AbstractFormatterTest
   @DisplayName("Formats coordinates using the default format dms")
   void testDefaultFormat()
   {
-    val messageSupport = MessageSupportFactory
-        .create(createFormatterService(new GeoFormatter()))
-        .setLocale(ENGLISH);
-
     for(var n = 0; n < 2; n++)
     {
-      assertEquals("51\u00b034'9\"", messageSupport
-          .message("%{lat,format:geo}")
-          .with("lat", dms(51, 34, 9, 0))
-          .format());
-      assertEquals(messageSupport.message("%{lat,geo:dms}").with("lat", dms(4, 48, 30, 0)).format(), messageSupport
-          .message("%{lat,format:geo}")
-          .with("lat", dms(4, 48, 30, 0))
-          .format());
+      assertEquals(
+          "51\u00b034'9\"",
+          messageSupport
+              .message("%{lat,format:geo}")
+              .with("lat", dms(51, 34, 9, 0))
+              .format());
+      assertEquals(
+          messageSupport
+              .message("%{lat,geo:dms}")
+              .with("lat", dms(4, 48, 30, 0))
+              .format(),
+          messageSupport
+              .message("%{lat,format:geo}")
+              .with("lat", dms(4, 48, 30, 0))
+              .format());
     }
   }
 
@@ -203,21 +193,21 @@ final class GeoFormatterTest extends AbstractFormatterTest
   @DisplayName("Formats non-finite values as empty text")
   void testNonFiniteValues()
   {
-    val messageSupport = MessageSupportFactory
-        .create(createFormatterService(new GeoFormatter()))
-        .setLocale(ENGLISH);
-
     for(var value: new Object[] { Double.NaN, Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY, Float.NaN })
     {
-      assertEquals("", messageSupport
-          .message("%{lat,geo:latitude}")
-          .with("lat", value)
-          .format());
+      assertEquals(
+          "",
+          messageSupport
+              .message("%{lat,geo:latitude}")
+              .with("lat", value)
+              .format());
 
-      assertEquals("unknown", messageSupport
-          .message("%{lat,geo:'dM LA',empty:'unknown'}")
-          .with("lat", value)
-          .format());
+      assertEquals(
+          "unknown",
+          messageSupport
+              .message("%{lat,geo:'dM LA',empty:'unknown'}")
+              .with("lat", value)
+              .format());
     }
   }
 
@@ -226,72 +216,45 @@ final class GeoFormatterTest extends AbstractFormatterTest
   @DisplayName("Rejects an invalid custom format pattern")
   void testInvalidFormatPattern()
   {
-    val messageSupport = MessageSupportFactory
-        .create(createFormatterService(new GeoFormatter()))
-        .setLocale(ENGLISH);
-
-    val exception = assertThrows(MessageFormatException.class, () -> messageSupport
-        .message("%{lat,geo:'invalid'}")
-        .with("lat", dms(51, 34, 9, 0))
-        .format());
-    assertInstanceOf(IllegalArgumentException.class, exception.getCause());
+    val exception = assertThrows(
+        MessageFormatException.class,
+        () -> messageSupport
+            .message("%{lat,geo:'invalid'}")
+            .with("lat", dms(51, 34, 9, 0))
+            .format());
+    assertInstanceOf(
+        IllegalArgumentException.class,
+        exception.getCause());
   }
 
 
-  @Test
-  @DisplayName("Parses custom format patterns")
-  void testParseFormatString()
+  static Stream<Arguments> formatPatterns()
   {
-    Format fmt;
+    return Stream.of(
+        arguments("d 0mSS LA", false, true, false, true, 0, 2, true, false),
+        arguments("d0m0s", null, false, false, false, 0, 0, true, true),
+        arguments("dmLO", true, false, false, false, 0, -1, false, false),
+        arguments("d 0MMM 0SSS ", null, true, true, false, 0, 3, true, true),
+        arguments("d LA", false, true, false, false, -1, -1, false, false));
+  }
 
-    fmt = GeoFormatter.parseFormatString("d 0mSS LA");
-    assertEquals(Boolean.FALSE, fmt.longitude);
-    assertTrue(fmt.separatorAfterDegree);
-    assertFalse(fmt.separatorAfterMinute);
-    assertTrue(fmt.separatorAfterSecond);
-    assertEquals(0, fmt.minuteDigits);
-    assertEquals(2, fmt.secondDigits);
-    assertTrue(fmt.zeroPadMinutes);
-    assertFalse(fmt.zeroPadSeconds);
 
-    fmt = GeoFormatter.parseFormatString("d0m0s");
-    assertNull(fmt.longitude);
-    assertFalse(fmt.separatorAfterDegree);
-    assertFalse(fmt.separatorAfterMinute);
-    assertFalse(fmt.separatorAfterSecond);
-    assertEquals(0, fmt.minuteDigits);
-    assertEquals(0, fmt.secondDigits);
-    assertTrue(fmt.zeroPadMinutes);
-    assertTrue(fmt.zeroPadSeconds);
+  @ParameterizedTest(name = "''{0}''")
+  @DisplayName("Parses custom format patterns")
+  @MethodSource("formatPatterns")
+  void testParseFormatString(String pattern, Boolean longitude, boolean separatorAfterDegree,
+                             boolean separatorAfterMinute, boolean separatorAfterSecond, int minuteDigits,
+                             int secondDigits, boolean zeroPadMinutes, boolean zeroPadSeconds)
+  {
+    val fmt = GeoFormatter.parseFormatString(pattern);
 
-    fmt = GeoFormatter.parseFormatString("dmLO");
-    assertEquals(Boolean.TRUE, fmt.longitude);
-    assertFalse(fmt.separatorAfterDegree);
-    assertFalse(fmt.separatorAfterMinute);
-    assertFalse(fmt.separatorAfterSecond);
-    assertEquals(0, fmt.minuteDigits);
-    assertEquals(-1, fmt.secondDigits);
-    assertFalse(fmt.zeroPadMinutes);
-    assertFalse(fmt.zeroPadSeconds);
-
-    fmt = GeoFormatter.parseFormatString("d 0MMM 0SSS ");
-    assertNull(fmt.longitude);
-    assertTrue(fmt.separatorAfterDegree);
-    assertTrue(fmt.separatorAfterMinute);
-    assertFalse(fmt.separatorAfterSecond);
-    assertEquals(0, fmt.minuteDigits);
-    assertEquals(3, fmt.secondDigits);
-    assertTrue(fmt.zeroPadMinutes);
-    assertTrue(fmt.zeroPadSeconds);
-
-    fmt = GeoFormatter.parseFormatString("d LA");
-    assertEquals(Boolean.FALSE, fmt.longitude);
-    assertTrue(fmt.separatorAfterDegree);
-    assertFalse(fmt.separatorAfterMinute);
-    assertFalse(fmt.separatorAfterSecond);
-    assertEquals(-1, fmt.minuteDigits);
-    assertEquals(-1, fmt.secondDigits);
-    assertFalse(fmt.zeroPadMinutes);
-    assertFalse(fmt.zeroPadSeconds);
+    assertEquals(longitude, fmt.longitude);
+    assertEquals(separatorAfterDegree, fmt.separatorAfterDegree);
+    assertEquals(separatorAfterMinute, fmt.separatorAfterMinute);
+    assertEquals(separatorAfterSecond, fmt.separatorAfterSecond);
+    assertEquals(minuteDigits, fmt.minuteDigits);
+    assertEquals(secondDigits, fmt.secondDigits);
+    assertEquals(zeroPadMinutes, fmt.zeroPadMinutes);
+    assertEquals(zeroPadSeconds, fmt.zeroPadSeconds);
   }
 }

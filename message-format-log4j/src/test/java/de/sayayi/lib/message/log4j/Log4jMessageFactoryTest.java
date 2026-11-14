@@ -103,20 +103,11 @@ class Log4jMessageFactoryTest
 
 
   @Test
-  @DisplayName("Format a simple message without parameters")
-  void testSimpleMessage()
-  {
-    logger.info("Hello World");
-    assertEquals("Hello World\n", stringWriter.toString());
-  }
-
-
-  @Test
-  @DisplayName("Format a message with named parameters p1 and p2")
-  void testMessageWithParameters()
+  @DisplayName("Use Log4jMessage for message-format %{} placeholders")
+  void testLog4jMessageForMessageFormatPlaceholders()
   {
     logger.info("Hello %{p1}, you are %{p2} years old", "Alice", 30);
-    assertEquals("Hello Alice, you are 30 years old\n", stringWriter.toString());
+    assertLogged("Hello Alice, you are 30 years old");
   }
 
 
@@ -135,23 +126,13 @@ class Log4jMessageFactoryTest
 
 
   @Test
-  @DisplayName("Format a static message with no placeholders")
-  void testMessageWithNoParameters()
-  {
-    logger.info("Static message with no placeholders");
-
-    assertEquals("Static message with no placeholders\n", stringWriter.toString());
-  }
-
-
-  @Test
   @DisplayName("Capture multiple sequential log messages")
   void testMultipleMessages()
   {
     logger.info("First");
     logger.info("Second");
 
-    assertEquals("First\nSecond\n", stringWriter.toString());
+    assertLogged("First\nSecond");
   }
 
 
@@ -160,7 +141,7 @@ class Log4jMessageFactoryTest
   void testNewMessageWithObject()
   {
     logger.info(LOG4J_MESSAGE_FACTORY.newMessage(42));
-    assertEquals("42\n", stringWriter.toString());
+    assertLogged("42");
   }
 
 
@@ -169,7 +150,7 @@ class Log4jMessageFactoryTest
   void testNewMessageWithNullString()
   {
     logger.info(LOG4J_MESSAGE_FACTORY.newMessage(null, (Object[])null));
-    assertEquals("null\n", stringWriter.toString());
+    assertLogged("null");
   }
 
 
@@ -178,16 +159,7 @@ class Log4jMessageFactoryTest
   void testParameterizedMessageForLog4jPlaceholders()
   {
     logger.info("Hello {}, you are {} years old", "Eve", 30);
-    assertEquals("Hello Eve, you are 30 years old\n", stringWriter.toString());
-  }
-
-
-  @Test
-  @DisplayName("Use Log4jMessage for message-format %{} placeholders")
-  void testLog4jMessageForMessageFormatPlaceholders()
-  {
-    logger.info("Hello %{p1}", "World");
-    assertEquals("Hello World\n", stringWriter.toString());
+    assertLogged("Hello Eve, you are 30 years old");
   }
 
 
@@ -196,7 +168,7 @@ class Log4jMessageFactoryTest
   void testLog4jMessageWhenBothPlaceholderStylesPresent()
   {
     logger.info("%{p1} {}", "Test");
-    assertEquals("Test {}\n", stringWriter.toString());
+    assertLogged("Test {}");
   }
 
 
@@ -216,7 +188,7 @@ class Log4jMessageFactoryTest
   void testLog4jMessageForPlainText()
   {
     logger.info("plain text");
-    assertEquals("plain text\n", stringWriter.toString());
+    assertLogged("plain text");
   }
 
 
@@ -225,7 +197,7 @@ class Log4jMessageFactoryTest
   void testLog4jMessageForEscapedLog4jPlaceholder()
   {
     logger.info("escaped \\{} placeholder");
-    assertEquals("escaped {} placeholder\n", stringWriter.toString());
+    assertLogged("escaped {} placeholder");
   }
 
 
@@ -234,7 +206,7 @@ class Log4jMessageFactoryTest
   void testInvalidMessageFormat()
   {
     logger.info("not valid %{}");
-    assertEquals("<internal error formatting: not valid %{}>\n", stringWriter.toString());
+    assertLogged("<internal error formatting: not valid %{}>");
   }
 
 
@@ -317,5 +289,10 @@ class Log4jMessageFactoryTest
     assertEquals("Hello Alice", deserialized.getFormattedMessage());
     assertNull(deserialized.getParameters());
     assertEquals("test error", deserialized.getThrowable().getMessage());
+  }
+
+
+  private void assertLogged(String expected) {
+    assertEquals(expected + "\n", stringWriter.toString());
   }
 }

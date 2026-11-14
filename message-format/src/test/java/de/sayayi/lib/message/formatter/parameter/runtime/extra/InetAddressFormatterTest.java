@@ -16,11 +16,12 @@
 package de.sayayi.lib.message.formatter.parameter.runtime.extra;
 
 import de.sayayi.lib.message.MessageSupport;
-import de.sayayi.lib.message.MessageSupportFactory;
-import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import lombok.val;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -38,17 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @TestMethodOrder(MethodOrderer.DisplayName.class)
 final class InetAddressFormatterTest extends AbstractFormatterTest
 {
-  private MessageSupport messageSupport;
-
-
-  @BeforeEach
-  void init()
-  {
-    val formatterService = new DefaultFormatterService();
-    formatterService.addFormatter(new InetAddressFormatter());
-
-    messageSupport = MessageSupportFactory.create(formatterService);
-  }
+  private final MessageSupport messageSupport = createDefaultMessageSupport(new InetAddressFormatter());
 
 
   @Test

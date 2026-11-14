@@ -15,7 +15,6 @@
  */
 package de.sayayi.lib.message.formatter.parameter.runtime;
 
-import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.parameter.named.StringFormatter;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import lombok.val;
@@ -43,19 +42,21 @@ final class OptionalFormatterTest extends AbstractFormatterTest
   @Test
   void testEmptyNull()
   {
-    val messageSupport = MessageSupportFactory
-        .create(createFormatterService(new OptionalFormatter(), new StringFormatter()))
-        .setLocale(ROOT);
+    val messageSupport = createMessageSupport(ROOT, new OptionalFormatter(), new StringFormatter());
 
-    assertEquals("null", messageSupport
-        .message("%{opt,empty:empty,null:null}")
-        .with("opt", Optional.empty())
-        .format());
+    assertEquals(
+        "null",
+        messageSupport
+            .message("%{opt,empty:empty,null:null}")
+            .with("opt", Optional.empty())
+            .format());
 
 
-    assertEquals("null", messageSupport
-        .message("%{opt,empty:empty,null:null}")
-        .with("opt", null)
-        .format());
+    assertEquals(
+        "null",
+        messageSupport
+            .message("%{opt,empty:empty,null:null}")
+            .with("opt", null)
+            .format());
   }
 }

@@ -16,17 +16,24 @@
 package de.sayayi.lib.message.formatter.parameter.runtime.extra;
 
 import de.sayayi.lib.message.MessageSupport;
-import de.sayayi.lib.message.MessageSupportFactory;
-import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import lombok.val;
-import org.junit.jupiter.api.*;
+import org.intellij.lang.annotations.Language;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.lang.reflect.Parameter;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 
 /**
@@ -40,18 +47,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @TestMethodOrder(MethodOrderer.DisplayName.class)
 final class MethodParameterFormatterTest extends AbstractFormatterTest
 {
-  private MessageSupport messageSupport;
-
-
-  @BeforeEach
-  void init()
-  {
-    val formatterService = new DefaultFormatterService();
-    formatterService.addFormatter(new MethodParameterFormatter());
-    formatterService.addFormatter(new MethodFormatter());
-
-    messageSupport = MessageSupportFactory.create(formatterService);
-  }
+  private final MessageSupport messageSupport =
+      createDefaultMessageSupport(new MethodParameterFormatter(), new MethodFormatter());
 
 
   @Test
@@ -60,18 +57,28 @@ final class MethodParameterFormatterTest extends AbstractFormatterTest
   }
 
 
-  @Test
-  @DisplayName("Format parameter, its name and its type")
-  void testFormat() throws ReflectiveOperationException
+  static Stream<Arguments> formattedParameters() throws ReflectiveOperationException
   {
-    val parameter = List.class.getMethod("get", int.class).getParameters()[0];
+    val getParameter = List.class.getMethod("get", int.class).getParameters()[0];
+    val addAllParameter = List.class.getMethod("addAll", Collection.class).getParameters()[0];
 
-    assertEquals("int arg0", messageSupport.message("%{p}").with("p", parameter).format());
-    assertEquals("arg0", messageSupport.message("%{p,parameter:name}").with("p", parameter).format());
-    assertEquals("Type: int", messageSupport.message("Type: %{p,parameter:class}").with("p", parameter).format());
-    assertEquals("Collection<? extends E>", messageSupport
-        .message("%{p,parameter:class}")
-        .with("p", List.class.getMethod("addAll", Collection.class).getParameters()[0])
+    return Stream.of(
+        arguments("%{p}", getParameter, "int arg0"),
+        arguments("%{p,parameter:name}", getParameter, "arg0"),
+        arguments("Type: %{p,parameter:class}", getParameter, "Type: int"),
+        arguments("%{p,parameter:class}", addAllParameter, "Collection<? extends E>")
+    );
+  }
+
+
+  @ParameterizedTest(name = "{0} -> {2}")
+  @DisplayName("Format parameter, its name and its type")
+  @MethodSource("formattedParameters")
+  void testFormat(@Language("MessageFormat") String formatString, Parameter parameter, String expected)
+  {
+    assertEquals(expected, messageSupport
+        .message(formatString)
+        .with("p", parameter)
         .format());
   }
 
@@ -82,11 +89,13 @@ final class MethodParameterFormatterTest extends AbstractFormatterTest
   {
     val method = String.class.getMethod("replace", char.class, char.class);
 
-    assertEquals("replace(char, char)", messageSupport
-        .message("%{m,method:name}(%{params,list-value:'%{value,parameter:class}'})")
-        .with("m", method)
-        .with("params", method.getParameters())
-        .format());
+    assertEquals(
+        "replace(char, char)",
+        messageSupport
+            .message("%{m,method:name}(%{params,list-value:'%{value,parameter:class}'})")
+            .with("m", method)
+            .with("params", method.getParameters())
+            .format());
   }
 
 
@@ -96,9 +105,11 @@ final class MethodParameterFormatterTest extends AbstractFormatterTest
   {
     val parameter = List.class.getMethod("get", int.class).getParameters()[0];
 
-    assertEquals("first", messageSupport
-        .message("%{p,format:choice,'arg0':'first',:'other'}")
-        .with("p", parameter)
-        .format());
+    assertEquals(
+        "first",
+        messageSupport
+            .message("%{p,format:choice,'arg0':'first',:'other'}")
+            .with("p", parameter)
+            .format());
   }
 }

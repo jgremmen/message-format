@@ -16,11 +16,11 @@
 package de.sayayi.lib.message.formatter.parameter.runtime.extra;
 
 import de.sayayi.lib.message.MessageSupport;
-import de.sayayi.lib.message.MessageSupportFactory;
-import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import lombok.val;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -38,17 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @TestMethodOrder(MethodOrderer.DisplayName.class)
 final class PackageFormatterTest extends AbstractFormatterTest
 {
-  private MessageSupport messageSupport;
-
-
-  @BeforeEach
-  void init()
-  {
-    val formatterService = new DefaultFormatterService();
-    formatterService.addFormatter(new PackageFormatter());
-
-    messageSupport = MessageSupportFactory.create(formatterService);
-  }
+  private final MessageSupport messageSupport = createDefaultMessageSupport(new PackageFormatter());
 
 
   @Test
@@ -61,10 +51,17 @@ final class PackageFormatterTest extends AbstractFormatterTest
   @DisplayName("Format package names")
   void testFormat()
   {
-    assertEquals("java.lang", messageSupport.message("%{p}").with("p", String.class.getPackage()).format());
-    assertEquals("Scanning java.lang, java.util and java.nio.file", messageSupport
-        .message("Scanning %{packages,list-sep-last:' and '}")
-        .with("packages", List.of(String.class.getPackage(), List.class.getPackage(), Path.class.getPackage()))
-        .format());
+    assertEquals(
+        "java.lang",
+        messageSupport
+            .message("%{p}")
+            .with("p", String.class.getPackage())
+            .format());
+    assertEquals(
+        "Scanning java.lang, java.util and java.nio.file",
+        messageSupport
+            .message("Scanning %{packages,list-sep-last:' and '}")
+            .with("packages", List.of(String.class.getPackage(), List.class.getPackage(), Path.class.getPackage()))
+            .format());
   }
 }

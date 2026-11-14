@@ -15,7 +15,6 @@
  */
 package de.sayayi.lib.message.formatter.parameter.runtime.extra;
 
-import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
@@ -49,15 +48,16 @@ final class MethodFormatterTest extends AbstractFormatterTest
   @Test
   void testFormat() throws Exception
   {
-    val message = MessageSupportFactory
-        .create(createFormatterService(new MethodFormatter()))
-        .setLocale(UK)
+    val message = createMessageSupport(UK, new MethodFormatter())
         .message("%{m} %{m,method:'name'} %{m,method:'return-type'} %{m,method:'class'}");
 
-    assertEquals("protected static " + Set.class.getName() + " " + MethodFormatterTest.class.getName() +
-        ".dummy() dummy " + Set.class.getSimpleName() + "<" + String.class.getSimpleName() + "> " +
-        MethodFormatterTest.class.getName(), message.with("m",
-        MethodFormatterTest.class.getDeclaredMethod("dummy")).format());
+    assertEquals(
+        "protected static " + Set.class.getName() + " " + MethodFormatterTest.class.getName() +
+            ".dummy() dummy " + Set.class.getSimpleName() + "<" + String.class.getSimpleName() + "> " +
+            MethodFormatterTest.class.getName(),
+        message
+            .with("m", MethodFormatterTest.class.getDeclaredMethod("dummy"))
+            .format());
   }
 
 

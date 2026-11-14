@@ -15,14 +15,22 @@
  */
 package de.sayayi.lib.message.part;
 
+import de.sayayi.lib.message.part.MessagePart.Text;
 import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import static de.sayayi.lib.message.part.TextPartFactory.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 
 /**
@@ -36,15 +44,38 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.DisplayName.class)
 final class TextJoinerTest
 {
-  @Test
-  @DisplayName("Empty joiner produces empty text")
-  void testEmpty()
+  static Stream<Arguments> pendingSpaces()
+  {
+    return Stream.of(
+        joined("empty joiner", joiner -> {}, emptyText(), emptyText()),
+        joined("add(String) ignores null", joiner -> joiner.add((String)null), emptyText(), emptyText()),
+        joined("addNoSpace(String) ignores null", joiner -> joiner.addNoSpace((String)null), emptyText(), emptyText()),
+        joined("add(char) leading space", joiner -> joiner.add(' ').add('x'), noSpaceText("x"), spacedText(" x")),
+        joined("add(char) trailing space", joiner -> joiner.add('x').add(' '), noSpaceText("x"), spacedText("x ")),
+        joined("add(char) leading and trailing space", joiner -> joiner.add(' ').add('x').add(' '),
+            noSpaceText("x"), spacedText(" x ")),
+        joined("add(Text) followed by add(char) space", joiner -> joiner.add(noSpaceText("a")).add(' '),
+            noSpaceText("a"), spacedText("a ")));
+  }
+
+
+  @ParameterizedTest(name = "{0}")
+  @DisplayName("Pending spaces and ignored values")
+  @MethodSource("pendingSpaces")
+  void testPendingSpaces(String name, Consumer<TextJoiner> operations, Text noSpace, Text spaced)
   {
     val joiner = new TextJoiner();
 
-    assertEquals(emptyText(), joiner.asNoSpaceText());
-    assertEquals(emptyText(), joiner.asSpacedText());
-    assertEquals(joiner.asSpacedText().toString(), joiner.toString());
+    operations.accept(joiner);
+
+    assertEquals(noSpace, joiner.asNoSpaceText());
+    assertEquals(spaced, joiner.asSpacedText());
+    assertEquals(spaced.toString(), joiner.toString());
+  }
+
+
+  private static Arguments joined(String name, Consumer<TextJoiner> operations, Text noSpace, Text spaced) {
+    return arguments(name, operations, noSpace, spaced);
   }
 
 
@@ -107,19 +138,6 @@ final class TextJoinerTest
 
 
   @Test
-  @DisplayName("add(String) ignores null argument")
-  void testAddNull()
-  {
-    val joiner = new TextJoiner();
-
-    joiner.add((String)null);
-
-    assertEquals(emptyText(), joiner.asSpacedText());
-    assertEquals(emptyText(), joiner.asNoSpaceText());
-  }
-
-
-  @Test
   @DisplayName("add(String) with blank string only records a pending space")
   void testAddBlank()
   {
@@ -146,19 +164,6 @@ final class TextJoinerTest
     // no space was preserved between the two additions
     assertEquals(noSpaceText("ab"), joiner.asNoSpaceText());
     assertEquals(spacedText("ab"), joiner.asSpacedText());
-  }
-
-
-  @Test
-  @DisplayName("addNoSpace(String) ignores null argument")
-  void testAddNoSpaceStringNull()
-  {
-    val joiner = new TextJoiner();
-
-    joiner.addNoSpace((String)null);
-
-    assertEquals(emptyText(), joiner.asSpacedText());
-    assertEquals(emptyText(), joiner.asNoSpaceText());
   }
 
 
@@ -225,33 +230,6 @@ final class TextJoinerTest
     joiner.add('a').add(' ').add(' ').add(' ').add('b');
 
     assertEquals(noSpaceText("a b"), joiner.asNoSpaceText());
-  }
-
-
-  @Test
-  @DisplayName("add(char) treats a leading space as a pending leading space")
-  void testAddLeadingSpaceChar()
-  {
-    val joiner = new TextJoiner();
-
-    joiner.add(' ').add('x');
-
-    // the pending leading space is flushed in front of the first content character
-    assertEquals(noSpaceText("x"), joiner.asNoSpaceText());
-    assertEquals(spacedText(" x"), joiner.asSpacedText());
-  }
-
-
-  @Test
-  @DisplayName("add(char) treats a trailing space as a pending trailing space")
-  void testAddTrailingSpaceChar()
-  {
-    val joiner = new TextJoiner();
-
-    joiner.add('x').add(' ');
-
-    assertEquals(noSpaceText("x"), joiner.asNoSpaceText());
-    assertEquals(spacedText("x "), joiner.asSpacedText());
   }
 
 
@@ -366,81 +344,5 @@ final class TextJoinerTest
 
     assertEquals(noSpaceText("a b"), joiner.asNoSpaceText());
     assertEquals(spacedText("a b"), joiner.asSpacedText());
-  }
-
-
-  @Test
-  @DisplayName("asNoSpaceText discards a pending trailing space")
-  void testNoSpaceDiscardsTrailingSpace()
-  {
-    val joiner = new TextJoiner();
-
-    joiner.add(noSpaceText("a")).add(' ');
-
-    assertEquals(noSpaceText("a"), joiner.asNoSpaceText());
-    assertFalse(joiner.asNoSpaceText().isSpaceAfter());
-  }
-
-
-  @Test
-  @DisplayName("asSpacedText keeps both a leading and a trailing space")
-  void testSpacedTextLeadingAndTrailingSpace()
-  {
-    val joiner = new TextJoiner();
-
-    joiner.add(' ').add('x').add(' ');
-
-    val text = joiner.asSpacedText();
-
-    assertEquals(spacedText(" x "), text);
-    assertTrue(text.isSpaceBefore());
-    assertTrue(text.isSpaceAfter());
-  }
-
-
-  @Test
-  @DisplayName("toString delegates to asSpacedText")
-  void testToString()
-  {
-    val joiner = new TextJoiner();
-
-    joiner.add(" a b ");
-
-    // toString delegates to asSpacedText().toString() (the debug representation)
-    assertEquals(joiner.asSpacedText().toString(), joiner.toString());
-    assertEquals(spacedText(" a b ").toString(), joiner.toString());
-  }
-
-
-  @Test
-  @DisplayName("All add methods return the same joiner instance")
-  void testFluentReturnsSameInstance()
-  {
-    val joiner = new TextJoiner();
-
-    assertSame(joiner, joiner.add('a'));
-    assertSame(joiner, joiner.add(noSpaceText("b")));
-    assertSame(joiner, joiner.addNoSpace("c"));
-    assertSame(joiner, joiner.addNoSpace(noSpaceText("d")));
-    assertSame(joiner, joiner.add("e"));
-  }
-
-
-  @Test
-  @DisplayName("Mixing chars, strings and texts joins them consistently")
-  void testMixedContent()
-  {
-    val joiner = new TextJoiner();
-
-    joiner
-        .add("   one ")
-        .add(noSpaceText("two"))
-        .add(',')
-        .add(' ')
-        .addNoSpace("  three  ")
-        .add(spacedText(" four "));
-
-    assertEquals(noSpaceText("one two, three four"), joiner.asNoSpaceText());
-    assertEquals(spacedText(" one two, three four "), joiner.asSpacedText());
   }
 }

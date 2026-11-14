@@ -45,24 +45,18 @@ import static org.mockito.Mockito.when;
 @TestMethodOrder(MethodOrderer.DisplayName.class)
 final class MessageParametersTest
 {
+  private static final Map<String,Object> VALUES = Map.of(
+      "a", "Hello",
+      "b", 45,
+      "c", true,
+      "o", OptionalInt.empty());
+
   private MessageParameters parameters;
 
 
   @BeforeEach
-  void init()
-  {
-    val messageSupport = new MessageSupportImpl(DefaultFormatterService.getSharedInstance(),
-        MessageFactory.getSharedInstance());
-    val configurer = messageSupport.new Configurer<>(() -> null);
-
-    configurer
-        .locale(ITALIAN)
-        .with("o", OptionalInt.empty())
-        .with("b", 45)
-        .with("c", true)
-        .with("a", "Hello");
-
-    parameters = new MessageParameters(configurer);
+  void init() {
+    parameters = createParameters(ITALIAN, "o", "b", "c", "a");
   }
 
 
@@ -86,11 +80,14 @@ final class MessageParametersTest
 
 
   @Test
-  @DisplayName("Equals")
-  void testEquals()
+  @DisplayName("Equals and hashCode do not depend on the parameter order")
+  void testEqualsAndHashCode()
   {
-    assertEquals(parameters, createParameters(ITALIAN));
-    assertNotEquals(parameters, createParameters(GERMAN));
+    val sameParameters = createParameters(ITALIAN, "a", "b", "c", "o");
+
+    assertEquals(parameters, sameParameters);
+    assertEquals(parameters.hashCode(), sameParameters.hashCode());
+    assertNotEquals(parameters, createParameters(GERMAN, "a", "b", "c", "o"));
   }
 
 
@@ -99,17 +96,12 @@ final class MessageParametersTest
   void testNotEqualsOtherImplementation()
   {
     val otherParameters = mock(Parameters.class);
-    val otherMap = Map.of(
-        "o", OptionalInt.empty(),
-        "b", 45,
-        "c", true,
-        "a", "Hello");
 
     when(otherParameters.getLocale()).thenReturn(ITALIAN);
-    when(otherParameters.getParameterNames()).thenReturn(otherMap.keySet());
+    when(otherParameters.getParameterNames()).thenReturn(VALUES.keySet());
     when(otherParameters.getParameterValue(anyString()))
-        .thenAnswer(invocation -> otherMap.get(invocation.getArgument(0, String.class)));
-    when(otherParameters.asParameterMap()).thenReturn(otherMap);
+        .thenAnswer(invocation -> VALUES.get(invocation.getArgument(0, String.class)));
+    when(otherParameters.asParameterMap()).thenReturn(VALUES);
 
     // symmetric: neither side considers the other equal
     assertNotEquals(parameters, otherParameters);
@@ -117,25 +109,15 @@ final class MessageParametersTest
   }
 
 
-  @Test
-  @DisplayName("HashCode")
-  void testHashCode() {
-    assertEquals(parameters.hashCode(), createParameters(ITALIAN).hashCode());
-  }
-
-
-  private static @NotNull MessageParameters createParameters(@NotNull Locale locale)
+  private static @NotNull MessageParameters createParameters(@NotNull Locale locale, @NotNull String... names)
   {
     val messageSupport = new MessageSupportImpl(DefaultFormatterService.getSharedInstance(),
         MessageFactory.getSharedInstance());
     val configurer = messageSupport.new Configurer<>(() -> null);
 
-    configurer
-        .locale(locale)
-        .with("a", "Hello")
-        .with("b", 45)
-        .with("c", true)
-        .with("o", OptionalInt.empty());
+    configurer.locale(locale);
+    for(val name: names)
+      configurer.with(name, VALUES.get(name));
 
     return new MessageParameters(configurer);
   }

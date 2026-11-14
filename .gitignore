@@ -2,6 +2,8 @@
 
 .build/
 .gradle/
+# Gradle writes the problems report to build/ of the root project if the configuration cache was reused
+/build/
 .idea/
 bin/
 out/

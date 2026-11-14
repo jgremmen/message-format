@@ -15,7 +15,6 @@
  */
 package de.sayayi.lib.message.formatter.parameter.named;
 
-import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.parameter.runtime.ArrayFormatter;
 import de.sayayi.lib.message.formatter.parameter.runtime.IterableFormatter;
 import de.sayayi.lib.message.formatter.parameter.runtime.MapFormatter;
@@ -46,31 +45,45 @@ final class SizeFormatterTest extends AbstractFormatterTest
   @Test
   void testFormat()
   {
-    val messageSupport = MessageSupportFactory
-        .create(createFormatterService(new SizeFormatter(), new IterableFormatter(),
-            new ArrayFormatter(), new MapFormatter()))
-        .setLocale(UK);
+    val messageSupport = createMessageSupport(UK,
+        new SizeFormatter(), new IterableFormatter(), new ArrayFormatter(), new MapFormatter());
     val message = messageSupport
-        .message("%{c,format:size} %{c,format:size,0:'empty',1:'singleton',:'multiple'}").getMessage();
+        .message("%{c,format:size} %{c,format:size,0:'empty',1:'singleton',:'multiple'}")
+        .getMessage();
 
-    assertEquals("0 empty", messageSupport.message(message)
-        .with("c", List.of()).format());
+    assertEquals(
+        "0 empty",
+        messageSupport
+            .message(message)
+            .with("c", List.of())
+            .format());
 
-    assertEquals("1 singleton", messageSupport.message(message)
-        .with("c", Map.of("a", "b")).format());
+    assertEquals(
+        "1 singleton",
+        messageSupport
+            .message(message)
+            .with("c", Map.of("a", "b"))
+            .format());
 
-    assertEquals("4 multiple", messageSupport.message(message)
-        .with("c", new int[] { 4, -45, 8, 1 }).format());
+    assertEquals(
+        "4 multiple",
+        messageSupport
+            .message(message)
+            .with("c", new int[] { 4, -45, 8, 1 })
+            .format());
   }
 
 
   @Test
   void testFormatNoSizeQueryable()
   {
-    val messageSupport = MessageSupportFactory
-        .create(createFormatterService(new SizeFormatter()))
-        .setLocale(UK);
+    val messageSupport = createMessageSupport(UK, new SizeFormatter());
 
-    assertEquals("", messageSupport.message("%{c,format:size}").with("c", true).format());
+    assertEquals(
+        "",
+        messageSupport
+            .message("%{c,format:size}")
+            .with("c", true)
+            .format());
   }
 }

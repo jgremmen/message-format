@@ -16,7 +16,6 @@
 package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.MessageSupport;
-import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
@@ -53,7 +52,7 @@ final class ListFormatterConfigTest extends AbstractFormatterTest
 
   @BeforeEach
   void init() {
-    messageSupport = MessageSupportFactory.create(createFormatterService(new ArrayFormatter(), new IterableFormatter()));
+    messageSupport = createMessageSupport(new ArrayFormatter(), new IterableFormatter());
   }
 
 
@@ -73,14 +72,18 @@ final class ListFormatterConfigTest extends AbstractFormatterTest
   {
     val values = container.apply(List.of(1, 2, 3, 4, 5));
 
-    assertEquals("1, 2, 3, 4 and 5", messageSupport
-        .message("%{c,list-sep:', ',list-sep-last:' and '}")
-        .with("c", values)
-        .format());
-    assertEquals("1.2.3.4.5", messageSupport
-        .message("%{c,list-sep:'.'}")
-        .with("c", values)
-        .format());
+    assertEquals(
+        "1, 2, 3, 4 and 5",
+        messageSupport
+            .message("%{c,list-sep:', ',list-sep-last:' and '}")
+            .with("c", values)
+            .format());
+    assertEquals(
+        "1.2.3.4.5",
+        messageSupport
+            .message("%{c,list-sep:'.'}")
+            .with("c", values)
+            .format());
   }
 
 
@@ -101,10 +104,12 @@ final class ListFormatterConfigTest extends AbstractFormatterTest
   @MethodSource("containers")
   void testNullElements(@SuppressWarnings("unused") String name, @NotNull Function<List<?>,Object> container)
   {
-    assertEquals("Test, true, -6", messageSupport
-        .message("%{c}")
-        .with("c", container.apply(asList("Test", true, null, -6)))
-        .format());
+    assertEquals(
+        "Test, true, -6",
+        messageSupport
+            .message("%{c}")
+            .with("c", container.apply(asList("Test", true, null, -6)))
+            .format());
   }
 
 
@@ -113,10 +118,12 @@ final class ListFormatterConfigTest extends AbstractFormatterTest
   @MethodSource("containers")
   void testUnique(@SuppressWarnings("unused") String name, @NotNull Function<List<?>,Object> container)
   {
-    assertEquals("1, 2, ...", messageSupport
-        .message("%{c,list-max-size:2,list-value-more:'...',list-unique:true}")
-        .with("c", container.apply(List.of(1, 1, 2, 2, 3, 3, 4, 4)))
-        .format());
+    assertEquals(
+        "1, 2, ...",
+        messageSupport
+            .message("%{c,list-max-size:2,list-value-more:'...',list-unique:true}")
+            .with("c", container.apply(List.of(1, 1, 2, 2, 3, 3, 4, 4)))
+            .format());
   }
 
 

@@ -26,7 +26,8 @@ import java.util.Map;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static java.util.Locale.UK;
 import static java.util.Locale.US;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 /**
@@ -89,34 +90,6 @@ public class MessageTest
     val messageSupport = MessageSupportFactory.shared();
 
     assertEquals("", messageSupport.message("").format());
-  }
-
-
-  @Test
-  @DisplayName("Format string is normalized and parses back into an equivalent message")
-  @SuppressWarnings("LanguageMismatch")
-  void testAsFormatString()
-  {
-    val messageFactory = MessageFactory.getSharedInstance();
-    val formatStrings = Map.of(
-        "%{a,(1,2):'x'}", "%{a,1:x,2:x}",
-        "%{a , null : 'n' }", "%{a,null:n}",
-        "%{a,!empty:\"x\"}", "%{a,<>empty:x}",
-        "%{a,n:007}", "%{a,n:7}",
-        "\u00e9 %{a,1:'%{b}'}", "\\u00e9 %{a,1:'%{b}'}");
-
-    formatStrings.forEach((formatString, expected) -> {
-      val message = messageFactory.parseMessage(formatString);
-      val serialized = message.asFormatString(US_ASCII);
-
-      assertEquals(expected, serialized);
-      assertTrue(message.isSame(messageFactory.parseMessage(serialized)), formatString);
-    });
-
-    // leading and trailing spaces are not part of the format string
-    assertEquals("hello world", messageFactory
-        .parseMessage("  hello   world  ")
-        .asFormatString(US_ASCII));
   }
 
 

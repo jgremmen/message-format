@@ -174,25 +174,6 @@ final class MessageFactoryTest
 
 
   @Test
-  @DisplayName("Localized message bundle preserves insertion order for fallback selection")
-  void testParseLocalizedMessagePreservesFallbackOrder()
-  {
-    final var localizedTexts = new LinkedHashMap<Locale,String>();
-    localizedTexts.put(forLanguageTag("fr-CA"), "Bonjour");
-    localizedTexts.put(forLanguageTag("en"), "Hello");
-
-    final var messageSupport = MessageSupportFactory.shared();
-    final var messageAccessor = messageSupport.getMessageAccessor();
-    final var message = messageAccessor.getMessageFactory().parseMessage("MSG-001", localizedTexts);
-
-    assertInstanceOf(LocalizedMessageBundleWithCode.class, message);
-    assertEquals(
-        "Bonjour",
-        message.format(messageAccessor, Message.Parameters.empty(JAPANESE)));
-  }
-
-
-  @Test
   @DisplayName("Localized message prefers the language without country over a different country")
   void testParseLocalizedMessageLanguageFallback()
   {
@@ -232,9 +213,10 @@ final class MessageFactoryTest
       for(var tag: tags)
         localizedTexts.putIfAbsent(forLanguageTag(tag), tag);
 
-      assertEquals(first, messageFactory
-          .parseMessage("MSG-001", localizedTexts)
-          .format(messageAccessor, Message.Parameters.empty(JAPANESE)));
+      final var message = messageFactory.parseMessage("MSG-001", localizedTexts);
+
+      assertInstanceOf(LocalizedMessageBundleWithCode.class, message);
+      assertEquals(first, message.format(messageAccessor, Message.Parameters.empty(JAPANESE)));
 
       assertEquals(first, MessageSupportFactory
           .createDefault()

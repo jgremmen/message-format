@@ -24,16 +24,22 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
+
+import java.util.stream.Stream;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 
 /**
- * Round trip tests: parse &rarr; {@code asFormatString} &rarr; parse must yield the same message.
+ * Round trip tests: parse &rarr; {@code asFormatString} &rarr; parse must yield the same message. Also tests the
+ * normalized form returned by {@code asFormatString}.
  *
  * @author Jeroen Gremmen
  * @since 0.25.0
@@ -59,6 +65,7 @@ final class FormatStringRoundTripTest
       "Smile 😀 now",
       "Cafe\u0301 नमस्ते \u200d",
       "a\\u000ab",
+      "\u00e9 %{a,1:'%{b}'}",
 
       // config values
       "%{p,cfg:true}",
@@ -80,6 +87,10 @@ final class FormatStringRoundTripTest
       "%{p,true:'true',false:false,null:'null',empty:empty,:'format'}",
       "%{p,1:yes,2:'two words',3:'back\\\\slash',:'%{p} items'}",
       "%{p,'key\\\\':value,'k\\'ey':'v\"alue'}",
+      "%{a,(1,2):'x'}",
+      "%{a , null : 'n' }",
+      "%{a,!empty:\"x\"}",
+      "%{a,n:007}",
 
       // templates
       "%[tpl]",
@@ -108,6 +119,27 @@ final class FormatStringRoundTripTest
       assertTrue(message.isSame(reparsed),
           () -> "'" + formatString + "' -> '" + serialized + "' (" + charset + ") is not the same message");
     }
+  }
+
+
+  @ParameterizedTest(name = "{0}")
+  @DisplayName("Format string is normalized")
+  @MethodSource("normalizedFormatStrings")
+  void testNormalizedForm(@Language("MessageFormat") String formatString, String expected) {
+    assertEquals(expected, MESSAGE_FACTORY.parseMessage(formatString).asFormatString(US_ASCII));
+  }
+
+
+  static Stream<Arguments> normalizedFormatStrings()
+  {
+    return Stream.of(
+        arguments("%{a,(1,2):'x'}", "%{a,1:x,2:x}"),
+        arguments("%{a , null : 'n' }", "%{a,null:n}"),
+        arguments("%{a,!empty:\"x\"}", "%{a,<>empty:x}"),
+        arguments("%{a,n:007}", "%{a,n:7}"),
+        arguments("\u00e9 %{a,1:'%{b}'}", "\\u00e9 %{a,1:'%{b}'}"),
+        // leading and trailing spaces are not part of the format string
+        arguments("  hello   world  ", "hello world"));
   }
 
 

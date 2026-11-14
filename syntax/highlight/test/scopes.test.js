@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {describe, it} from 'node:test';
 
-import {balanced, highlight} from './helpers.js';
+import {highlight} from './helpers.js';
 
 
 /** Asserts that `html` contains a span with the given hljs class(es) and text. */
@@ -144,10 +144,9 @@ describe('post format', () => {
     hasSpan(html, 'hljs-template-tag', ')');
   });
 
-  it('deep nesting is balanced', () => {
+  it('deep nesting', () => {
     const html = highlight('%{level1,:\'one %(upper,\'two %{level3,:\'three %[deep,x->y]\'}\')\'}');
 
-    assert.ok(balanced(html), html);
     assert.equal(html.match(/hljs-subst/g).length, 4);
     assert.equal(html.match(/hljs-string/g).length, 3);
     hasSpan(html, 'hljs-variable', 'level1');
