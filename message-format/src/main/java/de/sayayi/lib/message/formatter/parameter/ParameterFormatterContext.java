@@ -137,4 +137,15 @@ public interface ParameterFormatterContext extends Parameters, ConfigAccessor, M
    */
   @Contract(pure = true)
   @NotNull Set<String> getClassifiers(Object value, Config config);
+
+
+  /**
+   * Returns whether this formatter context was selected by name, or by type-based resolution.
+   *
+   * @return  {@code true} if selected by name, {@code false} if selected by type
+   *
+   * @since 0.25.0
+   */
+  @Contract(pure = true)
+  boolean isSelectedByName();
 }

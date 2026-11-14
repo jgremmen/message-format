@@ -251,6 +251,12 @@ final class ParameterFormatterContextImpl extends BaseConfigAccessor implements 
   }
 
 
+  @Override
+  public boolean isSelectedByName() {
+    return format != null;
+  }
+
+
 
 
   /**
