@@ -26,9 +26,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.part.TextPartFactory.nullText;
@@ -36,6 +42,7 @@ import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.util.Locale.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 
 /**
@@ -86,6 +93,81 @@ final class BoolFormatterTest extends AbstractFormatterTest
         .with("c", Integer.valueOf(1234))
         .with("d", Integer.valueOf(0))
         .with("e", Double.valueOf(3.14d))
+        .format());
+  }
+
+
+  static Stream<Arguments> convertedValues()
+  {
+    return Stream.of(
+        arguments(true, "yes"),
+        arguments(false, "no"),
+        arguments((byte)1, "yes"),
+        arguments((short)0, "no"),
+        arguments(2, "yes"),
+        arguments(0L, "no"),
+        arguments(1.5f, "yes"),
+        arguments(-0.0d, "no"),
+        arguments(Double.NaN, "invalid"),
+        arguments(Double.POSITIVE_INFINITY, "invalid"),
+        arguments(Float.NEGATIVE_INFINITY, "invalid"),
+        arguments(BigInteger.ONE, "yes"),
+        arguments(new BigDecimal("0.00"), "no"),
+        arguments(new AtomicInteger(3), "yes"),
+        arguments("true", "yes"),
+        arguments("false", "no"),
+        arguments("1", "yes"),
+        arguments("0.0", "no"),
+        arguments("maybe", "invalid"),
+        arguments("", "invalid"),
+        arguments(Optional.of(1), "yes"),
+        arguments(Optional.of("false"), "no"),
+        arguments(Optional.empty(), "invalid"),
+        arguments(Optional.of(Double.NaN), "invalid"),
+        arguments(OptionalInt.of(0), "no"),
+        arguments(OptionalInt.empty(), "invalid"),
+        arguments(OptionalLong.of(5), "yes"),
+        arguments(OptionalLong.empty(), "invalid"),
+        arguments(null, "unset"));
+  }
+
+
+  @ParameterizedTest(name = "{0} -> {1}")
+  @DisplayName("Selected by name, all formattable types are converted to a boolean")
+  @MethodSource("convertedValues")
+  void testSelectedByName(Object value, String expected)
+  {
+    assertEquals(expected, MessageSupportFactory
+        .createDefault()
+        .message("%{b,format:bool,true:yes,false:no,empty:invalid,null:unset}")
+        .with("b", value)
+        .format());
+  }
+
+
+  static Stream<Arguments> typedValues()
+  {
+    return Stream.of(
+        arguments(true, "yes"),
+        arguments(false, "no"),
+        arguments(2, "2"),
+        arguments(0L, "0"),
+        arguments("true", "true"),
+        arguments("maybe", "maybe"),
+        arguments(Optional.of(1), "1"),
+        arguments(OptionalLong.of(5), "5"));
+  }
+
+
+  @ParameterizedTest(name = "{0} -> {1}")
+  @DisplayName("Selected by type for boolean values only, other types are not converted")
+  @MethodSource("typedValues")
+  void testSelectedByType(Object value, String expected)
+  {
+    assertEquals(expected, MessageSupportFactory
+        .createDefault()
+        .message("%{b,true:yes,false:no,empty:invalid}")
+        .with("b", value)
         .format());
   }
 
@@ -235,11 +317,37 @@ final class BoolFormatterTest extends AbstractFormatterTest
   void testConfigKeyString()
   {
     val messageSupport = MessageSupportFactory.createDefault();
-    val message = messageSupport.message("%{b,format:bool,'false':false,'True':'True'}");
+    val message = messageSupport.message("""
+        %{b,format:bool,\
+            true:'bool true',\
+            false:'bool false',\
+            'true':'string true',\
+            'false':'string false',\
+            'True':'string True'}\
+        """);
 
-    assertEquals("true", message.with("b", TRUE).format());
-    assertEquals("true", message.with("b", "true").format());
-    assertEquals("false", message.with("b", FALSE).format());
-    assertEquals("false", message.with("b", "false").format());
+    assertEquals("bool true", message.with("b", TRUE).format());
+    assertEquals("bool true", message.with("b", "true").format());
+    assertEquals("bool true", message.with("b", "1").format());
+    assertEquals("bool false", message.with("b", FALSE).format());
+    assertEquals("bool false", message.with("b", "false").format());
+    assertEquals("bool false", message.with("b", "0").format());
+
+    // "True" cannot be converted to a boolean, and the equal string key 'True' does not match either
+    assertEquals("", message.with("b", "True").format());
+
+    // with string keys only, the boolean value itself is formatted
+    val stringKeysOnly = messageSupport.message("%{b,format:bool,'false':'string false','True':'string True'}");
+
+    assertEquals("true", stringKeysOnly.with("b", TRUE).format());
+    assertEquals("true", stringKeysOnly.with("b", "true").format());
+    assertEquals("false", stringKeysOnly.with("b", FALSE).format());
+    assertEquals("false", stringKeysOnly.with("b", "false").format());
+
+    // selected by type for a boolean value, string keys don't match either
+    val typed = messageSupport.message("%{b,'false':'string false','true':'string true'}");
+
+    assertEquals("true", typed.with("b", TRUE).format());
+    assertEquals("false", typed.with("b", FALSE).format());
   }
 }

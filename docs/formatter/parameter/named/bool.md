@@ -14,7 +14,8 @@ The named `bool` formatter accepts the following types and applies these convers
 
 **Numbers** (all primitive numeric types, their boxed equivalents, `BigInteger` and `BigDecimal`) are interpreted as 
 `false` when the value is zero and `true` when the value is non-zero. The sign of the number does not matter, only 
-whether it equals zero.
+whether it equals zero. A number that is not finite (`NaN` or infinite) is neither `true` nor `false`; it cannot be
+converted to a boolean and is treated as an empty value.
 
 The examples on this page use the following message support.
 
@@ -154,8 +155,8 @@ Because the named `bool` formatter coerces non-boolean types, the conversion can
 considered empty. This is the key distinction from the type-based formatters, where the value is always a valid boolean 
 and the `empty` key never matches.
 
-For example, a string that is neither a boolean literal nor a valid number cannot be converted to a boolean. The `empty`
-key catches these cases. Its negated form `!empty` matches any value that was successfully converted.
+For example, a string that is neither a boolean literal nor a valid number, a number that is not finite (`NaN` or
+infinite) or an empty optional cannot be converted to a boolean. The `empty` key catches these cases. Its negated form `!empty` matches any value that was successfully converted.
 
 ```java
 messageSupport

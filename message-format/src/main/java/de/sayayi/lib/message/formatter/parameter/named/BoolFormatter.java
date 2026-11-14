@@ -39,33 +39,48 @@ import static de.sayayi.lib.message.part.MapKey.Type.*;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
-import static java.lang.Math.signum;
 
 
 /**
- * Named parameter formatter that converts a parameter value to a boolean representation.
+ * Named parameter formatter that converts a parameter value to a boolean representation. It is also the type-based
+ * formatter for {@link Boolean} and {@code boolean} values.
  * <p>
- * This formatter is selected by using the name {@code bool} in a message parameter, e.g.
- * {@code %{myParam,format:bool}}.
+ * This formatter is selected in two ways:
+ * <ul>
+ *   <li>
+ *     By name, using {@code format:bool} in a message parameter, e.g. {@code %{myParam,format:bool}}. It then accepts
+ *     all types listed in {@link #canFormat(Class)} and converts the value to a boolean as described below.
+ *   </li>
+ *   <li>
+ *     By type, without a {@code format} configuration, for {@link Boolean} and {@code boolean} values only (see
+ *     {@link #getFormattableTypes()}). Values of other types are formatted by the formatter for their type and are not
+ *     converted; a number, for example, is formatted as a number, and a string {@code "true"} as a string.
+ *   </li>
+ * </ul>
  * <p>
- * It accepts a wide range of input types and converts them to a boolean value:
+ * When selected by name, the value is converted to a boolean as follows:
  * <ul>
  *   <li>{@link Boolean} values are used directly</li>
- *   <li>{@link Number} values are interpreted as {@code false} if zero, {@code true} otherwise</li>
  *   <li>
- *     {@link String} values {@code "true"} and {@code "false"} are recognized literally; numeric strings are parsed
- *     and treated as numbers
+ *     {@link Number} values (including the primitive number types) are interpreted as {@code false} if zero,
+ *     {@code true} otherwise; a number that is not finite ({@code NaN} or infinite) cannot be converted
+ *   </li>
+ *   <li>
+ *     {@link String} values {@code "true"} and {@code "false"} are recognized literally; numeric strings are parsed and
+ *     treated as numbers; other strings cannot be converted
  *   </li>
  *   <li>
  *     {@link java.util.Optional Optional}, {@link OptionalInt} and {@link OptionalLong} are unwrapped before
- *     conversion
+ *     conversion; an empty optional cannot be converted
  *   </li>
  *   <li>{@code null} values are handled separately using the null map key</li>
  * </ul>
+ * A value that cannot be converted is matched against the empty map key only.
  * <p>
- * The resulting boolean value can be mapped to custom text using map keys of type {@code bool}, {@code string},
- * {@code empty} and {@code null} in the parameter configuration. If no mapping is provided, the formatter defaults
- * to the text {@code "true"} or {@code "false"}.
+ * The resulting boolean value can be mapped to custom text using map keys of type {@code bool}, {@code empty} and
+ * {@code null} in the parameter configuration. The bool keys are matched against the converted value, never against the
+ * original value. String keys never match, even if their text is {@code true} or {@code false}. If no mapping is
+ * provided, the formatter defaults to the text {@code "true"} or {@code "false"}.
  * <p>
  * <b>Examples:</b>
  * <p>
@@ -108,7 +123,7 @@ import static java.lang.Math.signum;
 public final class BoolFormatter implements NamedParameterFormatter, MapKeyComparator<Object>
 {
   /** Map key types used to look up a mapped message for a boolean value. */
-  private static final Set<MapKey.Type> BOOL_KEY_TYPES = Set.of(EMPTY, NULL, BOOL, STRING);
+  private static final Set<MapKey.Type> BOOL_KEY_TYPES = Set.of(EMPTY, NULL, BOOL);
 
   /** Default texts for {@code false} (index 0) and {@code true} (index 1). */
   private static final Text[] BOOL_TEXT = new Text[] {
@@ -173,9 +188,8 @@ public final class BoolFormatter implements NamedParameterFormatter, MapKeyCompa
   /**
    * {@inheritDoc}
    * <p>
-   * Converts the given {@code value} to a boolean and formats it using the parameter map configuration. If the
-   * value is {@code null}, the null map key is used. If the value cannot be converted to a boolean, the empty map
-   * key is used.
+   * Converts the given {@code value} to a boolean and formats it using the parameter map configuration. If the value is
+   * {@code null}, the null map key is used. If the value cannot be converted to a boolean, the empty map key is used.
    */
   @Override
   @Contract(pure = true)
@@ -222,9 +236,8 @@ public final class BoolFormatter implements NamedParameterFormatter, MapKeyCompa
   @Contract(pure = true)
   private @NotNull Optional<Boolean> convertValueToBool(Object value)
   {
-    // unwrap optional
-    if (value instanceof Optional)
-      value = ((Optional<?>)value).orElse(null);
+    if (value instanceof Optional<?> optional)
+      value = optional.orElse(null);
 
     if (value instanceof Boolean)
       return Optional.of((Boolean)value);
@@ -256,11 +269,13 @@ public final class BoolFormatter implements NamedParameterFormatter, MapKeyCompa
 
 
   /**
-   * Converts a number into a boolean: zero is {@code false}, any other value (including {@code NaN}) is {@code true}.
+   * Converts a number into a boolean: zero is {@code false}, any other finite value is {@code true}. A number that is
+   * not finite ({@code NaN} or infinite) is neither {@code true} nor {@code false}.
    *
    * @param number  number to convert, not {@code null}
    *
-   * @return  optional containing the boolean value, never {@code null}
+   * @return  optional containing the boolean value, or an empty optional if {@code number} is not finite, never
+   *          {@code null}
    */
   private @NotNull Optional<Boolean> convertNumberToBool(@NotNull Number number)
   {
@@ -274,7 +289,11 @@ public final class BoolFormatter implements NamedParameterFormatter, MapKeyCompa
     if (number instanceof BigDecimal)
       return Optional.of(((BigDecimal)number).signum() != 0);
 
-    return Optional.of(signum(number.doubleValue()) != 0);
+    final var doubleValue = number.doubleValue();
+
+    return Double.isFinite(doubleValue)
+        ? Optional.of(doubleValue != 0)
+        : Optional.empty();
   }
 
 
