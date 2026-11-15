@@ -18,17 +18,24 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 import de.sayayi.lib.message.formatter.parameter.named.BoolFormatter;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import lombok.val;
+import org.intellij.lang.annotations.Language;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static java.util.Collections.singletonMap;
 import static java.util.Locale.UK;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 
 /**
@@ -153,6 +160,37 @@ final class MapFormatterTest extends AbstractFormatterTest
     assertEquals(
         "true:1 / false:-1234 / true:0",
         message
+            .with("map", map)
+            .format());
+  }
+
+
+  @SuppressWarnings("CollectionAddedToSelf")
+  static Stream<Arguments> selfReferenceCases()
+  {
+    val mapAsValue = new IdentityHashMap<>();
+    mapAsValue.put("k", mapAsValue);
+
+    val mapAsKey = new IdentityHashMap<>();
+    mapAsKey.put(mapAsKey, "v");
+
+    return Stream.of(
+        arguments("%{map}", mapAsValue, "k=(this map)"),
+        arguments("%{map,map-this:'<self>'}", mapAsValue, "k=<self>"),
+        arguments("%{map}", mapAsKey, "(this map)=v"),
+        arguments("%{map,map-this:'<self>'}", mapAsKey, "<self>=v"));
+  }
+
+
+  @ParameterizedTest(name = "{0} -> {2}")
+  @MethodSource("selfReferenceCases")
+  @DisplayName("Map referring to itself as key or value is formatted with the 'map-this' text")
+  void testSelfReference(@Language("MessageFormat") String format, Map<?,?> map, String expected)
+  {
+    assertEquals(
+        expected,
+        createMessageSupport(UK, new MapFormatter(), new ArrayFormatter())
+            .message(format)
             .with("map", map)
             .format());
   }

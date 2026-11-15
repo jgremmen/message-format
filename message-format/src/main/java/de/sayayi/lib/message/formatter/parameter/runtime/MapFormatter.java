@@ -276,7 +276,7 @@ public final class MapFormatter extends AbstractListFormatter<Map<?,?>> implemen
     private final KeyValueParameters parameters;
 
     /** Lazily created text for elements referring to the formatted value itself. */
-    private final Supplier<Text> thisText;
+    private final Supplier<String> thisText;
 
     /** Map being iterated. */
     private final Map<?,?> map;
@@ -308,8 +308,7 @@ public final class MapFormatter extends AbstractListFormatter<Map<?,?>> implemen
           .orElse(DEFAULT_KEY_VALUE_MESSAGE);
       parameters = new KeyValueParameters(context.getLocale());
 
-      thisText = SupplierDelegate.of(() ->
-          noSpaceText(context.getConfigValueString(CONFIG_MAP_THIS).orElse("(this map)")));
+      thisText = SupplierDelegate.of(() -> context.getConfigValueString(CONFIG_MAP_THIS).orElse("(this map)"));
 
       initIterator();
     }
