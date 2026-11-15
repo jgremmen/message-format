@@ -31,6 +31,11 @@ plugins {
 description = 'Message Format Library (Spring adopter and formatter)'
 
 
+notice {
+  inceptionYear = '2023'
+}
+
+
 dependencies {
   api project(':message-format')
   api libs.spring.context
@@ -75,8 +80,6 @@ publishing {
   publications {
     withType(MavenPublication).configureEach {
       pom {
-        inceptionYear = '2023'
-
         url = "https://lib.sayayi.de/message-format/${releaseVersion}/add-on/"
       }
     }

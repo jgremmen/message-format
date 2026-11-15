@@ -31,6 +31,11 @@ plugins {
 description = 'Message Format Library (ICU formatter)'
 
 
+notice {
+  inceptionYear = '2026'
+}
+
+
 dependencies {
   api project(':message-format')
 
@@ -60,17 +65,6 @@ publishOnCentral {
   projectDescription =
       'ICU4J-based formatter extension for the Message Format library, providing locale-sensitive plural, select, ' +
       'number, date and person name formatting.'
-}
-
-
-publishing {
-  publications {
-    withType(MavenPublication).configureEach {
-      pom {
-        inceptionYear = '2026'
-      }
-    }
-  }
 }
 
 

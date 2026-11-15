@@ -36,6 +36,11 @@ plugins {
 description = 'Message Format Gradle Plugin'
 
 
+notice {
+  inceptionYear = '2023'
+}
+
+
 // jar of the message-format-annotations project, provided by its annotationsJarElements configuration
 def annotationsJar = configurations.dependencyScope('annotationsJar')
 def annotationsJarClasspath = configurations.resolvable('annotationsJarClasspath') {
@@ -131,8 +136,6 @@ publishing {
     withType(MavenPublication).configureEach {
       pom {
         description = 'Gradle Plugin to scan the class path, pre-compile and pack message and template formats into a single file.'
-        inceptionYear = '2023'
-
         url = "https://lib.sayayi.de/message-format/${releaseVersion}/gradle-plugin/"
       }
     }

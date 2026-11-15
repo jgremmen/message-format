@@ -39,6 +39,11 @@ plugins {
 description = 'Message Format Library'
 
 
+notice {
+  inceptionYear = '2019'
+}
+
+
 sourceSets {
   tika3
   tika4
@@ -221,8 +226,6 @@ publishing {
   publications {
     withType(MavenPublication).configureEach {
       pom {
-        inceptionYear = '2019'
-
         url = "https://lib.sayayi.de/message-format/${releaseVersion}/"
       }
     }

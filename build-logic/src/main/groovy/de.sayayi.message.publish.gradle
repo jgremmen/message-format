@@ -18,6 +18,7 @@
 
 
 import de.sayayi.gradle.BuildSupport
+import de.sayayi.gradle.NoticeExtension
 
 
 plugins {
@@ -43,6 +44,9 @@ publishing {
   publications {
     withType(MavenPublication).configureEach {
       pom {
+        // same inception year as in META-INF/NOTICE
+        inceptionYear = project.extensions.getByType(NoticeExtension).inceptionYear
+
         developers {
           developer {
             id = 'jgremmen'

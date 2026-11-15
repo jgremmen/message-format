@@ -34,6 +34,24 @@ plugins {
 description = 'Message Format Library (annotations)'
 
 
+notice {
+  inceptionYear = '2025'
+
+  // notice for the bundled ASM library
+  appendix = layout.projectDirectory.file('src/main/notice/NOTICE-asm')
+  appendixProperties.put('asmVersion', providers.provider {
+    configurations
+        .asmToBundle
+        .incoming
+        .resolutionResult
+        .allComponents
+        .find { it.moduleVersion?.group == 'org.ow2.asm' && it.moduleVersion?.name == 'asm' }
+        ?.moduleVersion
+        ?.version
+  })
+}
+
+
 configurations {
   asmToBundle
 
@@ -87,29 +105,6 @@ configurations.consumable('annotationsJarElements') {
 }
 
 
-tasks.named('processResources') {
-  // version of the bundled ASM library, mentioned in META-INF/NOTICE
-  def asmVersion = providers.provider {
-    configurations
-        .asmToBundle
-        .incoming
-        .resolutionResult
-        .allComponents
-        .find { it.moduleVersion?.group == 'org.ow2.asm' && it.moduleVersion?.name == 'asm' }
-        ?.moduleVersion
-        ?.version
-  }
-  def copyrightYear = commitTime.map { it.year as String }
-
-  inputs.property('asmVersion', asmVersion)
-  inputs.property('copyrightYear', copyrightYear)
-
-  filesMatching('META-INF/NOTICE') {
-    expand(copyright: copyrightYear.get(), asmVersion: asmVersion.get())
-  }
-}
-
-
 tasks.named('sourcesJar') {
   eachFile { fileCopyDetails ->
     if (!fileCopyDetails.directory && fileCopyDetails.name.endsWith('.java')) {
@@ -146,8 +141,6 @@ publishing {
   publications {
     withType(MavenPublication).configureEach {
       pom {
-        inceptionYear = '2025'
-
         url = "https://lib.sayayi.de/message-format/${releaseVersion}/adopter/annotation/"
 
         licenses {

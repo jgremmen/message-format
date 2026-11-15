@@ -17,7 +17,9 @@
 //file:noinspection DependencyNotationArgument
 
 
+import de.sayayi.gradle.GenerateNotice
 import de.sayayi.gradle.JavaAgentArgumentProvider
+import de.sayayi.gradle.NoticeExtension
 
 import java.time.Instant
 import java.time.OffsetDateTime
@@ -83,6 +85,23 @@ ext.commitTime = providers
         .map { Instant.ofEpochSecond(it.trim() as long).atOffset(UTC) })
 
 
+// project specific information for META-INF/NOTICE; the inception year is also used for the published POM
+def notice = extensions.create('notice', NoticeExtension)
+
+
+def generateNotice = tasks.register('generateNotice', GenerateNotice) {
+  description = 'Generates the META-INF/NOTICE file included in the jars.'
+
+  // lazy, as the project scripts set the description after applying this plugin
+  productName = providers.provider { project.description }
+  inceptionYear = notice.inceptionYear
+  copyrightYear = commitTime.map { it.year as String }
+  appendix = notice.appendix
+  appendixProperties = notice.appendixProperties
+  noticeFile = layout.buildDirectory.file('notice/NOTICE')
+}
+
+
 tasks.withType(Jar).configureEach {
   includeEmptyDirs = false
 
@@ -100,17 +119,13 @@ tasks.withType(Jar).configureEach {
     )
   }
 
-  def copyrightYear = commitTime.map { it.year as String }
-  def version = project.version.toString()
-
-  inputs.property('copyrightYear', copyrightYear)
-
   from(rootDir) {
     include 'LICENSE'
     into 'META-INF'
-    filesMatching('LICENSE') {
-      expand(copyright: copyrightYear.get(), version: version)
-    }
+  }
+
+  from(generateNotice) {
+    into 'META-INF'
   }
 }
 
