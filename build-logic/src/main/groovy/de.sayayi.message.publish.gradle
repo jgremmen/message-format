@@ -36,7 +36,7 @@ publishOnCentral {
   licenseUrl = 'https://www.apache.org/licenses/LICENSE-2.0'
 
   projectUrl = 'https://github.com/jgremmen/message-format'
-  scmConnection = 'scm:git:git://github.com/jgremmen/message-format.git'
+  scmConnection = 'scm:git:https://github.com/jgremmen/message-format.git'
 }
 
 

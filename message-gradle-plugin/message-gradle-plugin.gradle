@@ -135,7 +135,6 @@ publishing {
   publications {
     withType(MavenPublication).configureEach {
       pom {
-        description = 'Gradle Plugin to scan the class path, pre-compile and pack message and template formats into a single file.'
         url = "https://lib.sayayi.de/message-format/${releaseVersion}/gradle-plugin/"
       }
     }

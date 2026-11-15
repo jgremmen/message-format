@@ -156,6 +156,9 @@ tasks.named('compileTestJava') {
 tasks.named('sourcesJar') {
   dependsOn tasks.named('generateGrammarSource')
 
+  from sourceSets.tika3.allJava
+  from sourceSets.tika4.allJava
+
   exclude 'gen/*'
   exclude '**/*.interp'
 }
@@ -204,12 +207,6 @@ tasks.named('javadoc', Javadoc) {
         "https://javadoc.io/doc/de.sayayi.lib/antlr4-runtime-ext/${resolveVersion('antlr4-runtime-ext')}/",
         "${rootDir}/gradle/javadocs/antlr4-runtime-ext")
   }
-}
-
-
-tasks.named('sourcesJar') {
-  from sourceSets.tika3.allJava
-  from sourceSets.tika4.allJava
 }
 
 
