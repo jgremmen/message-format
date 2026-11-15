@@ -48,7 +48,6 @@ import static de.sayayi.lib.message.part.MapKey.NUMBER_TYPE;
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.util.MessageUtil.isEmpty;
 import static java.lang.Double.isFinite;
-import static java.lang.Math.signum;
 import static java.text.NumberFormat.*;
 
 
@@ -64,7 +63,7 @@ import static java.text.NumberFormat.*;
  * <p>
  * Map key comparison supports {@code bool} keys (zero/non-zero), {@code number} keys (numeric comparison) and
  * {@code string} keys (parsed numeric comparison). {@code NaN} and infinite {@code double} or {@code float} values
- * never match a number or string key.
+ * never match a bool, number or string key.
  * <p>
  * <b>Configuration keys:</b>
  * <table border="1">
@@ -328,12 +327,18 @@ public final class NumberFormatter
         value instanceof AtomicInteger || value instanceof AtomicLong ||  value instanceof LongAdder ||
         value instanceof LongAccumulator)
       bool = value.longValue() != 0;
-    else if (value instanceof BigInteger)
-      bool = ((BigInteger)value).signum() != 0;
-    else if (value instanceof BigDecimal)
-      bool = ((BigDecimal)value).signum() != 0;
+    else if (value instanceof BigInteger bigInteger)
+      bool = bigInteger.signum() != 0;
+    else if (value instanceof BigDecimal bigDecimal)
+      bool = bigDecimal.signum() != 0;
     else
-      bool = signum(value.doubleValue()) != 0;
+    {
+      final var doubleValue = value.doubleValue();
+      if (!isFinite(doubleValue))
+        return MISMATCH;
+
+      bool = doubleValue != 0;
+    }
 
     return context.getCompareType().match(bool == context.getBoolKeyValue() ? 0 : 1) ? LENIENT : MISMATCH;
   }

@@ -191,6 +191,35 @@ final class NumberFormatterTest extends AbstractFormatterTest
   }
 
 
+  static Stream<Arguments> nonFiniteValuesWithBoolKey()
+  {
+    val formatString = "%{x,format:choice,true:'true',false:'false',:'other'}";
+
+    return Stream.of(
+        arguments(formatString, 1.5, "true"),
+        arguments(formatString, 0.0, "false"),
+        arguments(formatString, NaN, "other"),
+        arguments(formatString, POSITIVE_INFINITY, "other"),
+        arguments(formatString, NEGATIVE_INFINITY, "other"),
+        arguments(formatString, Float.NaN, "other")
+    );
+  }
+
+
+  @ParameterizedTest(name = "{0} with {1} -> {2}")
+  @DisplayName("Compare non-finite values to bool keys")
+  @MethodSource("nonFiniteValuesWithBoolKey")
+  void testNonFiniteValueWithBoolKey(@Language("MessageFormat") String formatString, Number value, String expected)
+  {
+    assertEquals(
+        expected,
+        createMessageSupport(UK, new NumberFormatter(), new ChoiceFormatter())
+            .message(formatString)
+            .with("x", value)
+            .format());
+  }
+
+
   @Test
   @DisplayName("Cached number formats are used per format and locale")
   void testCachedNumberFormats()
