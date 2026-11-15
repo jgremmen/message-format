@@ -15,6 +15,7 @@
  */
 
 //file:noinspection DependencyNotationArgument
+//file:noinspection GroovyAssignabilityCheck
 
 
 import de.sayayi.gradle.GenerateNotice
@@ -85,7 +86,7 @@ ext.commitTime = providers
         .map { Instant.ofEpochSecond(it.trim() as long).atOffset(UTC) })
 
 
-// project specific information for META-INF/NOTICE; the inception year is also used for the published POM
+// project specific information for META-INF/NOTICE
 def notice = extensions.create('notice', NoticeExtension)
 
 
