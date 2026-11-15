@@ -66,6 +66,7 @@ tasks.register(snapshot ? 'releaseAllSnapshots' : 'releaseAll') {
 
   dependsOn ':message-format:releaseMessageFormatArtifacts'
   dependsOn ':message-format-annotations:releaseMessageFormatAnnotationsArtifacts'
+  dependsOn ':message-format-log4j:releaseMessageFormatLog4jArtifacts'
   dependsOn ':message-format-spring:releaseMessageFormatSpringArtifacts'
 
   dependsOn ':message-gradle-plugin:releaseMessageGradlePluginArtifacts'
