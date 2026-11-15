@@ -28,6 +28,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.nio.charset.Charset;
 import java.util.stream.Stream;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
@@ -46,6 +47,7 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
  */
 @DisplayName("Format string round trip")
 @TestMethodOrder(MethodOrderer.DisplayName.class)
+@SuppressWarnings("UnnecessaryUnicodeEscape")
 final class FormatStringRoundTripTest
 {
   private static final MessageFactory MESSAGE_FACTORY = new MessageFactory(LRUMessagePartNormalizer.create(64));
@@ -66,6 +68,8 @@ final class FormatStringRoundTripTest
       "Cafe\u0301 नमस्ते \u200d",
       "a\\u000ab",
       "\u00e9 %{a,1:'%{b}'}",
+      "unassigned \\u0378 and \\udb40\\udc80",
+      "%{p,cfg:'unassigned \\u0378'}",
 
       // config values
       "%{p,cfg:true}",
@@ -109,14 +113,13 @@ final class FormatStringRoundTripTest
   {
     val message = MESSAGE_FACTORY.parseMessage(formatString);
 
-    for(val charset: new java.nio.charset.Charset[] { UTF_8, US_ASCII })
+    for(val charset: new Charset[] { UTF_8, US_ASCII })
     {
       @Language("MessageFormat")
       val serialized = message.asFormatString(charset);
 
-      val reparsed = MESSAGE_FACTORY.parseMessage(serialized);
-
-      assertTrue(message.isSame(reparsed),
+      assertTrue(
+          message.isSame(MESSAGE_FACTORY.parseMessage(serialized)),
           () -> "'" + formatString + "' -> '" + serialized + "' (" + charset + ") is not the same message");
     }
   }
@@ -125,8 +128,13 @@ final class FormatStringRoundTripTest
   @ParameterizedTest(name = "{0}")
   @DisplayName("Format string is normalized")
   @MethodSource("normalizedFormatStrings")
-  void testNormalizedForm(@Language("MessageFormat") String formatString, String expected) {
-    assertEquals(expected, MESSAGE_FACTORY.parseMessage(formatString).asFormatString(US_ASCII));
+  void testNormalizedForm(@Language("MessageFormat") String formatString, String expected)
+  {
+    assertEquals(
+        expected,
+        MESSAGE_FACTORY
+            .parseMessage(formatString)
+            .asFormatString(US_ASCII));
   }
 
 
@@ -149,7 +157,21 @@ final class FormatStringRoundTripTest
   {
     val message = MESSAGE_FACTORY.parseMessage("Smile \uD83D\uDE00 now");
 
-    assertEquals("Smile \uD83D\uDE00 now", message.asFormatString(UTF_8));
-    assertEquals("Smile \\ud83d\\ude00 now", message.asFormatString(US_ASCII));
+    assertEquals(
+        "Smile \ud83d\ude00 now",
+        message.asFormatString(UTF_8));
+    assertEquals(
+        "Smile \\ud83d\\ude00 now",
+        message.asFormatString(US_ASCII));
+  }
+
+
+  @Test
+  @DisplayName("Characters rejected by the lexer are escaped even if the charset can encode them")
+  void testLexerRejectedCharacters()
+  {
+    val message = MESSAGE_FACTORY.parseMessage("a\\u0378b \\udb40\\udc80 \\ud800");
+
+    assertEquals("a\\u0378b \\udb40\\udc80 \\ud800", message.asFormatString(UTF_8));
   }
 }

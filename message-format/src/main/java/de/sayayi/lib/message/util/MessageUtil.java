@@ -518,10 +518,12 @@ public final class MessageUtil
    *     prevent it from being interpreted as a parameter reference.
    *   </li>
    *   <li>
-   *     ISO control characters and characters that cannot be {@linkplain Context#canEncode(char) encoded} by the
-   *     context's charset are written as Unicode escape sequences (e.g. <code>&#92;u00e9</code>). A supplementary
-   *     character (surrogate pair) is {@linkplain Context#canEncode(CharSequence) checked as a whole} and, if it cannot
-   *     be encoded, written as two Unicode escape sequences.
+   *     ISO control characters, characters that are not accepted literally by the message format lexer (unassigned
+   *     code points, line separators, unpaired surrogates) and characters that cannot be
+   *     {@linkplain Context#canEncode(char) encoded} by the context's charset are written as Unicode escape sequences
+   *     (e.g. <code>&#92;u00e9</code>). A supplementary character (surrogate pair) is
+   *     {@linkplain Context#canEncode(CharSequence) checked as a whole} and, if it must be escaped, written as two
+   *     Unicode escape sequences.
    *   </li>
    *   <li>
    *     All other characters are appended as-is.
@@ -551,16 +553,38 @@ public final class MessageUtil
       {
         final var lowSurrogate = stringCharArray[++i];
 
-        if (context.canEncode(String.valueOf(new char[] { ch, lowSurrogate })))
+        if (isLexerCharacter(toCodePoint(ch, lowSurrogate)) &&
+            context.canEncode(String.valueOf(new char[] { ch, lowSurrogate })))
           textJoiner.add(ch).add(lowSurrogate);
         else
           textJoiner.addNoSpace(String.format("\\u%04x\\u%04x", (int)ch, (int)lowSurrogate));
       }
-      else if (!isISOControl(ch) && context.canEncode(ch))
+      else if (!isISOControl(ch) && (isLexerCharacter(ch) || isSpaceChar(ch)) && context.canEncode(ch))
         textJoiner.add(ch);
       else
         textJoiner.addNoSpace(String.format("\\u%04x", (int)ch));
     }
+  }
+
+
+  /**
+   * Tells whether code point {@code cp} is accepted literally (i.e. without escape sequence) by the message format
+   * lexer. The lexer rejects unassigned code points, control characters, line and paragraph separators and unpaired
+   * surrogates.
+   *
+   * @param cp  code point to check
+   *
+   * @return  {@code true} if the code point can be written literally, {@code false} if it must be escaped
+   *
+   * @since 0.25.0
+   */
+  @Contract(pure = true)
+  private static boolean isLexerCharacter(int cp)
+  {
+    return switch(getType(cp)) {
+      case UNASSIGNED, CONTROL, LINE_SEPARATOR, PARAGRAPH_SEPARATOR, SURROGATE -> false;
+      default -> true;
+    };
   }
 
 
