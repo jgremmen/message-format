@@ -48,7 +48,8 @@ import static java.util.stream.Collectors.joining;
  *     <td>{@code ju}</td>
  *     <td>
  *       Flag {@code c} uses the simple class name only, {@code j} omits the {@code java.lang.} package prefix,
- *       {@code u} omits the {@code java.util.} package prefix and {@code v} expands type variable bounds.
+ *       {@code u} omits the {@code java.util.} package prefix and {@code v} expands type variable bounds. Type
+ *       variables within the bounds are written by name only.
  *     </td>
  *   </tr>
  * </table>
@@ -229,6 +230,8 @@ public final class TypeFormatter extends AbstractSingleTypeParameterFormatter<Ty
 
   /**
    * Returns the textual representation of a type variable. Its bounds are included if format flag {@code v} is set.
+   * Type variables within the bounds are written by name only, so recursive bounds like
+   * {@code T extends Comparable<T>} are written as {@code <T extends Comparable<T>>}.
    *
    * @param typeVariable  type variable to format, not {@code null}
    * @param typeFormat    format flags, not {@code null}
@@ -245,7 +248,7 @@ public final class TypeFormatter extends AbstractSingleTypeParameterFormatter<Ty
 
     if (bounds.length > 0)
     {
-      final var typeFormat0 = typeFormat.replace("T", "");
+      final var typeFormat0 = typeFormat.replace("v", "");
 
       formattedTypeVariable.append(" extends ").append(Arrays.stream(bounds)
           .map(t -> toString(t, typeFormat0))

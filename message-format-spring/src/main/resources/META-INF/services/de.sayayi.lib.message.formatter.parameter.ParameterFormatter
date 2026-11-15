@@ -1,0 +1,3 @@
+de.sayayi.lib.message.spring.formatter.DataSizeFormatter
+de.sayayi.lib.message.spring.formatter.ResolvableTypeFormatter
+de.sayayi.lib.message.spring.formatter.TypeDescriptorFormatter

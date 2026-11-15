@@ -212,7 +212,8 @@ messageSupport
 ## Type Variable Bounds (`v`)
 
 By default, type variables are shown as their name only (e.g. `T`). The `v` flag expands the bounds of type variables,
-showing the full constraint.
+showing the full constraint. Type variables within the bounds are shown as their name only, so a recursive bound like
+`T extends Comparable<T>` is shown as `<T extends Comparable<T>>`.
 
 ```java
 interface Samples

@@ -19,17 +19,31 @@
  * <p>
  * This module provides:
  * <ul>
- *   <li>{@link de.sayayi.lib.message.spring.MessageSupportMessageSource MessageSupportMessageSource}: a Spring
- *       {@link org.springframework.context.MessageSource MessageSource} implementation backed by
- *       {@link de.sayayi.lib.message.MessageSupport MessageSupport}, allowing the message format library to serve
- *       as a drop-in replacement for Spring's message resolution</li>
- *   <li>{@link de.sayayi.lib.message.spring.formatter.SpELFormatter SpELFormatter}: a parameter formatter that
- *       evaluates Spring Expression Language (SpEL) expressions on parameter values</li>
+ *   <li>
+ *     {@link de.sayayi.lib.message.spring.MessageSupportMessageSource MessageSupportMessageSource}: a Spring
+ *     {@link org.springframework.context.MessageSource MessageSource} implementation backed by
+ *     {@link de.sayayi.lib.message.MessageSupport MessageSupport}, allowing the message format library to serve as a
+ *     drop-in replacement for Spring's message resolution
+ *   </li>
+ *   <li>
+ *     {@link de.sayayi.lib.message.spring.formatter.SpELFormatter SpELFormatter}: a parameter formatter that evaluates
+ *     Spring Expression Language (SpEL) expressions on parameter values
+ *   </li>
+ *   <li>
+ *     parameter formatters for the Spring types {@link org.springframework.util.unit.DataSize DataSize},
+ *     {@link org.springframework.core.ResolvableType ResolvableType} and
+ *     {@link org.springframework.core.convert.TypeDescriptor TypeDescriptor}
+ *   </li>
  * </ul>
  * <p>
- * The message source is located in package {@code de.sayayi.lib.message.spring} and the SpEL formatter in package
- * {@code de.sayayi.lib.message.spring.formatter}. The SpEL formatter is not registered automatically; it must be
- * added to the formatter service explicitly.
+ * The message source is located in package {@code de.sayayi.lib.message.spring} and the parameter formatters in
+ * package {@code de.sayayi.lib.message.spring.formatter}.
+ * <p>
+ * The module provides the formatters for Spring types as implementations of the
+ * {@link de.sayayi.lib.message.formatter.parameter.ParameterFormatter ParameterFormatter} service, so they are
+ * registered automatically by the {@link de.sayayi.lib.message.formatter.DefaultFormatterService
+ * DefaultFormatterService}. The SpEL formatter is not registered automatically; it must be added to the formatter
+ * service explicitly.
  *
  * @since 0.12.0
  */
@@ -46,4 +60,9 @@ module de.sayayi.lib.message.spring
 
   exports de.sayayi.lib.message.spring;
   exports de.sayayi.lib.message.spring.formatter;
+
+  provides de.sayayi.lib.message.formatter.parameter.ParameterFormatter with
+      de.sayayi.lib.message.spring.formatter.DataSizeFormatter,
+      de.sayayi.lib.message.spring.formatter.ResolvableTypeFormatter,
+      de.sayayi.lib.message.spring.formatter.TypeDescriptorFormatter;
 }

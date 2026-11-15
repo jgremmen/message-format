@@ -130,6 +130,29 @@ final class TypeFormatterTest
 
 
   @Test
+  @DisplayName("Type variables within bounds are not expanded")
+  void testToStringRecursiveTypeVariable()
+  {
+    //noinspection OptionalGetWithoutIsPresent
+    val method = findMethod(TypeFormatterTest.class, "internalMethod3", Comparable.class, List.class).get();
+    val types = method.getGenericParameterTypes();
+
+    // recursive bound, previously failed with a StackOverflowError
+    assertEquals(
+        "<T extends Comparable<T>>",
+        TypeFormatter.toString(types[0], "juv"));
+    assertEquals(
+        "<T extends java.lang.Comparable<T>>",
+        TypeFormatter.toString(types[0], "v"));
+
+    // bound referencing another bounded type variable
+    assertEquals(
+        "<U extends List<T>>",
+        TypeFormatter.toString(types[1], "juv"));
+  }
+
+
+  @Test
   void testToStringWildcard()
   {
     //noinspection OptionalGetWithoutIsPresent
@@ -173,5 +196,10 @@ final class TypeFormatterTest
 
   @SuppressWarnings("unused")
   private static <T extends Iterable<String> & Enumeration<String>> void internalMethod2(@SuppressWarnings("unused") T dummy) {
+  }
+
+
+  @SuppressWarnings("unused")
+  private static <T extends Comparable<T>, U extends List<T>> void internalMethod3(T t, U u) {
   }
 }

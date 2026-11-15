@@ -15,11 +15,30 @@
  */
 
 /**
- * Spring-specific parameter formatter, providing integration with the Spring Expression Language (SpEL).
+ * Spring-specific parameter formatters, providing integration with the Spring Expression Language (SpEL) and Spring
+ * utility types.
+ * <ul>
+ *   <li>
+ *     {@link de.sayayi.lib.message.spring.formatter.SpELFormatter SpELFormatter} ({@code spel}) evaluates a SpEL
+ *     expression on a parameter value and formats the result.
+ *   </li>
+ *   <li>
+ *     {@link de.sayayi.lib.message.spring.formatter.DataSizeFormatter DataSizeFormatter} formats
+ *     {@link org.springframework.util.unit.DataSize DataSize} values as file sizes.
+ *   </li>
+ *   <li>
+ *     {@link de.sayayi.lib.message.spring.formatter.TypeDescriptorFormatter TypeDescriptorFormatter} formats
+ *     {@link org.springframework.core.convert.TypeDescriptor TypeDescriptor} values as the type they describe.
+ *   </li>
+ *   <li>
+ *     {@link de.sayayi.lib.message.spring.formatter.ResolvableTypeFormatter ResolvableTypeFormatter} formats
+ *     {@link org.springframework.core.ResolvableType ResolvableType} values as their underlying type.
+ *   </li>
+ * </ul>
  * <p>
- * {@link de.sayayi.lib.message.spring.formatter.SpELFormatter SpELFormatter} ({@code spel}) evaluates a SpEL expression
- * on a parameter value and formats the result. It is not registered automatically and must be added to a formatter
- * service explicitly.
+ * The formatters for Spring types are provided as services and are registered automatically by the
+ * {@link de.sayayi.lib.message.formatter.DefaultFormatterService DefaultFormatterService}. The SpEL formatter is not
+ * registered automatically and must be added to a formatter service explicitly.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
