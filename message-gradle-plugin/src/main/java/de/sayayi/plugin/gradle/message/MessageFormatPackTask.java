@@ -105,6 +105,10 @@ public abstract class MessageFormatPackTask extends DefaultTask
     templates.getValidateReferences().convention(true);
 
     getCompress().convention(false);
+
+    final var outputs = getOutputs();
+    outputs.upToDateWhen(task -> actionList.isEmpty());
+    outputs.doNotCacheIf("custom actions have been registered", task -> !actionList.isEmpty());
   }
 
 
@@ -273,6 +277,10 @@ public abstract class MessageFormatPackTask extends DefaultTask
    *   }
    * </pre>
    * If multiple actions are provided, they are executed in the order of definition.
+   * <p>
+   * Actions cannot be tracked as task inputs. If at least one action has been provided, the task is therefore never
+   * considered up-to-date and its output is not stored in or loaded from the build cache, so the actions run on every
+   * build.
    *
    * @param action  custom action, not {@code null}
    *

@@ -80,7 +80,10 @@ final class PluginTest
   void prepareProject() throws IOException
   {
     write(new File(testProjectDir, "settings.gradle").toPath(),
-        List.of("rootProject.name = 'test-message-pack'"));
+        List.of(
+            "rootProject.name = 'test-message-pack'",
+            // isolate the build cache, so cache entries of other tests or test runs are not reused
+            "buildCache { local { directory = file('build-cache') } }"));
 
     write(new File(testProjectDir, "gradle.properties").toPath(), List.of(""));
 
@@ -319,6 +322,56 @@ final class PluginTest
     val result = runner("messageFormatPack").buildAndFail();
 
     assertTrue(result.getOutput().contains("Invalid include regular expression '[invalid'"));
+  }
+
+
+  @Test
+  @DisplayName("Pack task with custom action is neither up-to-date nor loaded from the build cache")
+  void testActionAlwaysRuns() throws IOException
+  {
+    writeBuildGradle(List.of(
+        "messageFormatPack {",
+        "  action { println \"Scanned message codes: ${it.messageCodes.size()}\" }",
+        "}"
+    ));
+
+    copy(
+        getResource("test-source-1.java"),
+        new File(testPackageDir, "Source1.java").toPath());
+
+    for(var arguments: List.of(
+        List.of("messageFormatPack", "--build-cache"),
+        List.of("messageFormatPack", "--build-cache"),
+        List.of("clean", "messageFormatPack", "--build-cache")))
+    {
+      val result = runner(arguments.toArray(String[]::new)).build();
+
+      assertEquals(SUCCESS, requireNonNull(result.task(":messageFormatPack")).getOutcome(), arguments.toString());
+      assertTrue(result.getOutput().contains("Scanned message codes: 4"), arguments.toString());
+    }
+  }
+
+
+  @Test
+  @DisplayName("Pack task without custom action is loaded from the build cache")
+  void testNoActionFromCache() throws IOException
+  {
+    copy(
+        getResource("test-source-1.java"),
+        new File(testPackageDir, "Source1.java").toPath());
+
+    assertEquals(
+        SUCCESS,
+        requireNonNull(runner("messageFormatPack", "--build-cache")
+            .build()
+            .task(":messageFormatPack"))
+            .getOutcome());
+    assertEquals(
+        FROM_CACHE,
+        requireNonNull(runner("clean", "messageFormatPack", "--build-cache")
+            .build()
+            .task(":messageFormatPack"))
+            .getOutcome());
   }
 
 
