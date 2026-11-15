@@ -17,9 +17,6 @@
 //file:noinspection DependencyNotationArgument
 
 
-import de.sayayi.gradle.BuildSupport
-
-
 plugins {
   id 'de.sayayi.message.base'
   id 'de.sayayi.message.java-library'
@@ -65,9 +62,4 @@ publishOnCentral {
   projectDescription =
       'ICU4J-based formatter extension for the Message Format library, providing locale-sensitive plural, select, ' +
       'number, date and person name formatting.'
-}
-
-
-BuildSupport.configureSnapshotRelease(project) {
-  dependsOn ':message-format-icu:publishOSSRHPublicationToMavenCentralSnapshotRepository'
 }

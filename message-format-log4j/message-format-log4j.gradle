@@ -17,9 +17,6 @@
 //file:noinspection DependencyNotationArgument
 
 
-import de.sayayi.gradle.BuildSupport
-
-
 plugins {
   id 'de.sayayi.message.base'
   id 'de.sayayi.message.java-library'
@@ -79,9 +76,4 @@ publishing {
       }
     }
   }
-}
-
-
-BuildSupport.configureSnapshotRelease(project) {
-  dependsOn ':message-format-log4j:publishOSSRHPublicationToMavenCentralSnapshotRepository'
 }

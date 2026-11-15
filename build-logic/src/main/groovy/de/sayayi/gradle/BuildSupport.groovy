@@ -86,16 +86,4 @@ final class BuildSupport
       dependsOn 'publishToProjectLocalRepository'
     }
   }
-
-
-  /**
-   * Applies an action to the release task when the project is a snapshot build.
-   *
-   * @param  project the project whose release task is configured
-   * @param  action the action to apply to the release task
-   */
-  static void configureSnapshotRelease(Project project, Closure<? extends Task> action) {
-    if (isSnapshot(project))
-      project.extensions.extraProperties.get('releaseTask').configure(action)
-  }
 }
