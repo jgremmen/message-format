@@ -712,17 +712,19 @@ public final class MessageUtil
    *
    * @param path  the path to the file to check, not {@code null}
    *
-   * @return  {@code true} if the file is a message format pack file, {@code false} otherwise
+   * @return  {@code true} if the file is a message format pack file, {@code false} otherwise, including if the file
+   *          does not exist or cannot be read
    *
    * @since 0.22.0
    */
-  @Contract(pure = true)
+  @Contract(mutates = "io")
   public static boolean isMessageFormatPack(@NotNull Path path)
   {
     try {
       final var mimetype = new PackFileTypeDetector().probeContentType(path);
       return mimetype != null && mimetype.startsWith(MIME_TYPE);
-    } catch(Exception ex) {
+    } catch(RuntimeException ex) {
+      // I/O errors are handled by the detector; e.g. a security exception or a corrupt file is not a pack file either
       return false;
     }
   }
