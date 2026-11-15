@@ -250,9 +250,28 @@ final class TemporalFormatterTest extends AbstractFormatterTest
   {
     var messageAccessor = createMessageAccessor(new TemporalFormatter());
 
-    assertEquals(
-        emptyText(),
-        format(messageAccessor, LocalDate.of(2024, 3, 15), "date", "yyyy-bb"));
+    // invalid patterns are not cached, so the result is the same for repeated use
+    for(var n = 0; n < 2; n++)
+    {
+      assertEquals(
+          emptyText(),
+          format(messageAccessor, LocalDate.of(2024, 3, 15), "date", "yyyy-bb"));
+    }
+  }
+
+
+  @Test
+  @DisplayName("A cached pattern is formatted in the locale of each message")
+  void cachedPatternWithDifferentLocales()
+  {
+    var message = createMessageSupport(new TemporalFormatter())
+        .message("%{d,date:'EEEE d MMMM'}")
+        .with("d", LocalDate.of(2024, 3, 15));
+
+    assertEquals("vendredi 15 mars", message.locale(FRANCE).format());
+    assertEquals("Freitag 15 März", message.locale(GERMANY).format());
+    assertEquals("Friday 15 March", message.locale(UK).format());
+    assertEquals("vendredi 15 mars", message.locale(FRANCE).format());
   }
 
 

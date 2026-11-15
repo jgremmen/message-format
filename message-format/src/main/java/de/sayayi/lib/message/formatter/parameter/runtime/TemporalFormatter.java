@@ -28,8 +28,11 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalQueries;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ClassifierContext.CLASSIFIER_TEMPORAL;
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
@@ -39,7 +42,6 @@ import static java.time.format.FormatStyle.*;
 import static java.time.temporal.ChronoField.*;
 import static java.util.Map.entry;
 import static java.util.Map.ofEntries;
-import static java.util.Objects.requireNonNull;
 
 
 /**
@@ -165,6 +167,23 @@ public final class TemporalFormatter extends AbstractParameterFormatter<Temporal
       entry("F-", ofLocalizedDate(FULL)),
       entry("-F", ofLocalizedTime(FULL)));
 
+  /** Maximum number of pattern formatters kept in {@link #patternFormatterCache}. */
+  private static final int PATTERN_FORMATTER_CACHE_SIZE = 64;
+
+
+  /**
+   * Formatters for custom patterns, keyed by pattern. The least recently used formatter is evicted first.
+   */
+  private final Map<String,DateTimeFormatter> patternFormatterCache = new LinkedHashMap<>(16, 0.75f, true) {
+    @Override
+    protected boolean removeEldestEntry(Map.Entry<String,DateTimeFormatter> eldest) {
+      return size() > PATTERN_FORMATTER_CACHE_SIZE;
+    }
+  };
+
+  /** Lock guarding access to {@link #patternFormatterCache}. */
+  private final Lock patternFormatterCacheLock = new ReentrantLock();
+
 
   /**
    * {@inheritDoc}
@@ -199,7 +218,7 @@ public final class TemporalFormatter extends AbstractParameterFormatter<Temporal
     if (format != null && !STYLE.containsKey(format))
     {
       try {
-        formatter = ofPattern(requireNonNull(format));
+        formatter = getPatternFormatter(format);
       } catch(IllegalArgumentException ex) {
         return emptyText();  // invalid pattern
       }
@@ -233,6 +252,47 @@ public final class TemporalFormatter extends AbstractParameterFormatter<Temporal
       // temporal lacks a field required by the style or pattern (e.g. day of month for Year or YearMonth)
       return emptyText();
     }
+  }
+
+
+  /**
+   * Returns the formatter for the given custom {@code pattern}. Formatters are cached, so a pattern is parsed only once
+   * as long as it is used frequently enough to stay in the cache. Invalid patterns are not cached.
+   *
+   * @param pattern  date/time pattern, not {@code null}
+   *
+   * @return  formatter for the pattern, never {@code null}
+   *
+   * @throws IllegalArgumentException  if the pattern is invalid
+   *
+   * @since 0.25.0
+   */
+  private @NotNull DateTimeFormatter getPatternFormatter(@NotNull String pattern)
+  {
+    DateTimeFormatter formatter;
+
+    patternFormatterCacheLock.lock();
+    try {
+      formatter = patternFormatterCache.get(pattern);
+    } finally {
+      patternFormatterCacheLock.unlock();
+    }
+
+    if (formatter == null)
+    {
+      // create outside the lock; if another thread cached the formatter meanwhile, its instance is used
+      final var createdFormatter = ofPattern(pattern);
+
+      patternFormatterCacheLock.lock();
+      try {
+        if ((formatter = patternFormatterCache.putIfAbsent(pattern, createdFormatter)) == null)
+          formatter = createdFormatter;
+      } finally {
+        patternFormatterCacheLock.unlock();
+      }
+    }
+
+    return formatter;
   }
 
 
