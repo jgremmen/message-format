@@ -99,10 +99,24 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
 
 
   /**
-   * Finds the message that best matches {@code locale}. In order of preference, this is the message for the same
-   * language and country, a message for the same language without country, a message for the same language and a
-   * different country, a message for a locale without language (e.g. {@link Locale#ROOT}) or the first available
-   * message. If several messages match equally well, the first one in iteration order is selected.
+   * Finds the message that best matches {@code locale}.
+   * <p>
+   * A message for the same language is always preferred over a message for a locale without language (e.g.
+   * {@link Locale#ROOT}), which in turn is preferred over a message for any other language. Among the messages for the
+   * same language, the script is compared first and the country second:
+   * <ol>
+   *   <li>
+   *     If {@code locale} has a script, a message with the same script is preferred over a message without script,
+   *     which is preferred over a message with a different script. If {@code locale} has no script, the script of the
+   *     messages is not considered.
+   *   </li>
+   *   <li>
+   *     A message for the same country is preferred over a message without country, which is preferred over a message
+   *     for a different country.
+   *   </li>
+   * </ol>
+   * The variant is not considered. If several messages match equally well, the first one in iteration order is
+   * selected.
    *
    * @param locale  locale to find a message for, not {@code null}
    *
@@ -112,6 +126,7 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
   private @NotNull Message findMessageByLocale(@NotNull Locale locale)
   {
     final var searchLanguage = locale.getLanguage();
+    final var searchScript = locale.getScript();
     final var searchCountry = locale.getCountry();
 
     var bestMatch = -1;
@@ -125,12 +140,21 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
 
       if (keyLanguage.equals(searchLanguage))
       {
+        // same script (or no script requested) / without script / different script
+        final var keyScript = keyLocale.getScript();
+        final var scriptMatch = searchScript.isEmpty() || keyScript.equals(searchScript)
+            ? 2 : keyScript.isEmpty() ? 1 : 0;
+
+        // same country / without country / different country
         final var keyCountry = keyLocale.getCountry();
+        final var countryMatch = keyCountry.equals(searchCountry)
+            ? 2 : keyCountry.isEmpty() ? 1 : 0;
 
-        if (keyCountry.equals(searchCountry))
-          return entry.getValue();  // same language and country
+        if (scriptMatch == 2 && countryMatch == 2)
+          return entry.getValue();  // same language, script and country
 
-        match = keyCountry.isEmpty() ? 3 : 2;  // same language without country / with different country
+        // same language: 2..9, the script is more significant than the country
+        match = 2 + scriptMatch * 3 + countryMatch;
       }
       else
         match = keyLanguage.isEmpty() ? 1 : 0;  // "default" language / any other language
