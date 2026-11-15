@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
+import com.github.gradle.node.npm.task.NpmTask
 import groovy.json.JsonSlurper
 
 
 plugins {
   id 'de.sayayi.message.base'
+
+  alias(libs.plugins.node.gradle)
 }
 
 
@@ -28,7 +31,6 @@ description = 'Message Format highlight.js language'
 def highlightDir = layout.projectDirectory
 def grammarDir = layout.settingsDirectory.dir('message-format/src/main/antlr')
 def testResourceDir = layout.settingsDirectory.dir('message-format/src/test/resources')
-def npm = System.getProperty('os.name').toLowerCase().contains('windows') ? 'npm.cmd' : 'npm'
 
 // the ANTLR tool must have exactly the version of the antlr4 runtime in package.json
 def antlrVersion = new JsonSlurper().parse(highlightDir.file('package.json').asFile).dependencies.antlr4
@@ -42,19 +44,27 @@ def highlightAntlrToolClasspath = configurations.resolvable('highlightAntlrToolC
   extendsFrom highlightAntlrTool.get()
 }
 
+
 dependencies {
   add(highlightAntlrTool.name, "org.antlr:antlr4:${antlrVersion}!!")
 }
 
 
-def highlightSyncVersion = tasks.register('highlightSyncVersion', Exec) {
+node {
+  version = libs.versions.nodejs.get()
+
+  download = true
+  workDir = new File(gradle.gradleUserHomeDir, 'nodejs')
+}
+
+
+def highlightSyncVersion = tasks.register('highlightSyncVersion', NpmTask) {
   group = 'highlight'
   description = 'Sets the version of the highlight.js package to the library version.'
 
   def packageJson = highlightDir.file('package.json').asFile
 
-  workingDir = highlightDir
-  commandLine npm, 'version', libraryVersion, '--no-git-tag-version', '--allow-same-version'
+  npmCommand = [ 'version', libraryVersion, '--no-git-tag-version', '--allow-same-version' ]
 
   onlyIf('package version differs from library version') {
     new JsonSlurper().parse(packageJson).version != libraryVersion
@@ -62,14 +72,13 @@ def highlightSyncVersion = tasks.register('highlightSyncVersion', Exec) {
 }
 
 
-def highlightNpmInstall = tasks.register('highlightNpmInstall', Exec) {
+def highlightNpmInstall = tasks.register('highlightNpmInstall', NpmTask) {
   group = 'highlight'
   description = 'Installs the npm dependencies of the highlight.js language.'
 
   dependsOn highlightSyncVersion
 
-  workingDir = highlightDir
-  commandLine npm, 'ci', '--no-audit', '--no-fund'
+  npmCommand = [ 'ci', '--no-audit', '--no-fund' ]
 
   inputs
       .files(highlightDir.file('package.json'), highlightDir.file('package-lock.json'))
@@ -83,7 +92,7 @@ def highlightNpmInstall = tasks.register('highlightNpmInstall', Exec) {
 }
 
 
-def highlightBuild = tasks.register('highlightBuild', Exec) {
+def highlightBuild = tasks.register('highlightBuild', NpmTask) {
   group = 'highlight'
   description = 'Generates the parser and builds the highlight.js language distributables.'
 
@@ -91,8 +100,8 @@ def highlightBuild = tasks.register('highlightBuild', Exec) {
 
   def antlrClasspath = highlightAntlrToolClasspath.get()
 
-  workingDir = highlightDir
-  commandLine npm, 'run', 'build'
+  npmCommand = [ 'run', 'build' ]
+  environment.put('ANTLR_CLASSPATH', antlrClasspath.elements.map { it*.asFile*.absolutePath.join(File.pathSeparator) })
 
   inputs
       .files(grammarDir.file('MessageLexer.g4'), grammarDir.file('MessageParser.g4'))
@@ -114,14 +123,10 @@ def highlightBuild = tasks.register('highlightBuild', Exec) {
   outputs
       .dirs(highlightDir.dir('dist'), highlightDir.dir('src/generated'))
       .withPropertyName('distributables')
-
-  doFirst {
-    environment 'ANTLR_CLASSPATH', antlrClasspath.asPath
-  }
 }
 
 
-def highlightTest = tasks.register('highlightTest', Exec) {
+def highlightTest = tasks.register('highlightTest', NpmTask) {
   group = 'verification'
   description = 'Runs the tests of the highlight.js language.'
 
@@ -129,8 +134,7 @@ def highlightTest = tasks.register('highlightTest', Exec) {
 
   def marker = layout.buildDirectory.file('highlight/test-passed')
 
-  workingDir = highlightDir
-  commandLine 'node', '--test', 'test/'
+  npmCommand = [ 'run', 'test:run' ]
 
   inputs
       .files(highlightDir.dir('src'), highlightDir.dir('dist'), highlightDir.dir('test'))

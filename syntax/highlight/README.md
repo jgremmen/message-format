@@ -246,6 +246,7 @@ Requirements: Node.js 20+, and Java 11+ to run the ANTLR tool.
 npm install
 npm run build        # check version, prepare grammar, generate parser, bundle into dist/
 npm test             # build + run all tests
+npm run test:run     # run all tests without building
 npm run test:update  # build + regenerate test snapshots
 npm run check-themes # list themes that need the delimiter fallback CSS
 npm run clean        # remove build/, dist/ and src/generated/
@@ -268,14 +269,16 @@ How the build works:
 ### Gradle
 
 The highlighter is the Gradle subproject `:highlight` (build file `highlight.gradle`), so it is part of the
-normal build. Node.js and npm must be on the `PATH`.
+normal build. Node.js and npm don't have to be installed: the
+[Gradle Node plugin](https://github.com/node-gradle/gradle-node-plugin) downloads the Node.js version
+`nodejs` from `gradle/libs.versions.toml` into the Gradle user home and runs all tasks with it.
 
 | Task                  | Does                                                      | Hooked into |
 |-----------------------|-----------------------------------------------------------|-------------|
 | `highlightSyncVersion`| sets the package version to the library version           | –           |
 | `highlightNpmInstall` | `npm ci`                                                  | –           |
 | `highlightBuild`      | `npm run build`, with the ANTLR tool resolved by Gradle    | `assemble`  |
-| `highlightTest`       | `node --test test/`                                       | `check`     |
+| `highlightTest`       | `npm run test:run` (`node --test test/`)                  | `check`     |
 | `highlightClean`      | deletes `build/`, `dist/` and `src/generated/`            | `clean`     |
 
 The package version follows the library version (`message-format` in `gradle/libs.versions.toml`).
