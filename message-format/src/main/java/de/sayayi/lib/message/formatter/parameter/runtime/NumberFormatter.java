@@ -246,6 +246,16 @@ public final class NumberFormatter
   }
 
 
+  /**
+   * Tells whether {@code format} selects the plain number format.
+   * <p>
+   * With the plain number format, integral numbers are written without locale specific formatting and all other numbers
+   * use the default number format of the locale.
+   *
+   * @param format  number format name or pattern, may be {@code null}
+   *
+   * @return  {@code true} if {@code format} is {@code null}, empty or {@code plain}, {@code false} otherwise
+   */
   @Contract(pure = true)
   private static boolean isPlainFormat(String format) {
     return isEmpty(format) || "plain".equals(format);
