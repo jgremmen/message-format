@@ -22,9 +22,9 @@
     "check-version": "node scripts/check-version.mjs",
     "build": "npm run check-version && npm run generate && node scripts/build.mjs",
     "test": "npm run build && npm run test:run",
-    "test:run": "node --test test/",
+    "test:run": "node --test 'test/*.test.js'",
     "check-themes": "node scripts/check-themes.mjs",
-    "test:update": "npm run build && UPDATE_SNAPSHOTS=1 node --test test/",
+    "test:update": "npm run build && UPDATE_SNAPSHOTS=1 node --test 'test/*.test.js'",
     "clean": "node -e \"for (const d of ['build', 'dist', 'src/generated']) require('fs').rmSync(d, { recursive: true, force: true })\""
   },
   "dependencies": {

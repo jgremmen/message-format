@@ -240,7 +240,7 @@ other 206 themes give `template-tag` a colour of its own):
 
 ## Building and testing
 
-Requirements: Node.js 20+, and Java 11+ to run the ANTLR tool.
+Requirements: Node.js 22+, and Java 11+ to run the ANTLR tool.
 
 ```sh
 npm install
@@ -278,7 +278,7 @@ normal build. Node.js and npm don't have to be installed: the
 | `highlightSyncVersion`| sets the package version to the library version           | –           |
 | `highlightNpmInstall` | `npm ci`                                                  | –           |
 | `highlightBuild`      | `npm run build`, with the ANTLR tool resolved by Gradle    | `assemble`  |
-| `highlightTest`       | `npm run test:run` (`node --test test/`)                  | `check`     |
+| `highlightTest`       | `npm run test:run` (`node --test` on `test/*.test.js`)    | `check`     |
 | `highlightClean`      | deletes `build/`, `dist/` and `src/generated/`            | `clean`     |
 
 The package version follows the library version (`message-format` in `gradle/libs.versions.toml`).
