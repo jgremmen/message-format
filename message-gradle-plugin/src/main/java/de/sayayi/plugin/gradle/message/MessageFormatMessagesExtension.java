@@ -15,7 +15,6 @@
  */
 package de.sayayi.plugin.gradle.message;
 
-import groovy.lang.GString;
 import org.gradle.api.InvalidUserDataException;
 import org.gradle.api.provider.ListProperty;
 import org.gradle.api.provider.Property;
@@ -175,12 +174,10 @@ public abstract class MessageFormatMessagesExtension
     if (value instanceof DuplicateStrategy duplicateStrategy)
       return duplicateStrategy;
 
-    if (value instanceof GString)
-      value = value.toString();
-
-    if (value instanceof String string)
+    // String, including Groovy GString and Kotlin string templates
+    if (value instanceof CharSequence charSequence)
     {
-      var ds = findEnumValue(string, DuplicateStrategy.class);
+      var ds = findEnumValue(charSequence.toString(), DuplicateStrategy.class);
       if (ds.isPresent())
         return ds.get();
     }

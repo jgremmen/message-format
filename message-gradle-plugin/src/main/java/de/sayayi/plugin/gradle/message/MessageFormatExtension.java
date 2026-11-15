@@ -19,7 +19,6 @@ import org.gradle.api.Action;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Property;
-import org.gradle.api.tasks.Nested;
 import org.gradle.api.tasks.SourceSet;
 import org.jetbrains.annotations.NotNull;
 
@@ -103,7 +102,6 @@ public abstract class MessageFormatExtension
    *
    * @since 0.24.0
    */
-  @Nested
   public MessageFormatTemplatesExtension getTemplates() {
     return templates;
   }
