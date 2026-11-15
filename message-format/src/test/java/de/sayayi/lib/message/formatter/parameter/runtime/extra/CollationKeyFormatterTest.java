@@ -17,7 +17,6 @@ package de.sayayi.lib.message.formatter.parameter.runtime.extra;
 
 import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -44,16 +43,17 @@ final class CollationKeyFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  void testFormattableTypes() {
+  @DisplayName("Formattable types include CollationKey")
+  void formattableTypes() {
     assertFormatterForType(new CollationKeyFormatter(), CollationKey.class);
   }
 
 
   @Test
   @DisplayName("Format source string and size")
-  void testFormat()
+  void formatSourceStringAndSize()
   {
-    val key = Collator
+    var key = Collator
         .getInstance(GERMANY)
         .getCollationKey("Straße");
 
@@ -74,10 +74,10 @@ final class CollationKeyFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Empty key matches a collation key for an empty string")
-  void testEmptyKey()
+  void emptyKey()
   {
-    val collator = Collator.getInstance(GERMANY);
-    val message = messageSupport.message("%{key,empty:'no sort key',!empty:'sort key'}");
+    var collator = Collator.getInstance(GERMANY);
+    var message = messageSupport.message("%{key,empty:'no sort key',!empty:'sort key'}");
 
     assertEquals(
         "no sort key",

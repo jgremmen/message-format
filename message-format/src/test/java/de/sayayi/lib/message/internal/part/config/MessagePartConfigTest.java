@@ -17,7 +17,6 @@ package de.sayayi.lib.message.internal.part.config;
 
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueNumber;
 import de.sayayi.lib.message.part.TypedValue;
-import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -47,10 +46,10 @@ class MessagePartConfigTest
   @DisplayName("Copies the configuration map")
   void copiesConfigurationMap()
   {
-    val source = new HashMap<String,TypedValue<?>>();
+    var source = new HashMap<String,TypedValue<?>>();
     source.put("enabled", TRUE);
 
-    val config = new MessagePartConfig(source);
+    var config = new MessagePartConfig(source);
 
     source.put("enabled", FALSE);
     source.put("added", TRUE);
@@ -64,11 +63,11 @@ class MessagePartConfigTest
   @DisplayName("Iterates config names in sorted order")
   void iteratesConfigNamesSorted()
   {
-    val source = new HashMap<String,TypedValue<?>>();
-    for(val name: List.of("g", "f", "a", "e", "c", "b", "d"))
+    var source = new HashMap<String,TypedValue<?>>();
+    for(var name: List.of("g", "f", "a", "e", "c", "b", "d"))
       source.put(name, new TypedValueNumber(name.charAt(0)));
 
-    val config = new MessagePartConfig(source);
+    var config = new MessagePartConfig(source);
 
     assertEquals(List.of("a", "b", "c", "d", "e", "f", "g"), List.copyOf(config.getConfigNames()));
     assertEquals(config, new MessagePartConfig(Map.copyOf(source)));
@@ -79,8 +78,8 @@ class MessagePartConfigTest
   @DisplayName("Packs identical configurations into identical bytes")
   void packIsIndependentOfSourceMapOrder() throws Exception
   {
-    val source = new HashMap<String,TypedValue<?>>();
-    for(val name: List.of("zeta", "alpha", "mu", "beta", "omega"))
+    var source = new HashMap<String,TypedValue<?>>();
+    for(var name: List.of("zeta", "alpha", "mu", "beta", "omega"))
       source.put(name, TRUE);
 
     assertArrayEquals(pack(new MessagePartConfig(source)), pack(new MessagePartConfig(Map.copyOf(source))));

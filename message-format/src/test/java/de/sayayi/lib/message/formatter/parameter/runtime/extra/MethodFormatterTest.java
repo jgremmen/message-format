@@ -16,7 +16,6 @@
 package de.sayayi.lib.message.formatter.parameter.runtime.extra;
 
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -40,15 +39,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 final class MethodFormatterTest extends AbstractFormatterTest
 {
   @Test
-  void testFormattableTypes() {
+  @DisplayName("Formattable types include Method")
+  void formattableTypes() {
     assertFormatterForType(new MethodFormatter(), Method.class);
   }
 
 
   @Test
-  void testFormat() throws Exception
+  @DisplayName("A method is formatted as signature, name, return type or declaring class")
+  void formatMethod() throws Exception
   {
-    val message = createMessageSupport(UK, new MethodFormatter())
+    var message = createMessageSupport(UK, new MethodFormatter())
         .message("%{m} %{m,method:'name'} %{m,method:'return-type'} %{m,method:'class'}");
 
     assertEquals(

@@ -72,7 +72,7 @@ final class LocalizedMessageBundleWithCodeTest
   @ParameterizedTest(name = "{1} -> {2}")
   @MethodSource("localeSelectionCases")
   @DisplayName("Selects the message matching language, script and country, in this order of significance")
-  void testLocaleSelection(@NotNull Message.WithCode bundle, @NotNull String languageTag, @NotNull String expected)
+  void localeSelection(@NotNull Message.WithCode bundle, @NotNull String languageTag, @NotNull String expected)
   {
     assertEquals(
         expected,

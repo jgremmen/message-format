@@ -21,7 +21,6 @@ import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.formatter.post.PostFormatter;
 import de.sayayi.lib.message.formatter.post.PostFormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
 
@@ -66,7 +65,7 @@ final class GenericFormatterServiceConcurrencyTest
   @DisplayName("Concurrent type-based formatter registration is visible to concurrent lookups")
   void concurrentTypeFormatterRegistrationAndLookup() throws Exception
   {
-    val service = new GenericFormatterService();
+    var service = new GenericFormatterService();
 
     runWithReaders(TYPES.length, idx -> service.addFormatterForType(
         new FormattableType(TYPES[idx]), new MarkerFormatter(TYPES[idx])), 8, reader -> {
@@ -77,7 +76,7 @@ final class GenericFormatterServiceConcurrencyTest
     // all registered types must now be resolvable
     for(var type: TYPES)
     {
-      val formatters = service.getFormatters(null, type, EMPTY_CONFIG);
+      var formatters = service.getFormatters(null, type, EMPTY_CONFIG);
 
       assertTrue(Stream
               .of(formatters)
@@ -91,8 +90,8 @@ final class GenericFormatterServiceConcurrencyTest
   @DisplayName("Concurrent named formatter and post formatter registration do not corrupt the registry")
   void concurrentNamedFormatterAndPostFormatterRegistration() throws Exception
   {
-    val service = new GenericFormatterService();
-    val threadCount = 16;
+    var service = new GenericFormatterService();
+    var threadCount = 16;
 
     runWithReaders(threadCount, idx -> {
       service.addFormatter(new MarkerNamedFormatter("named-" + idx));
@@ -102,14 +101,14 @@ final class GenericFormatterServiceConcurrencyTest
       service.getParameterConfigNames();
     });
 
-    val postFormatters = service.getPostFormatters();
+    var postFormatters = service.getPostFormatters();
     assertEquals(threadCount, postFormatters.size());
 
     for(var i = 0; i < threadCount; i++)
     {
       assertTrue(postFormatters.containsKey("post-" + i));
 
-      val formatters = service.getFormatters("named-" + i, String.class, EMPTY_CONFIG);
+      var formatters = service.getFormatters("named-" + i, String.class, EMPTY_CONFIG);
       assertEquals(1, formatters.length);
       assertEquals("named-" + i, ((NamedParameterFormatter)formatters[0]).getName());
     }
@@ -120,7 +119,7 @@ final class GenericFormatterServiceConcurrencyTest
   @DisplayName("High contention stress test with concurrent reads and writes")
   void highContentionStressTest() throws Exception
   {
-    val service = new GenericFormatterService();
+    var service = new GenericFormatterService();
 
     stress(24, 200,
         (idx, i) -> service.addFormatterForType(

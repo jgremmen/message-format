@@ -18,7 +18,6 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import lombok.val;
 import org.intellij.lang.annotations.Language;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -50,7 +49,7 @@ final class CharsetFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Formattable types")
-  void testFormattableTypes() {
+  void formattableTypes() {
     assertFormatterForType(new CharsetFormatter(), Charset.class);
   }
 
@@ -66,7 +65,7 @@ final class CharsetFormatterTest extends AbstractFormatterTest
   @DisplayName("Format ISO-8859-11 charset with display name")
   void formatIso885911DisplayName()
   {
-    val charset = Charset.forName("ISO-8859-11");
+    var charset = Charset.forName("ISO-8859-11");
 
     assertEquals(noSpaceText(charset.displayName()), format(messageAccessor, charset));
   }
@@ -84,7 +83,7 @@ final class CharsetFormatterTest extends AbstractFormatterTest
   void formatWithAliasMapping()
   {
     // Find an alias for UTF-8 that differs from the canonical name
-    val alias = UTF_8
+    var alias = UTF_8
         .aliases()
         .stream()
         .filter(a -> !a.equals(UTF_8.name()))
@@ -107,7 +106,7 @@ final class CharsetFormatterTest extends AbstractFormatterTest
   {
     // canonical 'UTF-8' matches UTF-8, alias 'latin1' matches ISO-8859-1, default for others
     @Language("MessageFormat")
-    val msg = "%{cs,'UTF-8':'by-canonical','latin1':'by-alias',:'default'}";
+    var msg = "%{cs,'UTF-8':'by-canonical','latin1':'by-alias',:'default'}";
 
     assertEquals(
         "by-canonical",
@@ -136,7 +135,7 @@ final class CharsetFormatterTest extends AbstractFormatterTest
   {
     // 'US-ASCII' is canonical, 'ASCII' is alias → canonical match (EXACT) wins over alias (EQUIVALENT)
     @Language("MessageFormat")
-    val msg = "%{cs,'ASCII':'by-alias','US-ASCII':'by-canonical',:'default'}";
+    var msg = "%{cs,'ASCII':'by-alias','US-ASCII':'by-canonical',:'default'}";
 
     assertEquals(
         "by-canonical",
@@ -155,7 +154,7 @@ final class CharsetFormatterTest extends AbstractFormatterTest
     // !'UTF-8' mismatches for UTF-8, matches for others;
     // !'latin1' leniently matches for ISO-8859-1 (alias), matches for others
     @Language("MessageFormat")
-    val msg = "%{cs,!'UTF-8':'not-utf8',!'latin1':'not-latin1',:'default'}";
+    var msg = "%{cs,!'UTF-8':'not-utf8',!'latin1':'not-latin1',:'default'}";
 
     // UTF-8: !'UTF-8' fails (canonical match), !'latin1' succeeds → "not-latin1"
     assertEquals(

@@ -18,7 +18,6 @@ package de.sayayi.lib.message.internal.formatter;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.parameter.runtime.ArrayFormatter;
 import de.sayayi.lib.message.util.IsolatingTestClassLoader;
-import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -51,8 +50,8 @@ final class FormatterCacheTest
   @DisplayName("Cache entry reorganization on lookup")
   void lookup()
   {
-    val cache = new FormatterCache(8);
-    val fn = (Function<Class<?>,ParameterFormatter[]>)t -> new ParameterFormatter[0];
+    var cache = new FormatterCache(8);
+    var fn = (Function<Class<?>,ParameterFormatter[]>)t -> new ParameterFormatter[0];
 
     cache.lookup(boolean.class, fn);
     cache.lookup(int.class, fn);
@@ -73,7 +72,7 @@ final class FormatterCacheTest
 
     // lookup int, requires call to buildFormatters (moves it to head) and removes long
     // cache: int, List, boolean, byte[], Map, Double, String, short
-    val pf = new ParameterFormatter[] { new ArrayFormatter() };
+    var pf = new ParameterFormatter[] { new ArrayFormatter() };
     assertArrayEquals(pf, cache.lookup(int.class, t -> pf));
 
     // lookup byte[] which doesn't move it to head (not in lower quarter)
@@ -98,13 +97,13 @@ final class FormatterCacheTest
   @DisplayName("Same class name loaded by different class loaders")
   void lookupSameClassNameDifferentClassLoaders() throws Exception
   {
-    val cache = new FormatterCache(8);
-    val type1 = new IsolatingTestClassLoader(SameNameType.class).loadClass(SameNameType.class.getName());
-    val type2 = new IsolatingTestClassLoader(SameNameType.class).loadClass(SameNameType.class.getName());
-    val type3 = new IsolatingTestClassLoader(SameNameType.class).loadClass(SameNameType.class.getName());
-    val pf1 = new ParameterFormatter[] { new ArrayFormatter() };
-    val pf2 = new ParameterFormatter[] { new ArrayFormatter() };
-    val pf3 = new ParameterFormatter[] { new ArrayFormatter() };
+    var cache = new FormatterCache(8);
+    var type1 = new IsolatingTestClassLoader(SameNameType.class).loadClass(SameNameType.class.getName());
+    var type2 = new IsolatingTestClassLoader(SameNameType.class).loadClass(SameNameType.class.getName());
+    var type3 = new IsolatingTestClassLoader(SameNameType.class).loadClass(SameNameType.class.getName());
+    var pf1 = new ParameterFormatter[] { new ArrayFormatter() };
+    var pf2 = new ParameterFormatter[] { new ArrayFormatter() };
+    var pf3 = new ParameterFormatter[] { new ArrayFormatter() };
 
     assertNotSame(type1, type2);
     assertEquals(type1.getName(), type2.getName());
@@ -126,7 +125,7 @@ final class FormatterCacheTest
       for(var type: List.of(int.class, long.class, short.class, byte.class, char.class, float.class, double.class))
         cache.lookup(type, t -> new ParameterFormatter[0]);
 
-      val pf = new ParameterFormatter[] { new ArrayFormatter() };
+      var pf = new ParameterFormatter[] { new ArrayFormatter() };
       assertSame(pf, cache.lookup(type1, t -> pf));
     });
   }
@@ -136,13 +135,13 @@ final class FormatterCacheTest
   @DisplayName("Cached types do not prevent their class loader from being unloaded")
   void lookupDoesNotRetainClassLoader() throws Exception
   {
-    val cache = new FormatterCache(8);
+    var cache = new FormatterCache(8);
 
     assertGarbageCollected(cacheTypeFromIsolatingClassLoader(cache),
         "class loader of a cached type has not been garbage collected");
 
     // the cache is still usable and a newly loaded type with the same name gets its own entry
-    val pf = new ParameterFormatter[] { new ArrayFormatter() };
+    var pf = new ParameterFormatter[] { new ArrayFormatter() };
     assertSame(pf, cache.lookup(new IsolatingTestClassLoader(SameNameType.class).loadClass(SameNameType.class.getName()), t -> pf));
   }
 
@@ -150,9 +149,9 @@ final class FormatterCacheTest
   private static @NotNull WeakReference<ClassLoader> cacheTypeFromIsolatingClassLoader(@NotNull FormatterCache cache)
       throws ClassNotFoundException
   {
-    val classLoader = new IsolatingTestClassLoader(SameNameType.class);
-    val type = classLoader.loadClass(SameNameType.class.getName());
-    val pf = new ParameterFormatter[] { new ArrayFormatter() };
+    var classLoader = new IsolatingTestClassLoader(SameNameType.class);
+    var type = classLoader.loadClass(SameNameType.class.getName());
+    var pf = new ParameterFormatter[] { new ArrayFormatter() };
 
     assertSame(pf, cache.lookup(type, t -> pf));
     assertSame(pf, cache.lookup(type, t -> fail()));

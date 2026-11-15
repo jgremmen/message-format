@@ -20,7 +20,6 @@ import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.exception.MessageFormatException;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import lombok.val;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -60,9 +59,9 @@ final class SpELFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Extract value from bean with optional format selector")
-  void testFormat()
+  void extractValueFromBean()
   {
-    val map = new TreeMap<String,Integer>();
+    var map = new TreeMap<String,Integer>();
     map.put("A", 0);
     map.put("C", 34);
     map.put("D", -8);
@@ -86,7 +85,7 @@ final class SpELFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Instance methods, properties and variables are available")
-  void testReadOnlyDataAccess()
+  void readOnlyDataAccess()
   {
     assertEquals("ALICE", messageSupport
         .message("%{name,spel-expr:'toUpperCase()'}")
@@ -108,7 +107,7 @@ final class SpELFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Cached expressions are evaluated for each value and variable")
-  void testCachedExpression()
+  void cachedExpression()
   {
     // more distinct expressions than the cache holds, each used repeatedly
     for(var round = 0; round < 2; round++)
@@ -140,14 +139,14 @@ final class SpELFormatterTest extends AbstractFormatterTest
       "#b = 1",
       "bytes = null"
   })
-  void testRestrictedExpressions(String expression)
+  void restrictedExpressions(String expression)
   {
-    val message = messageSupport.message("%{v,spel-expr:\"" + expression.replace("\"", "'") + "\"}");
+    var message = messageSupport.message("%{v,spel-expr:\"" + expression.replace("\"", "'") + "\"}");
 
     // the second evaluation uses the cached expression, which must be rejected as well
     for(var n = 0; n < 2; n++)
     {
-      val exception = assertThrows(MessageFormatException.class, () -> message
+      var exception = assertThrows(MessageFormatException.class, () -> message
           .with("v", "value")
           .with("b", 41)
           .format());

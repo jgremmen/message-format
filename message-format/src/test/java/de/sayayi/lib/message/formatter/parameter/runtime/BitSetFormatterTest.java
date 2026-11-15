@@ -18,7 +18,6 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
 
@@ -55,7 +54,7 @@ final class BitSetFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Empty BitSet")
-  void testEmptyBitSet()
+  void emptyBitSet()
   {
     assertEquals("", messageSupport
         .message("%{bs,0:zero,1:one,2:two}")
@@ -66,9 +65,9 @@ final class BitSetFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Set bits with no matching map keys are skipped")
-  void testNoMatchingKeys()
+  void noMatchingKeys()
   {
-    val bitSet = bitSet(5, 10, 15);
+    var bitSet = bitSet(5, 10, 15);
 
     // map keys 0, 1, 2 don't match any set bits (5, 10, 15)
     assertEquals("", messageSupport
@@ -80,9 +79,9 @@ final class BitSetFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Only bits with matching map keys are included in output")
-  void testPartiallyMatchingKeys()
+  void partiallyMatchingKeys()
   {
-    val bitSet = bitSet(1, 3, 5, 7);
+    var bitSet = bitSet(1, 3, 5, 7);
 
     // only bits 1, 3, 5 have matching map keys; bit 7 is skipped
     assertEquals("one, three, five", messageSupport
@@ -94,9 +93,9 @@ final class BitSetFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Unique filter removes duplicate values")
-  void testUniqueValues()
+  void uniqueValues()
   {
-    val bitSet = bitSet(1, 2, 3, 5, 8);
+    var bitSet = bitSet(1, 2, 3, 5, 8);
 
     // bits 1, 3, 5 all map to 'same'; with list-unique:true duplicates are suppressed
     assertEquals("same, two, eight", messageSupport
@@ -108,9 +107,9 @@ final class BitSetFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Most significant set bit first ordering (msb-set)")
-  void testMsbSetOrdering()
+  void msbSetOrdering()
   {
-    val bitSet = bitSet(0, 2, 4, 6, 8);
+    var bitSet = bitSet(0, 2, 4, 6, 8);
 
     assertEquals("eight, six, four, two, zero", messageSupport
         .message("%{bs,bitset:msb-set,0:zero,2:two,4:four,6:six,8:eight}")
@@ -121,9 +120,9 @@ final class BitSetFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Least significant set bit first ordering (lsb-set)")
-  void testLsbSetOrdering()
+  void lsbSetOrdering()
   {
-    val bitSet = bitSet(0, 2, 4, 6, 8);
+    var bitSet = bitSet(0, 2, 4, 6, 8);
 
     assertEquals("zero, two, four, six, eight", messageSupport
         .message("%{bs,bitset:lsb-set,0:zero,2:two,4:four,6:six,8:eight}")
@@ -134,9 +133,9 @@ final class BitSetFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("LSB bits with default true/false messages")
-  void testLsbBitsDefault()
+  void lsbBitsDefault()
   {
-    val bitSet = bitSet(0, 3, 5);
+    var bitSet = bitSet(0, 3, 5);
 
     // bits: 0=1, 1=0, 2=0, 3=1, 4=0, 5=1 → "100101"
     assertEquals("100101", messageSupport
@@ -148,9 +147,9 @@ final class BitSetFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("MSB bits with default true/false messages")
-  void testMsbBitsDefault()
+  void msbBitsDefault()
   {
-    val bitSet = bitSet(0, 3, 5);
+    var bitSet = bitSet(0, 3, 5);
 
     // bits: 5=1, 4=0, 3=1, 2=0, 1=0, 0=1 → "101001"
     assertEquals("101001", messageSupport
@@ -162,9 +161,9 @@ final class BitSetFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("LSB bits with custom true/false messages")
-  void testLsbBitsCustom()
+  void lsbBitsCustom()
   {
-    val bitSet = bitSet(1, 2, 4);
+    var bitSet = bitSet(1, 2, 4);
 
     // bits: 0=X, 1=O, 2=O, 3=X, 4=O → "XOOXO"
     assertEquals("XOOXO", messageSupport
@@ -176,9 +175,9 @@ final class BitSetFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("MSB bits with custom true/false messages")
-  void testMsbBitsCustom()
+  void msbBitsCustom()
   {
-    val bitSet = bitSet(1, 2, 4);
+    var bitSet = bitSet(1, 2, 4);
 
     // bits: 4=O, 3=X, 2=O, 1=O, 0=X → "OXOOX"
     assertEquals("OXOOX", messageSupport
@@ -190,9 +189,9 @@ final class BitSetFormatterTest extends AbstractFormatterTest
 
   private static @NotNull BitSet bitSet(int... bits)
   {
-    val bitSet = new BitSet();
+    var bitSet = new BitSet();
 
-    for(val bit: bits)
+    for(var bit: bits)
       bitSet.set(bit);
 
     return bitSet;

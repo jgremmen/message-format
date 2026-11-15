@@ -19,18 +19,23 @@ import de.sayayi.lib.message.internal.part.map.key.MapKeyString;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueMessage;
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
-import lombok.val;
+import org.intellij.lang.annotations.Language;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static java.util.Locale.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 
 /**
@@ -41,77 +46,65 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 @DisplayName("Locale formatter")
 @TestMethodOrder(MethodOrderer.DisplayName.class)
+@SuppressWarnings("SpellCheckingInspection")
 final class LocaleFormatterTest extends AbstractFormatterTest
 {
   @Test
-  void testFormattableTypes() {
+  @DisplayName("Formattable types include Locale")
+  void formattableTypes() {
     assertFormatterForType(new LocaleFormatter(), Locale.class);
   }
 
 
-  @Test
-  void testFormatCountry()
+  static Stream<Arguments> displayNames()
   {
-    val messageAccessor = createMessageAccessor(FRANCE, new LocaleFormatter());
-    val messageFactory = messageAccessor.getMessageFactory();
-
-    assertEquals(
-        noSpaceText("États-Unis"),
-        format(messageAccessor, US, "locale", "country"));
-
-    assertEquals(
-        noSpaceText("The Great Kingdom"),
-        format(
-            messageAccessor,
-            UK,
-            Map.of(
-                "locale",
-                new TypedValueString(messageFactory, "country")),
-            Map.of(
-                new MapKeyString("GB"),
-                new TypedValueMessage(messageAccessor.getMessageFactory().parseMessage("The Great Kingdom")))));
+    return Stream.of(
+        arguments(FRANCE, US, "country", "États-Unis"),
+        arguments(forLanguageTag("es-ES"), UK, "language", "inglés"),
+        arguments(forLanguageTag("nl-BE"), UK, null, "Engels (Verenigd Koninkrijk)"),
+        arguments(forLanguageTag("nl-BE"), GERMAN, "name", "Duits"),
+        arguments(forLanguageTag("nl-BE"), KOREA, "name", "Koreaans (Zuid-Korea)"));
   }
 
 
-  @Test
-  void testFormatLanguage()
+  @ParameterizedTest(name = "{1} in {0} with locale:{2} -> {3}")
+  @DisplayName("Country, language and name are displayed in the language of the formatting locale")
+  @MethodSource("displayNames")
+  void displayName(Locale formattingLocale, Locale value, String localeConfig, String expected)
   {
-    val messageAccessor = createMessageAccessor(Locale.forLanguageTag("es-ES"), new LocaleFormatter());
-    val messageFactory = messageAccessor.getMessageFactory();
+    var messageAccessor = createMessageAccessor(formattingLocale, new LocaleFormatter());
 
     assertEquals(
-        noSpaceText("inglés"),
-        format(messageAccessor, UK, "locale", "language"));
-
-    assertEquals(
-        noSpaceText("francesa"),
-        format(
-            messageAccessor,
-            FRANCE,
-            Map.of(
-                "locale",
-                new TypedValueString(messageFactory, "language")),
-            Map.of(
-                new MapKeyString("fr"),
-                new TypedValueMessage(messageAccessor.getMessageFactory().parseMessage("francesa")))));
+        noSpaceText(expected),
+        localeConfig == null
+            ? format(messageAccessor, value)
+            : format(messageAccessor, value, "locale", localeConfig));
   }
 
 
-  @Test
-  void testFormatName()
+  static Stream<Arguments> mappedValues()
   {
-    val messageAccessor = createMessageAccessor(Locale.forLanguageTag("nl-BE"), new LocaleFormatter());
+    return Stream.of(
+        arguments(FRANCE, UK, "country", "GB", "The Great Kingdom"),
+        arguments(forLanguageTag("es-ES"), FRANCE, "language", "fr", "francesa"));
+  }
+
+
+  @ParameterizedTest(name = "{1} with locale:{2} and key {3} -> {4}")
+  @DisplayName("Country and language codes matching a string map key are formatted with the mapped message")
+  @MethodSource("mappedValues")
+  void mappedValue(Locale formattingLocale, Locale value, String localeConfig, String mapKey,
+                       @Language("MessageFormat") String expected)
+  {
+    var messageAccessor = createMessageAccessor(formattingLocale, new LocaleFormatter());
+    var messageFactory = messageAccessor.getMessageFactory();
 
     assertEquals(
-        noSpaceText("Engels (Verenigd Koninkrijk)"),
-        format(messageAccessor, UK));
-
-    assertEquals(
-        noSpaceText("Duits"),
-        format(messageAccessor, GERMAN, "locale", "name"));
-
-    assertEquals(
-        noSpaceText("Koreaans (Zuid-Korea)"),
-        format(messageAccessor, KOREA, "locale", "name"));
+        noSpaceText(expected),
+        format(
+            messageAccessor,
+            value,
+            Map.of("locale", new TypedValueString(messageFactory, localeConfig)),
+            Map.of(new MapKeyString(mapKey), new TypedValueMessage(messageFactory.parseMessage(expected)))));
   }
 }

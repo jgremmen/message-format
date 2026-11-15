@@ -17,7 +17,6 @@ package de.sayayi.lib.message.formatter.parameter.named;
 
 import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -44,9 +43,9 @@ final class ClassifierFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Select message by classifier")
-  void testFormat()
+  void selectMessageByClassifier()
   {
-    val message = messageSupport.message("""
+    var message = messageSupport.message("""
         Received \
         %{v,format:classifier,\
             'null'  :'nothing',\
@@ -66,7 +65,7 @@ final class ClassifierFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Specific classifier takes precedence")
-  void testPrecedence()
+  void precedence()
   {
     assertEquals(
         "a language setting",
@@ -79,7 +78,7 @@ final class ClassifierFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("No matching classifier and no default formats null")
-  void testNoMatch()
+  void noMatch()
   {
     assertEquals(
         "",

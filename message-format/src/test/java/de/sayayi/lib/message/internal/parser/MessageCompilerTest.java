@@ -68,7 +68,7 @@ final class MessageCompilerTest
 
   @Test
   @DisplayName("Text only")
-  void testTextOnly()
+  void textOnly()
   {
     assertCompiles("", emptyText());
     assertCompiles("a\\u000ab ", addSpaces(noSpaceText("a\nb"), false, true));
@@ -80,7 +80,7 @@ final class MessageCompilerTest
 
   @Test
   @DisplayName("Text with lone backslash")
-  void testTextLoneBackslash()
+  void textLoneBackslash()
   {
     assertCompiles("C:\\temp \\ x\\", noSpaceText("C:\\temp \\ x\\"));
   }
@@ -88,7 +88,7 @@ final class MessageCompilerTest
 
   @Test
   @DisplayName("Text with supplementary characters")
-  void testTextSupplementaryCharacters()
+  void textSupplementaryCharacters()
   {
     assertCompiles("Smile 😀 now", noSpaceText("Smile 😀 now"));
     assertCompiles("😀𝔸𐌀", noSpaceText("😀𝔸𐌀"));
@@ -98,7 +98,7 @@ final class MessageCompilerTest
 
   @Test
   @DisplayName("Text with combining marks, format and private use characters")
-  void testTextCombiningMarksAndFormatCharacters()
+  void textCombiningMarksAndFormatCharacters()
   {
     // NFD-normalised Latin
     assertCompiles("Cafe\u0301", noSpaceText("Cafe\u0301"));
@@ -126,7 +126,7 @@ final class MessageCompilerTest
 
   @Test
   @DisplayName("Text with C1 control characters")
-  void testTextC1ControlCharacters()
+  void textC1ControlCharacters()
   {
     assertCompiles("a\u007f\u0085\u009fb", noSpaceText("ab"));
     assertCompiles("%{\u0085p\u009f}", new ParameterPart("p", false, false));
@@ -135,7 +135,7 @@ final class MessageCompilerTest
 
   @Test
   @DisplayName("Unquoted values with combining marks and joiners")
-  void testUnquotedValueCombiningMarks()
+  void unquotedValueCombiningMarks()
   {
     for(var value: new String[] { "नमस्ते", "cafe\u0301-au-lait", "می\u200cخواهم" })
     {
@@ -150,7 +150,7 @@ final class MessageCompilerTest
 
   @Test
   @DisplayName("Parameter with name only")
-  void testParameterWithNameOnly()
+  void parameterWithNameOnly()
   {
     assertCompiles("%{ p } ", new ParameterPart("p", false, true));
     assertCompiles(" %{ empty } ", new ParameterPart("empty", true, true));
@@ -161,7 +161,7 @@ final class MessageCompilerTest
 
   @Test
   @DisplayName("Parameter format")
-  void testParameterFormat()
+  void parameterFormat()
   {
     assertCompiles("%{ p, format:bool }", new ParameterPart("p", "bool", false, false, EMPTY_CONFIG, EMPTY_MAP));
     assertCompiles("%{p,format:null}", new ParameterPart("p", "null", false, false, EMPTY_CONFIG, EMPTY_MAP));
@@ -171,7 +171,7 @@ final class MessageCompilerTest
 
   @Test
   @DisplayName("Parameter with named configuration")
-  void testParameterWithNamedConfiguration()
+  void parameterWithNamedConfiguration()
   {
     assertCompiles(
         "%{ p, charset:false }",
@@ -203,7 +203,7 @@ final class MessageCompilerTest
 
   @Test
   @DisplayName("Numeric configuration values accept the full long range")
-  void testNumericConfigurationLongRange()
+  void numericConfigurationLongRange()
   {
     assertCompiles(
         "%{p,min:-9223372036854775808,max:9223372036854775807}",
@@ -216,7 +216,7 @@ final class MessageCompilerTest
 
   @Test
   @DisplayName("Parameter with 'null' configuration key")
-  void testParameterWithNullKey()
+  void parameterWithNullKey()
   {
     assertCompiles(
         "%{ p, =null:msg }",
@@ -232,7 +232,7 @@ final class MessageCompilerTest
 
   @Test
   @DisplayName("Parameter with 'empty' configuration key")
-  void testParameterWithEmptyKey()
+  void parameterWithEmptyKey()
   {
     assertCompiles(
         "%{ p, empty:msg }",
@@ -250,7 +250,7 @@ final class MessageCompilerTest
 
   @Test
   @DisplayName("Parameter with boolean configuration key")
-  void testParameterWithBooleanKey()
+  void parameterWithBooleanKey()
   {
     assertCompiles(
         "%{ p, true:msg }",
@@ -266,7 +266,7 @@ final class MessageCompilerTest
 
   @Test
   @DisplayName("Parameter with number configuration key")
-  void testParameterWithNumberKey()
+  void parameterWithNumberKey()
   {
     assertCompiles(
         "%{ p, 16:msg1 }",
@@ -300,7 +300,7 @@ final class MessageCompilerTest
 
   @Test
   @DisplayName("Parameter with string configuration key")
-  void testParameterWithStringKey()
+  void parameterWithStringKey()
   {
     assertCompiles(
         "%{ p, 'AA':msg1 }",
@@ -334,7 +334,7 @@ final class MessageCompilerTest
 
   @Test
   @DisplayName("Parameter with default map value")
-  void testParameterWithDefaultMapValue()
+  void parameterWithDefaultMapValue()
   {
     assertCompiles(
         "%{ p, 4:four, :test }",
@@ -348,7 +348,7 @@ final class MessageCompilerTest
 
   @Test
   @DisplayName("Template with name only")
-  void testTemplateWithNameOnly()
+  void templateWithNameOnly()
   {
     assertCompiles("%[pq] ", new TemplatePart("pq", false, true, Map.of(), Map.of()));
   }
@@ -356,7 +356,7 @@ final class MessageCompilerTest
 
   @Test
   @DisplayName("Template with parameter delegate")
-  void testTemplateWithParameterDelegate()
+  void templateWithParameterDelegate()
   {
     assertCompiles(
         "%[pq,a->b,c->d] ",
@@ -367,7 +367,7 @@ final class MessageCompilerTest
 
   @Test
   @DisplayName("Template with default parameter values")
-  void testTemplateWithDefaultParameterValues()
+  void templateWithDefaultParameterValues()
   {
     assertCompiles(
         "%[pq,a=true,c='C'] ",

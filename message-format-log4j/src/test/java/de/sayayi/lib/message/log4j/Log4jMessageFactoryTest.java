@@ -31,6 +31,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static de.sayayi.lib.message.util.AssertionTestSupport.assertNullRejected;
 import static org.apache.logging.log4j.Level.ALL;
 import static org.apache.logging.log4j.Level.WARN;
 import static org.apache.logging.log4j.LogManager.ROOT_LOGGER_NAME;
@@ -103,8 +104,19 @@ class Log4jMessageFactoryTest
 
 
   @Test
+  @DisplayName("Constructor rejects a null message support")
+  @SuppressWarnings("DataFlowIssue")
+  void nullMessageSupport()
+  {
+    assertNullRejected(
+        "messageSupport must not be null",
+        () -> new Log4jMessageFactory(null, true));
+  }
+
+
+  @Test
   @DisplayName("Use Log4jMessage for message-format %{} placeholders")
-  void testLog4jMessageForMessageFormatPlaceholders()
+  void log4jMessageForMessageFormatPlaceholders()
   {
     logger.info("Hello %{p1}, you are %{p2} years old", "Alice", 30);
     assertLogged("Hello Alice, you are 30 years old");
@@ -113,7 +125,7 @@ class Log4jMessageFactoryTest
 
   @Test
   @DisplayName("Attach throwable from last parameter to the log message")
-  void testMessageWithThrowable()
+  void messageWithThrowable()
   {
     final var exception = new RuntimeException("test error");
 
@@ -127,7 +139,7 @@ class Log4jMessageFactoryTest
 
   @Test
   @DisplayName("Capture multiple sequential log messages")
-  void testMultipleMessages()
+  void multipleMessages()
   {
     logger.info("First");
     logger.info("Second");
@@ -138,7 +150,7 @@ class Log4jMessageFactoryTest
 
   @Test
   @DisplayName("Log object message")
-  void testNewMessageWithObject()
+  void newMessageWithObject()
   {
     logger.info(LOG4J_MESSAGE_FACTORY.newMessage(42));
     assertLogged("42");
@@ -147,7 +159,7 @@ class Log4jMessageFactoryTest
 
   @Test
   @DisplayName("Log null message string")
-  void testNewMessageWithNullString()
+  void newMessageWithNullString()
   {
     logger.info(LOG4J_MESSAGE_FACTORY.newMessage(null, (Object[])null));
     assertLogged("null");
@@ -156,7 +168,7 @@ class Log4jMessageFactoryTest
 
   @Test
   @DisplayName("Use ParameterizedMessage for log4j-style {} placeholders")
-  void testParameterizedMessageForLog4jPlaceholders()
+  void parameterizedMessageForLog4jPlaceholders()
   {
     logger.info("Hello {}, you are {} years old", "Eve", 30);
     assertLogged("Hello Eve, you are 30 years old");
@@ -165,7 +177,7 @@ class Log4jMessageFactoryTest
 
   @Test
   @DisplayName("Prefer Log4jMessage when both {} and %{ are present")
-  void testLog4jMessageWhenBothPlaceholderStylesPresent()
+  void log4jMessageWhenBothPlaceholderStylesPresent()
   {
     logger.info("%{p1} {}", "Test");
     assertLogged("Test {}");
@@ -174,7 +186,7 @@ class Log4jMessageFactoryTest
 
   @Test
   @DisplayName("Prefer Log4jMessage when both {} and %[ are present")
-  void testLog4jMessageWithBracketPlaceholder()
+  void log4jMessageWithBracketPlaceholder()
   {
     logger.info("text %[p1] {}", "a");
 
@@ -185,7 +197,7 @@ class Log4jMessageFactoryTest
 
   @Test
   @DisplayName("Use Log4jMessage for plain text without any placeholders")
-  void testLog4jMessageForPlainText()
+  void log4jMessageForPlainText()
   {
     logger.info("plain text");
     assertLogged("plain text");
@@ -194,7 +206,7 @@ class Log4jMessageFactoryTest
 
   @Test
   @DisplayName("Use Log4jMessage when {} is escaped")
-  void testLog4jMessageForEscapedLog4jPlaceholder()
+  void log4jMessageForEscapedLog4jPlaceholder()
   {
     logger.info("escaped \\{} placeholder");
     assertLogged("escaped {} placeholder");
@@ -203,7 +215,7 @@ class Log4jMessageFactoryTest
 
   @Test
   @DisplayName("Return error placeholder for invalid message format")
-  void testInvalidMessageFormat()
+  void invalidMessageFormat()
   {
     logger.info("not valid %{}");
     assertLogged("<internal error formatting: not valid %{}>");
@@ -212,7 +224,7 @@ class Log4jMessageFactoryTest
 
   @Test
   @DisplayName("Report formatting errors through the status logger")
-  void testInvalidMessageFormatReportsCause()
+  void invalidMessageFormatReportsCause()
   {
     final List<StatusData> statusData = new ArrayList<>();
     final var listener = new StatusListener() {
@@ -243,7 +255,7 @@ class Log4jMessageFactoryTest
 
   @Test
   @DisplayName("Propagate errors thrown while formatting")
-  void testFormattingErrorIsPropagated()
+  void formattingErrorIsPropagated()
   {
     final var message = LOG4J_MESSAGE_FACTORY.newMessage("value %{p1}", new Object() {
       @Override public String toString() {
@@ -258,7 +270,7 @@ class Log4jMessageFactoryTest
   @Test
   @DisplayName("Message returns the unformatted format string")
   @SuppressWarnings("deprecation")
-  void testGetFormat()
+  void getFormat()
   {
     final var message = LOG4J_MESSAGE_FACTORY.newMessage("Hello %{p1}", "Alice");
 
@@ -270,7 +282,7 @@ class Log4jMessageFactoryTest
   @Test
   @DisplayName("Serialized message contains the formatted message and throwable")
   @SuppressWarnings("deprecation")
-  void testSerialization() throws Exception
+  void serialization() throws Exception
   {
     final var message = LOG4J_MESSAGE_FACTORY.newMessage("Hello %{p1}", "Alice", new RuntimeException("test error"));
     final var bytes = new ByteArrayOutputStream();

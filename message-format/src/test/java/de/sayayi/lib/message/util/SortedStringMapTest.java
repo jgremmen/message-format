@@ -28,6 +28,7 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static de.sayayi.lib.message.util.AssertionTestSupport.assertEqualsContract;
+import static de.sayayi.lib.message.util.AssertionTestSupport.assertNullRejected;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.junit.jupiter.api.Assertions.*;
@@ -1463,6 +1464,54 @@ class SortedStringMapTest
       assertEquals("3", map.get("charlie"));
       assertEquals("4", map.get("delta"));
       assertEquals("5", map.get("echo"));
+    }
+
+
+    @Test
+    @DisplayName("putAll of a larger map merges new and existing keys in sorted order")
+    void putAllMergesLargerMap()
+    {
+      final var map = new SortedStringMap<Integer>();
+      for(int i = 0; i < 100; i += 10)
+        map.put(String.format("key%03d", i), -i);
+
+      final var source = new HashMap<String,Integer>();
+      for(int i = 0; i < 100; i++)
+        source.put(String.format("key%03d", i), i);
+
+      map.putAll(source);
+
+      assertEquals(100, map.size());
+      assertEquals(new ArrayList<>(new TreeSet<>(source.keySet())), List.of(map.getKeys()));
+
+      for(int i = 0; i < 100; i++)
+        assertEquals(i, map.get(String.format("key%03d", i)));
+    }
+
+
+    @Test
+    @DisplayName("putAll of the map itself leaves the map unchanged")
+    void putAllSelf()
+    {
+      final var map = new SortedStringMap<String>();
+      map.put("alpha", "1");
+      map.put("bravo", "2");
+
+      //noinspection CollectionAddedToSelf
+      map.putAll(map);
+
+      assertEquals(Map.of("alpha", "1", "bravo", "2"), map);
+    }
+
+
+    @Test
+    @DisplayName("putAll of null throws NullPointerException")
+    void putAllNull()
+    {
+      //noinspection DataFlowIssue
+      assertNullRejected(
+          "map must not be null",
+          () -> new SortedStringMap<String>().putAll(null));
     }
   }
 

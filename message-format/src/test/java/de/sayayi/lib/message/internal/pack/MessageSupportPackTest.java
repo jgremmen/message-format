@@ -20,7 +20,6 @@ import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.exception.DuplicateMessageException;
-import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
 
@@ -84,16 +83,16 @@ final class MessageSupportPackTest
 
   @Test
   @DisplayName("Import exported messages and templates")
-  void testExportImport() throws IOException
+  void exportImport() throws IOException
   {
-    val messageSupportCloned = packRoundTrip(messageSupport, MessageSupportFactory::createGeneric);
-    val messageAccessor = messageSupport.getMessageAccessor();
-    val messageAccessorCloned = messageSupportCloned.getMessageAccessor();
+    var messageSupportCloned = packRoundTrip(messageSupport, MessageSupportFactory::createGeneric);
+    var messageAccessor = messageSupport.getMessageAccessor();
+    var messageAccessorCloned = messageSupportCloned.getMessageAccessor();
 
-    val messageCodes = messageAccessor.getMessageCodes();
+    var messageCodes = messageAccessor.getMessageCodes();
     assertEquals(messageCodes, messageAccessorCloned.getMessageCodes());
 
-    for(val messageCode: messageCodes)
+    for(var messageCode: messageCodes)
     {
       assertEquals(
           messageAccessor.getMessageByCode(messageCode),
@@ -104,7 +103,7 @@ final class MessageSupportPackTest
 
   @Test
   @DisplayName("Pack/unpack localized bundle with default locale entry")
-  void testExportImportDefaultLocaleMessage() throws IOException
+  void exportImportDefaultLocaleMessage() throws IOException
   {
     var cms = MessageSupportFactory.createGeneric();
     var localizedMessages = new LinkedHashMap<Locale,String>();
@@ -114,7 +113,7 @@ final class MessageSupportPackTest
 
     cms.addMessage(cms.getMessageAccessor().getMessageFactory().parseMessage("MSG-DEFAULT", localizedMessages));
 
-    val imported = packRoundTrip(cms, MessageSupportFactory::createGeneric);
+    var imported = packRoundTrip(cms, MessageSupportFactory::createGeneric);
     final var importedMessageAccessor = imported.getMessageAccessor();
     var importedMessage = importedMessageAccessor.getMessageByCode("MSG-DEFAULT");
     var localizedBundle = assertInstanceOf(LocaleAware.class, importedMessage);
@@ -136,9 +135,9 @@ final class MessageSupportPackTest
 
   @Test
   @DisplayName("Export maximum number of messages")
-  void testExportMaxMessageCount() throws IOException
+  void exportMaxMessageCount() throws IOException
   {
-    val imported = packRoundTrip(messageSupportWithMessages(0xffff), MessageSupportFactory::createGeneric);
+    var imported = packRoundTrip(messageSupportWithMessages(0xffff), MessageSupportFactory::createGeneric);
 
     assertEquals(0xffff, imported.getMessageAccessor().getMessageCodes().size());
   }
@@ -146,14 +145,14 @@ final class MessageSupportPackTest
 
   @Test
   @DisplayName("Export and import close the stream")
-  void testStreamsClosed() throws IOException
+  void streamsClosed() throws IOException
   {
-    val pack = new CloseRecordingOutputStream();
+    var pack = new CloseRecordingOutputStream();
 
     messageSupport.exportMessages(pack);
     assertTrue(pack.closed);
 
-    val packStream = new CloseRecordingInputStream(pack.toByteArray());
+    var packStream = new CloseRecordingInputStream(pack.toByteArray());
 
     MessageSupportFactory
         .createGeneric()
@@ -165,9 +164,9 @@ final class MessageSupportPackTest
 
   @Test
   @DisplayName("Import closes the stream if the pack is invalid")
-  void testImportFailureClosesStream()
+  void importFailureClosesStream()
   {
-    val packStream = new CloseRecordingInputStream("not a message pack".getBytes(UTF_8));
+    var packStream = new CloseRecordingInputStream("not a message pack".getBytes(UTF_8));
 
     assertThrows(
         IOException.class,
@@ -180,14 +179,14 @@ final class MessageSupportPackTest
 
   @Test
   @DisplayName("Import rejects a pack with an unsupported version")
-  void testImportUnsupportedVersion() throws IOException
+  void importUnsupportedVersion() throws IOException
   {
-    val pack = packBytes(PackSupport.VERSION + 1, packStream -> {
+    var pack = packBytes(PackSupport.VERSION + 1, packStream -> {
       packStream.writeUnsignedShort(0);  // messages
       packStream.writeUnsignedShort(0);  // templates
     });
 
-    val ex = assertThrows(
+    var ex = assertThrows(
         IOException.class,
         () -> MessageSupportFactory
             .createGeneric()
@@ -199,15 +198,15 @@ final class MessageSupportPackTest
 
   @Test
   @DisplayName("Import rejects a pack with an invalid message type")
-  void testImportInvalidMessageType() throws IOException
+  void importInvalidMessageType() throws IOException
   {
-    val pack = packBytes(PackSupport.VERSION, packStream -> {
+    var pack = packBytes(PackSupport.VERSION, packStream -> {
       packStream.writeUnsignedShort(1);  // messages
       packStream.writeSmall(7, 3);       // invalid message type
       packStream.writeUnsignedShort(0);  // templates
     });
 
-    val ex = assertThrows(
+    var ex = assertThrows(
         StreamCorruptedException.class,
         () -> MessageSupportFactory
             .createGeneric()
@@ -221,15 +220,15 @@ final class MessageSupportPackTest
 
   @Test
   @DisplayName("Import rejects a pack with a missing template name")
-  void testImportMissingTemplateName() throws IOException
+  void importMissingTemplateName() throws IOException
   {
-    val pack = packBytes(PackSupport.VERSION, packStream -> {
+    var pack = packBytes(PackSupport.VERSION, packStream -> {
       packStream.writeUnsignedShort(0);  // messages
       packStream.writeUnsignedShort(1);  // templates
       packStream.writeString(null);      // template name
     });
 
-    val ex = assertThrows(
+    var ex = assertThrows(
         StreamCorruptedException.class,
         () -> MessageSupportFactory
             .createGeneric()
@@ -243,13 +242,13 @@ final class MessageSupportPackTest
 
   @Test
   @DisplayName("Import rejects a truncated pack")
-  void testImportTruncatedPack() throws IOException
+  void importTruncatedPack() throws IOException
   {
-    val pack = new ByteArrayOutputStream();
+    var pack = new ByteArrayOutputStream();
     messageSupport.exportMessages(pack, false, null, null);
 
-    val bytes = pack.toByteArray();
-    val truncated = Arrays.copyOf(bytes, bytes.length / 2);
+    var bytes = pack.toByteArray();
+    var truncated = Arrays.copyOf(bytes, bytes.length / 2);
 
     assertThrows(
         IOException.class,
@@ -261,12 +260,12 @@ final class MessageSupportPackTest
 
   @Test
   @DisplayName("Import relays exceptions from adding messages")
-  void testImportDuplicateMessage() throws IOException
+  void importDuplicateMessage() throws IOException
   {
-    val pack = new ByteArrayOutputStream();
+    var pack = new ByteArrayOutputStream();
     messageSupport.exportMessages(pack);
 
-    val cms = MessageSupportFactory
+    var cms = MessageSupportFactory
         .createGeneric()
         .addMessage("MSG-002", "Different");
 
@@ -278,11 +277,11 @@ final class MessageSupportPackTest
 
   @Test
   @DisplayName("Export too many messages fails and closes the stream")
-  void testExportTooManyMessages()
+  void exportTooManyMessages()
   {
-    val cms = messageSupportWithMessages(0x10000);
-    val pack = new CloseRecordingOutputStream();
-    val ex = assertThrows(IOException.class, () -> cms.exportMessages(pack));
+    var cms = messageSupportWithMessages(0x10000);
+    var pack = new CloseRecordingOutputStream();
+    var ex = assertThrows(IOException.class, () -> cms.exportMessages(pack));
 
     assertTrue(ex.getMessage().contains("messages"));
     assertEquals(0, pack.size());
@@ -296,11 +295,11 @@ final class MessageSupportPackTest
 
   @Test
   @DisplayName("Export too many templates")
-  void testExportTooManyTemplates()
+  void exportTooManyTemplates()
   {
-    val cms = MessageSupportFactory.createGeneric();
-    val messageFactory = cms.getMessageAccessor().getMessageFactory();
-    val message = new StringBuilder();
+    var cms = MessageSupportFactory.createGeneric();
+    var messageFactory = cms.getMessageAccessor().getMessageFactory();
+    var message = new StringBuilder();
 
     // spread template references over several messages, each below the message part limit
     for(var n = 0; n <= 0xffff; n++)
@@ -315,8 +314,8 @@ final class MessageSupportPackTest
       }
     }
 
-    val pack = new ByteArrayOutputStream();
-    val ex = assertThrows(IOException.class, () -> cms.exportMessages(pack));
+    var pack = new ByteArrayOutputStream();
+    var ex = assertThrows(IOException.class, () -> cms.exportMessages(pack));
 
     assertTrue(ex.getMessage().contains("templates"));
     assertEquals(0, pack.size());
@@ -329,9 +328,9 @@ final class MessageSupportPackTest
 
   @Test
   @DisplayName("Export message with too many parts")
-  void testExportTooManyMessageParts()
+  void exportTooManyMessageParts()
   {
-    val cms = MessageSupportFactory.createGeneric();
+    var cms = MessageSupportFactory.createGeneric();
 
     cms.addMessage("MSG-255", "%{p}.".repeat(127) + "%{p}");
     cms.addMessage("MSG-256", "%{p}.".repeat(128));
@@ -340,7 +339,7 @@ final class MessageSupportPackTest
     assertDoesNotThrow(() -> cms.exportMessages(new ByteArrayOutputStream(), false, "MSG-255"::equals,
         null));
 
-    val ex = assertThrows(
+    var ex = assertThrows(
         IOException.class,
         () -> cms.exportMessages(new ByteArrayOutputStream()));
     assertTrue(ex.getMessage().contains("255 parts"));
@@ -349,9 +348,9 @@ final class MessageSupportPackTest
 
   @Test
   @DisplayName("Export message exceeding the pack format limits")
-  void testExportPackFormatLimits()
+  void exportPackFormatLimits()
   {
-    val cms = MessageSupportFactory.createGeneric();
+    var cms = MessageSupportFactory.createGeneric();
 
     cms.addMessage("MAP", "%{p," + elements(256, n -> "'k" + n + "':x") + '}');
     cms.addMessage("CONFIG", "%{p," + elements(256, n -> "c" + n + ":1") + '}');
@@ -378,7 +377,7 @@ final class MessageSupportPackTest
 
   private static @NotNull ConfigurableMessageSupport messageSupportWithMessages(int count)
   {
-    val cms = MessageSupportFactory.createGeneric();
+    var cms = MessageSupportFactory.createGeneric();
     for(var n = 0; n < count; n++)
       cms.addMessage("MSG-" + n, "text");
 
@@ -389,7 +388,7 @@ final class MessageSupportPackTest
   private static void assertExportFails(@NotNull MessageSupport messageSupport, @NotNull String code,
                                         @NotNull String expectedMessage)
   {
-    val ex = assertThrows(
+    var ex = assertThrows(
         IOException.class,
         () -> messageSupport.exportMessages(new ByteArrayOutputStream(), false, code::equals, null),
         code);

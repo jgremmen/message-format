@@ -15,7 +15,6 @@
  */
 package de.sayayi.lib.message.formatter;
 
-import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -59,8 +58,8 @@ final class FormattableTypeTest
   @DisplayName("Compare formattable types")
   void compare()
   {
-    val ft1 = new FormattableType(Object.class);
-    val ft2 = new FormattableType(int.class);
+    var ft1 = new FormattableType(Object.class);
+    var ft2 = new FormattableType(int.class);
 
     assertTrue(ft1.compareTo(ft2) > 0);
     assertTrue(ft2.compareTo(ft1) < 0);

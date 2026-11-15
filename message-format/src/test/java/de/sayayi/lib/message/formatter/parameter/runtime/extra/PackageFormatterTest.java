@@ -42,14 +42,15 @@ final class PackageFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  void testFormattableTypes() {
+  @DisplayName("Formattable types include Package")
+  void formattableTypes() {
     assertFormatterForType(new PackageFormatter(), Package.class);
   }
 
 
   @Test
   @DisplayName("Format package names")
-  void testFormat()
+  void formatPackageName()
   {
     assertEquals(
         "java.lang",

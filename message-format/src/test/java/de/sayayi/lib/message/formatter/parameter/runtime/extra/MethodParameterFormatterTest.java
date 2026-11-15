@@ -17,7 +17,6 @@ package de.sayayi.lib.message.formatter.parameter.runtime.extra;
 
 import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import lombok.val;
 import org.intellij.lang.annotations.Language;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -52,15 +51,16 @@ final class MethodParameterFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  void testFormattableTypes() {
+  @DisplayName("Formattable types include Parameter")
+  void formattableTypes() {
     assertFormatterForType(new MethodParameterFormatter(), Parameter.class);
   }
 
 
   static Stream<Arguments> formattedParameters() throws ReflectiveOperationException
   {
-    val getParameter = List.class.getMethod("get", int.class).getParameters()[0];
-    val addAllParameter = List.class.getMethod("addAll", Collection.class).getParameters()[0];
+    var getParameter = List.class.getMethod("get", int.class).getParameters()[0];
+    var addAllParameter = List.class.getMethod("addAll", Collection.class).getParameters()[0];
 
     return Stream.of(
         arguments("%{p}", getParameter, "int arg0"),
@@ -74,7 +74,7 @@ final class MethodParameterFormatterTest extends AbstractFormatterTest
   @ParameterizedTest(name = "{0} -> {2}")
   @DisplayName("Format parameter, its name and its type")
   @MethodSource("formattedParameters")
-  void testFormat(@Language("MessageFormat") String formatString, Parameter parameter, String expected)
+  void formatParameterNameAndType(@Language("MessageFormat") String formatString, Parameter parameter, String expected)
   {
     assertEquals(expected, messageSupport
         .message(formatString)
@@ -85,9 +85,9 @@ final class MethodParameterFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Format method parameter list")
-  void testParameterList() throws ReflectiveOperationException
+  void parameterList() throws ReflectiveOperationException
   {
-    val method = String.class.getMethod("replace", char.class, char.class);
+    var method = String.class.getMethod("replace", char.class, char.class);
 
     assertEquals(
         "replace(char, char)",
@@ -101,9 +101,9 @@ final class MethodParameterFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Compare parameter name with string keys")
-  void testStringKey() throws ReflectiveOperationException
+  void stringKey() throws ReflectiveOperationException
   {
-    val parameter = List.class.getMethod("get", int.class).getParameters()[0];
+    var parameter = List.class.getMethod("get", int.class).getParameters()[0];
 
     assertEquals(
         "first",

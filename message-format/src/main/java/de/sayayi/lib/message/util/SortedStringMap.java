@@ -50,6 +50,15 @@ import static java.util.Objects.requireNonNull;
  * {@link java.util.Set#forEach(java.util.function.Consumer) forEach}. Once the map is {@linkplain #seal() sealed},
  * structural modification is impossible and iteration is inherently safe.
  * <p>
+ * <b>Capacity and growth:</b> This map is designed for small maps, such as the parameters and parameter configuration
+ * of a message, which typically contain only a few entries. An empty map has room for 8 entries, a map created from
+ * another map has room for exactly the entries of that map. If the map is full, its storage grows by 4 entries at a
+ * time, rather than by a factor like {@link java.util.HashMap} or {@link java.util.ArrayList}; only
+ * {@link #putAll(Map)} reserves room for all entries to be added at once. As the keys are kept in a sorted array, each
+ * insertion of a new key also shifts all entries with a greater key. Building a map with <i>n</i> entries therefore
+ * takes <i>O(n&sup2;)</i> time, which is cheap for a few entries but makes this map unsuitable for large numbers of
+ * entries; use a {@link java.util.TreeMap} instead.
+ * <p>
  * This map is not thread-safe.
  *
  * @param <V>  the type of values stored in this map
@@ -247,6 +256,37 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
 
   /**
    * {@inheritDoc}
+   * <p>
+   * Before the entries are copied, the storage is enlarged once to hold all entries of {@code map}, so the storage is
+   * not reallocated repeatedly. Keys already contained in this map are counted as well, so the storage may be slightly
+   * larger than needed afterward.
+   *
+   * @throws UnsupportedOperationException  if this map is sealed
+   * @throws NullPointerException           if {@code map} is {@code null} or contains a {@code null} key
+   *
+   * @since 0.25.0
+   */
+  @Override
+  @Contract(mutates = "this")
+  public void putAll(@NotNull Map<? extends String,? extends V> map)
+  {
+    if (sealed)
+      throw new UnsupportedOperationException("putAll");
+
+    final var count = requireNonNull(map, "map must not be null").size();
+    if (count > 0 && map != this)
+    {
+      final var requiredLength = (size + count) * 2;
+      if (kv.length < requiredLength)
+        kv = copyOf(kv, requiredLength);
+
+      map.forEach(this::put);
+    }
+  }
+
+
+  /**
+   * {@inheritDoc}
    *
    * @throws UnsupportedOperationException  if this map is sealed
    */
@@ -357,8 +397,8 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
   /**
    * {@inheritDoc}
    * <p>
-   * Entries are returned in sorted key order. For an unsealed map, {@link java.util.Map.Entry#setValue(Object)
-   * setValue} on a returned entry writes the value through to this map.
+   * Entries are returned in sorted key order. For an unsealed map,
+   * {@link java.util.Map.Entry#setValue(Object) setValue} on a returned entry writes the value through to this map.
    */
   @Override
   public @NotNull Set<Entry<String,V>> entrySet() {

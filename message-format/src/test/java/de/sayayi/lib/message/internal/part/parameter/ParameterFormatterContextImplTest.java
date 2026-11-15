@@ -18,7 +18,6 @@ package de.sayayi.lib.message.internal.part.parameter;
 import de.sayayi.lib.message.formatter.parameter.NamedParameterFormatter;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -49,11 +48,11 @@ final class ParameterFormatterContextImplTest extends AbstractFormatterTest
       text | java.lang.String
       null | null
       """, delimiter = '|')
-  void testNamedFormatterDelegatesPastEnd(String value, String type)
+  void namedFormatterDelegatesPastEnd(String value, String type)
   {
-    val messageAccessor = createMessageAccessor(new DelegatingFormatter());
+    var messageAccessor = createMessageAccessor(new DelegatingFormatter());
 
-    val ex = assertThrows(
+    var ex = assertThrows(
         NoSuchElementException.class,
         () -> format(messageAccessor, value, "delegating"));
     assertEquals(

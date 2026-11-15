@@ -17,7 +17,6 @@ package de.sayayi.lib.message.formatter.parameter.runtime.extra;
 
 import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -43,16 +42,17 @@ final class KeyFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  void testFormattableTypes() {
+  @DisplayName("Formattable types include Key")
+  void formattableTypes() {
     assertFormatterForType(new KeyFormatter(), Key.class);
   }
 
 
   @Test
   @DisplayName("Format algorithm, format and encoded key")
-  void testFormat()
+  void formatAlgorithmFormatAndEncodedKey()
   {
-    val key = new SecretKeySpec(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 }, "AES");
+    var key = new SecretKeySpec(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 }, "AES");
 
     assertEquals(
         "Using AES key in RAW format",
@@ -71,9 +71,9 @@ final class KeyFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Missing key configuration delegates to the next formatter")
-  void testNoConfig()
+  void noConfig()
   {
-    val key = new SecretKeySpec(new byte[] { 1, 2, 3, 4 }, "AES");
+    var key = new SecretKeySpec(new byte[] { 1, 2, 3, 4 }, "AES");
 
     assertEquals(
         key.toString(),

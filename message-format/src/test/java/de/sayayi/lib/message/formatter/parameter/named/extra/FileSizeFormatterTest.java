@@ -65,7 +65,7 @@ final class FileSizeFormatterTest extends AbstractFormatterTest
   @ParameterizedTest(name = "{1} with {0} -> {2}")
   @DisplayName("Select unit and scale")
   @MethodSource("unitAndScale")
-  void testFormat(@Language("MessageFormat") String formatString, Number size, String expected)
+  void selectUnitAndScale(@Language("MessageFormat") String formatString, Number size, String expected)
   {
     assertEquals(expected, messageSupport
         .message(formatString)
@@ -77,7 +77,7 @@ final class FileSizeFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Replace unit by map message and match null")
-  void testUnitMessageAndNull()
+  void unitMessageAndNull()
   {
     assertEquals(
         "5 Gigabyte",

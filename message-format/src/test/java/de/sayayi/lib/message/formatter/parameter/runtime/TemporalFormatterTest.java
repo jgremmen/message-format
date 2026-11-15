@@ -18,7 +18,6 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 import de.sayayi.lib.message.internal.part.TextPart;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -53,7 +52,7 @@ final class TemporalFormatterTest extends AbstractFormatterTest
 {
   @Test
   @DisplayName("Reports the supported temporal types")
-  void testFormattableTypes()
+  void formattableTypes()
   {
     assertFormatterForType(new TemporalFormatter(), LocalDate.class);
     assertFormatterForType(new TemporalFormatter(), LocalTime.class);
@@ -77,7 +76,7 @@ final class TemporalFormatterTest extends AbstractFormatterTest
   @ParameterizedTest(name = "{0} -> {1}")
   @DisplayName("Formats local dates using localized styles")
   @MethodSource("localDateStyles")
-  void testLocalDate(String style, Text expected)
+  void localDate(String style, Text expected)
   {
     assertEquals(
         expected,
@@ -103,7 +102,7 @@ final class TemporalFormatterTest extends AbstractFormatterTest
   @ParameterizedTest(name = "{0} -> {1}")
   @DisplayName("Formats local times using localized styles")
   @MethodSource("localTimeStyles")
-  void testLocalTime(String style, Text expected)
+  void localTime(String style, Text expected)
   {
     assertEquals(
         expected,
@@ -129,7 +128,7 @@ final class TemporalFormatterTest extends AbstractFormatterTest
   @ParameterizedTest(name = "{0} -> {1}")
   @DisplayName("Formats local date-times using localized styles")
   @MethodSource("dateTimeStyles")
-  void testDateTime(String style, Text expected)
+  void dateTime(String style, Text expected)
   {
     assertEquals(
         expected,
@@ -152,7 +151,7 @@ final class TemporalFormatterTest extends AbstractFormatterTest
   @ParameterizedTest(name = "{0} -> {1}")
   @DisplayName("Formats temporal values with custom patterns")
   @MethodSource("customPatterns")
-  void testCustomPattern(String pattern, Text expected)
+  void customPattern(String pattern, Text expected)
   {
     assertEquals(
         expected,
@@ -178,7 +177,7 @@ final class TemporalFormatterTest extends AbstractFormatterTest
   @ParameterizedTest(name = "{0} with {1} -> {2}")
   @DisplayName("Preserves explicit zones and uses the system zone for instants")
   @MethodSource("explicitZones")
-  void testExplicitZones(Temporal temporal, String pattern, Text expected)
+  void preservesExplicitZones(Temporal temporal, String pattern, Text expected)
   {
     assertEquals(
         expected,
@@ -190,7 +189,7 @@ final class TemporalFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Formats temporal values through the message formatter")
-  void testFormatter()
+  void formatter()
   {
     assertEquals(
         "17 aug 1972 16:45 14:23:01 2019-02-19 feb",
@@ -206,15 +205,15 @@ final class TemporalFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Formats partial temporals as empty text if fields are missing")
-  void testPartialTemporalMissingFields()
+  void partialTemporalMissingFields()
   {
-    val messageAccessor = createMessageAccessor(GERMANY, new TemporalFormatter());
+    var messageAccessor = createMessageAccessor(GERMANY, new TemporalFormatter());
 
-    for(val temporal: new Object[] { Year.of(2024), YearMonth.of(2024, 3) })
+    for(var temporal: new Object[] { Year.of(2024), YearMonth.of(2024, 3) })
     {
       assertEquals(emptyText(), format(messageAccessor, temporal), temporal::toString);
 
-      for(val style: new String[] { "short", "medium", "long", "full", "date", "time" })
+      for(var style: new String[] { "short", "medium", "long", "full", "date", "time" })
       {
         assertEquals(emptyText(), format(messageAccessor, temporal,
             "date", style), () -> temporal + " " + style);
@@ -232,9 +231,9 @@ final class TemporalFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Formats partial temporals with patterns using supported fields")
-  void testPartialTemporalSupportedFields()
+  void partialTemporalSupportedFields()
   {
-    val messageAccessor = createMessageAccessor(GERMANY, new TemporalFormatter());
+    var messageAccessor = createMessageAccessor(GERMANY, new TemporalFormatter());
 
     assertEquals(
         new TextPart("2024"),
@@ -247,9 +246,9 @@ final class TemporalFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Formats as empty text for an invalid pattern")
-  void testInvalidPattern()
+  void invalidPattern()
   {
-    val messageAccessor = createMessageAccessor(new TemporalFormatter());
+    var messageAccessor = createMessageAccessor(new TemporalFormatter());
 
     assertEquals(
         emptyText(),
@@ -259,9 +258,9 @@ final class TemporalFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Formats messages with partial temporals without throwing")
-  void testFormatterPartialTemporal()
+  void formatterPartialTemporal()
   {
-    val messageSupport = createMessageSupport(new TemporalFormatter());
+    var messageSupport = createMessageSupport(new TemporalFormatter());
 
     assertEquals("[] [] [2024]", messageSupport
         .message("[%{y}] [%{ym,date:short}] [%{y,date:'yyyy'}]")

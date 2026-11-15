@@ -17,7 +17,6 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.formatter.parameter.named.StringFormatter;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -40,9 +39,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 final class OptionalFormatterTest extends AbstractFormatterTest
 {
   @Test
-  void testEmptyNull()
+  @DisplayName("An empty Optional and null both match the null key")
+  void emptyNull()
   {
-    val messageSupport = createMessageSupport(ROOT, new OptionalFormatter(), new StringFormatter());
+    var messageSupport = createMessageSupport(ROOT, new OptionalFormatter(), new StringFormatter());
 
     assertEquals(
         "null",

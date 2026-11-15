@@ -19,7 +19,6 @@ import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import lombok.val;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
@@ -48,7 +47,7 @@ final class ICUFormatterTest extends AbstractFormatterTest
   @BeforeAll
   static void init()
   {
-    val formatterService = new GenericFormatterService();
+    var formatterService = new GenericFormatterService();
     formatterService.addFormatter(new ICUFormatter());
 
     messageSupport = MessageSupportFactory
@@ -59,9 +58,9 @@ final class ICUFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Plural format with count parameter")
-  void testPlural()
+  void plural()
   {
-    val msg = messageSupport
+    var msg = messageSupport
         .message(icu("{count, plural, one {# item} other {# items}}"));
 
     assertEquals("1 item", msg.with("count", 1).format());
@@ -73,9 +72,9 @@ final class ICUFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Select format with gender parameter")
-  void testSelect()
+  void select()
   {
-    val msg = messageSupport
+    var msg = messageSupport
         .message(icu("{gender, select, male {He} female {She} other {They}} liked your post."));
 
     assertEquals("He liked your post.", msg.with("gender", "male").format());
@@ -87,9 +86,9 @@ final class ICUFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Select ordinal format")
-  void testSelectOrdinal()
+  void selectOrdinal()
   {
-    val msg = messageSupport
+    var msg = messageSupport
         .message(icu("{rank, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}"));
 
     assertEquals("1st", msg.with("rank", 1).format());
@@ -105,10 +104,10 @@ final class ICUFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Select ordinal format with Welsh locale")
-  void testSelectOrdinalWelsh()
+  void selectOrdinalWelsh()
   {
     // Welsh has rich ordinal categories: zero, one, two, few, many, other
-    val msg = messageSupport
+    var msg = messageSupport
         .message(icu("{rank, selectordinal, zero {#ain} one {#af} two {#ail} few {#ydd} many {#ed} other {#fed}}"))
         .locale(forLanguageTag("cy"));
 
@@ -126,16 +125,16 @@ final class ICUFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Number format with style")
-  void testNumberFormat()
+  void numberFormat()
   {
-    val msg = messageSupport
+    var msg = messageSupport
         .message(icu("{amount, number, currency}"))
         .locale(US);
 
     assertEquals("$1,234.56", msg.with("amount", 1234.56).format());
     assertEquals("$0.99", msg.with("amount", 0.99).format());
 
-    val percentMsg = messageSupport
+    var percentMsg = messageSupport
         .message(icu("{ratio, number, percent}"))
         .locale(US);
 
@@ -146,9 +145,9 @@ final class ICUFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Combined plural and select in one pattern")
-  void testCombinedPluralAndSelect()
+  void combinedPluralAndSelect()
   {
-    val msg = messageSupport
+    var msg = messageSupport
         .message("%{unused,icu:'{gender, select, male {He has {count, plural, one {# new message} other {# new messages}}} female {She has {count, plural, one {# new message} other {# new messages}}} other {They have {count, plural, one {# new message} other {# new messages}}}}'}");
 
     assertEquals("He has 1 new message", msg.with("gender", "male").with("count", 1).format());
@@ -159,9 +158,9 @@ final class ICUFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Multiple parameters in pattern")
-  void testMultipleParameters()
+  void multipleParameters()
   {
-    val msg = messageSupport
+    var msg = messageSupport
         .message(icu("{name} has {count, plural, one {# cat} other {# cats}}"));
 
     assertEquals("Alice has 1 cat", msg.with("name", "Alice").with("count", 1).format());
@@ -172,9 +171,9 @@ final class ICUFormatterTest extends AbstractFormatterTest
   @Test
   @DisplayName("Locale-sensitive plural rules")
   @SuppressWarnings("SpellCheckingInspection")
-  void testLocaleSensitivePlural()
+  void localeSensitivePlural()
   {
-    val msg = messageSupport
+    var msg = messageSupport
         .message(icu("{count, plural, one {# plik} few {# pliki} many {# plików} other {# pliku}}"))
         .locale(forLanguageTag("pl"));
 
@@ -188,17 +187,17 @@ final class ICUFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Date format with style")
-  void testDateFormat()
+  void dateFormat()
   {
     @SuppressWarnings("deprecation")
-    val date = new Date(2026 - 1900, JANUARY, 15, 10, 30, 0);
+    var date = new Date(2026 - 1900, JANUARY, 15, 10, 30, 0);
 
-    val msg = messageSupport
+    var msg = messageSupport
         .message(icu("{when, date, short}"));
 
     assertEquals("1/15/26", msg.with("when", date).format());
 
-    val longMsg = messageSupport
+    var longMsg = messageSupport
         .message(icu("{when, date, long}"));
 
     assertEquals("January 15, 2026", longMsg.with("when", date).format());
@@ -207,9 +206,9 @@ final class ICUFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Choice format with numeric ranges")
-  void testChoiceFormat()
+  void choiceFormat()
   {
-    val msg = messageSupport
+    var msg = messageSupport
         .message(icu("{temp, choice, 0#freezing|30#warm|40#hot}"));
 
     assertEquals("freezing", msg.with("temp", 0).format());
@@ -223,9 +222,9 @@ final class ICUFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Plural with offset")
-  void testPluralWithOffset()
+  void pluralWithOffset()
   {
-    val msg = messageSupport
+    var msg = messageSupport
         .message(icu("{guests, plural, offset:1 =0 {Nobody is attending} =1 {Only {name} is attending} one {{name} and # other person are attending} other {{name} and # other people are attending}}"));
 
     assertEquals("Nobody is attending", msg.with("guests", 0).with("name", "Alice").format());

@@ -31,7 +31,6 @@ import de.sayayi.lib.message.exception.DuplicateMessageException;
 import de.sayayi.lib.message.exception.MessageAdopterException;
 import de.sayayi.lib.message.exception.MessageParserException;
 import de.sayayi.lib.message.internal.MessageTemplate;
-import lombok.val;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
@@ -108,10 +107,10 @@ class AnnotationAdopterTest
   @ParameterizedTest(name = "{0}")
   @DisplayName("adopt entry points adopt the fixture messages and templates")
   @MethodSource("entryPoints")
-  void testAdoptEntryPoint(@SuppressWarnings("unused") String name, ThrowingConsumer<AnnotationAdopter> adopt,
+  void adoptEntryPoint(@SuppressWarnings("unused") String name, ThrowingConsumer<AnnotationAdopter> adopt,
                            Consumer<MessageAccessor> verification) throws Throwable
   {
-    val cms = newMessageSupport();
+    var cms = newMessageSupport();
 
     adopt.accept(new AnnotationAdopter(cms));
     verification.accept(cms.getMessageAccessor());
@@ -120,13 +119,13 @@ class AnnotationAdopterTest
 
   @Test
   @DisplayName("ignore synthetic method annotations")
-  void testIgnoreSyntheticMethodAnnotations() throws Exception
+  void ignoreSyntheticMethodAnnotations() throws Exception
   {
-    val cms = newMessageSupport();
+    var cms = newMessageSupport();
 
     new AnnotationAdopter(cms).adopt(syntheticMethodFixtureClassFile());
 
-    val accessor = cms.getMessageAccessor();
+    var accessor = cms.getMessageAccessor();
     assertTrue(accessor.hasMessageWithCode("control-msg"));
     assertEquals(
         "Control message",
@@ -148,9 +147,9 @@ class AnnotationAdopterTest
 
   @Test
   @DisplayName("adopt(ClassLoader, Set<String>)")
-  void testAdoptClassLoader()
+  void adoptClassLoader()
   {
-    val cms = newMessageSupport();
+    var cms = newMessageSupport();
 
     new AnnotationAdopter(cms)
         .adopt(AnnotationsFixture.class.getClassLoader(), Set.of(AnnotationsFixture.class.getPackageName()));
@@ -163,12 +162,12 @@ class AnnotationAdopterTest
   @Test
   @DisplayName("adopt(ClassLoader, Set<String>) with spaces and non-ASCII characters in directory path")
   @SuppressWarnings("UnnecessaryUnicodeEscape")
-  void testAdoptClassLoaderDirectoryWithSpaces(@TempDir Path tempDir) throws Exception
+  void adoptClassLoaderDirectoryWithSpaces(@TempDir Path tempDir) throws Exception
   {
-    val classesDir = copyFixturePackage(tempDir.resolve("with space/\u00e4\u00f6\u00fc \u65e5\u672c"));
-    val cms = newMessageSupport();
+    var classesDir = copyFixturePackage(tempDir.resolve("with space/\u00e4\u00f6\u00fc \u65e5\u672c"));
+    var cms = newMessageSupport();
 
-    try(val classLoader = new URLClassLoader(new URL[] { classesDir.toUri().toURL() }, null)) {
+    try(var classLoader = new URLClassLoader(new URL[] { classesDir.toUri().toURL() }, null)) {
       new AnnotationAdopter(cms).adopt(classLoader, Set.of(AnnotationsFixture.class.getPackageName()));
     }
 
@@ -180,13 +179,13 @@ class AnnotationAdopterTest
   @Test
   @DisplayName("adopt(ClassLoader, Set<String>) with spaces and non-ASCII characters in jar path")
   @SuppressWarnings("UnnecessaryUnicodeEscape")
-  void testAdoptClassLoaderJarWithSpaces(@TempDir Path tempDir) throws Exception
+  void adoptClassLoaderJarWithSpaces(@TempDir Path tempDir) throws Exception
   {
-    val jarFile = createFixtureJar(tempDir,
+    var jarFile = createFixtureJar(tempDir,
         createDirectories(tempDir.resolve("with space/\u00e4\u00f6\u00fc")).resolve("fixture.jar"));
-    val cms = newMessageSupport();
+    var cms = newMessageSupport();
 
-    try(val classLoader = new URLClassLoader(new URL[] { jarFile.toUri().toURL() }, null)) {
+    try(var classLoader = new URLClassLoader(new URL[] { jarFile.toUri().toURL() }, null)) {
       new AnnotationAdopter(cms).adopt(classLoader, Set.of(AnnotationsFixture.class.getPackageName()));
     }
 
@@ -197,22 +196,22 @@ class AnnotationAdopterTest
 
   @Test
   @DisplayName("adopt(ClassLoader, Set<String>) fails for unsupported url protocols")
-  void testAdoptClassLoaderUnsupportedProtocol() throws Exception
+  void adoptClassLoaderUnsupportedProtocol() throws Exception
   {
-    val url = URL.of(URI.create("vfs:/content/app.war/WEB-INF/classes/test/"), new URLStreamHandler() {
+    var url = URL.of(URI.create("vfs:/content/app.war/WEB-INF/classes/test/"), new URLStreamHandler() {
       @Override
       protected URLConnection openConnection(URL u) {
         throw new UnsupportedOperationException();
       }
     });
-    val classLoader = new ClassLoader(null) {
+    var classLoader = new ClassLoader(null) {
       @Override
       public Enumeration<URL> getResources(String name) {
         return Collections.enumeration(List.of(url));
       }
     };
 
-    val ex = assertThrows(MessageAdopterException.class,
+    var ex = assertThrows(MessageAdopterException.class,
         () -> new AnnotationAdopter(newMessageSupport()).adopt(classLoader, Set.of("test")));
     assertTrue(ex.getMessage().contains("vfs:"));
   }
@@ -220,21 +219,21 @@ class AnnotationAdopterTest
 
   @Test
   @DisplayName("reject @Text value combined with locale or text")
-  void testRejectValueWithLocaleOrText()
+  void rejectValueWithLocaleOrText()
   {
-    for(val text: new Text[] {
+    for(var text: new Text[] {
         new SyntheticText("de", null, "Hallo"),
         new SyntheticText(null, "Hello", "Hallo"),
         new SyntheticText("de", "Hello", "Hallo") })
     {
-      val texts = new Text[] { text };
+      var texts = new Text[] { text };
 
-      val messageEx = assertThrows(MessageAdopterException.class,
+      var messageEx = assertThrows(MessageAdopterException.class,
           () -> new AnnotationAdopter(newMessageSupport()).adopt(new SyntheticMessageDef("MSG", null, texts)));
       assertEquals("@Text value for message 'MSG' must not be combined with a locale or text; use text instead",
           messageEx.getMessage());
 
-      val templateEx = assertThrows(MessageAdopterException.class,
+      var templateEx = assertThrows(MessageAdopterException.class,
           () -> new AnnotationAdopter(newMessageSupport()).adopt(new SyntheticTemplateDef("tpl", null, texts)));
       assertEquals("@Text value for template 'tpl' must not be combined with a locale or text; use text instead",
           templateEx.getMessage());
@@ -244,9 +243,9 @@ class AnnotationAdopterTest
 
   @Test
   @DisplayName("accept @Text with value only or with locale and text")
-  void testAcceptValueOrLocaleAndText()
+  void acceptValueOrLocaleAndText()
   {
-    val messageSupport = newMessageSupport();
+    var messageSupport = newMessageSupport();
 
     new AnnotationAdopter(messageSupport).adopt(new SyntheticMessageDef("MSG", null, new Text[] {
         new SyntheticText(null, null, "Hello"),
@@ -259,10 +258,10 @@ class AnnotationAdopterTest
 
   @Test
   @DisplayName("propagate MessageParserException from adopt entry points")
-  void testPropagateParserExceptionFromEntryPoints() throws Exception
+  void propagateParserExceptionFromEntryPoints() throws Exception
   {
-    val classFile = invalidTemplateClassFile();
-    val invalidTemplateFixtureClass = invalidTemplateFixtureClass();
+    var classFile = invalidTemplateClassFile();
+    var invalidTemplateFixtureClass = invalidTemplateFixtureClass();
 
     assertEquals("invalid-template", assertThrows(MessageParserException.class,
         () -> new AnnotationAdopter(newMessageSupport()).adopt(classFile)).getTemplate());
@@ -277,12 +276,12 @@ class AnnotationAdopterTest
 
   @Test
   @DisplayName("wrap duplicate errors from adopt entry points with the class name")
-  void testWrapDuplicateExceptionFromEntryPoints()
+  void wrapDuplicateExceptionFromEntryPoints()
   {
-    val adopter = new AnnotationAdopter(newMessageSupport());
+    var adopter = new AnnotationAdopter(newMessageSupport());
     adopter.adopt(new SyntheticMessageDef("type-msg-1", "different text"));
 
-    val ex = assertThrows(MessageAdopterException.class, () -> adopter.adopt(AnnotationsFixture.class));
+    var ex = assertThrows(MessageAdopterException.class, () -> adopter.adopt(AnnotationsFixture.class));
     assertTrue(ex.getMessage().contains(AnnotationsFixture.class.getName()), ex.getMessage());
     assertEquals("type-msg-1", assertInstanceOf(DuplicateMessageException.class, ex.getCause()).getCode());
   }
@@ -290,17 +289,17 @@ class AnnotationAdopterTest
 
   @Test
   @DisplayName("adopt(Class<?>) fails with a descriptive message if the class file cannot be found")
-  void testAdoptClassFileNotFound()
+  void adoptClassFileNotFound()
   {
-    val classLoader = new ClassLoader(AnnotationAdopterTest.class.getClassLoader()) {
+    var classLoader = new ClassLoader(AnnotationAdopterTest.class.getClassLoader()) {
       @Override
       public InputStream getResourceAsStream(String name) {
         return null;
       }
     };
-    val proxyType = Proxy.newProxyInstance(classLoader, new Class<?>[] { Runnable.class }, (p, m, a) -> null).getClass();
+    var proxyType = Proxy.newProxyInstance(classLoader, new Class<?>[] { Runnable.class }, (p, m, a) -> null).getClass();
 
-    val ex = assertThrows(MessageAdopterException.class,
+    var ex = assertThrows(MessageAdopterException.class,
         () -> new AnnotationAdopter(newMessageSupport()).adopt(proxyType));
     assertTrue(ex.getMessage().contains("not found"), ex.getMessage());
   }
@@ -308,10 +307,10 @@ class AnnotationAdopterTest
 
   @Test
   @DisplayName("adopt(ClassLoader, Set<String>) fails for corrupt archives")
-  void testAdoptClassLoaderCorruptArchive(@TempDir Path tempDir) throws Exception
+  void adoptClassLoaderCorruptArchive(@TempDir Path tempDir) throws Exception
   {
-    val corruptJar = Files.writeString(tempDir.resolve("corrupt.jar"), "not a zip file");
-    val url = URL.of(URI.create("zip:" + corruptJar.toUri().getPath() + "!/test/"), new URLStreamHandler() {
+    var corruptJar = Files.writeString(tempDir.resolve("corrupt.jar"), "not a zip file");
+    var url = URL.of(URI.create("zip:" + corruptJar.toUri().getPath() + "!/test/"), new URLStreamHandler() {
       @Override
       protected URLConnection openConnection(URL u) {
         return new URLConnection(u) {
@@ -321,14 +320,14 @@ class AnnotationAdopterTest
         };
       }
     });
-    val classLoader = new ClassLoader(null) {
+    var classLoader = new ClassLoader(null) {
       @Override
       public Enumeration<URL> getResources(String name) {
         return Collections.enumeration(List.of(url));
       }
     };
 
-    val ex = assertThrows(MessageAdopterException.class,
+    var ex = assertThrows(MessageAdopterException.class,
         () -> new AnnotationAdopter(newMessageSupport()).adopt(classLoader, Set.of("test")));
     assertTrue(ex.getMessage().contains("corrupt.jar"), ex.getMessage());
   }
@@ -336,10 +335,10 @@ class AnnotationAdopterTest
 
   @Test
   @DisplayName("avoid duplicate visit across adopt(Class<?>) and adopt(ClassLoader, Set<String>)")
-  void testAvoidDuplicateVisitAcrossEntryPoints()
+  void avoidDuplicateVisitAcrossEntryPoints()
   {
-    val cms = newMessageSupport();
-    val adopter = new AnnotationAdopter(cms);
+    var cms = newMessageSupport();
+    var adopter = new AnnotationAdopter(cms);
 
     adopter.adopt(AnnotationsFixture.class);
     adopter.adopt(
@@ -353,22 +352,22 @@ class AnnotationAdopterTest
 
   @Test
   @DisplayName("avoid duplicate visit across adopt(Path), adopt(File), adopt(byte[]) and adopt(Class<?>)")
-  void testAvoidDuplicateVisitWithClassFile() throws Exception
+  void avoidDuplicateVisitWithClassFile() throws Exception
   {
     for(var pathFirst: new boolean[] { true, false })
     {
-      val cms = newMessageSupport();
-      val addedMessages = new AtomicInteger();
+      var cms = newMessageSupport();
+      var addedMessages = new AtomicInteger();
       cms.setMessageFilter(message -> addedMessages.incrementAndGet() > 0);
 
-      val adopter = new AnnotationAdopter(cms);
+      var adopter = new AnnotationAdopter(cms);
 
       if (pathFirst)
         adopter.adopt(classFilePath(AnnotationsFixture.class));
       else
         adopter.adopt(AnnotationsFixture.class);
 
-      val messageCount = addedMessages.get();
+      var messageCount = addedMessages.get();
       assertTrue(messageCount > 0);
 
       if (pathFirst)
@@ -387,7 +386,7 @@ class AnnotationAdopterTest
 
   @Test
   @DisplayName("adopt(byte[] classFileContent) rejects invalid class file content")
-  void testAdoptInvalidClassFileContent()
+  void adoptInvalidClassFileContent()
   {
     assertThrows(
         MessageAdopterException.class,
@@ -400,10 +399,10 @@ class AnnotationAdopterTest
 
   @Test
   @DisplayName("adopt(MessageDef)")
-  void testAdoptMessageDef()
+  void adoptMessageDef()
   {
-    val cms = newMessageSupport();
-    val adopter = new AnnotationAdopter(cms);
+    var cms = newMessageSupport();
+    var adopter = new AnnotationAdopter(cms);
 
     // Form 1: plain text= attribute (no @Text), uses single-text path
     adopter.adopt(new SyntheticMessageDef("MSG-D1", "Direct message 1"));
@@ -422,7 +421,7 @@ class AnnotationAdopterTest
             new SyntheticText("fr", "FR direct msg 3", "")
         }));
 
-    val accessor = cms.getMessageAccessor();
+    var accessor = cms.getMessageAccessor();
 
     assertTrue(accessor.hasMessageWithCode("MSG-D1"));
     assertEquals("Direct message 1", accessor.getMessageByCode("MSG-D1").asFormatString(UTF_8));
@@ -431,10 +430,10 @@ class AnnotationAdopterTest
     assertEquals("Direct message 2", accessor.getMessageByCode("MSG-D2").asFormatString(UTF_8));
 
     assertTrue(accessor.hasMessageWithCode("MSG-D3"));
-    val msg3 = accessor.getMessageByCode("MSG-D3");
+    var msg3 = accessor.getMessageByCode("MSG-D3");
     assertInstanceOf(LocaleAware.class, msg3);
 
-    val locMessages3 = ((LocaleAware)msg3).getLocalizedMessages();
+    var locMessages3 = ((LocaleAware)msg3).getLocalizedMessages();
     assertEquals(
         "EN direct msg 3",
         locMessages3
@@ -455,10 +454,10 @@ class AnnotationAdopterTest
 
   @Test
   @DisplayName("adopt(TemplateDef)")
-  void testAdoptTemplateDef()
+  void adoptTemplateDef()
   {
-    val cms = newMessageSupport();
-    val adopter = new AnnotationAdopter(cms);
+    var cms = newMessageSupport();
+    var adopter = new AnnotationAdopter(cms);
 
     // Form 1: plain text= attribute (no @Text), uses single-text path
     adopter.adopt(new SyntheticTemplateDef("tmpl-d1", "Direct template 1"));
@@ -477,7 +476,7 @@ class AnnotationAdopterTest
             new SyntheticText("fr", "FR direct tmpl 3", "")
         }));
 
-    val accessor = cms.getMessageAccessor();
+    var accessor = cms.getMessageAccessor();
 
     assertTrue(accessor.hasTemplateWithName("tmpl-d1"));
     assertEquals(
@@ -496,12 +495,12 @@ class AnnotationAdopterTest
             .asFormatString(UTF_8));
 
     assertTrue(accessor.hasTemplateWithName("tmpl-d3"));
-    val tmpl3 = ((MessageTemplate)accessor
+    var tmpl3 = ((MessageTemplate)accessor
         .getTemplateByName("tmpl-d3"))
         .getMessage();
     assertInstanceOf(LocaleAware.class, tmpl3);
 
-    val locTemplates3 = ((LocaleAware)tmpl3).getLocalizedMessages();
+    var locTemplates3 = ((LocaleAware)tmpl3).getLocalizedMessages();
     assertEquals(
         "EN direct tmpl 3",
         locTemplates3
@@ -522,9 +521,9 @@ class AnnotationAdopterTest
 
   @Test
   @DisplayName("adopt(MessageDef) with BCP 47 language tags")
-  void testAdoptMessageDefLanguageTags()
+  void adoptMessageDefLanguageTags()
   {
-    val cms = newMessageSupport();
+    var cms = newMessageSupport();
 
     new AnnotationAdopter(cms).adopt(new SyntheticMessageDef("MSG-L1", "",
         new SyntheticText[] {
@@ -535,7 +534,7 @@ class AnnotationAdopterTest
             new SyntheticText("zh-Hant-TW", "zh-Hant-TW", "")
         }));
 
-    val localizedMessages =
+    var localizedMessages =
         ((LocaleAware)cms.getMessageAccessor().getMessageByCode("MSG-L1")).getLocalizedMessages();
 
     assertEquals(
@@ -592,24 +591,24 @@ class AnnotationAdopterTest
   @ParameterizedTest(name = "{0}")
   @DisplayName("adopt entry points reject invalid locales")
   @MethodSource("invalidLocales")
-  void testAdoptInvalidLocale(@SuppressWarnings("unused") String name, ThrowingConsumer<AnnotationAdopter> adopt,
+  void adoptInvalidLocale(@SuppressWarnings("unused") String name, ThrowingConsumer<AnnotationAdopter> adopt,
                               String[] expectedMessageParts)
   {
-    val adopter = new AnnotationAdopter(newMessageSupport());
-    val message = assertThrows(
+    var adopter = new AnnotationAdopter(newMessageSupport());
+    var message = assertThrows(
         MessageAdopterException.class,
         () -> adopt.accept(adopter)).getMessage();
 
-    for(val expectedMessagePart: expectedMessageParts)
+    for(var expectedMessagePart: expectedMessageParts)
       assertTrue(message.contains(expectedMessagePart), message);
   }
 
 
   @Test
   @DisplayName("adopt(TemplateDef) with BCP 47 language tags")
-  void testAdoptTemplateDefLanguageTags()
+  void adoptTemplateDefLanguageTags()
   {
-    val cms = newMessageSupport();
+    var cms = newMessageSupport();
 
     new AnnotationAdopter(cms).adopt(new SyntheticTemplateDef("tmpl-l1", "",
         new SyntheticText[] {
@@ -617,7 +616,7 @@ class AnnotationAdopterTest
             new SyntheticText("en-GB", "en-GB", "")
         }));
 
-    val localizedTemplates =
+    var localizedTemplates =
         ((LocaleAware)((MessageTemplate)cms.getMessageAccessor().getTemplateByName("tmpl-l1")).getMessage())
             .getLocalizedMessages();
 
@@ -636,26 +635,26 @@ class AnnotationAdopterTest
   @Test
   @DisplayName("adopt(ClassLoader, Set<String>) does not close a cached jar file used by other code")
   @SuppressWarnings("TryFinallyCanBeTryWithResources")
-  void testAdoptClassLoaderJarKeepsCachedJarFileOpen(@TempDir Path tempDir) throws Exception
+  void adoptClassLoaderJarKeepsCachedJarFileOpen(@TempDir Path tempDir) throws Exception
   {
-    val jarFile = createFixtureJar(tempDir, tempDir.resolve("fixture.jar"));
+    var jarFile = createFixtureJar(tempDir, tempDir.resolve("fixture.jar"));
 
     // obtain the jar file instance that the JVM caches for jar: urls (useCaches is true by default)
-    val connection = (JarURLConnection)URI.create("jar:" + jarFile.toUri() + "!/").toURL().openConnection();
-    val sharedJarFile = connection.getJarFile();
+    var connection = (JarURLConnection)URI.create("jar:" + jarFile.toUri() + "!/").toURL().openConnection();
+    var sharedJarFile = connection.getJarFile();
 
     try {
-      val cms = newMessageSupport();
+      var cms = newMessageSupport();
 
-      try(val classLoader = new URLClassLoader(new URL[] { jarFile.toUri().toURL() }, null)) {
+      try(var classLoader = new URLClassLoader(new URL[] { jarFile.toUri().toURL() }, null)) {
         new AnnotationAdopter(cms).adopt(classLoader, Set.of(AnnotationsFixture.class.getPackageName()));
       }
 
       verifyFixture(cms.getMessageAccessor());
 
       // the shared instance must still be usable
-      val entryName = AnnotationsFixture.class.getName().replace('.', '/') + ".class";
-      try(val inputStream = sharedJarFile.getInputStream(requireNonNull(sharedJarFile.getEntry(entryName)))) {
+      var entryName = AnnotationsFixture.class.getName().replace('.', '/') + ".class";
+      try(var inputStream = sharedJarFile.getInputStream(requireNonNull(sharedJarFile.getEntry(entryName)))) {
         assertTrue(inputStream.readAllBytes().length > 0);
       }
     } finally {
@@ -679,12 +678,12 @@ class AnnotationAdopterTest
 
   private static @NotNull Path createFixtureJar(@NotNull Path tempDir, @NotNull Path jarFile) throws Exception
   {
-    val classesDir = copyFixturePackage(tempDir.resolve("classes"));
+    var classesDir = copyFixturePackage(tempDir.resolve("classes"));
 
-    try(val jar = new JarOutputStream(Files.newOutputStream(jarFile)); val paths = Files.walk(classesDir)) {
-      for(val path: (Iterable<Path>)paths.filter(p -> !p.equals(classesDir))::iterator)
+    try(var jar = new JarOutputStream(Files.newOutputStream(jarFile)); var paths = Files.walk(classesDir)) {
+      for(var path: (Iterable<Path>)paths.filter(p -> !p.equals(classesDir))::iterator)
       {
-        val entryName = classesDir.relativize(path).toString().replace('\\', '/');
+        var entryName = classesDir.relativize(path).toString().replace('\\', '/');
 
         if (Files.isDirectory(path))
           jar.putNextEntry(new JarEntry(entryName + '/'));  // required to locate the package
@@ -710,12 +709,12 @@ class AnnotationAdopterTest
   @Contract(pure = true)
   private static @NotNull Path copyFixturePackage(@NotNull Path classesDir) throws Exception
   {
-    val packagePath = AnnotationsFixture.class.getPackageName().replace('.', '/');
-    val sourceDir = classFilePath(AnnotationsFixture.class).getParent();
-    val targetDir = createDirectories(classesDir.resolve(packagePath));
+    var packagePath = AnnotationsFixture.class.getPackageName().replace('.', '/');
+    var sourceDir = classFilePath(AnnotationsFixture.class).getParent();
+    var targetDir = createDirectories(classesDir.resolve(packagePath));
 
-    try(val files = Files.list(sourceDir)) {
-      for(val file: (Iterable<Path>)files.filter(f -> f.toString().endsWith(".class"))::iterator)
+    try(var files = Files.list(sourceDir)) {
+      for(var file: (Iterable<Path>)files.filter(f -> f.toString().endsWith(".class"))::iterator)
         Files.copy(file, targetDir.resolve(file.getFileName().toString()));
     }
 
@@ -725,15 +724,15 @@ class AnnotationAdopterTest
 
   private static @NotNull Path classFilePath(Class<?> type) throws URISyntaxException
   {
-    val resourceName = type.getName().replace('.', '/') + ".class";
+    var resourceName = type.getName().replace('.', '/') + ".class";
     return Path.of(requireNonNull(type.getClassLoader().getResource(resourceName)).toURI());
   }
 
 
   private static @NotNull Path syntheticMethodFixtureClassFile() throws IOException
   {
-    val writer = new ClassWriter(0);
-    val fixtureClassName = (AnnotationAdopterTest.class.getPackageName() + ".SyntheticMethodFixtureGenerated")
+    var writer = new ClassWriter(0);
+    var fixtureClassName = (AnnotationAdopterTest.class.getPackageName() + ".SyntheticMethodFixtureGenerated")
         .replace('.', '/');
 
     writer.visit(V21, ACC_PUBLIC | ACC_FINAL, fixtureClassName, null, "java/lang/Object", null);
@@ -747,11 +746,11 @@ class AnnotationAdopterTest
     method.visitEnd();
 
     method = writer.visitMethod(ACC_PUBLIC, "control", "()V", null, null);
-    val controlMessageAnnotation = method.visitAnnotation(Type.getDescriptor(MessageDef.class), true);
+    var controlMessageAnnotation = method.visitAnnotation(Type.getDescriptor(MessageDef.class), true);
     controlMessageAnnotation.visit("code", "control-msg");
     controlMessageAnnotation.visit("text", "Control message");
     controlMessageAnnotation.visitEnd();
-    val controlTemplateAnnotation = method.visitAnnotation(Type.getDescriptor(TemplateDef.class), true);
+    var controlTemplateAnnotation = method.visitAnnotation(Type.getDescriptor(TemplateDef.class), true);
     controlTemplateAnnotation.visit("name", "control-tmpl");
     controlTemplateAnnotation.visit("text", "Control template");
     controlTemplateAnnotation.visitEnd();
@@ -761,11 +760,11 @@ class AnnotationAdopterTest
     method.visitEnd();
 
     method = writer.visitMethod(ACC_PRIVATE | ACC_STATIC | ACC_SYNTHETIC, "synthetic$annotated", "()V", null, null);
-    val syntheticMessageAnnotation = method.visitAnnotation(Type.getDescriptor(MessageDef.class), true);
+    var syntheticMessageAnnotation = method.visitAnnotation(Type.getDescriptor(MessageDef.class), true);
     syntheticMessageAnnotation.visit("code", "synthetic-msg");
     syntheticMessageAnnotation.visit("text", "Synthetic message");
     syntheticMessageAnnotation.visitEnd();
-    val syntheticTemplateAnnotation = method.visitAnnotation(Type.getDescriptor(TemplateDef.class), true);
+    var syntheticTemplateAnnotation = method.visitAnnotation(Type.getDescriptor(TemplateDef.class), true);
     syntheticTemplateAnnotation.visit("name", "synthetic-tmpl");
     syntheticTemplateAnnotation.visit("text", "Synthetic template");
     syntheticTemplateAnnotation.visitEnd();
@@ -776,7 +775,7 @@ class AnnotationAdopterTest
 
     writer.visitEnd();
 
-    val classFile = createTempFile("synthetic-method-fixture-", ".class");
+    var classFile = createTempFile("synthetic-method-fixture-", ".class");
     Files.write(classFile, writer.toByteArray());
     classFile.toFile().deleteOnExit();
 
@@ -786,8 +785,8 @@ class AnnotationAdopterTest
 
   private static @NotNull Path invalidTemplateClassFile() throws IOException
   {
-    val writer = new ClassWriter(0);
-    val fixtureClassName = (AnnotationAdopterTest.class.getPackageName() + ".InvalidTemplateFixtureGenerated")
+    var writer = new ClassWriter(0);
+    var fixtureClassName = (AnnotationAdopterTest.class.getPackageName() + ".InvalidTemplateFixtureGenerated")
         .replace('.', '/');
 
     writer.visit(V21, ACC_PUBLIC | ACC_FINAL, fixtureClassName, null, "java/lang/Object", null);
@@ -800,14 +799,14 @@ class AnnotationAdopterTest
     method.visitMaxs(1, 1);
     method.visitEnd();
 
-    val classAnnotation = writer.visitAnnotation(Type.getDescriptor(TemplateDef.class), true);
+    var classAnnotation = writer.visitAnnotation(Type.getDescriptor(TemplateDef.class), true);
     classAnnotation.visit("name", "invalid-template");
     classAnnotation.visit("text", "%{x,true false:1}");
     classAnnotation.visitEnd();
 
     writer.visitEnd();
 
-    val classFile = createTempFile("invalid-template-fixture-", ".class");
+    var classFile = createTempFile("invalid-template-fixture-", ".class");
     Files.write(classFile, writer.toByteArray());
     classFile.toFile().deleteOnExit();
 
@@ -834,9 +833,9 @@ class AnnotationAdopterTest
 
     // type-msg-3: multi-locale (EN, DE, FR)
     assertTrue(accessor.hasMessageWithCode("type-msg-3"));
-    val typeMsg3 = accessor.getMessageByCode("type-msg-3");
+    var typeMsg3 = accessor.getMessageByCode("type-msg-3");
     assertInstanceOf(LocaleAware.class, typeMsg3);
-    val typeMsg3Locales = ((LocaleAware)typeMsg3).getLocalizedMessages();
+    var typeMsg3Locales = ((LocaleAware)typeMsg3).getLocalizedMessages();
     assertEquals("EN type msg 3", typeMsg3Locales.get(ENGLISH).asFormatString(UTF_8));
     assertEquals("DE type msg 3", typeMsg3Locales.get(GERMAN).asFormatString(UTF_8));
     assertEquals("FR type msg 3", typeMsg3Locales.get(FRENCH).asFormatString(UTF_8));
@@ -853,9 +852,9 @@ class AnnotationAdopterTest
 
     // method-msg-3: multi-locale (EN, DE) — standalone @MessageDef on method
     assertTrue(accessor.hasMessageWithCode("method-msg-3"));
-    val methodMsg3 = accessor.getMessageByCode("method-msg-3");
+    var methodMsg3 = accessor.getMessageByCode("method-msg-3");
     assertInstanceOf(LocaleAware.class, methodMsg3);
-    val methodMsg3Locales = ((LocaleAware)methodMsg3).getLocalizedMessages();
+    var methodMsg3Locales = ((LocaleAware)methodMsg3).getLocalizedMessages();
     assertEquals("EN method msg 3", methodMsg3Locales.get(ENGLISH).asFormatString(UTF_8));
     assertEquals("DE method msg 3", methodMsg3Locales.get(GERMAN).asFormatString(UTF_8));
 
@@ -873,9 +872,9 @@ class AnnotationAdopterTest
 
     // type-tmpl-3: multi-locale (EN, DE)
     assertTrue(accessor.hasTemplateWithName("type-tmpl-3"));
-    val typeTmpl3 = ((MessageTemplate)accessor.getTemplateByName("type-tmpl-3")).getMessage();
+    var typeTmpl3 = ((MessageTemplate)accessor.getTemplateByName("type-tmpl-3")).getMessage();
     assertInstanceOf(LocaleAware.class, typeTmpl3);
-    val typeTmpl3Locales = ((LocaleAware)typeTmpl3).getLocalizedMessages();
+    var typeTmpl3Locales = ((LocaleAware)typeTmpl3).getLocalizedMessages();
     assertEquals("EN type tmpl 3", typeTmpl3Locales.get(ENGLISH).asFormatString(UTF_8));
     assertEquals("DE type tmpl 3", typeTmpl3Locales.get(GERMAN).asFormatString(UTF_8));
 
@@ -893,9 +892,9 @@ class AnnotationAdopterTest
 
     // method-tmpl-3: multi-locale (EN, FR) — @TemplateDefs container on method
     assertTrue(accessor.hasTemplateWithName("method-tmpl-3"));
-    val methodTmpl3 = ((MessageTemplate)accessor.getTemplateByName("method-tmpl-3")).getMessage();
+    var methodTmpl3 = ((MessageTemplate)accessor.getTemplateByName("method-tmpl-3")).getMessage();
     assertInstanceOf(LocaleAware.class, methodTmpl3);
-    val methodTmpl3Locales = ((LocaleAware)methodTmpl3).getLocalizedMessages();
+    var methodTmpl3Locales = ((LocaleAware)methodTmpl3).getLocalizedMessages();
     assertEquals("EN method tmpl 3", methodTmpl3Locales.get(ENGLISH).asFormatString(UTF_8));
     assertEquals("FR method tmpl 3", methodTmpl3Locales.get(FRENCH).asFormatString(UTF_8));
 
@@ -907,9 +906,9 @@ class AnnotationAdopterTest
 
     // ctor-msg-2: multi-locale (EN, DE) (@MessageDefs container on constructor)
     assertTrue(accessor.hasMessageWithCode("ctor-msg-2"));
-    val ctorMsg2 = accessor.getMessageByCode("ctor-msg-2");
+    var ctorMsg2 = accessor.getMessageByCode("ctor-msg-2");
     assertInstanceOf(LocaleAware.class, ctorMsg2);
-    val ctorMsg2Locales = ((LocaleAware)ctorMsg2).getLocalizedMessages();
+    var ctorMsg2Locales = ((LocaleAware)ctorMsg2).getLocalizedMessages();
     assertEquals("EN ctor msg 2", ctorMsg2Locales.get(ENGLISH).asFormatString(UTF_8));
     assertEquals("DE ctor msg 2", ctorMsg2Locales.get(GERMAN).asFormatString(UTF_8));
   }
@@ -923,9 +922,9 @@ class AnnotationAdopterTest
 
     // inner-msg-2: multi-locale (EN, DE)
     assertTrue(accessor.hasMessageWithCode("inner-msg-2"));
-    val innerMsg2 = accessor.getMessageByCode("inner-msg-2");
+    var innerMsg2 = accessor.getMessageByCode("inner-msg-2");
     assertInstanceOf(LocaleAware.class, innerMsg2);
-    val innerMsg2Locales = ((LocaleAware)innerMsg2).getLocalizedMessages();
+    var innerMsg2Locales = ((LocaleAware)innerMsg2).getLocalizedMessages();
     assertEquals("EN inner msg 2", innerMsg2Locales.get(ENGLISH).asFormatString(UTF_8));
     assertEquals("DE inner msg 2", innerMsg2Locales.get(GERMAN).asFormatString(UTF_8));
 

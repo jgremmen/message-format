@@ -17,7 +17,6 @@ package de.sayayi.lib.message;
 
 import de.sayayi.lib.message.exception.DuplicateMessageException;
 import de.sayayi.lib.message.exception.DuplicateTemplateException;
-import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
 
@@ -59,15 +58,15 @@ final class MessageSupportConcurrencyTest
   @DisplayName("Concurrent message and template registration is visible to concurrent reads")
   void concurrentMessageAndTemplateRegistrationAndReads() throws Exception
   {
-    val support = createGeneric();
-    val threadCount = 16;
+    var support = createGeneric();
+    var threadCount = 16;
 
     runWithReaders(threadCount, idx -> {
       support.addMessage("MSG-" + idx, "text " + idx);
       support.addTemplate("tpl-" + idx,
           support.getMessageAccessor().getMessageFactory().parseTemplate("template " + idx));
     }, 8, reader -> {
-      val accessor = support.getMessageAccessor();
+      var accessor = support.getMessageAccessor();
 
       accessor.getMessageCodes();
       accessor.getTemplateNames();
@@ -75,7 +74,7 @@ final class MessageSupportConcurrencyTest
       accessor.hasTemplateWithName("tpl-0");
     });
 
-    val accessor = support.getMessageAccessor();
+    var accessor = support.getMessageAccessor();
 
     for(var i = 0; i < threadCount; i++)
     {
@@ -92,7 +91,7 @@ final class MessageSupportConcurrencyTest
   @DisplayName("Concurrent locale/default-config writes with concurrent formatting reads do not throw")
   void concurrentLocaleAndDefaultConfigWritesWithReads() throws Exception
   {
-    val support = createGeneric();
+    var support = createGeneric();
 
     support.addMessage("MSG-DATE", "%{d,date:medium}");
 
@@ -115,8 +114,8 @@ final class MessageSupportConcurrencyTest
   @DisplayName("Concurrent registration of different messages with the same code adds exactly one")
   void concurrentDuplicateMessageRegistration() throws Exception
   {
-    val support = createGeneric();
-    val threadCount = 8;
+    var support = createGeneric();
+    var threadCount = 8;
 
     // slow filter which reads through the accessor, widening the window between check and put
     support.setMessageFilter(message -> {
@@ -127,7 +126,7 @@ final class MessageSupportConcurrencyTest
       return true;
     });
 
-    val results = registerConcurrently(threadCount, idx -> support.addMessage("MSG", "text " + idx));
+    var results = registerConcurrently(threadCount, idx -> support.addMessage("MSG", "text " + idx));
 
     assertEquals(1, results.added);
     assertEquals(threadCount - 1, results.duplicates);
@@ -139,9 +138,9 @@ final class MessageSupportConcurrencyTest
   @DisplayName("Concurrent registration of different templates with the same name adds exactly one")
   void concurrentDuplicateTemplateRegistration() throws Exception
   {
-    val support = createGeneric();
-    val messageFactory = support.getMessageAccessor().getMessageFactory();
-    val threadCount = 8;
+    var support = createGeneric();
+    var messageFactory = support.getMessageAccessor().getMessageFactory();
+    var threadCount = 8;
 
     // slow filter which reads through the accessor, widening the window between check and put
     support.setTemplateFilter((name, template) -> {
@@ -152,7 +151,7 @@ final class MessageSupportConcurrencyTest
       return true;
     });
 
-    val results = registerConcurrently(threadCount,
+    var results = registerConcurrently(threadCount,
         idx -> support.addTemplate("tpl", messageFactory.parseTemplate("template " + idx)));
 
     assertEquals(1, results.added);
@@ -165,16 +164,16 @@ final class MessageSupportConcurrencyTest
   @DisplayName("Concurrent registration with default filters detects all duplicates")
   void concurrentDuplicateRegistrationDefaultFilters() throws Exception
   {
-    val support = createGeneric();
-    val messageFactory = support.getMessageAccessor().getMessageFactory();
-    val threadCount = 16;
+    var support = createGeneric();
+    var messageFactory = support.getMessageAccessor().getMessageFactory();
+    var threadCount = 16;
 
-    val messageResults = registerConcurrently(threadCount, idx -> support.addMessage("MSG", "text " + idx));
+    var messageResults = registerConcurrently(threadCount, idx -> support.addMessage("MSG", "text " + idx));
 
     assertEquals(1, messageResults.added);
     assertEquals(threadCount - 1, messageResults.duplicates);
 
-    val templateResults = registerConcurrently(threadCount,
+    var templateResults = registerConcurrently(threadCount,
         idx -> support.addTemplate("tpl", messageFactory.parseTemplate("template " + idx)));
 
     assertEquals(1, templateResults.added);
@@ -187,12 +186,12 @@ final class MessageSupportConcurrencyTest
   @DisplayName("Missing-template predicates can update the support")
   void missingTemplatePredicateCanUpdateSupport()
   {
-    val support = createGeneric();
-    val messageAccessor = support.getMessageAccessor();
+    var support = createGeneric();
+    var messageAccessor = support.getMessageAccessor();
 
     support.addMessage("MSG", "%[missing]");
 
-    val missingTemplates = messageAccessor.findMissingTemplates(code -> {
+    var missingTemplates = messageAccessor.findMissingTemplates(code -> {
       support.addMessage("FROM-FILTER", "text");
       return true;
     });
@@ -207,15 +206,15 @@ final class MessageSupportConcurrencyTest
   @DisplayName("Export predicates and output can update the support")
   void exportCallbacksCanUpdateSupportWithoutChangingExportSnapshot() throws IOException
   {
-    val support = createGeneric();
-    val messageAccessor = support.getMessageAccessor();
+    var support = createGeneric();
+    var messageAccessor = support.getMessageAccessor();
 
     support.addTemplate("template", messageAccessor.getMessageFactory().parseTemplate("template text"));
     support.addMessage("ORIGINAL", "%[template]");
 
-    val bytes = new ByteArrayOutputStream();
-    val streamMutation = new AtomicBoolean();
-    val stream = new OutputStream() {
+    var bytes = new ByteArrayOutputStream();
+    var streamMutation = new AtomicBoolean();
+    var stream = new OutputStream() {
       @Override
       public void write(int value)
       {
@@ -245,8 +244,8 @@ final class MessageSupportConcurrencyTest
       return true;
     });
 
-    val imported = createGeneric();
-    val importedMessageAccessor = imported.getMessageAccessor();
+    var imported = createGeneric();
+    var importedMessageAccessor = imported.getMessageAccessor();
     imported.importMessages(new ByteArrayInputStream(bytes.toByteArray()));
 
     assertEquals(Set.of("ORIGINAL"), importedMessageAccessor.getMessageCodes());
@@ -263,7 +262,7 @@ final class MessageSupportConcurrencyTest
   @DisplayName("High contention stress test with concurrent reads and writes")
   void highContentionStressTest() throws Exception
   {
-    val support = createGeneric();
+    var support = createGeneric();
 
     stress(24, 200,
         (idx, i) -> support.addMessage("STRESS-" + idx + '-' + i, "text " + i),
@@ -272,7 +271,7 @@ final class MessageSupportConcurrencyTest
         (idx, i) -> support.setLocale(current().nextBoolean() ? GERMANY : US),
         (idx, i) -> support.setDefaultConfig("ignore-default-tostring", current().nextBoolean()),
         (idx, i) -> {
-          val accessor = support.getMessageAccessor();
+          var accessor = support.getMessageAccessor();
 
           accessor.getMessageCodes();
           accessor.getTemplateNames();
@@ -285,7 +284,7 @@ final class MessageSupportConcurrencyTest
   private static @NotNull RegistrationResults registerConcurrently(int threadCount, @NotNull IntConsumer registration)
       throws Exception
   {
-    val added = (int)getConcurrently(threadCount, idx -> {
+    var added = (int)getConcurrently(threadCount, idx -> {
       try {
         registration.accept(idx);
         return true;

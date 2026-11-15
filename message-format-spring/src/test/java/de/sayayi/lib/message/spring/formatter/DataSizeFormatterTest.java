@@ -19,7 +19,6 @@ import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.formatter.parameter.named.extra.FileSizeFormatter;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import lombok.val;
 import org.junit.jupiter.api.*;
 import org.springframework.util.unit.DataSize;
 
@@ -52,16 +51,16 @@ final class DataSizeFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Formattable types")
-  void testFormattableTypes() {
+  void formattableTypes() {
     assertFormatterForType(new DataSizeFormatter(), DataSize.class);
   }
 
 
   @Test
   @DisplayName("Registered as service")
-  void testRegisteredAsService()
+  void registeredAsService()
   {
-    val formatters = new DefaultFormatterService().getFormatters(null, DataSize.class, null);
+    var formatters = new DefaultFormatterService().getFormatters(null, DataSize.class, null);
 
     assertInstanceOf(DataSizeFormatter.class, formatters[0]);
   }
@@ -69,7 +68,7 @@ final class DataSizeFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Data size is formatted as file size")
-  void testFormat()
+  void formatAsFileSize()
   {
     assertEquals("0B", messageSupport.message("%{s}").with("s", DataSize.ofBytes(0)).format());
     assertEquals("999B", messageSupport.message("%{s}").with("s", DataSize.ofBytes(999)).format());
@@ -80,7 +79,7 @@ final class DataSizeFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Units are based on powers of 1000")
-  void testDecimalUnits()
+  void decimalUnits()
   {
     assertEquals("1.0KB", messageSupport.message("%{s}").with("s", DataSize.ofKilobytes(1)).format());
     assertEquals("524.3KB", messageSupport.message("%{s}").with("s", DataSize.ofKilobytes(512)).format());
@@ -90,9 +89,9 @@ final class DataSizeFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Configuration keys and unit labels of the filesize formatter apply")
-  void testFileSizeConfig()
+  void fileSizeConfig()
   {
-    val size = DataSize.ofMegabytes(5);
+    var size = DataSize.ofMegabytes(5);
 
     assertEquals("5 MB", messageSupport.message("%{s,scale:0,space:true}").with("s", size).format());
     assertEquals("5.243MB", messageSupport.message("%{s,scale:3}").with("s", size).format());
@@ -102,7 +101,7 @@ final class DataSizeFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Null is matched by the null key")
-  void testNull()
+  void nullMatchesNullKey()
   {
     assertEquals("unknown", messageSupport
         .message("%{s,null:'unknown'}")
@@ -113,9 +112,9 @@ final class DataSizeFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Without filesize formatter the number of bytes is formatted")
-  void testWithoutFileSizeFormatter()
+  void withoutFileSizeFormatter()
   {
-    val messageSupport = createDefaultMessageSupport(new DataSizeFormatter()).setLocale(US);
+    var messageSupport = createDefaultMessageSupport(new DataSizeFormatter()).setLocale(US);
 
     assertEquals("1234567", messageSupport.message("%{s}").with("s", DataSize.ofBytes(1234567)).format());
   }

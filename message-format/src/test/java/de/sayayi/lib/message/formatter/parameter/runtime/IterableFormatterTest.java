@@ -18,7 +18,6 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.parameter.named.SizeFormatter;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import lombok.val;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
@@ -52,17 +51,18 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 final class IterableFormatterTest extends AbstractFormatterTest
 {
   @Test
-  void testFormattableTypes() {
+  @DisplayName("Formattable types include Iterable")
+  void formattableTypes() {
     assertFormatterForType(new IterableFormatter(), Iterable.class);
   }
 
 
   @Test
   @DisplayName("Escaped parameter in string list value stays text")
-  void testListValueEscapedParameter() throws IOException
+  void listValueEscapedParameter() throws IOException
   {
-    val formatterService = createFormatterService(new IterableFormatter());
-    val messageSupport = MessageSupportFactory.create(formatterService);
+    var formatterService = createFormatterService(new IterableFormatter());
+    var messageSupport = MessageSupportFactory.create(formatterService);
 
     assertEquals(
         "<1>, <2>",
@@ -80,7 +80,7 @@ final class IterableFormatterTest extends AbstractFormatterTest
     // the string value survives a pack round trip
     messageSupport.addMessage("MSG", "%{c,list-value:'<\\%{value}>'}");
 
-    val importedMessageSupport = packRoundTrip(
+    var importedMessageSupport = packRoundTrip(
         messageSupport,
         () -> MessageSupportFactory.create(formatterService));
 
@@ -114,7 +114,7 @@ final class IterableFormatterTest extends AbstractFormatterTest
   @ParameterizedTest(name = "{0}")
   @DisplayName("Non-collection iterables are iterated for formatting only")
   @MethodSource("oneShotIterables")
-  void testOneShotIterable(String name, @Language("MessageFormat") String formatString, Iterable<String> iterable,
+  void oneShotIterable(String name, @Language("MessageFormat") String formatString, Iterable<String> iterable,
                            String expected)
   {
     assertEquals(
@@ -128,9 +128,9 @@ final class IterableFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("One-shot test iterable can be iterated only once")
-  void testOneShotIterableIteratesOnce()
+  void oneShotIterableIteratesOnce()
   {
-    val iterable = new OneShotIterable("a");
+    var iterable = new OneShotIterable("a");
     iterable.iterator();
 
     assertThrows(IllegalStateException.class, iterable::iterator);

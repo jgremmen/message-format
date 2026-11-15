@@ -19,7 +19,6 @@ import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.exception.MessageFormatException;
 import de.sayayi.lib.message.formatter.parameter.named.extra.GeoFormatter.Format;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -65,7 +64,7 @@ final class GeoFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Rounds degree values")
-  void testDmsSplitterDegree()
+  void dmsSplitterDegree()
   {
     assertDms(GeoFormatter.dmsSplitter(new Format(), dms(124, 30)), 125.0, 0.0, 0.0);
     assertDms(GeoFormatter.dmsSplitter(new Format(), dms(127, 29)), 127.0, 0.0, 0.0);
@@ -85,7 +84,7 @@ final class GeoFormatterTest extends AbstractFormatterTest
   @ParameterizedTest(name = "{0} minute digits -> {2}, {3}, {4}")
   @DisplayName("Rounds minute values to the configured precision")
   @MethodSource("minutePrecisions")
-  void testDmsSplitterMinute(int minuteDigits, double value, double degree, double minutes, double seconds)
+  void dmsSplitterMinute(int minuteDigits, double value, double degree, double minutes, double seconds)
   {
     assertDms(GeoFormatter.dmsSplitter(new Format(null, minuteDigits, -1), value), degree, minutes, seconds);
   }
@@ -104,7 +103,7 @@ final class GeoFormatterTest extends AbstractFormatterTest
   @ParameterizedTest(name = "{0} -> {3}")
   @DisplayName("Formats longitude values using predefined formats")
   @MethodSource("predefinedLongitudeFormats")
-  void testFormatLongitude(String geoFormat, Locale locale, double value, String expected)
+  void formatLongitude(String geoFormat, Locale locale, double value, String expected)
   {
     assertEquals(
         noSpaceText(expected),
@@ -114,9 +113,9 @@ final class GeoFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Formats coordinates using predefined and custom formats")
-  void testFormatter()
+  void formatter()
   {
-    val parameters = new HashMap<String,Object>();
+    var parameters = new HashMap<String,Object>();
 
     parameters.put("lat", dms(51, 34, 9, 0));
     parameters.put("lon", dms(4, 48));
@@ -153,7 +152,7 @@ final class GeoFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Formats coordinates using the default format dms")
-  void testDefaultFormat()
+  void defaultFormat()
   {
     for(var n = 0; n < 2; n++)
     {
@@ -178,7 +177,7 @@ final class GeoFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Formats non-finite values as empty text")
-  void testNonFiniteValues()
+  void nonFiniteValues()
   {
     for(var value: new Object[] { Double.NaN, Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY, Float.NaN })
     {
@@ -201,9 +200,9 @@ final class GeoFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Rejects an invalid custom format pattern")
-  void testInvalidFormatPattern()
+  void invalidFormatPattern()
   {
-    val exception = assertThrows(
+    var exception = assertThrows(
         MessageFormatException.class,
         () -> messageSupport
             .message("%{lat,geo:'invalid'}")
@@ -229,11 +228,11 @@ final class GeoFormatterTest extends AbstractFormatterTest
   @ParameterizedTest(name = "''{0}''")
   @DisplayName("Parses custom format patterns")
   @MethodSource("formatPatterns")
-  void testParseFormatString(String pattern, Boolean longitude, boolean separatorAfterDegree,
+  void parseFormatString(String pattern, Boolean longitude, boolean separatorAfterDegree,
                              boolean separatorAfterMinute, boolean separatorAfterSecond, int minuteDigits,
                              int secondDigits, boolean zeroPadMinutes, boolean zeroPadSeconds)
   {
-    val fmt = GeoFormatter.parseFormatString(pattern);
+    var fmt = GeoFormatter.parseFormatString(pattern);
 
     assertEquals(longitude, fmt.longitude);
     assertEquals(separatorAfterDegree, fmt.separatorAfterDegree);

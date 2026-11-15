@@ -16,7 +16,6 @@
 package de.sayayi.lib.message.formatter;
 
 import de.sayayi.lib.message.formatter.post.PostFormatter;
-import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -51,22 +50,22 @@ final class DefaultFormatterServiceTest
 {
   @Test
   @DisplayName("Default class loader is the library class loader")
-  void testDefaultClassLoader()
+  void defaultClassLoader()
   {
     assertSame(DefaultFormatterService.class.getClassLoader(), new DefaultFormatterService().classLoader);
     assertSame(DefaultFormatterService.class.getClassLoader(),
         new DefaultFormatterService(null, 16).classLoader);
 
-    val classLoader = new URLClassLoader(new URL[0]);
+    var classLoader = new URLClassLoader(new URL[0]);
     assertSame(classLoader, new DefaultFormatterService(classLoader, 16).classLoader);
   }
 
 
   @Test
   @DisplayName("Subclass can add default formatters after its fields are initialized")
-  void testDeferredDefaultFormatters()
+  void deferredDefaultFormatters()
   {
-    val service = new ExcludingFormatterService(Set.of("clip"));
+    var service = new ExcludingFormatterService(Set.of("clip"));
 
     assertTrue(service.getPostFormatters().containsKey("case"));
     assertFalse(service.getPostFormatters().containsKey("clip"));
@@ -75,7 +74,7 @@ final class DefaultFormatterServiceTest
 
   @Test
   @DisplayName("Overrides called from the public constructor see uninitialized subclass fields")
-  void testOverrideCalledFromConstructor()
+  void overrideCalledFromConstructor()
   {
     // the excluded names are not yet assigned when the public constructor calls addPostFormattersFromService()
     assertThrows(NullPointerException.class, () -> new DefaultFormatterService() {
@@ -97,9 +96,9 @@ final class DefaultFormatterServiceTest
 
   @Test
   @DisplayName("Protected constructor without default formatters registers no service formatters")
-  void testWithoutDefaultFormatters()
+  void withoutDefaultFormatters()
   {
-    val service = new DefaultFormatterService(null, 16, false) {};
+    var service = new DefaultFormatterService(null, 16, false) {};
 
     assertTrue(service.getPostFormatters().isEmpty());
     assertSame(DefaultFormatterService.class.getClassLoader(), service.classLoader);
@@ -108,20 +107,20 @@ final class DefaultFormatterServiceTest
 
   @Test
   @DisplayName("Formatters are discovered when the library is not visible to the system class loader")
-  void testIsolatedClassLoader() throws Exception
+  void isolatedClassLoader() throws Exception
   {
     // class path without the test classes, loaded in isolation from the system class loader
-    val urls = new ArrayList<URL>();
-    for(val entry: System.getProperty("java.class.path").split(pathSeparator))
+    var urls = new ArrayList<URL>();
+    for(var entry: System.getProperty("java.class.path").split(pathSeparator))
       if (!isTestEntry(entry))
         urls.add(toURL(entry));
 
-    try(val isolated = new URLClassLoader(urls.toArray(URL[]::new), getPlatformClassLoader())) {
-      val serviceClass = isolated.loadClass(DefaultFormatterService.class.getName());
+    try(var isolated = new URLClassLoader(urls.toArray(URL[]::new), getPlatformClassLoader())) {
+      var serviceClass = isolated.loadClass(DefaultFormatterService.class.getName());
       assertNotSame(DefaultFormatterService.class, serviceClass);
 
-      val service = serviceClass.getConstructor().newInstance();
-      val classLoaderField = serviceClass.getDeclaredField("classLoader");
+      var service = serviceClass.getConstructor().newInstance();
+      var classLoaderField = serviceClass.getDeclaredField("classLoader");
       classLoaderField.setAccessible(true);
 
       assertSame(isolated, classLoaderField.get(service));
@@ -134,7 +133,7 @@ final class DefaultFormatterServiceTest
 
   private static boolean isTestEntry(String entry)
   {
-    val path = Path.of(entry).normalize().toString().replace(File.separatorChar, '/');
+    var path = Path.of(entry).normalize().toString().replace(File.separatorChar, '/');
     return path.contains("/classes/java/test") || path.contains("/resources/test");
   }
 

@@ -29,7 +29,6 @@ import de.sayayi.lib.message.internal.message.MessageDelegateWithCode;
 import de.sayayi.lib.message.internal.message.TextMessage;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.template.AbstractNamedTemplate;
-import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -72,8 +71,8 @@ final class MessageFormatExceptionTest
 
   static
   {
-    val formatterService = new GenericFormatterService();
-    val formatter = mock(NamedParameterFormatter.class, CALLS_REAL_METHODS);
+    var formatterService = new GenericFormatterService();
+    var formatter = mock(NamedParameterFormatter.class, CALLS_REAL_METHODS);
 
     when(formatter.getName()).thenReturn("throw");
     when(formatter.format(any(ParameterFormatterContext.class), any()))
@@ -101,7 +100,7 @@ final class MessageFormatExceptionTest
   }
 
 
-  private static Stream<Arguments> getMessage_parameters()
+  static Stream<Arguments> getMessage_parameters()
   {
     return Stream.of(
         Arguments.of(null, null, null, null,
@@ -163,7 +162,7 @@ final class MessageFormatExceptionTest
   @DisplayName("Detailed exception messages")
   @ParameterizedTest(name = "msg: {4}")
   @MethodSource("getMessage_parameters")
-  void testGetMessage(String code, String template, Locale locale, String parameter, @NotNull String msg,
+  void getMessage(String code, String template, Locale locale, String parameter, @NotNull String msg,
                       @SuppressWarnings("unused") String msgWithPostFormatter) {
     assertEquals(msg, exceptionWith(code, template, locale, parameter, null).getMessage());
   }
@@ -171,7 +170,7 @@ final class MessageFormatExceptionTest
 
   @Test
   @DisplayName("Exclude generated code from detailed exception message")
-  void testGeneratedMessageCode()
+  void generatedMessageCode()
   {
     assertEquals("failed to format parameter 'q' using locale Dutch (Netherlands)",
         MessageFormatException.of(null)
@@ -184,7 +183,7 @@ final class MessageFormatExceptionTest
 
   @Test
   @DisplayName("format: failed to format message")
-  void testFormat0000()
+  void format0000()
   {
     assertFormatFails(
         "failed to format message",
@@ -196,7 +195,7 @@ final class MessageFormatExceptionTest
 
   @Test
   @DisplayName("format: failed to format message parameter 'p'")
-  void testFormat0001()
+  void format0001()
   {
     assertFormatFails(
         "failed to format parameter 'p'",
@@ -209,7 +208,7 @@ final class MessageFormatExceptionTest
 
   @Test
   @DisplayName("format: failed to format message for locale German (Germany)")
-  void testFormat0010()
+  void format0010()
   {
     assertFormatFails(
         "failed to format message using locale German (Germany)",
@@ -223,9 +222,9 @@ final class MessageFormatExceptionTest
 
   @Test
   @DisplayName("format: failed to format message parameter 'n' for locale German")
-  void testFormat0011()
+  void format0011()
   {
-    val lmMap = new HashMap<Locale,String>();
+    var lmMap = new HashMap<Locale,String>();
 
     lmMap.put(GERMANY, "%{n,format:throw}");
     lmMap.put(ENGLISH, "%{e}");
@@ -242,7 +241,7 @@ final class MessageFormatExceptionTest
 
   @Test
   @DisplayName("format: failed to format template 'msg'")
-  void testFormat0100()
+  void format0100()
   {
     assertFormatFails(
         "failed to format template 'tpl'",
@@ -254,7 +253,7 @@ final class MessageFormatExceptionTest
 
   @Test
   @DisplayName("format: failed to format parameter 'm' in template 'msg-with-default'")
-  void testFormat0101()
+  void format0101()
   {
     MESSAGE_SUPPORT.addTemplate("msg-with-default", MESSAGE_SUPPORT.getMessageAccessor()
         .getMessageFactory().parseTemplate("%{m,format:throw}"));
@@ -269,9 +268,9 @@ final class MessageFormatExceptionTest
 
   @Test
   @DisplayName("format: failed to format template 'tpl' for locale English (United Kingdom)")
-  void testFormat0110()
+  void format0110()
   {
-    val lmMap = new HashMap<Locale,String>();
+    var lmMap = new HashMap<Locale,String>();
 
     lmMap.put(GERMANY, "%{n,format:throw}");
     lmMap.put(ENGLISH, "%[tpl]");
@@ -287,12 +286,12 @@ final class MessageFormatExceptionTest
 
   @Test
   @DisplayName("format: failed to format parameter 'p' in template 'name' for locale Italian (Italy)")
-  void testFormat0111()
+  void format0111()
   {
     MESSAGE_SUPPORT.addTemplate("name", MESSAGE_SUPPORT.getMessageAccessor()
         .getMessageFactory().parseTemplate("%{p,format:throw}"));
 
-    val lmMap = new HashMap<Locale,String>();
+    var lmMap = new HashMap<Locale,String>();
 
     lmMap.put(GERMANY, "%{n,format:throw}");
     lmMap.put(ITALIAN, "%[name]");
@@ -308,7 +307,7 @@ final class MessageFormatExceptionTest
 
   @Test
   @DisplayName("format: failed to format message with code 'MSG-001'")
-  void testFormat1000()
+  void format1000()
   {
     MESSAGE_SUPPORT.addMessage(new MessageDelegateWithCode("MSG-001", THROWING_MESSAGE));
 
@@ -322,7 +321,7 @@ final class MessageFormatExceptionTest
 
   @Test
   @DisplayName("format: failed to format parameter 'number' for message with code 'MSG-002'")
-  void testFormat1001()
+  void format1001()
   {
     MESSAGE_SUPPORT.addMessage("MSG-002", "%{number,format:throw}");
 
@@ -336,7 +335,7 @@ final class MessageFormatExceptionTest
 
   @Test
   @DisplayName("format: failed to format message with code 'MSG-003' and locale Chinese (Taiwan)")
-  void testFormat1010()
+  void format1010()
   {
     assertFormatFails(
         "failed to format message with code 'MSG-003' using locale Chinese (Taiwan)",
@@ -350,9 +349,9 @@ final class MessageFormatExceptionTest
 
   @Test
   @DisplayName("format: failed to format parameter 'flag' for message with code 'MSG-004' and locale English (United States)")
-  void testFormat1011()
+  void format1011()
   {
-    val lmMap = new HashMap<Locale,String>();
+    var lmMap = new HashMap<Locale,String>();
 
     lmMap.put(GERMANY, "%{n,format:throw}");
     lmMap.put(ENGLISH, "%{flag,format:throw}");
@@ -368,7 +367,7 @@ final class MessageFormatExceptionTest
 
   @Test
   @DisplayName("format: failed to format template 'tpl' for message with code 'MFP1'")
-  void testFormat1100()
+  void format1100()
   {
     assertFormatFails(
         "message 'MFP1' failed to format template 'tpl'",
@@ -381,7 +380,7 @@ final class MessageFormatExceptionTest
 
   @Test
   @DisplayName("format: failed to format parameter 'abc' in template 'age-range' for message with code 'MFP2'")
-  void testFormat1101()
+  void format1101()
   {
     MESSAGE_SUPPORT.addTemplate("age-range", MESSAGE_SUPPORT.getMessageAccessor()
         .getMessageFactory().parseTemplate("%{abc,format:throw}"));
@@ -397,9 +396,9 @@ final class MessageFormatExceptionTest
 
   @Test
   @DisplayName("format: failed to format template 'tpl' for message with code 'MFP3' and locale Dutch (Belgium)")
-  void testFormat1110()
+  void format1110()
   {
-    val lmMap = new HashMap<Locale,String>();
+    var lmMap = new HashMap<Locale,String>();
 
     lmMap.put(GERMANY, "%{n,format:throw}");
     lmMap.put(Locale.forLanguageTag("nl"), "%[tpl]");
@@ -416,12 +415,12 @@ final class MessageFormatExceptionTest
 
   @Test
   @DisplayName("format: failed to format parameter 'j' in template 'bool' for message with code 'MFP4' and locale French (Switzerland)")
-  void testFormat1111()
+  void format1111()
   {
     MESSAGE_SUPPORT.addTemplate("bool", MESSAGE_SUPPORT.getMessageAccessor()
         .getMessageFactory().parseTemplate("%{j,format:throw}"));
 
-    val lmMap = new HashMap<Locale,String>();
+    var lmMap = new HashMap<Locale,String>();
 
     lmMap.put(GERMANY, "%{n,format:throw}");
     lmMap.put(FRANCE, "%[bool]");
@@ -438,15 +437,15 @@ final class MessageFormatExceptionTest
 
   @Test
   @DisplayName("with...: copies keep the original stack trace, cause and suppressed exceptions")
-  void testWithKeepsStackTrace()
+  void withKeepsStackTrace()
   {
-    val cause = new IllegalStateException("cause");
-    val suppressed = new IllegalArgumentException("suppressed");
-    val ex = MessageFormatException.of(cause);
+    var cause = new IllegalStateException("cause");
+    var suppressed = new IllegalArgumentException("suppressed");
+    var ex = MessageFormatException.of(cause);
     ex.addSuppressed(suppressed);
-    val stackTrace = ex.getStackTrace();
+    var stackTrace = ex.getStackTrace();
 
-    val copy = ex
+    var copy = ex
         .withParameter("p")
         .withTemplate("tpl")
         .withLocale(GERMANY)
@@ -461,10 +460,10 @@ final class MessageFormatExceptionTest
   @DisplayName("Detailed exception messages with post formatter")
   @ParameterizedTest(name = "msg: {5}")
   @MethodSource("getMessage_parameters")
-  void testGetMessageWithPostFormatter(String code, String template, Locale locale, String parameter,
+  void getMessageWithPostFormatter(String code, String template, Locale locale, String parameter,
                                        @SuppressWarnings("unused") String msg, @NotNull String msgWithPostFormatter)
   {
-    val ex = exceptionWith(code, template, locale, parameter, "clip");
+    var ex = exceptionWith(code, template, locale, parameter, "clip");
 
     assertEquals("clip", ex.getPostFormatter());
     assertEquals(msgWithPostFormatter, ex.getMessage());
@@ -473,9 +472,9 @@ final class MessageFormatExceptionTest
 
   @Test
   @DisplayName("format: unregistered post formatter is reported with its name")
-  void testFormatUnregisteredPostFormatter()
+  void formatUnregisteredPostFormatter()
   {
-    val ex = assertFormatFails(
+    var ex = assertFormatFails(
         "failed to format post formatter 'unknown-pf'",
         () -> MESSAGE_SUPPORT
             .message("%(unknown-pf,'text')")
@@ -488,7 +487,7 @@ final class MessageFormatExceptionTest
 
   @Test
   @DisplayName("format: failed to format message parameter 'n' in post formatter 'case'")
-  void testFormatParameterInPostFormatter()
+  void formatParameterInPostFormatter()
   {
     assertFormatFails(
         "failed to format sub-message parameter 'n' of post formatter 'case'",
@@ -500,7 +499,7 @@ final class MessageFormatExceptionTest
 
   @Test
   @DisplayName("format: failed to format parameter 'n' in post formatter 'case' for message with code 'MFP5'")
-  void testFormatParameterInPostFormatterWithCode()
+  void formatParameterInPostFormatterWithCode()
   {
     MESSAGE_SUPPORT.addMessage("MFP5", "%(case,'%{n,format:throw}',case:upper)");
 
@@ -512,7 +511,7 @@ final class MessageFormatExceptionTest
 
   @Test
   @DisplayName("format: failed to format parameter 'x' in template 'nested' in parameter 'p'")
-  void testFormatParameterInTemplateInParameter()
+  void formatParameterInTemplateInParameter()
   {
     MESSAGE_SUPPORT.addTemplate("nested", MESSAGE_SUPPORT.getMessageAccessor()
         .getMessageFactory().parseTemplate("%{x,format:throw}"));
@@ -527,7 +526,7 @@ final class MessageFormatExceptionTest
 
   @Test
   @DisplayName("format: failed to format post formatter 'unknown-pf' in parameter 'p' for message with code 'MFP6'")
-  void testFormatPostFormatterInParameterWithCode()
+  void formatPostFormatterInParameterWithCode()
   {
     MESSAGE_SUPPORT.addMessage("MFP6", "%{p,null:\"%(unknown-pf,'text')\"}");
 
@@ -541,9 +540,9 @@ final class MessageFormatExceptionTest
 
   @Test
   @DisplayName("with...: context is numbered per kind and getters return the innermost value")
-  void testContextNumbering()
+  void contextNumbering()
   {
-    val ex = MessageFormatException.of(null)
+    var ex = MessageFormatException.of(null)
         .withParameter("inner")
         .withTemplate("tpl")
         .withParameter("outer")
@@ -559,9 +558,9 @@ final class MessageFormatExceptionTest
 
   @Test
   @DisplayName("with...: code is recorded once")
-  void testCodeRecordedOnce()
+  void codeRecordedOnce()
   {
-    val ex = MessageFormatException.of(null)
+    var ex = MessageFormatException.of(null)
         .withParameter("p")
         .withCode("MSG-1")
         .withTemplate("tpl")
@@ -574,9 +573,9 @@ final class MessageFormatExceptionTest
 
   @Test
   @DisplayName("with...: locale is recorded once and kept for a partial match")
-  void testLocaleRecordedOnce()
+  void localeRecordedOnce()
   {
-    val ex = MessageFormatException.of(null)
+    var ex = MessageFormatException.of(null)
         .withLocale(GERMANY)
         .withParameter("p1")
         .withParameter("p2")
@@ -606,9 +605,9 @@ final class MessageFormatExceptionTest
   @ParameterizedTest(name = "sequence: {0}")
   @MethodSource("producibleContextKeys")
   @SuppressWarnings({"LanguageMismatch", "DataFlowIssue"})
-  void testContextKeySequence(@NotNull String sequence)
+  void contextKeySequence(@NotNull String sequence)
   {
-    val messageFactory = MESSAGE_SUPPORT.getMessageAccessor().getMessageFactory();
+    var messageFactory = MESSAGE_SUPPORT.getMessageAccessor().getMessageFactory();
     final var keys = List.of(sequence.split("-"));
     String format = null;
 
@@ -652,7 +651,7 @@ final class MessageFormatExceptionTest
           : messageFactory.parseMessage(format);
     }
 
-    val ex = assertThrowsExactly(MessageFormatException.class, () -> MESSAGE_SUPPORT
+    var ex = assertThrowsExactly(MessageFormatException.class, () -> MESSAGE_SUPPORT
         .message(message)
         .locale(GERMANY)
         .format());
@@ -693,7 +692,7 @@ final class MessageFormatExceptionTest
   private static @NotNull MessageFormatException assertFormatFails(@NotNull String expectedMessage,
                                                                    @NotNull Executable executable)
   {
-    val ex = assertThrowsExactly(MessageFormatException.class, executable);
+    var ex = assertThrowsExactly(MessageFormatException.class, executable);
 
     assertEquals(expectedMessage, ex.getMessage());
 

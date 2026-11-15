@@ -17,7 +17,6 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -42,16 +41,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 final class EnumFormatterTest extends AbstractFormatterTest
 {
   @Test
-  public void testFormattableTypes() {
+  @DisplayName("Formattable types include Enum")
+  public void formattableTypes() {
     assertFormatterForType(new EnumFormatter(), Enum.class);
   }
 
 
   @Test
-  void testFormat()
+  @DisplayName("The ordinal is formatted if configured by parameter or by default configuration")
+  void formatOrdinal()
   {
-    val messageSupport = createMessageSupport(ROOT, new EnumFormatter());
-    val messageAccessor = messageSupport.getMessageAccessor();
+    var messageSupport = createMessageSupport(ROOT, new EnumFormatter());
+    var messageAccessor = messageSupport.getMessageAccessor();
 
     assertEquals(
         noSpaceText("3"),
@@ -65,9 +66,10 @@ final class EnumFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  void testMapWithoutDefault()
+  @DisplayName("Relational string keys compare the enum name; without match and default, the result is empty")
+  void mapWithoutDefault()
   {
-    val messageAccessor = createMessageAccessor(new EnumFormatter());
+    var messageAccessor = createMessageAccessor(new EnumFormatter());
 
     assertEquals(
         "upper",
@@ -86,9 +88,10 @@ final class EnumFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  void testMapWithDefault()
+  @DisplayName("An enum value without matching key is formatted with the default map message")
+  void mapWithDefault()
   {
-    val messageAccessor = createMessageAccessor(new EnumFormatter());
+    var messageAccessor = createMessageAccessor(new EnumFormatter());
 
     assertEquals(
         "C or D",

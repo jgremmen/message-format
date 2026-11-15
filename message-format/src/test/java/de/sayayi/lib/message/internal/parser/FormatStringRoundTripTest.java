@@ -17,7 +17,6 @@ package de.sayayi.lib.message.internal.parser;
 
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.part.normalizer.LRUMessagePartNormalizer;
-import lombok.val;
 import org.intellij.lang.annotations.Language;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -109,32 +108,19 @@ final class FormatStringRoundTripTest
       "%(clip,'true',size:10)",
       "%(clip,'back\\\\slash',size:10)"
   })
-  void testRoundTrip(@Language("MessageFormat") String formatString)
+  void roundTrip(@Language("MessageFormat") String formatString)
   {
-    val message = MESSAGE_FACTORY.parseMessage(formatString);
+    var message = MESSAGE_FACTORY.parseMessage(formatString);
 
-    for(val charset: new Charset[] { UTF_8, US_ASCII })
+    for(var charset: new Charset[] { UTF_8, US_ASCII })
     {
       @Language("MessageFormat")
-      val serialized = message.asFormatString(charset);
+      var serialized = message.asFormatString(charset);
 
       assertTrue(
           message.isSame(MESSAGE_FACTORY.parseMessage(serialized)),
           () -> "'" + formatString + "' -> '" + serialized + "' (" + charset + ") is not the same message");
     }
-  }
-
-
-  @ParameterizedTest(name = "{0}")
-  @DisplayName("Format string is normalized")
-  @MethodSource("normalizedFormatStrings")
-  void testNormalizedForm(@Language("MessageFormat") String formatString, String expected)
-  {
-    assertEquals(
-        expected,
-        MESSAGE_FACTORY
-            .parseMessage(formatString)
-            .asFormatString(US_ASCII));
   }
 
 
@@ -151,11 +137,24 @@ final class FormatStringRoundTripTest
   }
 
 
+  @ParameterizedTest(name = "{0}")
+  @DisplayName("Format string is normalized")
+  @MethodSource("normalizedFormatStrings")
+  void normalizedForm(@Language("MessageFormat") String formatString, String expected)
+  {
+    assertEquals(
+        expected,
+        MESSAGE_FACTORY
+            .parseMessage(formatString)
+            .asFormatString(US_ASCII));
+  }
+
+
   @Test
   @DisplayName("Supplementary characters are only escaped if the charset cannot encode them")
-  void testSupplementaryCharacters()
+  void supplementaryCharacters()
   {
-    val message = MESSAGE_FACTORY.parseMessage("Smile \uD83D\uDE00 now");
+    var message = MESSAGE_FACTORY.parseMessage("Smile \uD83D\uDE00 now");
 
     assertEquals(
         "Smile \ud83d\ude00 now",
@@ -168,9 +167,9 @@ final class FormatStringRoundTripTest
 
   @Test
   @DisplayName("Characters rejected by the lexer are escaped even if the charset can encode them")
-  void testLexerRejectedCharacters()
+  void lexerRejectedCharacters()
   {
-    val message = MESSAGE_FACTORY.parseMessage("a\\u0378b \\udb40\\udc80 \\ud800");
+    var message = MESSAGE_FACTORY.parseMessage("a\\u0378b \\udb40\\udc80 \\ud800");
 
     assertEquals("a\\u0378b \\udb40\\udc80 \\ud800", message.asFormatString(UTF_8));
   }

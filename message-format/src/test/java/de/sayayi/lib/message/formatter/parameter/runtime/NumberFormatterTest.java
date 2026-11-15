@@ -17,7 +17,6 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.formatter.parameter.named.ChoiceFormatter;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import lombok.val;
 import org.intellij.lang.annotations.Language;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -50,9 +49,10 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 final class NumberFormatterTest extends AbstractFormatterTest
 {
   @Test
-  void testFormattableTypes()
+  @DisplayName("Formattable types include Number and the primitive number types")
+  void formattableTypes()
   {
-    val formatter = new NumberFormatter();
+    var formatter = new NumberFormatter();
 
     assertFormatterForType(formatter, Number.class);
     assertFormatterForType(formatter, byte.class);
@@ -66,11 +66,11 @@ final class NumberFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Plain and integer formats")
-  void testPlainAndIntegerFormat()
+  void plainAndIntegerFormat()
   {
-    val messageSupport = createMessageSupport(US, new NumberFormatter());
+    var messageSupport = createMessageSupport(US, new NumberFormatter());
 
-    for(val value: new Number[] {
+    for(var value: new Number[] {
         1234567, 1234567L, BigInteger.valueOf(1234567), new AtomicLong(1234567), 1234567.0, new BigDecimal("1234567") })
     {
       assertEquals("1,234,567", messageSupport
@@ -84,10 +84,10 @@ final class NumberFormatterTest extends AbstractFormatterTest
         .with("v", 3.7)
         .format());
 
-    for(val format: new String[] { "%{v}", "%{v,number:plain}" })
+    for(var format: new String[] { "%{v}", "%{v,number:plain}" })
     {
       //noinspection LanguageMismatch
-      val message = messageSupport.message(format);
+      var message = messageSupport.message(format);
 
       assertEquals("1234567", message.with("v", 1234567).format());
       assertEquals("1234567", message.with("v", 1234567L).format());
@@ -100,7 +100,7 @@ final class NumberFormatterTest extends AbstractFormatterTest
 
   static Stream<Arguments> nonFiniteValuesWithNumberKey()
   {
-    val formatString = "%{x,format:choice,>5:'big',<=5:'small',:'other'}";
+    var formatString = "%{x,format:choice,>5:'big',<=5:'small',:'other'}";
 
     return Stream.of(
         arguments(formatString, 6.0, "big"),
@@ -117,7 +117,7 @@ final class NumberFormatterTest extends AbstractFormatterTest
   @ParameterizedTest(name = "{0} with {1} -> {2}")
   @DisplayName("Compare non-finite values to number keys")
   @MethodSource("nonFiniteValuesWithNumberKey")
-  void testNonFiniteValueWithNumberKey(@Language("MessageFormat") String formatString, Number value, String expected)
+  void nonFiniteValueWithNumberKey(@Language("MessageFormat") String formatString, Number value, String expected)
   {
     assertEquals(
         expected,
@@ -130,8 +130,8 @@ final class NumberFormatterTest extends AbstractFormatterTest
 
   static Stream<Arguments> nonFiniteValuesWithNumericStringKey()
   {
-    val formatString = "%{x,format:choice,'1':'one',:'other'}";
-    val relationalFormatString = "%{x,format:choice,>'1000':'large',<>'1':'not one',:'other'}";
+    var formatString = "%{x,format:choice,'1':'one',:'other'}";
+    var relationalFormatString = "%{x,format:choice,>'1000':'large',<>'1':'not one',:'other'}";
 
     return Stream.of(
         arguments(formatString, 1.0, "one"),
@@ -152,7 +152,7 @@ final class NumberFormatterTest extends AbstractFormatterTest
   @ParameterizedTest(name = "{0} with {1} -> {2}")
   @DisplayName("Compare non-finite values to numeric string keys")
   @MethodSource("nonFiniteValuesWithNumericStringKey")
-  void testNonFiniteValueWithNumericStringKey(@Language("MessageFormat") String formatString, Number value,
+  void nonFiniteValueWithNumericStringKey(@Language("MessageFormat") String formatString, Number value,
                                               String expected)
   {
     assertEquals(
@@ -166,7 +166,7 @@ final class NumberFormatterTest extends AbstractFormatterTest
 
   static Stream<Arguments> nonFiniteValuesWithNonNumericStringKey()
   {
-    val formatString = "%{x,format:choice,'abc':'abc','NaN':'nan','Infinity':'+inf','-Infinity':'-inf',:'other'}";
+    var formatString = "%{x,format:choice,'abc':'abc','NaN':'nan','Infinity':'+inf','-Infinity':'-inf',:'other'}";
 
     return Stream.of(
         arguments(formatString, NaN, "other"),
@@ -181,7 +181,7 @@ final class NumberFormatterTest extends AbstractFormatterTest
   @ParameterizedTest(name = "{0} with {1} -> {2}")
   @DisplayName("Compare non-finite values to non-numeric string keys")
   @MethodSource("nonFiniteValuesWithNonNumericStringKey")
-  void testNonFiniteValueWithNonNumericStringKey(@Language("MessageFormat") String formatString, Number value,
+  void nonFiniteValueWithNonNumericStringKey(@Language("MessageFormat") String formatString, Number value,
                                                  String expected)
   {
     assertEquals(expected, createMessageSupport(UK, new NumberFormatter(), new ChoiceFormatter())
@@ -193,7 +193,7 @@ final class NumberFormatterTest extends AbstractFormatterTest
 
   static Stream<Arguments> nonFiniteValuesWithBoolKey()
   {
-    val formatString = "%{x,format:choice,true:'true',false:'false',:'other'}";
+    var formatString = "%{x,format:choice,true:'true',false:'false',:'other'}";
 
     return Stream.of(
         arguments(formatString, 1.5, "true"),
@@ -209,7 +209,7 @@ final class NumberFormatterTest extends AbstractFormatterTest
   @ParameterizedTest(name = "{0} with {1} -> {2}")
   @DisplayName("Compare non-finite values to bool keys")
   @MethodSource("nonFiniteValuesWithBoolKey")
-  void testNonFiniteValueWithBoolKey(@Language("MessageFormat") String formatString, Number value, String expected)
+  void nonFiniteValueWithBoolKey(@Language("MessageFormat") String formatString, Number value, String expected)
   {
     assertEquals(
         expected,
@@ -222,9 +222,9 @@ final class NumberFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Cached number formats are used per format and locale")
-  void testCachedNumberFormats()
+  void cachedNumberFormats()
   {
-    val message = createMessageSupport(new NumberFormatter())
+    var message = createMessageSupport(new NumberFormatter())
         .message("%{v,number:'#,##0.00'} %{v} %{v,number:percent}");
 
     for(var n = 0; n < 2; n++)

@@ -86,7 +86,7 @@ final class MessageErrorTest
   @ParameterizedTest(name = "{0}: {1}")
   @DisplayName("Syntax errors are reported with a descriptive message")
   @MethodSource("errorMessages")
-  void testErrorMessage(@SuppressWarnings("unused") String name, @Language("MessageFormat") String formatString, String errorMessage)
+  void errorMessage(@SuppressWarnings("unused") String name, @Language("MessageFormat") String formatString, String errorMessage)
   {
     final var ex = assertThrowsExactly(
         MessageParserException.class,

@@ -136,7 +136,7 @@ final class BitmaskFormatterTest extends AbstractFormatterTest
   @ParameterizedTest(name = "{0}")
   @DisplayName("Bits are formatted in the configured order")
   @MethodSource("bitmasks")
-  void testBitmask(@SuppressWarnings("unused") String name, @Language("MessageFormat") String formatString,
+  void bitmask(@SuppressWarnings("unused") String name, @Language("MessageFormat") String formatString,
                    Object value, String expected)
   {
     assertEquals(

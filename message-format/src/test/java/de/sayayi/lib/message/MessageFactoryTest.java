@@ -58,7 +58,7 @@ final class MessageFactoryTest
 {
   @Test
   @DisplayName("Parse message format string into CompoundMessage")
-  void testParseString() {
+  void parseString() {
     assertInstanceOf(CompoundMessage.class, MessageFactory.getSharedInstance().parseMessage("this is %{test}"));
   }
 
@@ -66,7 +66,7 @@ final class MessageFactoryTest
   @Test
   @DisplayName("Creating a factory without a normalizer throws with a descriptive message")
   @SuppressWarnings("DataFlowIssue")
-  void testNullNormalizer()
+  void nullNormalizer()
   {
     assertNullRejected(
         "messagePartNormalizer must not be null",
@@ -76,7 +76,7 @@ final class MessageFactoryTest
 
   @Test
   @DisplayName("Wrap message with a different code using withCode()")
-  void testWithCode()
+  void withCode()
   {
     final var msgWithCode1 = MessageFactory.getSharedInstance().withCode("ABC", EmptyMessage.INSTANCE);
     assertEquals("ABC", msgWithCode1.getCode());
@@ -92,7 +92,7 @@ final class MessageFactoryTest
 
   @Test
   @DisplayName("Throw MessageParserException on syntax errors")
-  void testSyntaxError()
+  void syntaxError()
   {
     // lexer error
     assertThrows(
@@ -108,7 +108,7 @@ final class MessageFactoryTest
 
   @Test
   @DisplayName("Cache returns same instance for identical format string")
-  void testParseMessageCacheHit()
+  void parseMessageCacheHit()
   {
     final var factory = new MessageFactory(PASS_THROUGH, 8);
     final var msg1 = factory.parseMessage("hello %{name}");
@@ -120,7 +120,7 @@ final class MessageFactoryTest
 
   @Test
   @DisplayName("No-cache factory returns different instances for identical format string")
-  void testParseMessageNoCacheReturnsDifferentInstances()
+  void parseMessageNoCacheReturnsDifferentInstances()
   {
     final var messageFactory = new MessageFactory(PASS_THROUGH, 0);
     final var msg1 = messageFactory.parseMessage("hello %{name}");
@@ -132,7 +132,7 @@ final class MessageFactoryTest
 
   @Test
   @DisplayName("Cache evicts least recently used entry when full")
-  void testParseMessageCacheEvictsLRU()
+  void parseMessageCacheEvictsLRU()
   {
     final var factory = new MessageFactory(PASS_THROUGH, 2);
     final var messageA = factory.parseMessage("a");
@@ -146,7 +146,7 @@ final class MessageFactoryTest
 
   @Test
   @DisplayName("Cache preserves recently accessed entry over older entries")
-  void testParseMessageCacheLRUAccessOrder()
+  void parseMessageCacheLRUAccessOrder()
   {
     var factory = new MessageFactory(PASS_THROUGH, 2);
 
@@ -162,7 +162,7 @@ final class MessageFactoryTest
 
   @Test
   @DisplayName("Cache is thread-safe under concurrent access")
-  void testParseMessageCacheThreadSafety() throws Exception
+  void parseMessageCacheThreadSafety() throws Exception
   {
     final var factory = new MessageFactory(LRUMessagePartNormalizer.create(64), 16);
 
@@ -175,7 +175,7 @@ final class MessageFactoryTest
 
   @Test
   @DisplayName("Localized message prefers the language without country over a different country")
-  void testParseLocalizedMessageLanguageFallback()
+  void parseLocalizedMessageLanguageFallback()
   {
     final var messageAccessor = MessageSupportFactory.shared().getMessageAccessor();
     final var messageFactory = messageAccessor.getMessageFactory();
@@ -200,7 +200,7 @@ final class MessageFactoryTest
 
   @Test
   @DisplayName("Localized message and template preserve the map order for the first available message")
-  void testParseLocalizedPreservesMapOrder()
+  void parseLocalizedPreservesMapOrder()
   {
     final var messageAccessor = MessageSupportFactory.shared().getMessageAccessor();
     final var messageFactory = messageAccessor.getMessageFactory();
@@ -230,7 +230,7 @@ final class MessageFactoryTest
 
   @Test
   @DisplayName("Cache does not block other threads while compiling a message")
-  void testParseMessageCacheCompilesOutsideLock() throws Exception
+  void parseMessageCacheCompilesOutsideLock() throws Exception
   {
     final var normalizer = new BlockingNormalizer();
     final var messageFactory = new MessageFactory(normalizer, 16);
@@ -252,7 +252,7 @@ final class MessageFactoryTest
 
   @Test
   @DisplayName("Cache returns the first cached message for concurrently compiled identical texts")
-  void testParseMessageCacheConcurrentIdenticalText() throws Exception
+  void parseMessageCacheConcurrentIdenticalText() throws Exception
   {
     final var normalizer = new BlockingNormalizer();
     final var messageFactory = new MessageFactory(normalizer, 16);

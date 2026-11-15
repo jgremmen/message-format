@@ -18,7 +18,6 @@ package de.sayayi.lib.message.util;
 import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport;
 import de.sayayi.lib.pack.PackOutputStream;
-import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayInputStream;
@@ -54,7 +53,7 @@ public final class PackTestSupport
   public static @NotNull ConfigurableMessageSupport packRoundTrip(
       @NotNull MessageSupport source, @NotNull Supplier<ConfigurableMessageSupport> target) throws IOException
   {
-    val pack = new ByteArrayOutputStream();
+    var pack = new ByteArrayOutputStream();
 
     source.exportMessages(pack);
 
@@ -73,9 +72,9 @@ public final class PackTestSupport
    */
   public static byte @NotNull [] packBytes(@NotNull PackWriter writer) throws IOException
   {
-    val bytes = new ByteArrayOutputStream();
+    var bytes = new ByteArrayOutputStream();
 
-    try(val packStream = new PackOutputStream(PACK_CONFIG, false, bytes)) {
+    try(var packStream = new PackOutputStream(PACK_CONFIG, false, bytes)) {
       writer.write(packStream);
     }
 
@@ -95,9 +94,9 @@ public final class PackTestSupport
    */
   public static byte @NotNull [] packBytes(int version, @NotNull PackWriter writer) throws IOException
   {
-    val bytes = new ByteArrayOutputStream();
+    var bytes = new ByteArrayOutputStream();
 
-    try(val packStream = new PackOutputStream(PACK_CONFIG, version, false, bytes)) {
+    try(var packStream = new PackOutputStream(PACK_CONFIG, version, false, bytes)) {
       writer.write(packStream);
     }
 

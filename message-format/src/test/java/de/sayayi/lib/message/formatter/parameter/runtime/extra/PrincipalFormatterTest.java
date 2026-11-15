@@ -17,7 +17,6 @@ package de.sayayi.lib.message.formatter.parameter.runtime.extra;
 
 import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -43,14 +42,15 @@ final class PrincipalFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  void testFormattableTypes() {
+  @DisplayName("Formattable types include Principal")
+  void formattableTypes() {
     assertFormatterForType(new PrincipalFormatter(), Principal.class);
   }
 
 
   @Test
   @DisplayName("Format principal name")
-  void testFormat()
+  void formatPrincipalName()
   {
     assertEquals(
         "Signed by CN=Alice,O=Example",
@@ -69,11 +69,11 @@ final class PrincipalFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Compare principal name with string keys")
-  void testStringKey()
+  void stringKey()
   {
     final Principal admin = () -> "admin";
     final Principal bob = () -> "bob";
-    val message = messageSupport.message("%{user,format:choice,'admin':'Administrator',:'Regular user'}");
+    var message = messageSupport.message("%{user,format:choice,'admin':'Administrator',:'Regular user'}");
 
     assertEquals(
         "Administrator",

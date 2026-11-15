@@ -54,7 +54,7 @@ class MessageBuilderTest
   {
     @Test
     @DisplayName("mapBool with nested builder message")
-    void testMapBoolWithConsumerMessage()
+    void mapBoolWithConsumerMessage()
     {
       final var message = MessageBuilder
           .create()
@@ -70,7 +70,7 @@ class MessageBuilderTest
 
     @Test
     @DisplayName("mapDefault with nested builder message")
-    void testMapDefaultWithConsumerMessage()
+    void mapDefaultWithConsumerMessage()
     {
       final var message = MessageBuilder
           .create()
@@ -87,7 +87,7 @@ class MessageBuilderTest
 
     @Test
     @DisplayName("mapNumber with nested builder message")
-    void testMapNumberWithConsumerMessage()
+    void mapNumberWithConsumerMessage()
     {
       final var message = MessageBuilder
           .create()
@@ -104,7 +104,7 @@ class MessageBuilderTest
 
     @Test
     @DisplayName("mapString with nested builder message")
-    void testMapStringWithConsumerMessage()
+    void mapStringWithConsumerMessage()
     {
       final var message = MessageBuilder
           .create()
@@ -121,7 +121,7 @@ class MessageBuilderTest
 
     @Test
     @DisplayName("mapNull with nested builder message")
-    void testMapNullWithConsumerMessage()
+    void mapNullWithConsumerMessage()
     {
       final var message = MessageBuilder
           .create()
@@ -137,7 +137,7 @@ class MessageBuilderTest
 
     @Test
     @DisplayName("mapEmpty with nested builder message")
-    void testMapEmptyWithConsumerMessage()
+    void mapEmptyWithConsumerMessage()
     {
       final var message = MessageBuilder
           .create()
@@ -153,7 +153,7 @@ class MessageBuilderTest
 
     @Test
     @DisplayName("mapNumber with relational operator and nested builder message")
-    void testMapNumberRelationalWithConsumerMessage()
+    void mapNumberRelationalWithConsumerMessage()
     {
       final var message = MessageBuilder
           .create()
@@ -173,7 +173,7 @@ class MessageBuilderTest
     @Test
     @DisplayName("Null messageConfigurer throws NullPointerException")
     @SuppressWarnings("DataFlowIssue")
-    void testNullConsumerThrowsException()
+    void nullConsumerThrowsException()
     {
       assertThrows(NullPointerException.class, () -> MessageBuilder
           .create()
@@ -191,7 +191,7 @@ class MessageBuilderTest
   {
     @Test
     @DisplayName("Two consecutive text parts are merged into one")
-    void testTwoConsecutiveTexts()
+    void twoConsecutiveTexts()
     {
       final var message = MessageBuilder
           .create()
@@ -208,7 +208,7 @@ class MessageBuilderTest
 
     @Test
     @DisplayName("Three consecutive text parts are merged into one")
-    void testThreeConsecutiveTexts()
+    void threeConsecutiveTexts()
     {
       final var message = MessageBuilder
           .create()
@@ -225,7 +225,7 @@ class MessageBuilderTest
 
     @Test
     @DisplayName("Text parts around a parameter remain separate")
-    void testTextAroundParameter()
+    void textAroundParameter()
     {
       final var message = MessageBuilder
           .create()
@@ -243,7 +243,7 @@ class MessageBuilderTest
 
     @Test
     @DisplayName("Multiple text parts before and after a parameter are each merged")
-    void testMultipleTextGroupsAroundParameter()
+    void multipleTextGroupsAroundParameter()
     {
       final var message = MessageBuilder
           .create()
@@ -268,7 +268,7 @@ class MessageBuilderTest
 
     @Test
     @DisplayName("Single text part produces a single-part message")
-    void testSingleText()
+    void singleText()
     {
       final var message = MessageBuilder
           .create()
@@ -283,7 +283,7 @@ class MessageBuilderTest
 
     @Test
     @DisplayName("Text with spaceAfter merges correctly with following text")
-    void testSpaceAfterMerge()
+    void spaceAfterMerge()
     {
       final var message = MessageBuilder
           .create()
@@ -299,7 +299,7 @@ class MessageBuilderTest
 
     @Test
     @DisplayName("Consecutive texts between two parameters are merged")
-    void testConsecutiveTextsBetweenParameters()
+    void consecutiveTextsBetweenParameters()
     {
       final var message = MessageBuilder
           .create()
@@ -325,7 +325,7 @@ class MessageBuilderTest
   {
     @Test
     @DisplayName("Simple text message produces a MessageTemplate")
-    void testSimpleTextTemplate()
+    void simpleTextTemplate()
     {
       final Template template = MessageBuilder
           .create()
@@ -340,7 +340,7 @@ class MessageBuilderTest
 
     @Test
     @DisplayName("Template references are not allowed in a template built by the builder")
-    void testNestedTemplateReferenceIsRejected()
+    void nestedTemplateReferenceIsRejected()
     {
       final var builder = MessageBuilder
           .create()
@@ -353,7 +353,7 @@ class MessageBuilderTest
 
     @Test
     @DisplayName("Template with parameter part formats correctly")
-    void testTemplateWithParameter()
+    void templateWithParameter()
     {
       final Template template = MessageBuilder
           .create()
@@ -370,7 +370,7 @@ class MessageBuilderTest
 
     @Test
     @DisplayName("Template from builder with map entries")
-    void testTemplateWithMapEntries()
+    void templateWithMapEntries()
     {
       final Template template = MessageBuilder
           .create()
@@ -389,7 +389,7 @@ class MessageBuilderTest
 
     @Test
     @DisplayName("Empty message produces a template")
-    void testEmptyMessageTemplate()
+    void emptyMessageTemplate()
     {
       final Template template = MessageBuilder
           .create()
@@ -402,7 +402,7 @@ class MessageBuilderTest
 
     @Test
     @DisplayName("buildAsTemplate from sub-builder finalizes current part")
-    void testBuildAsTemplateFromSubBuilder()
+    void buildAsTemplateFromSubBuilder()
     {
       final Template template = MessageBuilder
           .create()
@@ -419,7 +419,7 @@ class MessageBuilderTest
 
     @Test
     @DisplayName("isSame returns true for identical templates built separately")
-    void testIsSameForIdenticalTemplates()
+    void isSameForIdenticalTemplates()
     {
       final Template template1 = MessageBuilder
           .create()
@@ -437,7 +437,7 @@ class MessageBuilderTest
 
     @Test
     @DisplayName("isSame returns false for different templates")
-    void testIsSameForDifferentTemplates()
+    void isSameForDifferentTemplates()
     {
       final Template template1 = MessageBuilder
           .create()
@@ -462,7 +462,7 @@ class MessageBuilderTest
   {
     @Test
     @DisplayName("withMessage(Message.WithSpaces) sets inner message")
-    void testWithMessageObject()
+    void withMessageObject()
     {
       final var innerMessage = MessageBuilder
           .create()
@@ -482,7 +482,7 @@ class MessageBuilderTest
 
     @Test
     @DisplayName("withMessage(String) parses format string as inner message")
-    void testWithMessageString()
+    void withMessageString()
     {
       final var message = MessageBuilder
           .create()
@@ -497,7 +497,7 @@ class MessageBuilderTest
 
     @Test
     @DisplayName("withMessage(String) with parameter reference")
-    void testWithMessageStringContainingParameter()
+    void withMessageStringContainingParameter()
     {
       final var message = MessageBuilder
           .create()
@@ -512,7 +512,7 @@ class MessageBuilderTest
 
     @Test
     @DisplayName("withMessage(Consumer) builds inner message via nested builder")
-    void testWithMessageConsumer()
+    void withMessageConsumer()
     {
       final var message = MessageBuilder
           .create()
@@ -527,7 +527,7 @@ class MessageBuilderTest
 
     @Test
     @DisplayName("withMessage(Consumer) with parameter in nested builder")
-    void testWithMessageConsumerWithParameter()
+    void withMessageConsumerWithParameter()
     {
       final var message = MessageBuilder
           .create()
@@ -542,7 +542,7 @@ class MessageBuilderTest
 
     @Test
     @DisplayName("withMessage defaults to empty message when not set")
-    void testDefaultEmptyMessage()
+    void defaultEmptyMessage()
     {
       final var message = MessageBuilder
           .create()
@@ -557,7 +557,7 @@ class MessageBuilderTest
     @Test
     @DisplayName("withMessage(Consumer) with null throws NullPointerException")
     @SuppressWarnings("DataFlowIssue")
-    void testWithMessageConsumerNullThrows()
+    void withMessageConsumerNullThrows()
     {
       assertThrows(NullPointerException.class, () -> MessageBuilder
           .create()
@@ -569,7 +569,7 @@ class MessageBuilderTest
     @Test
     @DisplayName("withMessage(Message.WithSpaces) with null throws NullPointerException")
     @SuppressWarnings("DataFlowIssue")
-    void testWithMessageObjectNullThrows()
+    void withMessageObjectNullThrows()
     {
       assertThrows(NullPointerException.class, () -> MessageBuilder
           .create()
@@ -580,7 +580,7 @@ class MessageBuilderTest
 
     @Test
     @DisplayName("configMessage is not supported for post-formatter configuration")
-    void testMessageConfigValueIsRejected()
+    void messageConfigValueIsRejected()
     {
       final var message = MessageBuilder.create().text("config message").build();
 
@@ -594,7 +594,7 @@ class MessageBuilderTest
     @Test
     @DisplayName("withMessage(String) with null throws NullPointerException")
     @SuppressWarnings("DataFlowIssue")
-    void testWithMessageStringNullThrows()
+    void withMessageStringNullThrows()
     {
       assertThrows(NullPointerException.class, () -> MessageBuilder
           .create()
@@ -605,7 +605,7 @@ class MessageBuilderTest
 
     @Test
     @DisplayName("Post-formatter with spaceBefore and spaceAfter")
-    void testWithSpacing()
+    void withSpacing()
     {
       final var message = MessageBuilder
           .create()
@@ -623,7 +623,7 @@ class MessageBuilderTest
 
     @Test
     @DisplayName("Last withMessage call wins")
-    void testLastWithMessageWins()
+    void lastWithMessageWins()
     {
       final var message = MessageBuilder
           .create()
@@ -646,7 +646,7 @@ class MessageBuilderTest
   {
     @Test
     @DisplayName("Parameter configuration cannot be changed after its part is flushed")
-    void testParameterConfigurationIsFinalized()
+    void parameterConfigurationIsFinalized()
     {
       final var parameterBuilder = MessageBuilder
           .create()
@@ -663,7 +663,7 @@ class MessageBuilderTest
 
     @Test
     @DisplayName("Post-formatter configuration cannot be changed after its part is flushed")
-    void testPostFormatterConfigurationIsFinalized()
+    void postFormatterConfigurationIsFinalized()
     {
       final var postFormatterBuilder = MessageBuilder
           .create()
@@ -681,7 +681,7 @@ class MessageBuilderTest
 
     @Test
     @DisplayName("Parameter format and map entries cannot be added after its part is flushed")
-    void testParameterIsFinalized()
+    void parameterIsFinalized()
     {
       final var parameterBuilder = MessageBuilder
           .create()
@@ -699,7 +699,7 @@ class MessageBuilderTest
 
     @Test
     @DisplayName("Post-formatter message cannot be changed after its part is flushed")
-    void testPostFormatterMessageIsFinalized()
+    void postFormatterMessageIsFinalized()
     {
       final var postFormatterBuilder = MessageBuilder
           .create()
@@ -717,7 +717,7 @@ class MessageBuilderTest
 
     @Test
     @DisplayName("Template default parameters and delegates cannot be added after its part is flushed")
-    void testTemplateIsFinalized()
+    void templateIsFinalized()
     {
       final var templateBuilder = MessageBuilder
           .create()
@@ -734,7 +734,7 @@ class MessageBuilderTest
 
     @Test
     @DisplayName("Spacing cannot be changed after a part is flushed")
-    void testSpacingIsFinalized()
+    void spacingIsFinalized()
     {
       final var textBuilder = MessageBuilder
           .create()
@@ -758,7 +758,7 @@ class MessageBuilderTest
   {
     @Test
     @DisplayName("withDefaultParameter(String, String) provides string default, overridden by explicit parameter")
-    void testWithDefaultParameterString()
+    void withDefaultParameterString()
     {
       final var cms = createMessageSupportWithTemplate("greeting", "Hello %{name}");
       final var message = MessageBuilder
@@ -774,7 +774,7 @@ class MessageBuilderTest
 
     @Test
     @DisplayName("withDefaultParameter(String, boolean) provides boolean default")
-    void testWithDefaultParameterBoolean()
+    void withDefaultParameterBoolean()
     {
       final var cms = createMessageSupportWithTemplate("status",
           "%{active,true:enabled,false:disabled}");
@@ -794,7 +794,7 @@ class MessageBuilderTest
 
     @Test
     @DisplayName("withDefaultParameter(String, long) provides numeric default, overridden by explicit parameter")
-    void testWithDefaultParameterLong()
+    void withDefaultParameterLong()
     {
       final var cms = createMessageSupportWithTemplate("count-msg",
           "%{count,format:choice,1:'one item',:'%{count} items'}");
@@ -811,7 +811,7 @@ class MessageBuilderTest
 
     @Test
     @DisplayName("Multiple default parameters on same template")
-    void testMultipleDefaultParameters()
+    void multipleDefaultParameters()
     {
       final var cms = createMessageSupportWithTemplate("multi",
           "%{greeting} %{name}");
@@ -829,7 +829,7 @@ class MessageBuilderTest
     @Test
     @DisplayName("withDefaultParameter with null name throws NullPointerException")
     @SuppressWarnings("DataFlowIssue")
-    void testWithDefaultParameterNullNameThrows()
+    void withDefaultParameterNullNameThrows()
     {
       assertThrows(NullPointerException.class, () -> MessageBuilder
           .create()
@@ -841,7 +841,7 @@ class MessageBuilderTest
     @Test
     @DisplayName("withDefaultParameter(String) with null value throws NullPointerException")
     @SuppressWarnings("DataFlowIssue")
-    void testWithDefaultParameterNullStringValueThrows()
+    void withDefaultParameterNullStringValueThrows()
     {
       assertThrows(NullPointerException.class, () -> MessageBuilder
           .create()
@@ -852,7 +852,7 @@ class MessageBuilderTest
 
     @Test
     @DisplayName("withDefaultParameter with invalid name throws IllegalArgumentException")
-    void testWithDefaultParameterInvalidNameThrows()
+    void withDefaultParameterInvalidNameThrows()
     {
       assertThrows(IllegalArgumentException.class, () -> MessageBuilder
           .create()
@@ -863,7 +863,7 @@ class MessageBuilderTest
 
     @Test
     @DisplayName("Template with default parameter serializes correctly")
-    void testDefaultParameterSerialization()
+    void defaultParameterSerialization()
     {
       final var message = MessageBuilder
           .create()
@@ -880,7 +880,7 @@ class MessageBuilderTest
 
     @Test
     @DisplayName("Template with spaceBefore and default parameter")
-    void testTemplateWithSpacingAndDefault()
+    void templateWithSpacingAndDefault()
     {
       final var cms = createMessageSupportWithTemplate("suffix",
           "%{value}");
@@ -898,7 +898,7 @@ class MessageBuilderTest
 
     @Test
     @DisplayName("withParameterDelegate maps template param to message param")
-    void testWithParameterDelegate()
+    void withParameterDelegate()
     {
       final var cms = createMessageSupportWithTemplate("greeting",
           "Hello %{name}");
@@ -956,7 +956,7 @@ class MessageBuilderTest
     @ParameterizedTest(name = "{0}")
     @DisplayName("Builder methods throw IllegalStateException after the message has been built")
     @MethodSource("operationsAfterBuild")
-    void testOperationAfterBuildThrows(@SuppressWarnings("unused") String name, Consumer<MessageBuilder> finisher,
+    void operationAfterBuildThrows(@SuppressWarnings("unused") String name, Consumer<MessageBuilder> finisher,
                                        Consumer<MessageBuilder> operation)
     {
       final var builder = MessageBuilder.create().text("hello");

@@ -59,7 +59,6 @@ import static de.sayayi.lib.message.internal.parser.MessageParser.*;
 import static de.sayayi.lib.message.util.MessageUtil.*;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Character.isHighSurrogate;
-import static java.lang.Character.isSpaceChar;
 import static java.lang.Integer.parseInt;
 import static java.util.Objects.requireNonNull;
 import static org.antlr.v4.runtime.Token.EOF;

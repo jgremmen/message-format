@@ -19,7 +19,6 @@ import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.formatter.parameter.runtime.TypeFormatter;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import lombok.val;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
@@ -61,16 +60,16 @@ final class TypeDescriptorFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Formattable types")
-  void testFormattableTypes() {
+  void formattableTypes() {
     assertFormatterForType(new TypeDescriptorFormatter(), TypeDescriptor.class);
   }
 
 
   @Test
   @DisplayName("Registered as service")
-  void testRegisteredAsService()
+  void registeredAsService()
   {
-    val formatters = new DefaultFormatterService().getFormatters(null, TypeDescriptor.class, null);
+    var formatters = new DefaultFormatterService().getFormatters(null, TypeDescriptor.class, null);
 
     assertInstanceOf(TypeDescriptorFormatter.class, formatters[0]);
   }
@@ -78,7 +77,7 @@ final class TypeDescriptorFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Class type descriptors are formatted as type")
-  void testClass()
+  void formatClassType()
   {
     assertEquals(
         "String",
@@ -107,9 +106,9 @@ final class TypeDescriptorFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Generic type arguments are formatted")
-  void testGenericTypes() throws Exception
+  void genericTypes() throws Exception
   {
-    val listOfDates = TypeDescriptor.collection(List.class, valueOf(LocalDate.class));
+    var listOfDates = TypeDescriptor.collection(List.class, valueOf(LocalDate.class));
 
     assertEquals(
         "List<java.time.LocalDate>",
@@ -124,7 +123,7 @@ final class TypeDescriptorFormatterTest extends AbstractFormatterTest
             .with("t", listOfDates)
             .format());
 
-    val fieldType = new TypeDescriptor(Fixture.class.getDeclaredField("sets"));
+    var fieldType = new TypeDescriptor(Fixture.class.getDeclaredField("sets"));
 
     assertEquals(
         "Map<String, Set<LocalDate>>",
@@ -148,10 +147,10 @@ final class TypeDescriptorFormatterTest extends AbstractFormatterTest
       value    | -   | T
       value    | juv | <T extends CharSequence>
       """)
-  void testTypeConfig(String fieldName, String typeConfig, String expected) throws Exception
+  void formatWithTypeConfig(String fieldName, String typeConfig, String expected) throws Exception
   {
-    val typeDescriptor = new TypeDescriptor(Fixture.class.getDeclaredField(fieldName));
-    val formatted = messageSupport
+    var typeDescriptor = new TypeDescriptor(Fixture.class.getDeclaredField(fieldName));
+    var formatted = messageSupport
         .message(typeConfig == null ? "%{t}" : "%{t,type:'" + typeConfig + "'}")
         .with("t", typeDescriptor)
         .format();
@@ -166,9 +165,9 @@ final class TypeDescriptorFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Formatting is delegated to the type formatter")
-  void testDelegationToTypeFormatter() throws Exception
+  void delegationToTypeFormatter() throws Exception
   {
-    val typeDescriptor = new TypeDescriptor(Fixture.class.getDeclaredField("map"));
+    var typeDescriptor = new TypeDescriptor(Fixture.class.getDeclaredField("map"));
 
     // without type formatter, the underlying type is formatted by the default formatter
     assertEquals(
@@ -189,7 +188,7 @@ final class TypeDescriptorFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Null is matched by the null key")
-  void testNull()
+  void nullMatchesNullKey()
   {
     assertEquals(
         "unknown",

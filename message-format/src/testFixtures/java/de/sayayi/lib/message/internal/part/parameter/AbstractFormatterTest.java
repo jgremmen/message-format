@@ -29,7 +29,6 @@ import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import de.sayayi.lib.message.part.MapKey;
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.TypedValue;
-import lombok.val;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -50,7 +49,7 @@ public abstract class AbstractFormatterTest
 {
   protected void assertFormatterForType(ParameterFormatter formatter, Class<?> type)
   {
-    for(val formattableType: formatter.getFormattableTypes())
+    for(var formattableType: formatter.getFormattableTypes())
       if (formattableType.getType().isAssignableFrom(type))
         return;
 
@@ -151,9 +150,9 @@ public abstract class AbstractFormatterTest
   @Contract(pure = true)
   protected @NotNull FormatterService.WithRegistry createFormatterService(@NotNull ParameterFormatter ... formatters)
   {
-    val formatterService = new GenericFormatterService();
+    var formatterService = new GenericFormatterService();
 
-    for(val formatter: formatters)
+    for(var formatter: formatters)
       formatterService.addFormatter(formatter);
 
     return formatterService;
@@ -240,9 +239,9 @@ public abstract class AbstractFormatterTest
   @Contract(pure = true)
   protected @NotNull ConfigurableMessageSupport createDefaultMessageSupport(@NotNull ParameterFormatter... formatters)
   {
-    val formatterService = new DefaultFormatterService();
+    var formatterService = new DefaultFormatterService();
 
-    for(val formatter: formatters)
+    for(var formatter: formatters)
       formatterService.addFormatter(formatter);
 
     return MessageSupportFactory.create(formatterService);

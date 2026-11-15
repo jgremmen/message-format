@@ -17,7 +17,6 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -57,7 +56,7 @@ final class ListFormatterConfigTest extends AbstractFormatterTest
 
 
   /** Returns the containers handled by the list formatters: an array and an iterable. */
-  private static Stream<Arguments> containers()
+  static Stream<Arguments> containers()
   {
     return Stream.of(
         arguments("array", (Function<List<?>,Object>)List::toArray),
@@ -68,9 +67,9 @@ final class ListFormatterConfigTest extends AbstractFormatterTest
   @DisplayName("Separators")
   @ParameterizedTest(name = "{0}")
   @MethodSource("containers")
-  void testSeparator(@SuppressWarnings("unused") String name, @NotNull Function<List<?>,Object> container)
+  void separator(@SuppressWarnings("unused") String name, @NotNull Function<List<?>,Object> container)
   {
-    val values = container.apply(List.of(1, 2, 3, 4, 5));
+    var values = container.apply(List.of(1, 2, 3, 4, 5));
 
     assertEquals(
         "1, 2, 3, 4 and 5",
@@ -90,9 +89,9 @@ final class ListFormatterConfigTest extends AbstractFormatterTest
   @DisplayName("Empty and null values")
   @ParameterizedTest(name = "{0}")
   @MethodSource("containers")
-  void testEmptyOrNull(@SuppressWarnings("unused") String name, @NotNull Function<List<?>,Object> container)
+  void emptyOrNull(@SuppressWarnings("unused") String name, @NotNull Function<List<?>,Object> container)
   {
-    val message = messageSupport.message("%{c,null:null,empty:empty}");
+    var message = messageSupport.message("%{c,null:null,empty:empty}");
 
     assertEquals("null", message.with("c", null).format());
     assertEquals("empty", message.with("c", container.apply(List.of())).format());
@@ -102,7 +101,7 @@ final class ListFormatterConfigTest extends AbstractFormatterTest
   @DisplayName("Null elements are skipped")
   @ParameterizedTest(name = "{0}")
   @MethodSource("containers")
-  void testNullElements(@SuppressWarnings("unused") String name, @NotNull Function<List<?>,Object> container)
+  void nullElements(@SuppressWarnings("unused") String name, @NotNull Function<List<?>,Object> container)
   {
     assertEquals(
         "Test, true, -6",
@@ -116,7 +115,7 @@ final class ListFormatterConfigTest extends AbstractFormatterTest
   @DisplayName("Unique values with max size and more value")
   @ParameterizedTest(name = "{0}")
   @MethodSource("containers")
-  void testUnique(@SuppressWarnings("unused") String name, @NotNull Function<List<?>,Object> container)
+  void unique(@SuppressWarnings("unused") String name, @NotNull Function<List<?>,Object> container)
   {
     assertEquals(
         "1, 2, ...",
@@ -127,9 +126,9 @@ final class ListFormatterConfigTest extends AbstractFormatterTest
   }
 
 
-  private static Stream<Arguments> crossTableParameters()
+  static Stream<Arguments> crossTableParameters()
   {
-    val rows = Stream.of(
+    var rows = Stream.of(
         arguments("Empty with max size 0", List.of(), null, 0, null, ""),
         arguments("Last separator", List.of(" A ", "B", "C"), " and ", null, null, "A, B and C"),
         arguments("Max size 2 and more value", List.of("A", "B", "C"), null, 2, "...", "A, B, ..."),
@@ -148,8 +147,8 @@ final class ListFormatterConfigTest extends AbstractFormatterTest
     ).toList();
 
     return containers().flatMap(container -> rows.stream().map(row -> {
-      val c = container.get();
-      val r = row.get();
+      var c = container.get();
+      var r = row.get();
 
       return arguments(c[0] + ": " + r[0], c[1], r[1], r[2], r[3], r[4], r[5]);
     }));
@@ -163,7 +162,7 @@ final class ListFormatterConfigTest extends AbstractFormatterTest
                   @NotNull List<?> values, String listSepLast, Integer listMaxSize, String listValueMore,
                   @NotNull String result)
   {
-    val messageFormat = new StringBuilder("%{c");
+    var messageFormat = new StringBuilder("%{c");
     if (listSepLast != null)
       messageFormat.append(",list-sep-last:\"").append(listSepLast).append('"');
     if (listMaxSize != null)

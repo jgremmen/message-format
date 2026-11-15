@@ -79,7 +79,7 @@ final class LongSupplierFormatterTest extends AbstractSupplierFormatterTest
 
   @Test
   @DisplayName("Supplied value is formatted by the number formatter")
-  void testNumberFormat()
+  void numberFormat()
   {
     assertEquals(
         noSpaceText("1,234,567,890"),

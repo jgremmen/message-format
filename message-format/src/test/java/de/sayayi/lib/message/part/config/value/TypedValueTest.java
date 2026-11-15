@@ -22,7 +22,7 @@ import de.sayayi.lib.message.internal.part.typedvalue.TypedValueBool;
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueMessage;
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueNumber;
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
-import lombok.val;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -38,13 +38,15 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @author Jeroen Gremmen
  * @since 0.21.0
  */
+@DisplayName("Typed values")
 class TypedValueTest
 {
   @ParameterizedTest
   @ValueSource(booleans = { false, true })
-  void testBool(boolean value)
+  @DisplayName("A bool value returns its boolean value")
+  void bool(boolean value)
   {
-    val bool = value ? TypedValueBool.TRUE : TypedValueBool.FALSE;
+    var bool = value ? TypedValueBool.TRUE : TypedValueBool.FALSE;
 
     assertEquals(value, bool.booleanValue());
     assertEquals(value, bool.asObject());
@@ -52,9 +54,10 @@ class TypedValueTest
 
 
   @Test
-  void testNumber()
+  @DisplayName("A number value returns its long value and an int value clamped to the int range")
+  void number()
   {
-    val number = new TypedValueNumber(1234);
+    var number = new TypedValueNumber(1234);
 
     assertEquals(1234, number.longValue());
     assertEquals(1234, number.intValue());
@@ -66,14 +69,15 @@ class TypedValueTest
 
 
   @Test
-  void testString()
+  @DisplayName("A string value rejects null and is used as text, not parsed as message")
+  void string()
   {
-    val messageFactory = MessageFactory.getSharedInstance();
+    var messageFactory = MessageFactory.getSharedInstance();
 
     //noinspection DataFlowIssue
     assertThrows(Exception.class, () -> new TypedValueString(messageFactory, null));
 
-    val string = new TypedValueString(messageFactory, "Hello %{s}");
+    var string = new TypedValueString(messageFactory, "Hello %{s}");
 
     assertEquals("Hello %{s}", string.stringValue());
     assertEquals("Hello %{s}", string.asObject());
@@ -84,15 +88,16 @@ class TypedValueTest
 
 
   @Test
-  void testMessage()
+  @DisplayName("A message value rejects null and returns its message")
+  void message()
   {
     //noinspection DataFlowIssue
     assertThrows(Exception.class, () -> new TypedValueMessage(null));
 
-    val messageFactory = MessageFactory.getSharedInstance();
-    val msg = messageFactory.parseMessage("%{a,format:bool} %{s}.");
+    var messageFactory = MessageFactory.getSharedInstance();
+    var msg = messageFactory.parseMessage("%{a,format:bool} %{s}.");
 
-    val message = new TypedValueMessage(msg);
+    var message = new TypedValueMessage(msg);
 
     assertEquals(messageFactory.parseMessage("%{a, format:bool } %{ s }."), message.asObject());
   }

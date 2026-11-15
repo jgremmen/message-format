@@ -16,7 +16,6 @@
 package de.sayayi.lib.message.internal.formatter;
 
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
-import lombok.val;
 import org.junit.jupiter.api.*;
 
 import java.io.Serializable;
@@ -46,8 +45,8 @@ final class FormatterCacheConcurrencyTest
   @DisplayName("Concurrent lookups for different types do not corrupt cache")
   void concurrentLookupsForDifferentTypes() throws Exception
   {
-    val cache = new FormatterCache(16);
-    val types = new Class<?>[] {
+    var cache = new FormatterCache(16);
+    var types = new Class<?>[] {
         String.class, Integer.class, Long.class, Double.class,
         Float.class, Boolean.class, Byte.class, Short.class,
         List.class, Map.class, Set.class, Queue.class,
@@ -66,10 +65,10 @@ final class FormatterCacheConcurrencyTest
   @DisplayName("Concurrent lookups for the same type return the formatters cached first")
   void concurrentLookupsForSameType() throws Exception
   {
-    val cache = new FormatterCache(8);
+    var cache = new FormatterCache(8);
 
     // several threads build formatters for the same type at the same time, but only the first result is cached
-    val results = getConcurrently(20, idx -> cache.lookup(String.class, t -> {
+    var results = getConcurrently(20, idx -> cache.lookup(String.class, t -> {
       try {
         Thread.sleep(10);
       } catch(InterruptedException ignored) {
@@ -78,7 +77,7 @@ final class FormatterCacheConcurrencyTest
       return new ParameterFormatter[0];
     }));
 
-    val cached = cache.lookup(String.class, t -> fail("should be cached"));
+    var cached = cache.lookup(String.class, t -> fail("should be cached"));
 
     for(var result: results)
       assertSame(cached, result);
@@ -89,10 +88,10 @@ final class FormatterCacheConcurrencyTest
   @DisplayName("Concurrent lookups with cache eviction do not corrupt state")
   void concurrentLookupsWithEviction() throws Exception
   {
-    val cache = new FormatterCache(8);
+    var cache = new FormatterCache(8);
 
     // each thread inserts a unique set of types that will cause eviction
-    val allTypes = new Class<?>[][] {
+    var allTypes = new Class<?>[][] {
         { String.class, Integer.class, Long.class, Double.class, Float.class, Boolean.class, Byte.class, Short.class, List.class },
         { Map.class, Set.class, Queue.class, Comparable.class, Serializable.class, Iterable.class, Collection.class, Deque.class },
     };
@@ -112,8 +111,8 @@ final class FormatterCacheConcurrencyTest
   @DisplayName("Clear during concurrent lookups does not cause exceptions")
   void clearDuringConcurrentLookups() throws Exception
   {
-    val cache = new FormatterCache(8);
-    val types = new Class<?>[] {
+    var cache = new FormatterCache(8);
+    var types = new Class<?>[] {
         String.class, Integer.class, Long.class, Double.class,
         Float.class, Boolean.class, Byte.class, Short.class
     };
@@ -137,8 +136,8 @@ final class FormatterCacheConcurrencyTest
   @DisplayName("toString during concurrent modifications does not throw")
   void toStringDuringConcurrentModifications() throws Exception
   {
-    val cache = new FormatterCache(8);
-    val types = new Class<?>[] {
+    var cache = new FormatterCache(8);
+    var types = new Class<?>[] {
         String.class, Integer.class, Long.class, Double.class,
         Float.class, Boolean.class, Byte.class, Short.class
     };
@@ -152,7 +151,7 @@ final class FormatterCacheConcurrencyTest
           cache.clear();
       }
     }, 1, reader -> {
-      val s = cache.toString();
+      var s = cache.toString();
 
       assertTrue(s.startsWith("["));
       assertTrue(s.endsWith("]"));
@@ -164,12 +163,12 @@ final class FormatterCacheConcurrencyTest
   @DisplayName("buildFormatters is not called under lock (no deadlock with slow builder)")
   void buildFormattersNotCalledUnderLock() throws Exception
   {
-    val cache = new FormatterCache(8);
-    val buildStarted = new CountDownLatch(1);
-    val lookupDone = new CountDownLatch(1);
+    var cache = new FormatterCache(8);
+    var buildStarted = new CountDownLatch(1);
+    var lookupDone = new CountDownLatch(1);
 
     // thread 1: lookup with a slow buildFormatters
-    val thread1 = new Thread(() -> cache.lookup(String.class, t -> {
+    var thread1 = new Thread(() -> cache.lookup(String.class, t -> {
       buildStarted.countDown();
 
       try {
@@ -181,7 +180,7 @@ final class FormatterCacheConcurrencyTest
     }));
 
     // thread 2: lookup for a different type while thread 1's buildFormatters is running
-    val thread2 = new Thread(() -> {
+    var thread2 = new Thread(() -> {
       try {
         buildStarted.await();
 
@@ -209,15 +208,15 @@ final class FormatterCacheConcurrencyTest
   @SuppressWarnings("ResultOfMethodCallIgnored")
   void highContentionStressTest() throws Exception
   {
-    val cache = new FormatterCache(8);
-    val types = new Class<?>[] {
+    var cache = new FormatterCache(8);
+    var types = new Class<?>[] {
         String.class, Integer.class, Long.class, Double.class,
         Float.class, Boolean.class, Byte.class, Short.class,
         List.class, Map.class, Set.class, Queue.class
     };
 
     runConcurrently(32, idx -> {
-      val rng = ThreadLocalRandom.current();
+      var rng = ThreadLocalRandom.current();
 
       for(var i = 0; i < 500; i++)
       {

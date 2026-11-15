@@ -43,7 +43,7 @@ final class MessageTemplateTest
 {
   @Test
   @DisplayName("toString() of a template with a single message")
-  void testToString()
+  void toStringSingleMessage()
   {
     assertEquals(
         "Template(\"Hello %{name}\")",
@@ -56,7 +56,7 @@ final class MessageTemplateTest
 
   @Test
   @DisplayName("toString() of a localized template")
-  void testToStringLocalized()
+  void toStringLocalized()
   {
     final var template = MessageFactory.getSharedInstance().parseTemplate(Map.of(
         ENGLISH, "Hello %{name}",
@@ -75,7 +75,7 @@ final class MessageTemplateTest
   @Test
   @DisplayName("Creating a template without a message throws with a descriptive message")
   @SuppressWarnings("DataFlowIssue")
-  void testNullMessage()
+  void nullMessage()
   {
     assertNullRejected(
         "message must not be null",

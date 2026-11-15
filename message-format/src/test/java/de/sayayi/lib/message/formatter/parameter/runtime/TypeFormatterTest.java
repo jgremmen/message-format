@@ -15,16 +15,20 @@
  */
 package de.sayayi.lib.message.formatter.parameter.runtime;
 
-import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.junit.platform.commons.util.ReflectionUtils.findMethod;
 
 
@@ -39,36 +43,44 @@ import static org.junit.platform.commons.util.ReflectionUtils.findMethod;
 @TestMethodOrder(MethodOrderer.DisplayName.class)
 final class TypeFormatterTest
 {
-  @Test
-  void testToStringNative()
+  static Stream<Arguments> primitiveTypeNames()
   {
-    assertEquals("boolean", TypeFormatter.toString(boolean.class, ""));
-    assertEquals("byte", TypeFormatter.toString(byte.class, ""));
-    assertEquals("char", TypeFormatter.toString(char.class, ""));
-    assertEquals("short", TypeFormatter.toString(short.class, ""));
-    assertEquals("int", TypeFormatter.toString(int.class, ""));
-    assertEquals("long", TypeFormatter.toString(long.class, ""));
-    assertEquals("float", TypeFormatter.toString(float.class, ""));
-    assertEquals("double", TypeFormatter.toString(double.class, ""));
+    return Stream.of(
+        arguments(boolean.class, "boolean"),
+        arguments(byte.class, "byte"),
+        arguments(char.class, "char"),
+        arguments(short.class, "short"),
+        arguments(int.class, "int"),
+        arguments(long.class, "long"),
+        arguments(float.class, "float"),
+        arguments(double.class, "double"),
+
+        // arrays
+        arguments(boolean[].class, "boolean[]"),
+        arguments(byte[].class, "byte[]"),
+        arguments(char[][].class, "char[][]"),
+        arguments(short[].class, "short[]"),
+        arguments(int[].class, "int[]"),
+        arguments(long[][][].class, "long[][][]"),
+        arguments(float[].class, "float[]"),
+        arguments(double[].class, "double[]"));
+  }
+
+
+  @ParameterizedTest(name = "{1}")
+  @DisplayName("Primitive types and arrays of primitive types are formatted with their simple name")
+  @MethodSource("primitiveTypeNames")
+  void toStringPrimitive(Class<?> type, String expected)
+  {
+    assertEquals(
+        expected,
+        TypeFormatter.toString(type, ""));
   }
 
 
   @Test
-  void testToStringNativeArray()
-  {
-    assertEquals("boolean[]", TypeFormatter.toString(boolean[].class, ""));
-    assertEquals("byte[]", TypeFormatter.toString(byte[].class, ""));
-    assertEquals("char[][]", TypeFormatter.toString(char[][].class, ""));
-    assertEquals("short[]", TypeFormatter.toString(short[].class, ""));
-    assertEquals("int[]", TypeFormatter.toString(int[].class, ""));
-    assertEquals("long[][][]", TypeFormatter.toString(long[][][].class, ""));
-    assertEquals("float[]", TypeFormatter.toString(float[].class, ""));
-    assertEquals("double[]", TypeFormatter.toString(double[].class, ""));
-  }
-
-
-  @Test
-  void testToStringJavaClass()
+  @DisplayName("JDK classes are formatted with the full name, without the java.lang. prefix or with the simple name")
+  void toStringJavaClass()
   {
     assertEquals("java.lang.reflect.Method", TypeFormatter.toString(Method.class, ""));
     assertEquals("reflect.Method", TypeFormatter.toString(Method.class, "j"));
@@ -77,32 +89,40 @@ final class TypeFormatterTest
 
 
   @Test
-  void testToStringProjectClass()
+  @DisplayName("Project classes are formatted with the full or the simple name")
+  void toStringProjectClass()
   {
-    assertEquals("de.sayayi.lib.message.formatter.parameter.runtime.TypeFormatter",
+    assertEquals(
+        "de.sayayi.lib.message.formatter.parameter.runtime.TypeFormatter",
         TypeFormatter.toString(TypeFormatter.class, ""));
-    assertEquals("TypeFormatter",
+    assertEquals(
+        "TypeFormatter",
         TypeFormatter.toString(TypeFormatter.class, "c"));
   }
 
 
   @Test
-  void testToStringNestedClass()
+  @DisplayName("Nested classes are formatted with the enclosing class name, separated by a dot")
+  void toStringNestedClass()
   {
     class Test {
     }
 
-    assertEquals(TypeFormatterTest.class.getName() + '.' + Test.class.getSimpleName(),
+    assertEquals(
+        TypeFormatterTest.class.getName() + '.' + Test.class.getSimpleName(),
         TypeFormatter.toString(Test.class, ""));
-    assertEquals(Test.class.getSimpleName(), TypeFormatter.toString(Test.class, "c"));
+    assertEquals(
+        Test.class.getSimpleName(),
+        TypeFormatter.toString(Test.class, "c"));
   }
 
 
   @Test
-  void testToStringParameterized()
+  @DisplayName("Parameterized types are formatted with their type arguments")
+  void toStringParameterized()
   {
     //noinspection OptionalGetWithoutIsPresent
-    val method = findMethod(Collections.class, "unmodifiableMap", Map.class).get();
+    var method = findMethod(Collections.class, "unmodifiableMap", Map.class).get();
 
     assertEquals("java.util.Map<K, V>", TypeFormatter.toString(method.getGenericReturnType(), ""));
     assertEquals("Map<K, V>", TypeFormatter.toString(method.getGenericReturnType(), "u"));
@@ -116,26 +136,28 @@ final class TypeFormatterTest
 
 
   @Test
-  void testToStringTypeVariable()
+  @DisplayName("Type variables are formatted by name, or with their bounds using the v flag")
+  void toStringTypeVariable()
   {
     //noinspection OptionalGetWithoutIsPresent
-    val method = findMethod(TypeFormatterTest.class, "internalMethod2", Iterable.class).get();
-    val type = method.getGenericParameterTypes()[0];
+    var method = findMethod(TypeFormatterTest.class, "internalMethod2", Iterable.class).get();
+    var type = method.getGenericParameterTypes()[0];
 
     assertEquals("T", TypeFormatter.toString(type, ""));
 
-    assertEquals("<T extends Iterable<String> & Enumeration<String>>",
+    assertEquals(
+        "<T extends Iterable<String> & Enumeration<String>>",
         TypeFormatter.toString(type, "juv"));
   }
 
 
   @Test
   @DisplayName("Type variables within bounds are not expanded")
-  void testToStringRecursiveTypeVariable()
+  void toStringRecursiveTypeVariable()
   {
     //noinspection OptionalGetWithoutIsPresent
-    val method = findMethod(TypeFormatterTest.class, "internalMethod3", Comparable.class, List.class).get();
-    val types = method.getGenericParameterTypes();
+    var method = findMethod(TypeFormatterTest.class, "internalMethod3", Comparable.class, List.class).get();
+    var types = method.getGenericParameterTypes();
 
     // recursive bound, previously failed with a StackOverflowError
     assertEquals(
@@ -153,20 +175,21 @@ final class TypeFormatterTest
 
 
   @Test
-  void testToStringWildcard()
+  @DisplayName("Wildcard types are formatted with their super or extends bound")
+  void toStringWildcard()
   {
     //noinspection OptionalGetWithoutIsPresent
-    val method1 = findMethod(Collections.class, "copy", List.class, List.class).get();
+    var method1 = findMethod(Collections.class, "copy", List.class, List.class).get();
 
-    val m1arg0 = method1.getGenericParameterTypes()[0];
+    var m1arg0 = method1.getGenericParameterTypes()[0];
     assertEquals("java.util.List<? super T>", TypeFormatter.toString(m1arg0, ""));
     assertEquals("List<? super T>", TypeFormatter.toString(m1arg0, "u"));
     assertEquals("List<? super T>", TypeFormatter.toString(m1arg0, "c"));
 
     //noinspection OptionalGetWithoutIsPresent
-    val method2 = findMethod(Collections.class, "shuffle", List.class).get();
+    var method2 = findMethod(Collections.class, "shuffle", List.class).get();
 
-    val m2arg0 = method2.getGenericParameterTypes()[0];
+    var m2arg0 = method2.getGenericParameterTypes()[0];
     assertEquals("java.util.List<?>", TypeFormatter.toString(m2arg0, ""));
     assertEquals("List<?>", TypeFormatter.toString(m2arg0, "u"));
     assertEquals("List<?>", TypeFormatter.toString(m2arg0, "c"));
@@ -174,11 +197,12 @@ final class TypeFormatterTest
 
 
   @Test
-  void testToStringGenericArray()
+  @DisplayName("Generic array types are formatted with their component type followed by brackets")
+  void toStringGenericArray()
   {
     //noinspection OptionalGetWithoutIsPresent
-    val method = findMethod(TypeFormatterTest.class, "internalMethod1").get();
-    val type = method.getGenericReturnType();
+    var method = findMethod(TypeFormatterTest.class, "internalMethod1").get();
+    var type = method.getGenericReturnType();
 
     assertEquals("java.util.Optional<? extends java.lang.Number>[]", TypeFormatter.toString(type, ""));
     assertEquals("java.util.Optional<? extends Number>[]", TypeFormatter.toString(type, "j"));

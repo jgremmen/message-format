@@ -15,7 +15,6 @@
  */
 package de.sayayi.lib.message.util;
 
-import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -44,11 +43,11 @@ final class SupplierDelegateTest
 {
   @Test
   @DisplayName("Delegate is invoked once and its value is cached")
-  void testValueCached()
+  void valueCached()
   {
-    val calls = new AtomicInteger();
-    val supplier = SupplierDelegate.of(() -> new Object[] { calls.incrementAndGet() });
-    val value = supplier.get();
+    var calls = new AtomicInteger();
+    var supplier = SupplierDelegate.of(() -> new Object[] { calls.incrementAndGet() });
+    var value = supplier.get();
 
     assertSame(value, supplier.get());
     assertSame(value, supplier.get());
@@ -58,10 +57,10 @@ final class SupplierDelegateTest
 
   @Test
   @DisplayName("Null value is cached")
-  void testNullValueCached()
+  void nullValueCached()
   {
-    val calls = new AtomicInteger();
-    val supplier = SupplierDelegate.of(() -> {
+    var calls = new AtomicInteger();
+    var supplier = SupplierDelegate.of(() -> {
       calls.incrementAndGet();
       return null;
     });
@@ -74,10 +73,10 @@ final class SupplierDelegateTest
 
   @Test
   @DisplayName("Delegate is invoked again after an exception")
-  void testRetryAfterException()
+  void retryAfterException()
   {
-    val calls = new AtomicInteger();
-    val supplier = SupplierDelegate.of(() -> {
+    var calls = new AtomicInteger();
+    var supplier = SupplierDelegate.of(() -> {
       if (calls.incrementAndGet() == 1)
         throw new IllegalStateException("first call fails");
 
@@ -94,30 +93,30 @@ final class SupplierDelegateTest
   @Test
   @DisplayName("Null delegate is rejected")
   @SuppressWarnings("DataFlowIssue")
-  void testNullDelegate() {
+  void nullDelegate() {
     assertThrows(NullPointerException.class, () -> SupplierDelegate.of(null));
   }
 
 
   @Test
   @DisplayName("Concurrent first calls invoke the delegate once")
-  void testConcurrentFirstCalls() throws Exception
+  void concurrentFirstCalls() throws Exception
   {
-    val threads = 8;
+    var threads = 8;
 
     for(var round = 0; round < 50; round++)
     {
-      val calls = new AtomicInteger();
-      val supplier = SupplierDelegate.of(() -> {
+      var calls = new AtomicInteger();
+      var supplier = SupplierDelegate.of(() -> {
         calls.incrementAndGet();
         Thread.yield();
         return new Object();
       });
 
-      val values = getConcurrently(threads, thread -> supplier.get());
+      var values = getConcurrently(threads, thread -> supplier.get());
 
       assertEquals(1, calls.get());
-      for(val value: values)
+      for(var value: values)
         assertSame(values.getFirst(), value);
     }
   }
@@ -125,12 +124,12 @@ final class SupplierDelegateTest
 
   @Test
   @DisplayName("Concurrent calls after an exception invoke the delegate until it succeeds")
-  void testConcurrentCallsAfterException() throws Exception
+  void concurrentCallsAfterException() throws Exception
   {
-    val threads = 8;
-    val calls = new AtomicInteger();
-    val value = new Object();
-    val supplier = SupplierDelegate.of(() -> {
+    var threads = 8;
+    var calls = new AtomicInteger();
+    var value = new Object();
+    var supplier = SupplierDelegate.of(() -> {
       if (calls.incrementAndGet() <= 3)
         throw new IllegalStateException();
 
@@ -140,7 +139,7 @@ final class SupplierDelegateTest
     for(var n = 0; n < 3; n++)
       assertThrows(IllegalStateException.class, supplier::get);
 
-    for(val v: getConcurrently(threads, thread -> supplier.get()))
+    for(var v: getConcurrently(threads, thread -> supplier.get()))
       assertSame(value, v);
 
     assertEquals(4, calls.get());
@@ -149,10 +148,10 @@ final class SupplierDelegateTest
 
   @Test
   @DisplayName("Recursive call from the delegate fails instead of recursing endlessly")
-  void testRecursiveCall()
+  void recursiveCall()
   {
-    val calls = new AtomicInteger();
-    val self = new AtomicReference<Supplier<Object>>();
+    var calls = new AtomicInteger();
+    var self = new AtomicReference<Supplier<Object>>();
 
     // without detection, the re-entrant lock lets the delegate run again and again until the stack overflows
     self.set(SupplierDelegate.of(() -> {
@@ -168,12 +167,12 @@ final class SupplierDelegateTest
 
   @Test
   @DisplayName("Delegate is invoked again after a recursive call failed")
-  void testRetryAfterRecursiveCall()
+  void retryAfterRecursiveCall()
   {
-    val calls = new AtomicInteger();
-    val recurse = new AtomicBoolean(true);
-    val self = new AtomicReference<Supplier<Object>>();
-    val value = new Object();
+    var calls = new AtomicInteger();
+    var recurse = new AtomicBoolean(true);
+    var self = new AtomicReference<Supplier<Object>>();
+    var value = new Object();
 
     self.set(SupplierDelegate.of(() -> {
       calls.incrementAndGet();
@@ -192,11 +191,11 @@ final class SupplierDelegateTest
 
   @Test
   @DisplayName("Caught recursive call does not invoke the delegate twice")
-  void testCaughtRecursiveCall()
+  void caughtRecursiveCall()
   {
-    val calls = new AtomicInteger();
-    val self = new AtomicReference<Supplier<Object>>();
-    val innerValue = new AtomicReference<>();
+    var calls = new AtomicInteger();
+    var self = new AtomicReference<Supplier<Object>>();
+    var innerValue = new AtomicReference<>();
 
     // the delegate re-enters only once; without detection, the nested invocation caches a value which is then
     // overwritten by the outer invocation, so callers see two different values
@@ -212,7 +211,7 @@ final class SupplierDelegateTest
       return new Object();
     }));
 
-    val value = self.get().get();
+    var value = self.get().get();
 
     assertNull(innerValue.get());
     assertSame(value, self.get().get());

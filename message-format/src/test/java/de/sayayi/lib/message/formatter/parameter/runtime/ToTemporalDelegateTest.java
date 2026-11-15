@@ -18,7 +18,6 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import lombok.val;
 import org.junit.jupiter.api.*;
 
 import java.io.IOException;
@@ -63,7 +62,7 @@ final class ToTemporalDelegateTest extends AbstractFormatterTest
   @SuppressWarnings("deprecation")
   void formatDate()
   {
-    val date = new Date(2024 - 1900, Calendar.NOVEMBER, 9);
+    var date = new Date(2024 - 1900, Calendar.NOVEMBER, 9);
 
     assertEquals(
         noSpaceText("09.11.2024, 00:00:00"),
@@ -75,7 +74,7 @@ final class ToTemporalDelegateTest extends AbstractFormatterTest
   @DisplayName("Format java.sql.Date as LocalDate (date only)")
   void formatSqlDateAsLocalDate()
   {
-    val sqlDate = java.sql.Date.valueOf("2024-11-09");
+    var sqlDate = java.sql.Date.valueOf("2024-11-09");
 
     // a java.util.Date with the medium style includes the time: "09.11.2024, 00:00:00"
     assertEquals(
@@ -88,7 +87,7 @@ final class ToTemporalDelegateTest extends AbstractFormatterTest
   @DisplayName("Format java.sql.Time as LocalTime (time only)")
   void formatSqlTimeAsLocalTime()
   {
-    val sqlTime = java.sql.Time.valueOf("23:36:04");
+    var sqlTime = java.sql.Time.valueOf("23:36:04");
 
     // a java.util.Date with the medium style includes the date: "01.01.1970, 23:36:04"
     assertEquals(
@@ -102,8 +101,8 @@ final class ToTemporalDelegateTest extends AbstractFormatterTest
   void formatCalendarWithTimeZone()
   {
     // use a zone which differs from the system default zone
-    val zone = getTimeZone(TimeZone.getDefault().getID().equals("Asia/Tokyo") ? "America/New_York" : "Asia/Tokyo");
-    val calendar = new GregorianCalendar(zone);
+    var zone = getTimeZone(TimeZone.getDefault().getID().equals("Asia/Tokyo") ? "America/New_York" : "Asia/Tokyo");
+    var calendar = new GregorianCalendar(zone);
     calendar.clear();
     calendar.set(2024, Calendar.NOVEMBER, 9, 8, 30, 0);
 
@@ -118,7 +117,7 @@ final class ToTemporalDelegateTest extends AbstractFormatterTest
   void formatWithoutJavaSqlModule() throws IOException, InterruptedException
   {
     // the java.sql module is part of this JVM, so a separate JVM is started with java.base as the only system module
-    val process = new ProcessBuilder(
+    var process = new ProcessBuilder(
         Path.of(System.getProperty("java.home"), "bin", "java").toString(),
         "--limit-modules", "java.base",
         "-Duser.timezone=UTC",
@@ -126,7 +125,7 @@ final class ToTemporalDelegateTest extends AbstractFormatterTest
         WithoutJavaSqlMain.class.getName())
         .redirectErrorStream(true)
         .start();
-    val output = new String(process.getInputStream().readAllBytes(), UTF_8);
+    var output = new String(process.getInputStream().readAllBytes(), UTF_8);
 
     assertEquals(
         0,

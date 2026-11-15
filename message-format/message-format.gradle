@@ -73,9 +73,7 @@ dependencies {
   testImplementation libs.spring.core
 
   // test fixtures
-  testFixturesAnnotationProcessor libs.lombok
   testFixturesCompileOnly libs.jetbrains.annotations
-  testFixturesCompileOnly libs.lombok
   testFixturesImplementation libs.junit.jupiter.api
 
   // tika

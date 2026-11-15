@@ -15,25 +15,25 @@
  */
 package de.sayayi.lib.message.formatter.parameter.runtime;
 
+import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.parameter.named.SizeFormatter;
-import de.sayayi.lib.message.internal.part.TextPart;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import lombok.val;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.nio.charset.IllegalCharsetNameException;
 import java.util.Map;
+import java.util.stream.Stream;
 
-import static de.sayayi.lib.message.part.MessagePart.Text.EMPTY;
+import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Locale.ROOT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 
 /**
@@ -47,59 +47,60 @@ import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 @TestMethodOrder(MethodOrderer.DisplayName.class)
 final class ByteArrayFormatterTest extends AbstractFormatterTest
 {
+  private MessageAccessor messageAccessor;
+
+
+  @BeforeEach
+  void createMessageAccessor()
+  {
+    messageAccessor = MessageSupportFactory
+        .create(createFormatterService(new ByteArrayFormatter(), new ArrayFormatter()))
+        .setLocale("de-DE")
+        .getMessageAccessor();
+  }
+
+
   @Test
-  void testFormattableTypes() {
+  @DisplayName("Formattable types include byte[]")
+  void formattableTypes() {
     assertFormatterForType(new ByteArrayFormatter(), byte[].class);
   }
 
 
-  @Test
   @SuppressWarnings("ConvertToBasicLatin")
-  void testEncodedByteArray()
+  static Stream<Arguments> encodedByteArrays()
   {
-    val formatterService = createFormatterService(new ByteArrayFormatter(), new ArrayFormatter());
-    val messageAccessor = MessageSupportFactory
-        .create(formatterService)
-        .setLocale("de-DE")
-        .getMessageAccessor();
+    return Stream.of(
+        arguments("Größe".getBytes(ISO_8859_1), "iso-8859-1", "Größe"),
+        arguments("Größe".getBytes(UTF_8), "utf-8", "Größe"),
 
-    assertEquals(
-        new TextPart("Größe"),
-        format(messageAccessor, "Größe".getBytes(ISO_8859_1), "bytes", "iso-8859-1"));
-    assertEquals(
-        new TextPart("Größe"),
-        format(messageAccessor, "Größe".getBytes(UTF_8), "bytes", "utf-8"));
-    assertEquals(
-        new TextPart("Größe"),
-        format(messageAccessor, "Größe".getBytes(), "bytes", ""));
-    assertEquals(
-        new TextPart("Größe"),
-        format(messageAccessor, "Größe".getBytes(), "bytes", "AA-bb"));
+        // empty or unsupported charset: platform default charset
+        arguments("Größe".getBytes(), "", "Größe"),
+        arguments("Größe".getBytes(), "AA-bb", "Größe"),
+
+        arguments("Größe".getBytes(), "base64", "R3LDtsOfZQ=="),
+        arguments(
+            "This appears to be a very long text with a single linefeed!".getBytes(),
+            "base64-lf",
+            "VGhpcyBhcHBlYXJzIHRvIGJlIGEgdmVyeSBsb25nIHRleHQgd2l0aCBhIHNpbmdsZSBsaW5lZmVl\nZCE="),
+
+        // empty array
+        arguments(new byte[0], "utf-8", ""));
+  }
+
+
+  @ParameterizedTest(name = "bytes:{1} -> {2}")
+  @DisplayName("Byte arrays are decoded with the configured charset or encoded as base64")
+  @MethodSource("encodedByteArrays")
+  void encodedByteArray(byte[] bytes, String bytesConfig, String expected) {
+    assertEquals(noSpaceText(expected), format(messageAccessor, bytes, "bytes", bytesConfig));
   }
 
 
   @Test
-  void testEmptyArray()
+  @DisplayName("An illegal charset name fails")
+  void illegalCharset()
   {
-    val formatterService = createFormatterService(new ByteArrayFormatter());
-    val messageAccessor = MessageSupportFactory
-        .create(formatterService)
-        .setLocale(ROOT)
-        .getMessageAccessor();
-
-    assertEquals(EMPTY, format(messageAccessor, "".getBytes(UTF_8), "bytes", "utf-8"));
-  }
-
-
-  @Test
-  void testIllegalCharset()
-  {
-    val formatterService = createFormatterService(new ByteArrayFormatter(), new ArrayFormatter());
-    val messageAccessor = MessageSupportFactory
-        .create(formatterService)
-        .setLocale("de-DE")
-        .getMessageAccessor();
-
     assertThrowsExactly(
         IllegalCharsetNameException.class,
         () -> format(messageAccessor, "Größe".getBytes(), "bytes", "XYZ&%"));
@@ -107,58 +108,20 @@ final class ByteArrayFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  void testBase64()
+  @DisplayName("Without bytes configuration, formatting is delegated to the array formatter")
+  void delegate()
   {
-    val formatterService = createFormatterService(new ByteArrayFormatter(), new ArrayFormatter());
-    val messageAccessor = MessageSupportFactory
-        .create(formatterService)
-        .getMessageAccessor();
-
     assertEquals(
-        new TextPart("R3LDtsOfZQ=="),
-        format(messageAccessor, "Größe".getBytes(), "bytes", "base64"));
-  }
-
-
-  @Test
-  void testBase64lf()
-  {
-    val formatterService = createFormatterService(new ByteArrayFormatter(), new ArrayFormatter());
-    val messageAccessor = MessageSupportFactory
-        .create(formatterService)
-        .getMessageAccessor();
-
-    assertEquals(
-        new TextPart("VGhpcyBhcHBlYXJzIHRvIGJlIGEgdmVyeSBsb25nIHRleHQgd2l0aCBhIHNpbmdsZSBsaW5lZmVl\nZCE="),
-        format(
-            messageAccessor,
-            "This appears to be a very long text with a single linefeed!".getBytes(),
-            "bytes",
-            "base64-lf"));
-  }
-
-
-  @Test
-  void testDelegate()
-  {
-    val formatterService = createFormatterService(
-        new ByteArrayFormatter(),
-        new ArrayFormatter());
-    val messageAccessor = MessageSupportFactory
-        .create(formatterService)
-        .setLocale("de-DE")
-        .getMessageAccessor();
-
-    assertEquals(
-        new TextPart("71, 114, -61, -74, -61, -97, 101"),
+        noSpaceText("71, 114, -61, -74, -61, -97, 101"),
         format(messageAccessor, "Größe".getBytes(UTF_8), Map.of(), Map.of()));
   }
 
 
   @Test
-  void testSize()
+  @DisplayName("The size of a byte array is its length")
+  void size()
   {
-    val messageSupport = MessageSupportFactory.create(
+    var messageSupport = MessageSupportFactory.create(
         createFormatterService(
             new SizeFormatter(),
             new ArrayFormatter(),

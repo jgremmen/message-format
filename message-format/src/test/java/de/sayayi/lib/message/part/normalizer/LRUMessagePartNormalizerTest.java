@@ -19,7 +19,6 @@ import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.internal.message.CompoundMessage;
 import de.sayayi.lib.message.internal.part.TextPart;
 import de.sayayi.lib.message.part.MessagePart;
-import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -49,12 +48,12 @@ final class LRUMessagePartNormalizerTest
 {
   @Test
   @DisplayName("normalize without eviction")
-  void testNoEviction()
+  void noEviction()
   {
-    val cache = LRUMessagePartNormalizer.create(4);
-    val mp1 = new TextPart("mp1");
-    val mp2 = new TextPart("mp2");
-    val mp3 = new TextPart("mp3");
+    var cache = LRUMessagePartNormalizer.create(4);
+    var mp1 = new TextPart("mp1");
+    var mp2 = new TextPart("mp2");
+    var mp3 = new TextPart("mp3");
 
     assertSame(mp1, cache.normalize(mp1));
     assertSame(mp2, cache.normalize(mp2));
@@ -68,15 +67,15 @@ final class LRUMessagePartNormalizerTest
 
   @Test
   @DisplayName("normalize with eviction")
-  void testWithEviction()
+  void withEviction()
   {
-    val cache = LRUMessagePartNormalizer.create(4);
-    val mp1 = new TextPart("mp1");
-    val mp2 = new TextPart("mp2");
-    val mp3 = new TextPart("mp3");
-    val mp4 = new TextPart("mp4");
-    val mp5 = new TextPart("mp5");
-    val mp6 = new TextPart("mp6");
+    var cache = LRUMessagePartNormalizer.create(4);
+    var mp1 = new TextPart("mp1");
+    var mp2 = new TextPart("mp2");
+    var mp3 = new TextPart("mp3");
+    var mp4 = new TextPart("mp4");
+    var mp5 = new TextPart("mp5");
+    var mp6 = new TextPart("mp6");
 
     cache.normalize(mp1);
     cache.normalize(mp2);
@@ -93,14 +92,14 @@ final class LRUMessagePartNormalizerTest
 
   @Test
   @DisplayName("normalize identical instance not at head")
-  void testIdenticalInstanceNotAtHead()
+  void identicalInstanceNotAtHead()
   {
-    for(val maxSize: new int[] { 4, 100 })
+    for(var maxSize: new int[] { 4, 100 })
     {
-      val cache = LRUMessagePartNormalizer.create(maxSize);
-      val mp1 = new TextPart("mp1");
-      val mp2 = new TextPart("mp2");
-      val mp3 = new TextPart("mp3");
+      var cache = LRUMessagePartNormalizer.create(maxSize);
+      var mp1 = new TextPart("mp1");
+      var mp2 = new TextPart("mp2");
+      var mp3 = new TextPart("mp3");
 
       cache.normalize(mp1);
       cache.normalize(mp2);
@@ -116,12 +115,12 @@ final class LRUMessagePartNormalizerTest
 
   @Test
   @DisplayName("validate normalization on message parsing")
-  void testCache() throws Exception
+  void cache() throws Exception
   {
-    val resolver = LRUMessagePartNormalizer.create(10);
-    val msg = new MessageFactory(resolver)
+    var resolver = LRUMessagePartNormalizer.create(10);
+    var msg = new MessageFactory(resolver)
         .parseMessage("this is %{a,format:number} and %{b}this is %{b}");
-    val parts = (MessagePart[])
+    var parts = (MessagePart[])
         tryToReadFieldValue(CompoundMessage.class, "messageParts", (CompoundMessage)msg).get();
 
     assertEquals(6, parts.length);
@@ -134,17 +133,17 @@ final class LRUMessagePartNormalizerTest
   @ParameterizedTest(name = "max size {0}")
   @DisplayName("concurrent normalization of overlapping parts without eviction")
   @ValueSource(ints = { 16, 200 })
-  void testConcurrentNoEviction(int maxSize) throws Exception
+  void concurrentNoEviction(int maxSize) throws Exception
   {
-    val cache = LRUMessagePartNormalizer.create(maxSize);
-    val normalized = new ConcurrentHashMap<String,MessagePart>();
+    var cache = LRUMessagePartNormalizer.create(maxSize);
+    var normalized = new ConcurrentHashMap<String,MessagePart>();
 
     // all threads normalize the same maxSize values, each starting at a different offset
     runConcurrently(8, thread -> {
       for(var n = 0; n < 50 * maxSize; n++)
       {
-        val text = "mp" + ((thread * 7 + n) % maxSize);
-        val part = cache.normalize(new TextPart(text));
+        var text = "mp" + ((thread * 7 + n) % maxSize);
+        var part = cache.normalize(new TextPart(text));
 
         assertEquals(text, part.getText());
         assertSame(normalized.computeIfAbsent(text, t -> part), part);
@@ -153,7 +152,7 @@ final class LRUMessagePartNormalizerTest
 
     assertEquals(maxSize, normalized.size());
 
-    for(val entry: normalized.entrySet())
+    for(var entry: normalized.entrySet())
       assertSame(entry.getValue(), cache.normalize(new TextPart(entry.getKey())));
   }
 
@@ -161,22 +160,22 @@ final class LRUMessagePartNormalizerTest
   @ParameterizedTest(name = "max size {0}")
   @DisplayName("concurrent normalization with eviction keeps the cache bounded and consistent")
   @ValueSource(ints = { 16, 200 })
-  void testConcurrentWithEviction(int maxSize) throws Exception
+  void concurrentWithEviction(int maxSize) throws Exception
   {
-    val cache = LRUMessagePartNormalizer.create(maxSize);
+    var cache = LRUMessagePartNormalizer.create(maxSize);
 
     runConcurrently(8, thread -> {
-      val random = ThreadLocalRandom.current();
+      var random = ThreadLocalRandom.current();
 
       for(var n = 0; n < 50 * maxSize; n++)
       {
-        val text = "mp" + random.nextInt(4 * maxSize);
+        var text = "mp" + random.nextInt(4 * maxSize);
         assertEquals(text, cache.normalize(new TextPart(text)).getText());
       }
     });
 
     // fill the cache with maxSize new parts, which must all be retained
-    val parts = new TextPart[maxSize];
+    var parts = new TextPart[maxSize];
     for(var n = 0; n < maxSize; n++)
       assertSame(parts[n] = new TextPart("new" + n), cache.normalize(parts[n]));
 

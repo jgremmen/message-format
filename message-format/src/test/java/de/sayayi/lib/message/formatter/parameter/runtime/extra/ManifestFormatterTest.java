@@ -17,7 +17,6 @@ package de.sayayi.lib.message.formatter.parameter.runtime.extra;
 
 import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -43,16 +42,17 @@ final class ManifestFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  void testFormattableTypes() {
+  @DisplayName("Formattable types include Manifest")
+  void formattableTypes() {
     assertFormatterForType(new ManifestFormatter(), Manifest.class);
   }
 
 
   @Test
   @DisplayName("Format main attributes")
-  void testMainAttributes()
+  void mainAttributes()
   {
-    val manifest = new Manifest();
+    var manifest = new Manifest();
     manifest
         .getMainAttributes()
         .putValue("Manifest-Version", "1.0");
@@ -74,9 +74,9 @@ final class ManifestFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Format entry names")
-  void testEntries()
+  void entries()
   {
-    val manifest = new Manifest();
+    var manifest = new Manifest();
     manifest
         .getEntries()
         .put("de/sayayi/Main.class", new Attributes());

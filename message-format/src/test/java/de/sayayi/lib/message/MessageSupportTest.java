@@ -21,7 +21,6 @@ import de.sayayi.lib.message.exception.DuplicateTemplateException;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.template.AbstractNamedTemplate;
 import de.sayayi.lib.message.template.NamedTemplate;
-import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -61,7 +60,7 @@ final class MessageSupportTest
 {
   @Test
   @DisplayName("Immediate message formatting")
-  void testFormat()
+  void formatImmediately()
   {
     assertEquals("69", shared()
         .message("%{n}")
@@ -72,14 +71,14 @@ final class MessageSupportTest
 
   @Test
   @DisplayName("Deferred message formatting")
-  void testFormatSupplier()
+  void formatSupplier()
   {
-    val messageBuilder = shared()
+    var messageBuilder = shared()
         .message("%{d,date:medium}")
         .with("d", LocalDate.of(2023, 6, 15))
         .locale(GERMANY);
 
-    val supplier = messageBuilder.formatSupplier();
+    var supplier = messageBuilder.formatSupplier();
 
     assertEquals("15.06.2023", Optional.<String>empty().orElseGet(supplier));
 
@@ -98,9 +97,9 @@ final class MessageSupportTest
 
   @Test
   @DisplayName("Immediate exception construction with formatted message")
-  void testException()
+  void exception()
   {
-    val exception = assertThrowsExactly(IOException.class, () -> {
+    var exception = assertThrowsExactly(IOException.class, () -> {
       throw shared()
           .message("%{list,list-sep-last:' and '}")
           .with("list", new int[] { -5, 12, 0 })
@@ -113,10 +112,10 @@ final class MessageSupportTest
 
   @Test
   @DisplayName("Deferred exception construction with formatted message")
-  void testFormattedExceptionSupplier()
+  void formattedExceptionSupplier()
   {
-    val exception = assertThrowsExactly(IOException.class, () -> {
-      val supplier = shared()
+    var exception = assertThrowsExactly(IOException.class, () -> {
+      var supplier = shared()
           .message("%{b,format:bool,true:yes,false:no}")
           .with("b", BigInteger.valueOf(-5000))
           .formattedExceptionSupplier(msg -> new IOException("answer = " + msg));
@@ -133,16 +132,16 @@ final class MessageSupportTest
 
   @Test
   @DisplayName("Exception construction with constructor references")
-  void testFormattedExceptionConstructorReference()
+  void formattedExceptionConstructorReference()
   {
-    val cause = new IOException("cause");
-    val configurer = shared().message("value %{v}").with("v", 7);
+    var cause = new IOException("cause");
+    var configurer = shared().message("value %{v}").with("v", 7);
 
-    val exception = configurer.formattedException(IllegalStateException::new);
+    var exception = configurer.formattedException(IllegalStateException::new);
     assertEquals("value 7", exception.getMessage());
     assertNull(exception.getCause());
 
-    val exceptionWithCause = configurer.formattedException(IllegalStateException::new, cause);
+    var exceptionWithCause = configurer.formattedException(IllegalStateException::new, cause);
     assertEquals("value 7", exceptionWithCause.getMessage());
     assertSame(cause, exceptionWithCause.getCause());
 
@@ -154,11 +153,11 @@ final class MessageSupportTest
 
   @Test
   @DisplayName("Exception suppliers create a new exception on every call and format the message once")
-  void testFormattedExceptionSupplierCreatesNewException()
+  void formattedExceptionSupplierCreatesNewException()
   {
-    val formatCount = new AtomicInteger();
-    val cause = new IOException("cause");
-    val configurer = shared()
+    var formatCount = new AtomicInteger();
+    var cause = new IOException("cause");
+    var configurer = shared()
         .message("%{v}")
         .with("v", new Object() {
           @Override
@@ -167,17 +166,17 @@ final class MessageSupportTest
           }
         });
 
-    val supplier = configurer.formattedExceptionSupplier(IllegalStateException::new);
-    val supplierWithCause = configurer.formattedExceptionSupplier(IllegalStateException::new, cause);
+    var supplier = configurer.formattedExceptionSupplier(IllegalStateException::new);
+    var supplierWithCause = configurer.formattedExceptionSupplier(IllegalStateException::new, cause);
 
-    val exception1 = supplier.get();
-    val exception2 = supplier.get();
+    var exception1 = supplier.get();
+    var exception2 = supplier.get();
     assertNotSame(exception1, exception2);
     assertEquals("value 1", exception1.getMessage());
     assertEquals("value 1", exception2.getMessage());
 
-    val exceptionWithCause1 = supplierWithCause.get();
-    val exceptionWithCause2 = supplierWithCause.get();
+    var exceptionWithCause1 = supplierWithCause.get();
+    var exceptionWithCause2 = supplierWithCause.get();
     assertNotSame(exceptionWithCause1, exceptionWithCause2);
     assertEquals("value 2", exceptionWithCause1.getMessage());
     assertEquals("value 2", exceptionWithCause2.getMessage());
@@ -191,10 +190,10 @@ final class MessageSupportTest
   @Test
   @DisplayName("Parameter map is an unmodifiable view of the configured parameters")
   @SuppressWarnings("DataFlowIssue")
-  void testGetParametersUnmodifiableView()
+  void getParametersUnmodifiableView()
   {
-    val configurer = shared().message("%{a}").with("a", 1);
-    val parameters = configurer.getParameters();
+    var configurer = shared().message("%{a}").with("a", 1);
+    var parameters = configurer.getParameters();
 
     assertThrowsExactly(UnsupportedOperationException.class, () -> parameters.put("b", 2));
     assertThrowsExactly(UnsupportedOperationException.class, () -> parameters.remove("a"));
@@ -211,7 +210,7 @@ final class MessageSupportTest
   @Test
   @DisplayName("Post formatter uses per-call locale")
   @SuppressWarnings("UnnecessaryUnicodeEscape")
-  void testPostFormatterLocaleOverride()
+  void postFormatterLocaleOverride()
   {
     assertEquals("I", MessageSupportFactory
         .createDefault()
@@ -231,10 +230,10 @@ final class MessageSupportTest
 
   @Test
   @DisplayName("Template filter accepting a duplicate replaces the existing template")
-  void testTemplateFilterReplacesDuplicate()
+  void templateFilterReplacesDuplicate()
   {
-    val messageSupport = createDefault();
-    val messageFactory = messageSupport.getMessageAccessor().getMessageFactory();
+    var messageSupport = createDefault();
+    var messageFactory = messageSupport.getMessageAccessor().getMessageFactory();
 
     messageSupport
         .addTemplate("tpl", messageFactory.parseTemplate("first"))
@@ -247,10 +246,10 @@ final class MessageSupportTest
 
   @Test
   @DisplayName("Default template filter rejects a different duplicate")
-  void testDefaultTemplateFilterRejectsDuplicate()
+  void defaultTemplateFilterRejectsDuplicate()
   {
-    val messageSupport = createDefault();
-    val messageFactory = messageSupport.getMessageAccessor().getMessageFactory();
+    var messageSupport = createDefault();
+    var messageFactory = messageSupport.getMessageAccessor().getMessageFactory();
 
     messageSupport
         .addTemplate("tpl", messageFactory.parseTemplate("first"))
@@ -266,7 +265,7 @@ final class MessageSupportTest
   @Test
   @DisplayName("Adding a null template throws with a descriptive message")
   @SuppressWarnings("DataFlowIssue")
-  void testAddNullTemplate()
+  void addNullTemplate()
   {
     assertNullRejected(
         "template must not be null",
@@ -278,7 +277,7 @@ final class MessageSupportTest
   @Test
   @DisplayName("Registering templates from a null class loader throws with a descriptive message")
   @SuppressWarnings("DataFlowIssue")
-  void testRegisterTemplatesFromNullClassLoader()
+  void registerTemplatesFromNullClassLoader()
   {
     assertNullRejected(
         "classLoader must not be null",
@@ -289,12 +288,12 @@ final class MessageSupportTest
 
   @Test
   @DisplayName("Registering templates from a class loader adds the service provided templates")
-  void testRegisterTemplatesFromService(@TempDir Path tempDir) throws IOException
+  void registerTemplatesFromService(@TempDir Path tempDir) throws IOException
   {
-    val serviceFile = writeString(tempDir.resolve("services"), GreetingTestTemplate.class.getName() + '\n');
+    var serviceFile = writeString(tempDir.resolve("services"), GreetingTestTemplate.class.getName() + '\n');
 
     // only this class loader provides the template, so other message supports aren't affected
-    val classLoader = new ClassLoader(getClass().getClassLoader()) {
+    var classLoader = new ClassLoader(getClass().getClassLoader()) {
       @Override
       public Enumeration<URL> getResources(String name) throws IOException
       {
@@ -304,7 +303,7 @@ final class MessageSupportTest
       }
     };
 
-    val messageSupport = createDefault().registerTemplatesFromService(classLoader);
+    var messageSupport = createDefault().registerTemplatesFromService(classLoader);
 
     assertTrue(messageSupport.getMessageAccessor().hasTemplateWithName("greeting"));
     assertEquals("Hello Alice!", messageSupport.message("%[greeting] Alice!").format());

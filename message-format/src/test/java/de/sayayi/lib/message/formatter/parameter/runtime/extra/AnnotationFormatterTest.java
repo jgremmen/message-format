@@ -18,7 +18,6 @@ package de.sayayi.lib.message.formatter.parameter.runtime.extra;
 import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import de.sayayi.lib.message.util.IsolatingTestClassLoader;
-import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -54,17 +53,19 @@ final class AnnotationFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  void testFormattableTypes() {
+  @DisplayName("Formattable types include Annotation")
+  void formattableTypes() {
     assertFormatterForType(new AnnotationFormatter(), Annotation.class);
   }
 
 
   @Test
   @MyAnnotation(value = 56, name = "Annotation", chars = { 'A', 'b', 'C' })
-  void testAnnotation() throws ReflectiveOperationException
+  @DisplayName("An annotation is formatted as a whole or by the value of a single element")
+  void annotation() throws ReflectiveOperationException
   {
-    val annotation = AnnotationFormatterTest.class
-        .getDeclaredMethod("testAnnotation").getAnnotation(MyAnnotation.class);
+    var annotation = AnnotationFormatterTest.class
+        .getDeclaredMethod("annotation").getAnnotation(MyAnnotation.class);
 
     assertEquals(
         '@' + getClass().getName() + ".MyAnnotation(value=56, name=\"Annotation\", chars={'A', 'b', 'C'})",
@@ -85,10 +86,10 @@ final class AnnotationFormatterTest extends AbstractFormatterTest
   @Test
   @DisplayName("Unknown annotation element delegates to the next formatter")
   @MyAnnotation(value = 7, name = "Unknown", chars = {})
-  void testUnknownElement() throws ReflectiveOperationException
+  void unknownElement() throws ReflectiveOperationException
   {
-    val annotation = AnnotationFormatterTest.class
-        .getDeclaredMethod("testUnknownElement")
+    var annotation = AnnotationFormatterTest.class
+        .getDeclaredMethod("unknownElement")
         .getAnnotation(MyAnnotation.class);
 
     // unknown elements are not cached, so the second lookup must give the same result
@@ -122,10 +123,10 @@ final class AnnotationFormatterTest extends AbstractFormatterTest
   @Test
   @DisplayName("Concurrent formatting of annotation elements")
   @MyAnnotation(value = 42, name = "Concurrent", chars = { 'x', 'y' })
-  void testConcurrentFormatting() throws Exception
+  void concurrentFormatting() throws Exception
   {
-    val annotation = AnnotationFormatterTest.class
-        .getDeclaredMethod("testConcurrentFormatting")
+    var annotation = AnnotationFormatterTest.class
+        .getDeclaredMethod("concurrentFormatting")
         .getAnnotation(MyAnnotation.class);
 
     runConcurrently(8, thread -> {
@@ -144,7 +145,7 @@ final class AnnotationFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Formatted annotations do not prevent their class loader from being unloaded")
-  void testAnnotationTypeNotRetained() throws Exception
+  void annotationTypeNotRetained() throws Exception
   {
     assertGarbageCollected(formatAnnotationFromIsolatingClassLoader(messageSupport),
         "class loader of a formatted annotation has not been garbage collected");
@@ -154,9 +155,9 @@ final class AnnotationFormatterTest extends AbstractFormatterTest
   private static @NotNull WeakReference<ClassLoader> formatAnnotationFromIsolatingClassLoader(
       @NotNull MessageSupport context) throws ClassNotFoundException
   {
-    val classLoader = new IsolatingTestClassLoader(IsolatedAnnotation.class, IsolatedAnnotated.class);
-    val annotatedType = classLoader.loadClass(IsolatedAnnotated.class.getName());
-    val annotation = annotatedType.getDeclaredAnnotations()[0];
+    var classLoader = new IsolatingTestClassLoader(IsolatedAnnotation.class, IsolatedAnnotated.class);
+    var annotatedType = classLoader.loadClass(IsolatedAnnotated.class.getName());
+    var annotation = annotatedType.getDeclaredAnnotations()[0];
 
     assertNotSame(IsolatedAnnotation.class, annotation.annotationType());
     assertEquals(

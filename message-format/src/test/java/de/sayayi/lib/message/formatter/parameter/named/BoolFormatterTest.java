@@ -21,7 +21,7 @@ import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueMessage;
 import de.sayayi.lib.message.part.MapKey;
 import de.sayayi.lib.message.part.TypedValue;
-import lombok.val;
+import org.intellij.lang.annotations.Language;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -57,7 +57,8 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 final class BoolFormatterTest extends AbstractFormatterTest
 {
   @Test
-  void testFormattableTypes()
+  @DisplayName("Formattable types include boolean and Boolean")
+  void formattableTypes()
   {
     assertFormatterForType(new BoolFormatter(), boolean.class);
     assertFormatterForType(new BoolFormatter(), Boolean.class);
@@ -65,11 +66,12 @@ final class BoolFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  void testFormat()
+  @DisplayName("Bool map keys select the message for booleans and for numbers selected by name; null is formatted as null text")
+  void formatWithBoolMapKeys()
   {
-    val messageAccessor = createMessageAccessor(GERMANY, new BoolFormatter());
+    var messageAccessor = createMessageAccessor(GERMANY, new BoolFormatter());
 
-    val map = new HashMap<MapKey,TypedValue.MessageValue>();
+    var map = new HashMap<MapKey,TypedValue.MessageValue>();
     map.put(MapKeyBool.TRUE, new TypedValueMessage(messageAccessor.getMessageFactory().parseMessage("wahr")));
     map.put(MapKeyBool.FALSE, new TypedValueMessage(messageAccessor.getMessageFactory().parseMessage("falsch")));
 
@@ -82,9 +84,10 @@ final class BoolFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  void testFormatter()
+  @DisplayName("Booleans are formatted as true or false, numbers only if the bool formatter is selected by name")
+  void formatter()
   {
-    val messageSupport = createMessageSupport(ENGLISH, new BoolFormatter());
+    var messageSupport = createMessageSupport(ENGLISH, new BoolFormatter());
 
     assertEquals("false true 1234 true no 3.14", messageSupport
         .message("%{a} %{b} %{c} %{c,format:bool} %{d,format:bool,true:'yes',false:'no'} %{e}")
@@ -135,7 +138,7 @@ final class BoolFormatterTest extends AbstractFormatterTest
   @ParameterizedTest(name = "{0} -> {1}")
   @DisplayName("Selected by name, all formattable types are converted to a boolean")
   @MethodSource("convertedValues")
-  void testSelectedByName(Object value, String expected)
+  void selectedByName(Object value, String expected)
   {
     assertEquals(expected, MessageSupportFactory
         .createDefault()
@@ -162,7 +165,7 @@ final class BoolFormatterTest extends AbstractFormatterTest
   @ParameterizedTest(name = "{0} -> {1}")
   @DisplayName("Selected by type for boolean values only, other types are not converted")
   @MethodSource("typedValues")
-  void testSelectedByType(Object value, String expected)
+  void selectedByType(Object value, String expected)
   {
     assertEquals(expected, MessageSupportFactory
         .createDefault()
@@ -173,11 +176,12 @@ final class BoolFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  void testNamedFormatter()
+  @DisplayName("Selected by name, null, true and false are formatted with their mapped messages")
+  void namedFormatter()
   {
-    val messageSupport = createMessageSupport(GERMAN, new BoolFormatter());
+    var messageSupport = createMessageSupport(GERMAN, new BoolFormatter());
 
-    val msg = messageSupport.message("%{b,format:bool,null:'<unknown>',true:'yes',false:'no'}").getMessage();
+    var msg = messageSupport.message("%{b,format:bool,null:'<unknown>',true:'yes',false:'no'}").getMessage();
 
     assertEquals("<unknown>", messageSupport.message(msg).with("b", null).format());
     assertEquals("yes", messageSupport.message(msg).with("b", true).format());
@@ -186,10 +190,11 @@ final class BoolFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  void testConfigKeyNull()
+  @DisplayName("Null and not-null keys match null and boolean values; an unmapped null is formatted as empty text")
+  void configKeyNull()
   {
-    val messageSupport = MessageSupportFactory.createDefault();
-    val message = messageSupport
+    var messageSupport = MessageSupportFactory.createDefault();
+    var message = messageSupport
         .message("%{b,empty:empty,!empty:'not empty',null:null,!null:'not null'}");
 
     assertEquals("null", message
@@ -209,9 +214,10 @@ final class BoolFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  void testConfigKeyEmpty()
+  @DisplayName("Empty keys match null and values that cannot be converted to a boolean, but not false")
+  void configKeyEmpty()
   {
-    val messageSupport = MessageSupportFactory.createDefault();
+    var messageSupport = MessageSupportFactory.createDefault();
 
     assertEquals("not empty", messageSupport
         .message("%{b,empty:empty,!empty:'not empty',null:null}")
@@ -230,124 +236,109 @@ final class BoolFormatterTest extends AbstractFormatterTest
   }
 
 
-  @Test
-  void testConfigKeyBool()
+  static Stream<Arguments> boolKeyCases()
   {
-    val messageSupport = MessageSupportFactory.createDefault();
-    var message = messageSupport.message("%{b,true:true,false:false}");
+    final var byType = "%{b,true:true,false:false}";
+    final var byName = "%{b,format:bool,true:true,false:false}";
 
-    assertEquals("true", message
-        .with("b", true)
-        .format());
-    assertEquals("false", message
-        .with("b", false)
-        .format());
-    assertEquals("false", message
-        .with("b", Optional.of(false))
-        .format());
+    return Stream.of(
+        arguments(byType, true, "true"),
+        arguments(byType, false, "false"),
+        arguments(byType, Optional.of(false), "false"),
 
-    message = messageSupport.message("%{b,format:bool,true:true,false:false}");
+        // int value
+        arguments(byName, -24, "true"),
+        arguments(byName, 0, "false"),
+        arguments(byName, Optional.of(4), "true"),
 
-    // int value
-    assertEquals("true", message
-        .with("b", -24)
-        .format());
-    assertEquals("false", message
-        .with("b", 0)
-        .format());
-    assertEquals("true", message
-        .with("b", Optional.of(4))
-        .format());
+        // float value
+        arguments(byName, 3.14f, "true"),
+        arguments(byName, 0.0f, "false"),
 
-    // float value
-    assertEquals("true", message
-        .with("b", 3.14f)
-        .format());
-    assertEquals("false", message
-        .with("b", 0.0f)
-        .format());
+        // big decimal value
+        arguments(byName, BigDecimal.TEN, "true"),
+        arguments(byName, BigDecimal.ZERO, "false"),
+        arguments(byName, Optional.of(BigDecimal.ONE), "true"),
 
-    // big decimal value
-    assertEquals("true", message
-        .with("b", BigDecimal.TEN)
-        .format());
-    assertEquals("false", message
-        .with("b", BigDecimal.ZERO)
-        .format());
-    assertEquals("true", message
-        .with("b", Optional.of(BigDecimal.ONE))
-        .format());
+        // string value
+        arguments(byName, "true", "true"),
+        arguments(byName, "false", "false"),
+        arguments(byName, Optional.of("false"), "false"),
 
-    // string value
-    assertEquals("true", message
-        .with("b", "true")
-        .format());
-    assertEquals("false", message
-        .with("b", "false")
-        .format());
-    assertEquals("false", message
-        .with("b", Optional.of("false"))
-        .format());
+        // optional int value
+        arguments(byName, OptionalInt.of(-24), "true"),
+        arguments(byName, OptionalInt.of(0), "false"),
+        arguments(byName, OptionalInt.empty(), ""),
 
-    // optional int value
-    assertEquals("true", message
-        .with("b", OptionalInt.of(-24))
-        .format());
-    assertEquals("false", message
-        .with("b", OptionalInt.of(0))
-        .format());
-    assertEquals("", message
-        .with("b", OptionalInt.empty())
-        .format());
-
-    // optional long value
-    assertEquals("true", message
-        .with("b", OptionalLong.of(Long.MAX_VALUE))
-        .format());
-    assertEquals("false", message
-        .with("b", OptionalLong.of(0))
-        .format());
-    assertEquals("", message
-        .with("b", OptionalLong.empty())
-        .format());
+        // optional long value
+        arguments(byName, OptionalLong.of(Long.MAX_VALUE), "true"),
+        arguments(byName, OptionalLong.of(0), "false"),
+        arguments(byName, OptionalLong.empty(), ""));
   }
 
 
-  @Test
-  void testConfigKeyString()
+  @ParameterizedTest(name = "{0} with {1} -> {2}")
+  @DisplayName("Bool map keys select the message matching the boolean value")
+  @MethodSource("boolKeyCases")
+  void configKeyBool(@Language("MessageFormat") String format, Object value, String expected)
   {
-    val messageSupport = MessageSupportFactory.createDefault();
-    val message = messageSupport.message("""
+    assertEquals(
+        expected,
+        MessageSupportFactory
+            .createDefault()
+            .message(format)
+            .with("b", value)
+            .format());
+  }
+
+
+  static Stream<Arguments> stringKeyCases()
+  {
+    final var boolAndStringKeys = """
         %{b,format:bool,\
             true:'bool true',\
             false:'bool false',\
             'true':'string true',\
             'false':'string false',\
             'True':'string True'}\
-        """);
+        """;
+    final var stringKeysOnly = "%{b,format:bool,'false':'string false','True':'string True'}";
+    final var byType = "%{b,'false':'string false','true':'string true'}";
 
-    assertEquals("bool true", message.with("b", TRUE).format());
-    assertEquals("bool true", message.with("b", "true").format());
-    assertEquals("bool true", message.with("b", "1").format());
-    assertEquals("bool false", message.with("b", FALSE).format());
-    assertEquals("bool false", message.with("b", "false").format());
-    assertEquals("bool false", message.with("b", "0").format());
+    return Stream.of(
+        arguments(boolAndStringKeys, TRUE, "bool true"),
+        arguments(boolAndStringKeys, "true", "bool true"),
+        arguments(boolAndStringKeys, "1", "bool true"),
+        arguments(boolAndStringKeys, FALSE, "bool false"),
+        arguments(boolAndStringKeys, "false", "bool false"),
+        arguments(boolAndStringKeys, "0", "bool false"),
 
-    // "True" cannot be converted to a boolean, and the equal string key 'True' does not match either
-    assertEquals("", message.with("b", "True").format());
+        // "True" cannot be converted to a boolean, and the equal string key 'True' does not match either
+        arguments(boolAndStringKeys, "True", ""),
 
-    // with string keys only, the boolean value itself is formatted
-    val stringKeysOnly = messageSupport.message("%{b,format:bool,'false':'string false','True':'string True'}");
+        // with string keys only, the boolean value itself is formatted
+        arguments(stringKeysOnly, TRUE, "true"),
+        arguments(stringKeysOnly, "true", "true"),
+        arguments(stringKeysOnly, FALSE, "false"),
+        arguments(stringKeysOnly, "false", "false"),
 
-    assertEquals("true", stringKeysOnly.with("b", TRUE).format());
-    assertEquals("true", stringKeysOnly.with("b", "true").format());
-    assertEquals("false", stringKeysOnly.with("b", FALSE).format());
-    assertEquals("false", stringKeysOnly.with("b", "false").format());
+        // selected by type for a boolean value, string keys don't match either
+        arguments(byType, TRUE, "true"),
+        arguments(byType, FALSE, "false"));
+  }
 
-    // selected by type for a boolean value, string keys don't match either
-    val typed = messageSupport.message("%{b,'false':'string false','true':'string true'}");
 
-    assertEquals("true", typed.with("b", TRUE).format());
-    assertEquals("false", typed.with("b", FALSE).format());
+  @ParameterizedTest(name = "{0} with {1} -> {2}")
+  @DisplayName("String map keys never match a value converted to a boolean")
+  @MethodSource("stringKeyCases")
+  void configKeyString(@Language("MessageFormat") String format, Object value, String expected)
+  {
+    assertEquals(
+        expected,
+        MessageSupportFactory
+            .createDefault()
+            .message(format)
+            .with("b", value)
+            .format());
   }
 }

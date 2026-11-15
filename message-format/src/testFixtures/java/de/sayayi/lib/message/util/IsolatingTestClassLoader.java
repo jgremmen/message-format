@@ -15,7 +15,6 @@
  */
 package de.sayayi.lib.message.util;
 
-import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -67,8 +66,8 @@ public final class IsolatingTestClassLoader extends ClassLoader
       var type = findLoadedClass(name);
       if (type == null)
       {
-        try(val in = getParent().getResourceAsStream(name.replace('.', '/') + ".class")) {
-          val bytes = requireNonNull(in).readAllBytes();
+        try(var in = getParent().getResourceAsStream(name.replace('.', '/') + ".class")) {
+          var bytes = requireNonNull(in).readAllBytes();
           type = defineClass(name, bytes, 0, bytes.length);
         } catch(IOException ex) {
           throw new ClassNotFoundException(name, ex);

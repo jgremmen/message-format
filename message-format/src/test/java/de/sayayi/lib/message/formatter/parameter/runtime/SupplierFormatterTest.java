@@ -18,7 +18,6 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.formatter.parameter.named.ClassifierFormatter;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import lombok.val;
 import org.intellij.lang.annotations.Language;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -52,14 +51,15 @@ final class SupplierFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  void testFormattableTypes() {
+  @DisplayName("Formattable types include Supplier")
+  void formattableTypes() {
     assertFormatterForType(new SupplierFormatter(), Supplier.class);
   }
 
 
   @Test
   @DisplayName("Supplied value is formatted according to its type")
-  void testFormat()
+  void formatSuppliedValue()
   {
     final Supplier<List<String>> names = () -> List.of("alice", "bob", "carol");
 
@@ -86,7 +86,7 @@ final class SupplierFormatterTest extends AbstractFormatterTest
   @ParameterizedTest(name = "{0} -> {2}")
   @DisplayName("Map keys and size are based on the supplied value")
   @MethodSource("suppliedValues")
-  void testMapKeysAndSize(@Language("MessageFormat") String formatString, Supplier<?> supplier, String expected)
+  void mapKeysAndSize(@Language("MessageFormat") String formatString, Supplier<?> supplier, String expected)
   {
     assertEquals(
         expected,
@@ -99,7 +99,7 @@ final class SupplierFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Classifiers of the supplier and of the supplied value")
-  void testClassifiers()
+  void classifiers()
   {
     final Supplier<List<String>> list = () -> List.of("a", "b");
 
@@ -120,9 +120,9 @@ final class SupplierFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Supplier passed as a parameter is evaluated once")
-  void testSupplierEvaluatedOnce()
+  void supplierEvaluatedOnce()
   {
-    val calls = new AtomicInteger();
+    var calls = new AtomicInteger();
     final Supplier<List<String>> list = () -> {
       calls.incrementAndGet();
       return List.of("a", "b");

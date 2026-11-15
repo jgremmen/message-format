@@ -15,7 +15,6 @@
  */
 package de.sayayi.lib.message;
 
-import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -37,12 +36,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @author Jeroen Gremmen
  * @since 0.1.0
  */
+@DisplayName("Message")
 public class MessageTest
 {
   @Test
-  void testParseTrimsTrailingSpace()
+  @DisplayName("Parsing removes a trailing space from the message text")
+  void parseTrimsTrailingSpace()
   {
-    val messageSupport = MessageSupportFactory.shared();
+    var messageSupport = MessageSupportFactory.shared();
 
     assertEquals("Just a simple message without parameters",
         messageSupport.message("Just a simple message without parameters ").format());
@@ -50,17 +51,18 @@ public class MessageTest
 
 
   @Test
-  void testParseMultiLocale()
+  @DisplayName("A localized message is formatted in the requested locale")
+  void parseMultiLocale()
   {
-    val texts = new HashMap<Locale,String>();
+    var texts = new HashMap<Locale,String>();
 
     texts.put(UK, "%{n} %{n,format:choice,1:'colour', :'colours'}.");
     texts.put(Locale.forLanguageTag("nl-NL"), "%{n} %{n, format:choice,1 : 'kleur',: 'kleuren'}.");
     texts.put(Locale.GERMAN, "%{n} %{n,format:choice,1: 'Farbe', :'Farben'}.");
     texts.put(US, "%{n} %{n,format:choice,1:'color', :'colors'}.");
 
-    val msg = MessageFactory.getSharedInstance().parseMessage(texts);
-    val messageSupport = MessageSupportFactory.shared();
+    var msg = MessageFactory.getSharedInstance().parseMessage(texts);
+    var messageSupport = MessageSupportFactory.shared();
 
     assertEquals("1 kleur.",
         messageSupport.message(msg).locale("nl-NL").with("n", 1).format());
@@ -70,10 +72,11 @@ public class MessageTest
 
 
   @Test
-  void testCompareType()
+  @DisplayName("Relational number keys select the negative, zero and positive message")
+  void compareType()
   {
-    val messageSupport = MessageSupportFactory.shared();
-    val m = messageSupport.message("%{n,format:choice,<0:'negative',>0:'positive',:'zero'}").getMessage();
+    var messageSupport = MessageSupportFactory.shared();
+    var m = messageSupport.message("%{n,format:choice,<0:'negative',>0:'positive',:'zero'}").getMessage();
 
     assertEquals("negative",
         messageSupport.message(m).locale(UK).with("n", -1).format());
@@ -85,9 +88,10 @@ public class MessageTest
 
 
   @Test
-  void testEmptyMessage()
+  @DisplayName("An empty message is formatted as empty string")
+  void emptyMessage()
   {
-    val messageSupport = MessageSupportFactory.shared();
+    var messageSupport = MessageSupportFactory.shared();
 
     assertEquals("", messageSupport.message("").format());
   }
@@ -95,9 +99,9 @@ public class MessageTest
 
   @Test
   @DisplayName("Locale-aware message has no format string")
-  void testAsFormatStringLocaleAware()
+  void asFormatStringLocaleAware()
   {
-    val message = MessageFactory
+    var message = MessageFactory
         .getSharedInstance()
         .parseMessage(Map.of(UK, "colour", US, "color"));
 

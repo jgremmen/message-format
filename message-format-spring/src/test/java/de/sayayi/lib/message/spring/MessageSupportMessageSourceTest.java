@@ -16,7 +16,6 @@
 package de.sayayi.lib.message.spring;
 
 import de.sayayi.lib.message.MessageSupportFactory;
-import lombok.val;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -49,7 +48,7 @@ final class MessageSupportMessageSourceTest
   @BeforeEach
   void init()
   {
-    val messageSupport = MessageSupportFactory.createDefault();
+    var messageSupport = MessageSupportFactory.createDefault();
 
     messageSupport.addMessage("spring.message.1",
         "you have %{p1,format:choice,1:'a single result',:'%{p1} results'}");
@@ -65,7 +64,7 @@ final class MessageSupportMessageSourceTest
 
   @Test
   @DisplayName("getMessage without a default message")
-  void testGetMessageNoDefault()
+  void getMessageNoDefault()
   {
     assertEquals("0= 1=false 2=3.14 3=Hello",
         messageSource.getMessage("spring.message.3",
@@ -79,7 +78,7 @@ final class MessageSupportMessageSourceTest
 
   @Test
   @DisplayName("getMessage with a default message")
-  void testGetMessageWithDefault()
+  void getMessageWithDefault()
   {
     assertEquals("you have a single result",
         messageSource.getMessage("spring.message.1",
@@ -94,7 +93,7 @@ final class MessageSupportMessageSourceTest
 
   @Test
   @DisplayName("getMessage with resolvable")
-  void testGetMessageWithResolvable()
+  void getMessageWithResolvable()
   {
     assertEquals("hello jack", messageSource.getMessage(
         new DefaultMessageSourceResolvable(
@@ -111,7 +110,7 @@ final class MessageSupportMessageSourceTest
 
   @Test
   @DisplayName("getMessage with resolvable arguments")
-  void testGetMessageWithResolvableArguments()
+  void getMessageWithResolvableArguments()
   {
     assertEquals("hello user name", messageSource.getMessage("spring.message.2",
         new Object[] { new DefaultMessageSourceResolvable("spring.field.name") }, ENGLISH));
@@ -128,9 +127,9 @@ final class MessageSupportMessageSourceTest
   @ParameterizedTest(name = "[{index}] {0}")
   @DisplayName("Parameter prefixes forming valid parameter names are accepted")
   @ValueSource(strings = { "p", "arg", "myArg", "my-arg-", "ä-" })
-  void testValidParameterPrefix(String parameterPrefix)
+  void validParameterPrefix(String parameterPrefix)
   {
-    val messageSupport = MessageSupportFactory.createDefault();
+    var messageSupport = MessageSupportFactory.createDefault();
     messageSupport.addMessage("msg", "hello %{" + parameterPrefix + "1}");
 
     assertEquals(
@@ -143,11 +142,11 @@ final class MessageSupportMessageSourceTest
   @ParameterizedTest(name = "[{index}] '{0}'")
   @DisplayName("Parameter prefixes not forming valid parameter names are rejected")
   @ValueSource(strings = { "", " ", "1x", "P", "Arg", "p_", "my_arg", "my--arg-" })
-  void testInvalidParameterPrefix(String parameterPrefix)
+  void invalidParameterPrefix(String parameterPrefix)
   {
-    val messageSupport = MessageSupportFactory.createDefault();
+    var messageSupport = MessageSupportFactory.createDefault();
 
-    val ex = assertThrows(
+    var ex = assertThrows(
         IllegalArgumentException.class,
         () -> new MessageSupportMessageSource(parameterPrefix, messageSupport));
 
@@ -160,7 +159,7 @@ final class MessageSupportMessageSourceTest
   @Test
   @DisplayName("Message support must not be null")
   @SuppressWarnings("DataFlowIssue")
-  void testNullMessageSupport()
+  void nullMessageSupport()
   {
     assertNullRejected(
         "messageSupport must not be null",

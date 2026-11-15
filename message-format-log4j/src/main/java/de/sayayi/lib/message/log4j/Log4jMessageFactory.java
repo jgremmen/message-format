@@ -29,6 +29,7 @@ import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 
 import static de.sayayi.lib.message.part.normalizer.MessagePartNormalizer.PASS_THROUGH;
+import static java.util.Objects.requireNonNull;
 
 
 /**
@@ -91,7 +92,7 @@ public final class Log4jMessageFactory extends AbstractMessageFactory
    */
   public Log4jMessageFactory(@NotNull MessageSupport messageSupport, boolean parameterizedMessageFallback)
   {
-    this.messageSupport = messageSupport;
+    this.messageSupport = requireNonNull(messageSupport, "messageSupport must not be null");
     this.parameterizedMessageFallback = parameterizedMessageFallback;
   }
 

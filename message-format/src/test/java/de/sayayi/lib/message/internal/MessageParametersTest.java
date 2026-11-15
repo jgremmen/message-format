@@ -18,7 +18,6 @@ package de.sayayi.lib.message.internal;
 import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
-import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
 
@@ -63,7 +62,7 @@ final class MessageParametersTest
 
   @Test
   @DisplayName("Querying parameter values")
-  void testParameterValues()
+  void parameterValues()
   {
     assertEquals(ITALIAN, parameters.getLocale());
 
@@ -82,7 +81,7 @@ final class MessageParametersTest
 
   @Test
   @DisplayName("Equals and hashCode do not depend on the parameter order")
-  void testEqualsAndHashCode()
+  void equalsAndHashCode()
   {
     assertEqualsContract(
         parameters,
@@ -93,9 +92,9 @@ final class MessageParametersTest
 
   @Test
   @DisplayName("Not equal to other Parameters implementations")
-  void testNotEqualsOtherImplementation()
+  void notEqualsOtherImplementation()
   {
-    val otherParameters = mock(Parameters.class);
+    var otherParameters = mock(Parameters.class);
 
     when(otherParameters.getLocale()).thenReturn(ITALIAN);
     when(otherParameters.getParameterNames()).thenReturn(VALUES.keySet());
@@ -111,13 +110,13 @@ final class MessageParametersTest
 
   private static @NotNull MessageParameters createParameters(@NotNull Locale locale, @NotNull String... names)
   {
-    val messageSupport = new MessageSupportImpl(
+    var messageSupport = new MessageSupportImpl(
         DefaultFormatterService.getSharedInstance(),
         MessageFactory.getSharedInstance());
-    val configurer = messageSupport.new Configurer<>(() -> null);
+    var configurer = messageSupport.new Configurer<>(() -> null);
 
     configurer.locale(locale);
-    for(val name: names)
+    for(var name: names)
       configurer.with(name, VALUES.get(name));
 
     return new MessageParameters(configurer);

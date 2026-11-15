@@ -16,7 +16,6 @@
 package de.sayayi.lib.message.part;
 
 import de.sayayi.lib.message.part.MessagePart.Text;
-import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -63,9 +62,9 @@ final class TextJoinerTest
   @ParameterizedTest(name = "{0}")
   @DisplayName("Pending spaces and ignored values")
   @MethodSource("pendingSpaces")
-  void testPendingSpaces(String name, Consumer<TextJoiner> operations, Text noSpace, Text spaced)
+  void pendingSpacesAndIgnoredValues(String name, Consumer<TextJoiner> operations, Text noSpace, Text spaced)
   {
-    val joiner = new TextJoiner();
+    var joiner = new TextJoiner();
 
     operations.accept(joiner);
 
@@ -82,9 +81,9 @@ final class TextJoinerTest
 
   @Test
   @DisplayName("Join 'String' instances")
-  void testStrings()
+  void strings()
   {
-    val joiner = new TextJoiner();
+    var joiner = new TextJoiner();
 
     joiner
         .add(" Test ")
@@ -98,9 +97,9 @@ final class TextJoinerTest
 
   @Test
   @DisplayName("Join 'Text' instances")
-  void testTexts()
+  void texts()
   {
-    val joiner = new TextJoiner();
+    var joiner = new TextJoiner();
 
     joiner
         .add(noSpaceText("e1"))
@@ -113,9 +112,9 @@ final class TextJoinerTest
 
   @Test
   @DisplayName("add(String) collapses consecutive spaces into a single separator")
-  void testCollapseSpaces()
+  void collapseSpaces()
   {
-    val joiner = new TextJoiner();
+    var joiner = new TextJoiner();
 
     joiner.add("a     b   c");
 
@@ -125,9 +124,9 @@ final class TextJoinerTest
 
   @Test
   @DisplayName("add(String) preserves leading and trailing spaces")
-  void testAddPreservesSurroundingSpaces()
+  void addPreservesSurroundingSpaces()
   {
-    val joiner = new TextJoiner();
+    var joiner = new TextJoiner();
 
     joiner.add("  hello  ");
 
@@ -137,9 +136,9 @@ final class TextJoinerTest
 
   @Test
   @DisplayName("add(String) with blank string only records a pending space")
-  void testAddBlank()
+  void addBlank()
   {
-    val joiner = new TextJoiner();
+    var joiner = new TextJoiner();
 
     joiner.add("   ");
 
@@ -151,9 +150,9 @@ final class TextJoinerTest
 
   @Test
   @DisplayName("addNoSpace(String) strips leading and trailing spaces")
-  void testAddNoSpaceString()
+  void addNoSpaceString()
   {
-    val joiner = new TextJoiner();
+    var joiner = new TextJoiner();
 
     joiner
         .addNoSpace("  a  ")
@@ -166,9 +165,9 @@ final class TextJoinerTest
 
   @Test
   @DisplayName("addNoSpace(Text) strips the surrounding spaces of the text")
-  void testAddNoSpaceText()
+  void addNoSpaceText()
   {
-    val joiner = new TextJoiner();
+    var joiner = new TextJoiner();
 
     joiner
         .addNoSpace(spacedText("  a  "))
@@ -181,9 +180,9 @@ final class TextJoinerTest
 
   @Test
   @DisplayName("add(char[]) adds all characters and collapses spaces")
-  void testAddCharArray()
+  void addCharArray()
   {
-    val joiner = new TextJoiner();
+    var joiner = new TextJoiner();
 
     joiner.add("a   b  ".toCharArray());
 
@@ -193,9 +192,9 @@ final class TextJoinerTest
 
   @Test
   @DisplayName("add(char) with a non-space character appends it directly")
-  void testAddChar()
+  void addChar()
   {
-    val joiner = new TextJoiner();
+    var joiner = new TextJoiner();
 
     joiner.add('a').add('b').add('c');
 
@@ -205,9 +204,9 @@ final class TextJoinerTest
 
   @Test
   @DisplayName("add(char) with a space character records a pending separator space")
-  void testAddSpaceChar()
+  void addSpaceChar()
   {
-    val joiner = new TextJoiner();
+    var joiner = new TextJoiner();
 
     joiner.add('a').add(' ').add('b');
 
@@ -217,9 +216,9 @@ final class TextJoinerTest
 
   @Test
   @DisplayName("add(char) collapses multiple space characters into one")
-  void testAddMultipleSpaceChars()
+  void addMultipleSpaceChars()
   {
-    val joiner = new TextJoiner();
+    var joiner = new TextJoiner();
 
     joiner.add('a').add(' ').add(' ').add(' ').add('b');
 
@@ -229,9 +228,9 @@ final class TextJoinerTest
 
   @Test
   @DisplayName("add(char) treats unicode space separators as spaces")
-  void testAddUnicodeSpaceChar()
+  void addUnicodeSpaceChar()
   {
-    val joiner = new TextJoiner();
+    var joiner = new TextJoiner();
 
     // non-breaking space, tab and carriage return are all space characters
     joiner.add('a').add('\u00a0').add('\t').add('\r').add('b');
@@ -242,9 +241,9 @@ final class TextJoinerTest
 
   @Test
   @DisplayName("add(char) keeps a newline as a literal character")
-  void testAddNewlineChar()
+  void addNewlineChar()
   {
-    val joiner = new TextJoiner();
+    var joiner = new TextJoiner();
 
     joiner.add('a').add('\n').add('b');
 
@@ -254,9 +253,9 @@ final class TextJoinerTest
 
   @Test
   @DisplayName("add(Text) honours the leading space of the first text")
-  void testAddTextLeadingSpace()
+  void addTextLeadingSpace()
   {
-    val joiner = new TextJoiner();
+    var joiner = new TextJoiner();
 
     joiner.add(spacedText(" x"));
 
@@ -266,9 +265,9 @@ final class TextJoinerTest
 
   @Test
   @DisplayName("add(Text) honours the trailing space of the last text")
-  void testAddTextTrailingSpace()
+  void addTextTrailingSpace()
   {
-    val joiner = new TextJoiner();
+    var joiner = new TextJoiner();
 
     joiner.add(spacedText("x "));
 
@@ -278,9 +277,9 @@ final class TextJoinerTest
 
   @Test
   @DisplayName("add(Text) inserts a single space between space-adjacent texts")
-  void testAddTextAdjacentSpaces()
+  void addTextAdjacentSpaces()
   {
-    val joiner = new TextJoiner();
+    var joiner = new TextJoiner();
 
     joiner
         .add(spacedText("a "))
@@ -292,9 +291,9 @@ final class TextJoinerTest
 
   @Test
   @DisplayName("add(Text) with empty text only accumulates the pending space state")
-  void testAddEmptyText()
+  void addEmptyText()
   {
-    val joiner = new TextJoiner();
+    var joiner = new TextJoiner();
 
     joiner
         .add(noSpaceText("a"))
@@ -307,9 +306,9 @@ final class TextJoinerTest
 
   @Test
   @DisplayName("add(Text) with null text only accumulates the pending space state")
-  void testAddNullText()
+  void addNullText()
   {
-    val joiner = new TextJoiner();
+    var joiner = new TextJoiner();
 
     joiner
         .add(noSpaceText("a"))
@@ -322,9 +321,9 @@ final class TextJoinerTest
 
   @Test
   @DisplayName("add(Text) with a space-around empty text carries the pending space")
-  void testAddSpaceAroundEmptyText()
+  void addSpaceAroundEmptyText()
   {
-    val joiner = new TextJoiner();
+    var joiner = new TextJoiner();
 
     joiner
         .add(noSpaceText("a"))

@@ -15,7 +15,6 @@
  */
 package de.sayayi.lib.message.internal.parser;
 
-import lombok.val;
 import org.antlr.v4.runtime.CharStreams;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -39,9 +38,10 @@ final class MessageTokenizerTest
 {
   @Test
   @SuppressWarnings("UnnecessaryUnicodeEscape")
-  void testDefaultMode()
+  @DisplayName("In default mode, characters, spaces, escape sequences and a parameter start are tokenized")
+  void defaultMode()
   {
-    val lexer = createFor("hi  \\u0021%{");
+    var lexer = createFor("hi  \\u0021%{");
 
     // h
     var token = lexer.nextToken();

@@ -17,7 +17,6 @@ package de.sayayi.lib.message.formatter.parameter.runtime.extra;
 
 import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -43,16 +42,17 @@ final class InetAddressFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  void testFormattableTypes() {
+  @DisplayName("Formattable types include InetAddress")
+  void formattableTypes() {
     assertFormatterForType(new InetAddressFormatter(), InetAddress.class);
   }
 
 
   @Test
   @DisplayName("Format IP address and host name")
-  void testFormat() throws UnknownHostException
+  void formatAddressAndHostName() throws UnknownHostException
   {
-    val address = InetAddress.getByAddress("db01", new byte[] { 10, 0, 0, 7 });
+    var address = InetAddress.getByAddress("db01", new byte[] { 10, 0, 0, 7 });
 
     assertEquals("Connected to db01 (10.0.0.7)", messageSupport
         .message("Connected to %{a,inet:name} (%{a})")
@@ -64,9 +64,9 @@ final class InetAddressFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Format IPv6 address")
-  void testFormatIPv6() throws UnknownHostException
+  void formatIPv6() throws UnknownHostException
   {
-    val address = InetAddress.getByAddress("ip6",
+    var address = InetAddress.getByAddress("ip6",
         new byte[] { 0x20, 0x01, 0x0d, (byte)0xb8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 });
 
     assertEquals("2001:db8:0:0:0:0:0:1", messageSupport.message("%{a}").with("a", address).format());
@@ -75,9 +75,9 @@ final class InetAddressFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Unknown inet value delegates to the next formatter")
-  void testUnknownConfigValue() throws UnknownHostException
+  void unknownConfigValue() throws UnknownHostException
   {
-    val address = InetAddress.getByAddress("db01", new byte[] { 10, 0, 0, 7 });
+    var address = InetAddress.getByAddress("db01", new byte[] { 10, 0, 0, 7 });
 
     assertEquals(address.toString(), messageSupport.message("%{a,inet:unknown}").with("a", address).format());
   }

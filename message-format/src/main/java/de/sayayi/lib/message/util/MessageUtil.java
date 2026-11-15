@@ -650,20 +650,20 @@ public final class MessageUtil
 
 
   /**
-   * Serializes a message into the format string representation. If the message is a simple
-   * {@link TextMessage} whose text is a valid {@linkplain #isName(String) name}, is not a keyword and
-   * {@code forceQuoted} is {@code false}, the text is serialized without quotes. Otherwise,
-   * the message is wrapped in quotes and serialized using the message's own serialization logic.
+   * Serializes a message into the format string representation. If the message is a simple {@link TextMessage} whose
+   * text is a valid {@linkplain #isName(String) name}, is not a keyword and {@code forceQuoted} is {@code false}, the
+   * text is serialized without quotes. Otherwise, the message is wrapped in quotes and serialized using the message's
+   * own serialization logic.
    * <p>
-   * The quote character is automatically chosen to prevent or reduce unnecessary escape sequences in the
-   * resulting format string: if any text part contains a single quote ({@code '}), a double quote
-   * ({@code "}) is used; otherwise a single quote is used.
+   * The quote character is automatically chosen to prevent or reduce unnecessary escape sequences in the resulting
+   * format string: if the text parts of the message contain more single quotes ({@code '}) than double quotes
+   * ({@code "}), a double quote is used as the wrapper; otherwise a single quote is used.
    *
-   * @param context      the serialization context providing charset encoding, text joiner and
-   *                     string quoting information, not {@code null}
+   * @param context      the serialization context providing charset encoding, text joiner and string quoting
+   *                     information, not {@code null}
    * @param message      the message to serialize, not {@code null}
-   * @param forceQuoted  if {@code true}, the message is always serialized as a quoted string;
-   *                     if {@code false}, simple name-like text messages may be unquoted
+   * @param forceQuoted  if {@code true}, the message is always serialized as a quoted string; if {@code false}, simple
+   *                     name-like text messages may be unquoted
    *
    * @see #serializeString(Context, String)
    * @see #serializeQuotedString(Context, String)
@@ -761,9 +761,10 @@ public final class MessageUtil
   {
     requireNonNull(packStream, "packStream must not be null");
 
-    final var packHelper = new PackSupport(messageFactory);
-
     try(packStream; var dataStream = new PackInputStream(PACK_CONFIG, packStream)) {
+      // created inside the try block, so packStream is closed even if messageFactory is null
+      final var packHelper = new PackSupport(messageFactory);
+
       if (dataStream.getVersion().isEmpty())
         throw new StreamCorruptedException("pack stream has no version");
 

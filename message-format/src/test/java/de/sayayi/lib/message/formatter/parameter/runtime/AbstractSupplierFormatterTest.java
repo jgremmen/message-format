@@ -70,14 +70,14 @@ abstract class AbstractSupplierFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Formattable types")
-  void testFormattableTypes() {
+  void formattableTypes() {
     assertFormatterForType(createFormatter(), getFormattableType());
   }
 
 
   @Test
   @DisplayName("Null is formatted as null text")
-  void testFormatNull() {
+  void formatNull() {
     assertEquals(nullText(), format(createMessageAccessor(getLocale(), createFormatter()), null));
   }
 
@@ -85,7 +85,7 @@ abstract class AbstractSupplierFormatterTest extends AbstractFormatterTest
   @ParameterizedTest(name = "-> {1}")
   @DisplayName("Held value is formatted")
   @MethodSource("formattedValues")
-  void testFormat(Object value, Text expected) {
+  void formatHeldValue(Object value, Text expected) {
     assertEquals(expected, format(createMessageAccessor(getLocale(), createFormatter()), value));
   }
 }

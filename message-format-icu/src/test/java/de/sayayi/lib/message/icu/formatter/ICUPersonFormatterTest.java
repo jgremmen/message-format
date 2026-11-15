@@ -19,7 +19,6 @@ import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import lombok.val;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -50,7 +49,7 @@ final class ICUPersonFormatterTest extends AbstractFormatterTest
   @BeforeAll
   static void init()
   {
-    val formatterService = new GenericFormatterService();
+    var formatterService = new GenericFormatterService();
     formatterService.addFormatter(new ICUPersonFormatter());
 
     messageSupport = MessageSupportFactory
@@ -116,10 +115,10 @@ final class ICUPersonFormatterTest extends AbstractFormatterTest
   @ParameterizedTest(name = "{0}")
   @DisplayName("Person names are formatted according to the configuration")
   @MethodSource("personNames")
-  void testPersonName(@SuppressWarnings("unused") String name, String configuration, Map<String,String> names,
+  void personName(@SuppressWarnings("unused") String name, String configuration, Map<String,String> names,
                       String expected)
   {
-    val msg = messageSupport.message("%{unused,format:icu-person" + configuration + "}");
+    var msg = messageSupport.message("%{unused,format:icu-person" + configuration + "}");
 
     names.forEach(msg::with);
 
@@ -129,9 +128,9 @@ final class ICUPersonFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Null given and family name returns null text")
-  void testNullNames()
+  void nullNames()
   {
-    val msg = messageSupport
+    var msg = messageSupport
         .message("%{unused,format:icu-person,null:'unknown'}")
         .with("given-name", null)
         .with("family-name", null);

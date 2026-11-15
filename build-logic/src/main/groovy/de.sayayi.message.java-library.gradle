@@ -36,20 +36,13 @@ configurations.named('compileOnly') {
 }
 
 
-configurations.named('testAnnotationProcessor') {
-  extendsFrom configurations.annotationProcessor
-}
-
-
 configurations.named('testCompileOnly') {
-  extendsFrom configurations.compileOnly, configurations.testAnnotationProcessor
+  extendsFrom configurations.compileOnly
 }
 
 
 dependencies {
   compileOnly libs.jetbrains.annotations
-
-  testAnnotationProcessor libs.lombok
 
   testImplementation libs.bundles.mockito.test
   testImplementation libs.junit.jupiter.api

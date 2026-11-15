@@ -55,7 +55,7 @@ final class MatchResultFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Formattable types")
-  void testFormattableTypes() {
+  void formattableTypes() {
     assertFormatterForType(new MatchResultFormatter(), Matcher.class);
   }
 
@@ -76,7 +76,7 @@ final class MatchResultFormatterTest extends AbstractFormatterTest
   @ParameterizedTest(name = "{0} -> {1}")
   @DisplayName("Formats a group selected by number")
   @MethodSource("groupNumbers")
-  void testFormatGroupNumber(@Language("MessageFormat") String formatString, String expected)
+  void formatGroupNumber(@Language("MessageFormat") String formatString, String expected)
   {
     final var matcher = VERSION_PATTERN.matcher("v5.12");
 
@@ -103,7 +103,7 @@ final class MatchResultFormatterTest extends AbstractFormatterTest
   @ParameterizedTest(name = "{0} -> {1}")
   @DisplayName("Formats a group selected by name")
   @MethodSource("groupNames")
-  void testFormatGroupName(@Language("MessageFormat") String formatString, String expected)
+  void formatGroupName(@Language("MessageFormat") String formatString, String expected)
   {
     final var matcher = VERSION_PATTERN.matcher("v5.12");
 
@@ -118,7 +118,7 @@ final class MatchResultFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Formats the whole match by default")
-  void testFormat()
+  void formatWholeMatchByDefault()
   {
     final var matcher = VERSION_PATTERN.matcher("v4.999");
 

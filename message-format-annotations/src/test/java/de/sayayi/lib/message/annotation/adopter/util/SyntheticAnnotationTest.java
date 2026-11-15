@@ -16,7 +16,6 @@
 package de.sayayi.lib.message.annotation.adopter.util;
 
 import de.sayayi.lib.message.annotation.Text;
-import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -41,10 +40,10 @@ final class SyntheticAnnotationTest
 {
   @Test
   @DisplayName("Synthetic text equals any text annotation with equal members")
-  void testText()
+  void syntheticTextEqualsTextAnnotation()
   {
-    val text = new SyntheticText("de", "Hallo", null);
-    val other = new Text() {
+    var text = new SyntheticText("de", "Hallo", null);
+    var other = new Text() {
       @Override public String locale() { return "de"; }
       @Override public String text() { return "Hallo"; }
       @Override public String value() { return ""; }
@@ -65,7 +64,7 @@ final class SyntheticAnnotationTest
 
   @Test
   @DisplayName("Synthetic message definitions compare texts element-wise")
-  void testMessageDef()
+  void messageDef()
   {
     assertEqualsContract(
         new SyntheticMessageDef("MSG", "", new Text[] { new SyntheticText("de", "Hallo", null) }),
@@ -77,7 +76,7 @@ final class SyntheticAnnotationTest
 
   @Test
   @DisplayName("Synthetic template definitions compare texts element-wise")
-  void testTemplateDef()
+  void templateDef()
   {
     assertEqualsContract(
         new SyntheticTemplateDef("tpl", "", new Text[] { new SyntheticText("de", "Hallo", null) }),
@@ -88,11 +87,11 @@ final class SyntheticAnnotationTest
 
   @Test
   @DisplayName("Texts of synthetic definitions cannot be modified")
-  void testTextsImmutable()
+  void textsImmutable()
   {
-    val texts = new Text[] { new SyntheticText("de", "Hallo", null) };
-    val messageDef = new SyntheticMessageDef("MSG", "", texts);
-    val templateDef = new SyntheticTemplateDef("tpl", "", texts);
+    var texts = new Text[] { new SyntheticText("de", "Hallo", null) };
+    var messageDef = new SyntheticMessageDef("MSG", "", texts);
+    var templateDef = new SyntheticTemplateDef("tpl", "", texts);
 
     texts[0] = new SyntheticText("en", "Hello", null);
     assertEquals("de", messageDef.texts()[0].locale());

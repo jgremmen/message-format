@@ -73,14 +73,14 @@ final class TokenFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Formattable type is Token")
-  void testFormattableType() {
+  void formattableType() {
     assertFormatterForType(new TokenFormatter(), Token.class);
   }
 
 
   @Test
   @DisplayName("Format token text (default)")
-  void testFormatText()
+  void formatText()
   {
     assertEquals("4", messageSupport.message("%{t}").with("t", token).format());
     assertEquals("4", messageSupport.message("%{t,token:'text'}").with("t", token).format());
@@ -89,7 +89,7 @@ final class TokenFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Format token type")
-  void testFormatType()
+  void formatType()
   {
     assertEquals(
         Integer.toString(CalculatorParser.NUMBER),
@@ -102,7 +102,7 @@ final class TokenFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Format token channel")
-  void testFormatChannel()
+  void formatChannel()
   {
     assertEquals(
         Integer.toString(CalculatorLexer.DEFAULT_TOKEN_CHANNEL),
@@ -115,7 +115,7 @@ final class TokenFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Format token line")
-  void testFormatLine()
+  void formatLine()
   {
     assertEquals(
         "1",
@@ -128,7 +128,7 @@ final class TokenFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Format token column")
-  void testFormatColumn()
+  void formatColumn()
   {
     assertEquals(
         "2",
@@ -141,7 +141,7 @@ final class TokenFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Format token position (line:column)")
-  void testFormatPosition()
+  void formatPosition()
   {
     assertEquals(
         "1:2",
@@ -154,7 +154,7 @@ final class TokenFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Format token position without column (line)")
-  void testFormatPositionNoColumn()
+  void formatPositionNoColumn()
   {
     assertEquals(
         "5",
@@ -167,7 +167,7 @@ final class TokenFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Format token with invalid token config returns null text")
-  void testFormatInvalidConfig()
+  void formatInvalidConfig()
   {
     assertEquals(
         "",
@@ -186,7 +186,7 @@ final class TokenFormatterTest extends AbstractFormatterTest
   {
     @Test
     @DisplayName("Token at start of expression has column 0")
-    void testTokenAtStart()
+    void tokenAtStart()
     {
       // "/" is an invalid start token at column 0
       var calculator = new CalculatorTestParser(messageSupport);
@@ -200,7 +200,7 @@ final class TokenFormatterTest extends AbstractFormatterTest
 
     @Test
     @DisplayName("Token with adjusted 1st-column")
-    void testAdjustedColumn()
+    void adjustedColumn()
     {
       assertEquals("3", messageSupport
           .message("%{t,token:'column',token-1st-column:1}").with("t", token).format());
@@ -209,7 +209,7 @@ final class TokenFormatterTest extends AbstractFormatterTest
 
     @Test
     @DisplayName("Token with adjusted 1st-line")
-    void testAdjustedLine()
+    void adjustedLine()
     {
       assertEquals("5", messageSupport
           .message("%{t,token:'line',token-1st-line:5}").with("t", token).format());
@@ -218,7 +218,7 @@ final class TokenFormatterTest extends AbstractFormatterTest
 
     @Test
     @DisplayName("Custom position format with line only")
-    void testCustomPositionFormatLineOnly()
+    void customPositionFormatLineOnly()
     {
       assertEquals("line 42", messageSupport
           .message("%{t,token:position,token-position-format:'line %{line}'}")
@@ -228,7 +228,7 @@ final class TokenFormatterTest extends AbstractFormatterTest
 
     @Test
     @DisplayName("Custom position format with line and column")
-    void testCustomPositionFormat()
+    void customPositionFormat()
     {
       assertEquals("(3, 12)", messageSupport
           .message("%{t,token:position,token-position-format:'(%{line}, %{column})'}")
@@ -238,7 +238,7 @@ final class TokenFormatterTest extends AbstractFormatterTest
 
     @Test
     @DisplayName("Custom position format when token has no column")
-    void testCustomPositionFormatNoColumn()
+    void customPositionFormatNoColumn()
     {
       assertEquals("(5, )", messageSupport
           .message("%{t,token:position,token-position-format:'(%{line}, %{column})'}")
@@ -248,7 +248,7 @@ final class TokenFormatterTest extends AbstractFormatterTest
 
     @Test
     @DisplayName("Custom position format with no line yields empty")
-    void testCustomPositionFormatNoLine()
+    void customPositionFormatNoLine()
     {
       assertEquals("", messageSupport
           .message("%{t,token:position,token-position-format:'%{line}-%{column}'}")
@@ -258,7 +258,7 @@ final class TokenFormatterTest extends AbstractFormatterTest
 
     @Test
     @DisplayName("Custom position format with adjusted 1st-line and 1st-column")
-    void testCustomPositionFormatAdjusted()
+    void customPositionFormatAdjusted()
     {
       assertEquals("0/1", messageSupport
           .message("%{t,token:'position',token-position-format:'%{line}/%{column}',token-1st-line:0,token-1st-column:1}")

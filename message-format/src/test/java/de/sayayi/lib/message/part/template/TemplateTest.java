@@ -19,8 +19,8 @@ import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
-import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -36,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Jeroen Gremmen
  * @since 0.8.3
  */
+@DisplayName("Template")
 public class TemplateTest
 {
   private MessageSupport messageSupport;
@@ -44,8 +45,8 @@ public class TemplateTest
   @BeforeEach
   void init()
   {
-    val messageFactory = MessageFactory.getSharedInstance();
-    val configurableMessageSupport = MessageSupportFactory
+    var messageFactory = MessageFactory.getSharedInstance();
+    var configurableMessageSupport = MessageSupportFactory
         .create(DefaultFormatterService.getSharedInstance(), messageFactory)
         .setLocale(GERMANY);
 
@@ -60,7 +61,8 @@ public class TemplateTest
 
 
   @Test
-  void testSingularPlural()
+  @DisplayName("Template default and delegated parameters select the singular or plural form")
+  void singularPlural()
   {
     // akkusativ singular
     assertEquals("Ich gebe dem Mann das Buch", messageSupport

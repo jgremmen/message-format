@@ -15,7 +15,6 @@
  */
 package de.sayayi.lib.message.util;
 
-import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -78,15 +77,15 @@ public final class ConcurrentTestSupport
    */
   public static <T> @NotNull List<T> getConcurrently(int threads, @NotNull ThreadFunction<T> task) throws Exception
   {
-    val executor = newFixedThreadPool(threads);
+    var executor = newFixedThreadPool(threads);
 
     try {
-      val start = new CountDownLatch(1);
-      val futures = new ArrayList<Future<T>>(threads);
+      var start = new CountDownLatch(1);
+      var futures = new ArrayList<Future<T>>(threads);
 
       for(var t = 0; t < threads; t++)
       {
-        val thread = t;
+        var thread = t;
 
         futures.add(executor.submit(() -> {
           start.await();
@@ -96,8 +95,8 @@ public final class ConcurrentTestSupport
 
       start.countDown();
 
-      val results = new ArrayList<T>(threads);
-      for(val future: futures)
+      var results = new ArrayList<T>(threads);
+      for(var future: futures)
         results.add(get(future));
 
       return results;
@@ -121,17 +120,17 @@ public final class ConcurrentTestSupport
   public static void runWithReaders(int writers, @NotNull ThreadTask writer, int readers, @NotNull ThreadTask reader)
       throws Exception
   {
-    val executor = newFixedThreadPool(writers + readers);
-    val writing = new AtomicBoolean(true);
+    var executor = newFixedThreadPool(writers + readers);
+    var writing = new AtomicBoolean(true);
 
     try {
-      val start = new CountDownLatch(1);
-      val writerFutures = new ArrayList<Future<?>>(writers);
-      val readerFutures = new ArrayList<Future<?>>(readers);
+      var start = new CountDownLatch(1);
+      var writerFutures = new ArrayList<Future<?>>(writers);
+      var readerFutures = new ArrayList<Future<?>>(readers);
 
       for(var t = 0; t < writers; t++)
       {
-        val thread = t;
+        var thread = t;
 
         writerFutures.add(executor.submit(() -> {
           start.await();
@@ -142,7 +141,7 @@ public final class ConcurrentTestSupport
 
       for(var t = 0; t < readers; t++)
       {
-        val thread = t;
+        var thread = t;
 
         readerFutures.add(executor.submit(() -> {
           start.await();
@@ -158,13 +157,13 @@ public final class ConcurrentTestSupport
       start.countDown();
 
       try {
-        for(val future: writerFutures)
+        for(var future: writerFutures)
           get(future);
       } finally {
         writing.set(false);
       }
 
-      for(val future: readerFutures)
+      for(var future: readerFutures)
         get(future);
     } finally {
       shutdown(executor);
@@ -185,7 +184,7 @@ public final class ConcurrentTestSupport
       throws Exception
   {
     runConcurrently(threads, thread -> {
-      val random = ThreadLocalRandom.current();
+      var random = ThreadLocalRandom.current();
 
       for(var iteration = 0; iteration < iterations; iteration++)
         operations[random.nextInt(operations.length)].run(thread, iteration);

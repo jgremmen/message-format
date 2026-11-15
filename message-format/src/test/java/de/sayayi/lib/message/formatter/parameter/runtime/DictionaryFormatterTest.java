@@ -18,7 +18,6 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.formatter.parameter.named.StringFormatter;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -53,20 +52,20 @@ final class DictionaryFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Formattable types")
-  void testFormattableTypes() {
+  void formattableTypes() {
     assertFormatterForType(new DictionaryFormatter(), Dictionary.class);
   }
 
 
   @Test
   @DisplayName("Hashtable without key config formats entries")
-  void testHashtableEntries()
+  void hashtableEntries()
   {
-    val ht = new Hashtable<String,String>();
+    var ht = new Hashtable<String,String>();
     ht.put("color", "red");
     ht.put("shape", "circle");
 
-    val result = messageSupport
+    var result = messageSupport
         .message("%{ht}")
         .with("ht", ht)
         .format();
@@ -82,9 +81,9 @@ final class DictionaryFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Hashtable with key config returns value")
-  void testHashtableKeyLookup()
+  void hashtableKeyLookup()
   {
-    val ht = new Hashtable<String,String>();
+    var ht = new Hashtable<String,String>();
     ht.put("color", "red");
     ht.put("shape", "circle");
 
@@ -105,9 +104,9 @@ final class DictionaryFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Hashtable with missing key returns empty")
-  void testHashtableMissingKey()
+  void hashtableMissingKey()
   {
-    val ht = new Hashtable<String,String>();
+    var ht = new Hashtable<String,String>();
     ht.put("color", "red");
 
     assertEquals(
@@ -121,13 +120,13 @@ final class DictionaryFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Properties without key config formats entries")
-  void testPropertiesEntries()
+  void propertiesEntries()
   {
-    val props = new Properties();
+    var props = new Properties();
     props.setProperty("host", "localhost");
     props.setProperty("port", "8080");
 
-    val result = messageSupport
+    var result = messageSupport
         .message("%{p}")
         .with("p", props)
         .format();
@@ -143,9 +142,9 @@ final class DictionaryFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Properties with key config returns value")
-  void testPropertiesKeyLookup()
+  void propertiesKeyLookup()
   {
-    val props = new Properties();
+    var props = new Properties();
     props.setProperty("host", "localhost");
     props.setProperty("port", "8080");
 
@@ -166,7 +165,7 @@ final class DictionaryFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Custom Dictionary without key config uses toString")
-  void testCustomDictionaryNoKey()
+  void customDictionaryNoKey()
   {
     assertEquals(
         "MyDictionary",
@@ -179,7 +178,7 @@ final class DictionaryFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Custom Dictionary with key config returns value")
-  void testCustomDictionaryKeyLookup()
+  void customDictionaryKeyLookup()
   {
     assertEquals(
         "apple",
@@ -198,7 +197,7 @@ final class DictionaryFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Custom Dictionary with missing key returns empty")
-  void testCustomDictionaryMissingKey()
+  void customDictionaryMissingKey()
   {
     assertEquals(
         "",

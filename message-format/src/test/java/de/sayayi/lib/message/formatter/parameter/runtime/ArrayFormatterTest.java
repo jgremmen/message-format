@@ -25,7 +25,6 @@ import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueMessage;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.TypedValue;
-import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -52,29 +51,29 @@ final class ArrayFormatterTest extends AbstractFormatterTest
 {
   @Test
   @DisplayName("Formattable types")
-  void testFormattableTypes() {
+  void formattableTypes() {
     assertFormatterForType(new ArrayFormatter(), Object[].class);
   }
 
 
   @Test
   @DisplayName("Native boolean array")
-  void testBooleanArray()
+  void booleanArray()
   {
-    val formatterService = createFormatterService(new ArrayFormatter(), new BoolFormatter());
-    val messageAccessor = MessageSupportFactory
+    var formatterService = createFormatterService(new ArrayFormatter(), new BoolFormatter());
+    var messageAccessor = MessageSupportFactory
         .create(formatterService)
         .setLocale("de-DE")
         .getMessageAccessor();
-    val messageFactory = messageAccessor.getMessageFactory();
+    var messageFactory = messageAccessor.getMessageFactory();
 
-    val map = Map.<String,TypedValue<?>>of(
+    var map = Map.<String,TypedValue<?>>of(
         "list-value", new TypedValueMessage(messageFactory.parseMessage("%{value,true:wahr,false:falsch}")));
 
     assertEquals(new TextPart("wahr, falsch, wahr"),
         format(messageAccessor, new boolean[] { true, false, true }, map, Map.of()));
 
-    val booleanMap = Map.<String,TypedValue<?>>of(
+    var booleanMap = Map.<String,TypedValue<?>>of(
         "list-value", new TypedValueMessage(messageFactory.parseMessage("%{value,true:YES,false:NO}")));
 
     assertEquals(new TextPart("NO, YES"),
@@ -116,14 +115,14 @@ final class ArrayFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Native int array")
-  void testIntegerArray()
+  void integerArray()
   {
-    val formatterService = createFormatterService(new ArrayFormatter());
-    val messageAccessor = MessageSupportFactory
+    var formatterService = createFormatterService(new ArrayFormatter());
+    var messageAccessor = MessageSupportFactory
         .create(formatterService)
         .setLocale("de-DE")
         .getMessageAccessor();
-    val messageFactory = messageAccessor.getMessageFactory();
+    var messageFactory = messageAccessor.getMessageFactory();
 
     assertEquals(new TextPart("12, -7, 99"), format(messageAccessor, new int[] { 12, -7, 99 }));
     assertEquals(new TextPart("1, -7, 248"), format(messageAccessor, new int[] { 1, -7, 248 }, "number", "##00"));
@@ -171,19 +170,19 @@ final class ArrayFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Object array")
-  void testObjectArray()
+  void objectArray()
   {
-    val registry = createFormatterService(
+    var registry = createFormatterService(
         new ArrayFormatter(),
         new BoolFormatter(),
         new NumberFormatter());
-    val messageAccessor = MessageSupportFactory
+    var messageAccessor = MessageSupportFactory
         .create(registry)
         .setLocale("de-DE")
         .getMessageAccessor();
-    val messageFactory = messageAccessor.getMessageFactory();
+    var messageFactory = messageAccessor.getMessageFactory();
 
-    val map = Map.<String,TypedValue<?>>of(
+    var map = Map.<String,TypedValue<?>>of(
         "list-value",
         new TypedValueMessage(messageFactory.parseMessage("%{value,number:'0000',true:wahr,false:falsch}")));
 

@@ -47,9 +47,10 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 @DisplayName("Message/template parse exception")
 @TestMethodOrder(OrderAnnotation.class)
+@SuppressWarnings("SpellCheckingInspection")
 final class MessageParserExceptionTest
 {
-  private static Stream<Arguments> testGetMessage_parameters()
+  static Stream<Arguments> directlyConstructedExceptionMessages()
   {
     return Stream.of(
         Arguments.of(null, null, null, null,
@@ -88,9 +89,9 @@ final class MessageParserExceptionTest
 
   @DisplayName("Detailed exception messages (directly constructed)")
   @ParameterizedTest(name = "msg: {5}")
-  @MethodSource("testGetMessage_parameters")
+  @MethodSource("directlyConstructedExceptionMessages")
   @Order(1)
-  void testGetMessage(String code, String template, Locale locale, Type type, @NotNull String msg,
+  void getMessage(String code, String template, Locale locale, Type type, @NotNull String msg,
                       @SuppressWarnings("unused") @NotNull String displayText)
   {
     var ex = new MessageParserException("ERROR", "SYNTAX", new IllegalArgumentException());
@@ -114,7 +115,7 @@ final class MessageParserExceptionTest
   @Test
   @DisplayName("Exclude generated code from detailed exception message")
   @Order(3)
-  void testGeneratedMessageCode()
+  void generatedMessageCode()
   {
     assertEquals("failed to parse message for locale Dutch (Netherlands): ERROR\nSYNTAX",
         new MessageParserException("ERROR", "SYNTAX", null)
@@ -127,7 +128,7 @@ final class MessageParserExceptionTest
   @Test
   @DisplayName("Exclude generated template name from detailed exception message")
   @Order(4)
-  void testGeneratedTemplateName()
+  void generatedTemplateName()
   {
     assertEquals("failed to parse template for locale Dutch (Netherlands): ERROR\nSYNTAX",
         new MessageParserException("ERROR", "SYNTAX", null)
@@ -137,7 +138,7 @@ final class MessageParserExceptionTest
   }
 
 
-  private static Stream<Arguments> testParseFailure_parameters()
+  static Stream<Arguments> parserExceptionMessages()
   {
     return Stream.of(
         Arguments.of(null, null, MESSAGE, "%{@var",
@@ -158,9 +159,9 @@ final class MessageParserExceptionTest
 
   @DisplayName("Detailed exception messages (thrown by parser)")
   @ParameterizedTest(name = "parse: {4}")
-  @MethodSource("testParseFailure_parameters")
+  @MethodSource("parserExceptionMessages")
   @Order(2)
-  void testParseFailure(String code, Locale locale, @NotNull Type type,
+  void parseFailure(String code, Locale locale, @NotNull Type type,
                         @Language("MessageFormat") @NotNull String parseString, @NotNull String msg)
   {
     final var n =
@@ -202,7 +203,7 @@ final class MessageParserExceptionTest
   @Test
   @DisplayName("with...: copies keep the original stack trace, cause and suppressed exceptions")
   @Order(5)
-  void testWithKeepsStackTrace()
+  void withKeepsStackTrace()
   {
     final var cause = new IllegalStateException("cause");
     final var suppressed = new IllegalArgumentException("suppressed");

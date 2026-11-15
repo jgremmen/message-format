@@ -17,7 +17,6 @@ package de.sayayi.plugin.gradle.message;
 
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.MessageSupportFactory;
-import lombok.val;
 import org.gradle.testkit.runner.BuildResult;
 import org.gradle.testkit.runner.GradleRunner;
 import org.jetbrains.annotations.Contract;
@@ -98,13 +97,13 @@ final class PluginTest
 
   @Test
   @DisplayName("Pack task without sources")
-  void testNoSources() throws IOException
+  void noSources() throws IOException
   {
-    val result = runner("messageFormatPack")
+    var result = runner("messageFormatPack")
         .withDebug(true)
         .build();
 
-    val pack = assertPackTaskSucceeded(result);
+    var pack = assertPackTaskSucceeded(result);
 
     assertEquals(Set.of(), pack.getMessageCodes());
     assertEquals(Set.of(), pack.getTemplateNames());
@@ -113,16 +112,16 @@ final class PluginTest
 
   @Test
   @DisplayName("Pack task with a single class")
-  void testWithSource() throws IOException
+  void withSource() throws IOException
   {
     copy(getResource("test-source-1.java"),
         new File(testPackageDir, "Source1.java").toPath());
 
-    val result = runner("messageFormatPack")
+    var result = runner("messageFormatPack")
         .withDebug(true)
         .build();
 
-    val pack = assertPackTaskSucceeded(result);
+    var pack = assertPackTaskSucceeded(result);
 
     assertEquals(4, pack.getMessageCodes().size());
     assertEquals(Set.of(), pack.getTemplateNames());
@@ -131,7 +130,7 @@ final class PluginTest
 
   @Test
   @DisplayName("Pack task with filtered message codes")
-  void testWithFilteredSource() throws IOException
+  void withFilteredSource() throws IOException
   {
     writeBuildGradle(List.of(
         "messageFormat {",
@@ -144,11 +143,11 @@ final class PluginTest
     copy(getResource("test-source-1.java"),
         new File(testPackageDir, "Source1.java").toPath());
 
-    val result = runner("messageFormatPack")
+    var result = runner("messageFormatPack")
         .withDebug(true)
         .build();
 
-    val pack = assertPackTaskSucceeded(result);
+    var pack = assertPackTaskSucceeded(result);
 
     assertEquals(Set.of("MSG-INNER1"), pack.getMessageCodes());
     assertEquals(Set.of(), pack.getTemplateNames());
@@ -157,7 +156,7 @@ final class PluginTest
 
   @Test
   @DisplayName("Pack task with filtered message codes configured after task realization")
-  void testWithFilteredSourceAfterRealization() throws IOException
+  void withFilteredSourceAfterRealization() throws IOException
   {
     writeBuildGradle(List.of(
         "jar {",
@@ -175,11 +174,11 @@ final class PluginTest
     copy(getResource("test-source-1.java"),
         new File(testPackageDir, "Source1.java").toPath());
 
-    val result = runner("messageFormatPack")
+    var result = runner("messageFormatPack")
         .withDebug(true)
         .build();
 
-    val pack = assertPackTaskSucceeded(result);
+    var pack = assertPackTaskSucceeded(result);
 
     assertEquals(Set.of("MSG-INNER1"), pack.getMessageCodes());
     assertEquals(Set.of(), pack.getTemplateNames());
@@ -188,7 +187,7 @@ final class PluginTest
 
   @Test
   @DisplayName("Pack task with message code filters from extension and task")
-  void testWithFilteredSourceFromExtensionAndTask() throws IOException
+  void withFilteredSourceFromExtensionAndTask() throws IOException
   {
     writeBuildGradle(List.of(
         "messageFormatPack {",
@@ -206,18 +205,18 @@ final class PluginTest
     copy(getResource("test-source-1.java"),
         new File(testPackageDir, "Source1.java").toPath());
 
-    val result = runner("messageFormatPack")
+    var result = runner("messageFormatPack")
         .withDebug(true)
         .build();
 
-    val pack = assertPackTaskSucceeded(result);
+    var pack = assertPackTaskSucceeded(result);
 
     assertEquals(Set.of("MSG1", "MSG-INNER1"), pack.getMessageCodes());
     assertEquals(Set.of(), pack.getTemplateNames());
   }
 
 
-  private static Stream<Arguments> testDuplicateMessage_parameters()
+  static Stream<Arguments> duplicateStrategyOutcomes()
   {
     return Stream.of(
         Arguments.of("ignore", true),
@@ -231,8 +230,8 @@ final class PluginTest
 
   @DisplayName("Pack task with duplicate strategy")
   @ParameterizedTest(name = "Strategy: {0}")
-  @MethodSource("testDuplicateMessage_parameters")
-  void testDuplicateMessage(@NotNull String duplicateMsgStrategy, boolean success)
+  @MethodSource("duplicateStrategyOutcomes")
+  void duplicateMessage(@NotNull String duplicateMsgStrategy, boolean success)
       throws IOException
   {
     writeBuildGradle(List.of("messageFormat.messages.duplicateStrategy = '" + duplicateMsgStrategy + "'"));
@@ -242,9 +241,9 @@ final class PluginTest
     copy(getResource("test-source-2.java"),
         new File(testPackageDir, "Source2.java").toPath());
 
-    val runner = runner("messageFormatPack")
+    var runner = runner("messageFormatPack")
         .withDebug(true);
-    val result = success
+    var result = success
         ? runner.build()
         : runner.buildAndFail();
 
@@ -255,7 +254,7 @@ final class PluginTest
 
   @Test
   @DisplayName("Plugin applied before the java plugin")
-  void testAppliedBeforeJavaPlugin() throws IOException
+  void appliedBeforeJavaPlugin() throws IOException
   {
     write(new File(testProjectDir, "build.gradle").toPath(), List.of(
         "plugins {",
@@ -270,7 +269,7 @@ final class PluginTest
     copy(getResource("test-source-1.java"),
         new File(testPackageDir, "Source1.java").toPath());
 
-    val result = runner("messageFormatPack")
+    var result = runner("messageFormatPack")
         .withDebug(true)
         .build();
 
@@ -280,7 +279,7 @@ final class PluginTest
 
   @Test
   @DisplayName("Equal duplicate strategies in different formats keep the pack task up-to-date")
-  void testDuplicateStrategyFormats() throws IOException
+  void duplicateStrategyFormats() throws IOException
   {
     copy(getResource("test-source-1.java"),
         new File(testPackageDir, "Source1.java").toPath());
@@ -290,7 +289,7 @@ final class PluginTest
     {
       writeBuildGradle(List.of("messageFormat.messages.duplicateStrategy = " + duplicateStrategy));
 
-      val result = runner("messageFormatPack").build();
+      var result = runner("messageFormatPack").build();
 
       assertEquals(duplicateStrategy.equals("'fail'") ? SUCCESS : UP_TO_DATE,
           requireNonNull(result.task(":messageFormatPack")).getOutcome(), duplicateStrategy);
@@ -300,11 +299,11 @@ final class PluginTest
 
   @Test
   @DisplayName("Unknown duplicate strategy")
-  void testUnknownDuplicateStrategy() throws IOException
+  void unknownDuplicateStrategy() throws IOException
   {
     writeBuildGradle(List.of("messageFormat.messages.duplicateStrategy = 'unknown'"));
 
-    val result = runner("messageFormatPack").buildAndFail();
+    var result = runner("messageFormatPack").buildAndFail();
 
     assertTrue(result.getOutput().contains("Unknown duplicates strategy: unknown"));
   }
@@ -312,14 +311,14 @@ final class PluginTest
 
   @Test
   @DisplayName("Invalid regular expression")
-  void testInvalidRegex() throws IOException
+  void invalidRegex() throws IOException
   {
     writeBuildGradle(List.of("messageFormat.messages.include '[invalid'"));
 
     copy(getResource("test-source-1.java"),
         new File(testPackageDir, "Source1.java").toPath());
 
-    val result = runner("messageFormatPack").buildAndFail();
+    var result = runner("messageFormatPack").buildAndFail();
 
     assertTrue(result.getOutput().contains("Invalid include regular expression '[invalid'"));
   }
@@ -327,7 +326,7 @@ final class PluginTest
 
   @Test
   @DisplayName("Pack task with custom action is neither up-to-date nor loaded from the build cache")
-  void testActionAlwaysRuns() throws IOException
+  void actionAlwaysRuns() throws IOException
   {
     writeBuildGradle(List.of(
         "messageFormatPack {",
@@ -344,7 +343,7 @@ final class PluginTest
         List.of("messageFormatPack", "--build-cache"),
         List.of("clean", "messageFormatPack", "--build-cache")))
     {
-      val result = runner(arguments.toArray(String[]::new)).build();
+      var result = runner(arguments.toArray(String[]::new)).build();
 
       assertEquals(SUCCESS, requireNonNull(result.task(":messageFormatPack")).getOutcome(), arguments.toString());
       assertTrue(result.getOutput().contains("Scanned message codes: 4"), arguments.toString());
@@ -354,7 +353,7 @@ final class PluginTest
 
   @Test
   @DisplayName("Pack task without custom action is loaded from the build cache")
-  void testNoActionFromCache() throws IOException
+  void noActionFromCache() throws IOException
   {
     copy(
         getResource("test-source-1.java"),
@@ -377,7 +376,7 @@ final class PluginTest
 
   @Test
   @DisplayName("Jar task with messageFormatPack dependency")
-  void testJar() throws IOException
+  void jar() throws IOException
   {
     writeBuildGradle(List.of(
         "jar {",
@@ -392,7 +391,7 @@ final class PluginTest
     copy(getResource("test-source-2.java"),
         new File(testPackageDir, "Source2.java").toPath());
 
-    val result = runner("jar")
+    var result = runner("jar")
         .withDebug(true)
         .build();
 

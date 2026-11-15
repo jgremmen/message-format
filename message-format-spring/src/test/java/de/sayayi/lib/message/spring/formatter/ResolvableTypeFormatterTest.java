@@ -19,7 +19,6 @@ import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.formatter.parameter.runtime.TypeFormatter;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import lombok.val;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
@@ -61,16 +60,16 @@ final class ResolvableTypeFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Formattable types")
-  void testFormattableTypes() {
+  void formattableTypes() {
     assertFormatterForType(new ResolvableTypeFormatter(), ResolvableType.class);
   }
 
 
   @Test
   @DisplayName("Registered as service")
-  void testRegisteredAsService()
+  void registeredAsService()
   {
-    val formatters = new DefaultFormatterService().getFormatters(null, ResolvableType.class, null);
+    var formatters = new DefaultFormatterService().getFormatters(null, ResolvableType.class, null);
 
     assertInstanceOf(ResolvableTypeFormatter.class, formatters[0]);
   }
@@ -78,7 +77,7 @@ final class ResolvableTypeFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Class resolvable types are formatted as type")
-  void testClass()
+  void formatClassType()
   {
     assertEquals("String", messageSupport.message("%{t}").with("t", forClass(String.class)).format());
     assertEquals("long", messageSupport.message("%{t}").with("t", forClass(long.class)).format());
@@ -92,14 +91,14 @@ final class ResolvableTypeFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Generic type arguments are formatted")
-  void testGenericTypes() throws Exception
+  void genericTypes() throws Exception
   {
-    val mapType = forClassWithGenerics(Map.class, String.class, LocalDate.class);
+    var mapType = forClassWithGenerics(Map.class, String.class, LocalDate.class);
 
     assertEquals("Map<String, java.time.LocalDate>", messageSupport.message("%{t}").with("t", mapType).format());
     assertEquals("Map<String, LocalDate>", messageSupport.message("%{t,type:c}").with("t", mapType).format());
 
-    val fieldType = forField(Fixture.class.getDeclaredField("dates"));
+    var fieldType = forField(Fixture.class.getDeclaredField("dates"));
 
     assertEquals("List<Set<LocalDate>>", messageSupport.message("%{t,type:c}").with("t", fieldType).format());
   }
@@ -118,10 +117,10 @@ final class ResolvableTypeFormatterTest extends AbstractFormatterTest
       value    | -   | T
       value    | juv | <T extends CharSequence>
       """)
-  void testTypeConfig(String fieldName, String typeConfig, String expected) throws Exception
+  void formatWithTypeConfig(String fieldName, String typeConfig, String expected) throws Exception
   {
-    val resolvableType = forField(Fixture.class.getDeclaredField(fieldName));
-    val formatted = messageSupport
+    var resolvableType = forField(Fixture.class.getDeclaredField(fieldName));
+    var formatted = messageSupport
         .message(typeConfig == null ? "%{t}" : "%{t,type:'" + typeConfig + "'}")
         .with("t", resolvableType)
         .format();
@@ -136,10 +135,10 @@ final class ResolvableTypeFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Formatting is delegated to the type formatter")
-  void testDelegationToTypeFormatter() throws Exception
+  void delegationToTypeFormatter() throws Exception
   {
-    val resolvableType = forField(Fixture.class.getDeclaredField("map"));
-    val type = getType(resolvableType);
+    var resolvableType = forField(Fixture.class.getDeclaredField("map"));
+    var type = getType(resolvableType);
 
     // without type formatter, the underlying type is formatted by the default formatter
     assertEquals(type.toString(), createMessageSupport(new ResolvableTypeFormatter())
@@ -156,9 +155,9 @@ final class ResolvableTypeFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Type variables are formatted as declared")
-  void testTypeVariable() throws Exception
+  void typeVariable() throws Exception
   {
-    val fieldType = forField(Fixture.class.getDeclaredField("value"), StringFixture.class);
+    var fieldType = forField(Fixture.class.getDeclaredField("value"), StringFixture.class);
 
     assertEquals(String.class, fieldType.resolve());
     assertEquals("T", messageSupport.message("%{t}").with("t", fieldType).format());
@@ -167,7 +166,7 @@ final class ResolvableTypeFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("NONE is empty")
-  void testNone()
+  void none()
   {
     assertEquals("", messageSupport.message("%{t}").with("t", NONE).format());
     assertEquals("unknown", messageSupport.message("%{t,empty:'unknown'}").with("t", NONE).format());
@@ -180,7 +179,7 @@ final class ResolvableTypeFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Null is matched by the null key")
-  void testNull()
+  void nullMatchesNullKey()
   {
     assertEquals("unknown", messageSupport
         .message("%{t,null:'unknown'}")

@@ -17,7 +17,6 @@ package de.sayayi.lib.message.formatter.parameter.runtime.extra;
 
 import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import lombok.val;
 import org.intellij.lang.annotations.Language;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -53,7 +52,7 @@ final class NodeFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Formattable types")
-  void testFormattableTypes()
+  void formattableTypes()
   {
     assertFormatterForType(new NodeFormatter(), Element.class);
     assertFormatterForType(new NodeFormatter(), Attr.class);
@@ -62,12 +61,12 @@ final class NodeFormatterTest extends AbstractFormatterTest
 
   static Stream<Arguments> formattedNodes() throws Exception
   {
-    val document = DocumentBuilderFactory
+    var document = DocumentBuilderFactory
         .newInstance()
         .newDocumentBuilder()
         .parse(new InputSource(new StringReader(
             "<catalog><book id='1'/><book id='2'><title/></book></catalog>")));
-    val book = (Element)document
+    var book = (Element)document
         .getElementsByTagName("book")
         .item(1);
 
@@ -86,7 +85,7 @@ final class NodeFormatterTest extends AbstractFormatterTest
   @ParameterizedTest(name = "{0} -> {2}")
   @DisplayName("Format XPath of elements and attributes")
   @MethodSource("formattedNodes")
-  void testFormat(@Language("MessageFormat") String formatString, org.w3c.dom.Node node, String expected)
+  void formatXPath(@Language("MessageFormat") String formatString, org.w3c.dom.Node node, String expected)
   {
     assertEquals(
         expected,
@@ -99,10 +98,10 @@ final class NodeFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("XPath of a deeply nested element")
-  void testDeepPath() throws Exception
+  void deepPath() throws Exception
   {
-    val document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-    val path = new StringBuilder("/");
+    var document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+    var path = new StringBuilder("/");
     org.w3c.dom.Node node = document;
 
     // the XPath exceeds the initial capacity of the XPath builder

@@ -19,7 +19,6 @@ import de.sayayi.lib.message.FormatStringSerializer;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageBuilder;
 import de.sayayi.lib.message.MessageSupportFactory;
-import lombok.val;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
@@ -27,9 +26,14 @@ import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import static de.sayayi.lib.message.util.AssertionTestSupport.assertNullRejected;
 import static de.sayayi.lib.message.util.MessageUtil.*;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.Files.newOutputStream;
@@ -188,7 +192,7 @@ final class MessageUtilTest
       a\u202eb                         | false | false | false          | false
       a\u00adb                         | false | false | false          | false
       """)
-  void testNamePredicates(String name, boolean kebab, boolean camel, boolean kebabOrCamel, boolean isName)
+  void namePredicates(String name, boolean kebab, boolean camel, boolean kebabOrCamel, boolean isName)
   {
     assertAll(
         () -> assertEquals(kebab, isKebabCaseName(name), "isKebabCaseName"),
@@ -200,9 +204,9 @@ final class MessageUtilTest
 
   @Test
   @DisplayName("Detect message format pack files")
-  void testIsMessageFormatPack(@TempDir Path tempDir) throws IOException
+  void detectMessageFormatPackFiles(@TempDir Path tempDir) throws IOException
   {
-    val messageSupport = MessageSupportFactory.createDefault().addMessage("MSG", "Hello %{name}");
+    var messageSupport = MessageSupportFactory.createDefault().addMessage("MSG", "Hello %{name}");
 
     for(var compress: new boolean[] { true, false })
     {
@@ -224,6 +228,34 @@ final class MessageUtilTest
   }
 
 
+  @Test
+  @DisplayName("importMessages() rejects a null message factory and still closes the pack stream")
+  @SuppressWarnings("DataFlowIssue")
+  void importMessagesNullMessageFactory() throws IOException
+  {
+    var packBytes = new ByteArrayOutputStream();
+    MessageSupportFactory
+        .createDefault()
+        .addMessage("MSG", "Hello")
+        .exportMessages(packBytes);
+
+    var closed = new AtomicBoolean();
+    var packStream = new FilterInputStream(new ByteArrayInputStream(packBytes.toByteArray())) {
+      @Override
+      public void close() throws IOException
+      {
+        closed.set(true);
+        super.close();
+      }
+    };
+
+    assertNullRejected(
+        "messageFactory must not be null",
+        () -> importMessages(null, packStream, null, null));
+    assertTrue(closed.get());
+  }
+
+
 
 
   @Nested
@@ -232,7 +264,7 @@ final class MessageUtilTest
   {
     @Test
     @DisplayName("null and empty inputs")
-    void testNullAndEmpty()
+    void nullAndEmpty()
     {
       // null returns null
       //noinspection ConstantValue
@@ -251,7 +283,7 @@ final class MessageUtilTest
 
     @Test
     @DisplayName("returns same instance when unchanged")
-    void testSameInstance()
+    void sameInstance()
     {
       // no spaces at all → same instance
       var s = "hello";
@@ -271,7 +303,7 @@ final class MessageUtilTest
 
     @Test
     @DisplayName("trims leading and trailing spaces")
-    void testTrim()
+    void trim()
     {
       assertEquals("hello", trimAndNormalizeSpaces(" hello"));
       assertEquals("hello", trimAndNormalizeSpaces("hello "));
@@ -284,7 +316,7 @@ final class MessageUtilTest
 
     @Test
     @DisplayName("collapses consecutive spaces")
-    void testCollapse()
+    void collapse()
     {
       assertEquals("hello there", trimAndNormalizeSpaces("hello  there"));
       assertEquals("hello there", trimAndNormalizeSpaces("hello     there"));
@@ -295,7 +327,7 @@ final class MessageUtilTest
 
     @Test
     @DisplayName("trims and collapses combined")
-    void testTrimAndCollapse()
+    void trimAndCollapse()
     {
       assertEquals("hello there", trimAndNormalizeSpaces("  hello     there  "));
       assertEquals("a b c", trimAndNormalizeSpaces("   a   b   c   "));
@@ -305,7 +337,7 @@ final class MessageUtilTest
 
     @Test
     @DisplayName("unicode space characters")
-    void testUnicode()
+    void unicode()
     {
       // non-breaking space (U+00A0) is a SPACE_SEPARATOR
       assertEquals("hello there", trimAndNormalizeSpaces("hello\u00a0\u00a0there"));
@@ -319,7 +351,7 @@ final class MessageUtilTest
 
     @Test
     @DisplayName("single internal non-ASCII space character is normalized (no collapsing fast-path)")
-    void testSingleInternalNonAsciiSpaceChar()
+    void singleInternalNonAsciiSpaceChar()
     {
       // single internal NBSP, no adjacent spaces to collapse: same result length as input,
       // must still be normalized to a regular ASCII space rather than left untouched
@@ -338,7 +370,7 @@ final class MessageUtilTest
 
     @Test
     @DisplayName("preserves newlines")
-    void testPreservesNewlines()
+    void preservesNewlines()
     {
       assertEquals("hello\nthere", trimAndNormalizeSpaces("hello\nthere"));
       assertEquals("hello\nthere", trimAndNormalizeSpaces(" hello\nthere "));
@@ -349,7 +381,7 @@ final class MessageUtilTest
 
     @Test
     @DisplayName("single characters")
-    void testSingleCharacters()
+    void singleCharacters()
     {
       assertEquals("a", trimAndNormalizeSpaces("a"));
       assertEquals("a", trimAndNormalizeSpaces(" a "));
@@ -366,7 +398,7 @@ final class MessageUtilTest
   {
     @Test
     @DisplayName("force quoted regular text message with letters only")
-    void testRegularTextLettersOnlyForceQuoted()
+    void regularTextLettersOnlyForceQuoted()
     {
       final var message = MessageBuilder
           .create()
@@ -378,7 +410,7 @@ final class MessageUtilTest
 
     @Test
     @DisplayName("regular text message with letters only serializes unquoted")
-    void testRegularTextLettersOnly()
+    void regularTextLettersOnly()
     {
       final var message = MessageBuilder
           .create()
@@ -390,7 +422,7 @@ final class MessageUtilTest
 
     @Test
     @DisplayName("text message with single quotes uses double-quote wrapper")
-    void testTextWithSingleQuotes()
+    void textWithSingleQuotes()
     {
       final var message = MessageBuilder
           .create()
@@ -402,7 +434,7 @@ final class MessageUtilTest
 
     @Test
     @DisplayName("text message with double quotes uses single-quote wrapper")
-    void testTextWithDoubleQuotes()
+    void textWithDoubleQuotes()
     {
       final var message = MessageBuilder
           .create()
@@ -414,7 +446,7 @@ final class MessageUtilTest
 
     @Test
     @DisplayName("text message with more single quotes than double quotes uses double-quote wrapper")
-    void testTextWithMoreSingleQuotesThanDoubleQuotes()
+    void textWithMoreSingleQuotesThanDoubleQuotes()
     {
       final var message = MessageBuilder
           .create()
@@ -426,7 +458,7 @@ final class MessageUtilTest
 
     @Test
     @DisplayName("text message with more double quotes than single quotes uses single-quote wrapper")
-    void testTextWithMoreDoubleQuotesThanSingleQuotes()
+    void textWithMoreDoubleQuotesThanSingleQuotes()
     {
       final var message = MessageBuilder
           .create()
@@ -438,7 +470,7 @@ final class MessageUtilTest
 
     @Test
     @DisplayName("compound message with text part containing single quote after parameter uses double-quote wrapper")
-    void testCompoundMessageWithSingleQuoteAfterParameter()
+    void compoundMessageWithSingleQuoteAfterParameter()
     {
       final var message = MessageBuilder
           .create()

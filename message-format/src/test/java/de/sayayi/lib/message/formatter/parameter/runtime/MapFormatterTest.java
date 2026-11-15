@@ -17,7 +17,6 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.formatter.parameter.named.BoolFormatter;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import lombok.val;
 import org.intellij.lang.annotations.Language;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -51,16 +50,16 @@ final class MapFormatterTest extends AbstractFormatterTest
 {
   @Test
   @DisplayName("Formattable types")
-  void testFormattableTypes() {
+  void formattableTypes() {
     assertFormatterForType(new MapFormatter(), Map.class);
   }
 
 
   @Test
   @DisplayName("Key/value separator")
-  void testSeparator()
+  void separator()
   {
-    val message = createMessageSupport(UK, new MapFormatter(), new ArrayFormatter())
+    var message = createMessageSupport(UK, new MapFormatter(), new ArrayFormatter())
         .message("%{map1} %{map2,map-kv:'%{key}   -> %{value}'} %{map3,map-kv:' %{key}:  %{value} '}");
 
     assertEquals(
@@ -85,9 +84,9 @@ final class MapFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Null key and value with/without configuration")
-  void testNullKeyValue()
+  void nullKeyValue()
   {
-    val message = createMessageSupport(UK, new MapFormatter(), new ArrayFormatter())
+    var message = createMessageSupport(UK, new MapFormatter(), new ArrayFormatter())
         .message("%{map1} %{map2,map-kv:'%{key,null:key}=%{value,null:value}'}");
 
     assertEquals(
@@ -106,10 +105,10 @@ final class MapFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Empty map")
-  void testEmpty()
+  void empty()
   {
-    val messageSupport = createMessageSupport(UK, new MapFormatter(), new ArrayFormatter());
-    val parameters = Map.<String,Object>of("map", Map.of());
+    var messageSupport = createMessageSupport(UK, new MapFormatter(), new ArrayFormatter());
+    var parameters = Map.<String,Object>of("map", Map.of());
 
     assertEquals(
         "",
@@ -127,12 +126,13 @@ final class MapFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  void testMultiEntry()
+  @DisplayName("Map entries are formatted with a custom key/value message and list separators")
+  void multiEntry()
   {
-    val message = createMessageSupport(UK, new MapFormatter(), new ArrayFormatter(), new NumberFormatter())
+    var message = createMessageSupport(UK, new MapFormatter(), new ArrayFormatter(), new NumberFormatter())
         .message("%{map,map-kv:'%{key} -> %{value,number:\"0000\"}',list-sep:', ',list-sep-last:' and '}");
 
-    val map = new LinkedHashMap<String,Integer>();
+    var map = new LinkedHashMap<String,Integer>();
     map.put("map1", 1);
     map.put("map2", -1234);
     map.put("map3", 8);
@@ -147,12 +147,12 @@ final class MapFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Custom key format")
-  void testKeyFormat()
+  void keyFormat()
   {
-    val message = createMessageSupport(new MapFormatter(), new ArrayFormatter(), new BoolFormatter())
+    var message = createMessageSupport(new MapFormatter(), new ArrayFormatter(), new BoolFormatter())
         .message("%{map,map-kv:'%{key,format:bool}:%{value}',list-sep:' / '}");
 
-    val map = new LinkedHashMap<Integer,Integer>();
+    var map = new LinkedHashMap<Integer,Integer>();
     map.put(10, 1);
     map.put(0, -1234);
     map.put(-4, 0);
@@ -168,10 +168,10 @@ final class MapFormatterTest extends AbstractFormatterTest
   @SuppressWarnings("CollectionAddedToSelf")
   static Stream<Arguments> selfReferenceCases()
   {
-    val mapAsValue = new IdentityHashMap<>();
+    var mapAsValue = new IdentityHashMap<>();
     mapAsValue.put("k", mapAsValue);
 
-    val mapAsKey = new IdentityHashMap<>();
+    var mapAsKey = new IdentityHashMap<>();
     mapAsKey.put(mapAsKey, "v");
 
     return Stream.of(
@@ -185,7 +185,7 @@ final class MapFormatterTest extends AbstractFormatterTest
   @ParameterizedTest(name = "{0} -> {2}")
   @MethodSource("selfReferenceCases")
   @DisplayName("Map referring to itself as key or value is formatted with the 'map-this' text")
-  void testSelfReference(@Language("MessageFormat") String format, Map<?,?> map, String expected)
+  void selfReference(@Language("MessageFormat") String format, Map<?,?> map, String expected)
   {
     assertEquals(
         expected,

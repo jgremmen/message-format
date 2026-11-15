@@ -56,7 +56,7 @@ class AbstractAntlr4ParserTest
   {
     @Test
     @DisplayName("Invalid character in input")
-    void testInvalidCharacter()
+    void invalidCharacter()
     {
       assertEquals("token recognition error at: '&'",
           assertThrowsExactly(SyntaxErrorException.class, () -> calculator.calculate("3 & 4")).getErrorMessage());
@@ -65,7 +65,7 @@ class AbstractAntlr4ParserTest
 
     @Test
     @DisplayName("Incomplete expression (trailing operator)")
-    void testIncompleteExpression()
+    void incompleteExpression()
     {
       assertEquals("mismatched input <EOF> expecting {<number>, '-', '('}",
           assertThrowsExactly(SyntaxErrorException.class, () -> calculator.calculate("3 +")).getErrorMessage());
@@ -74,7 +74,7 @@ class AbstractAntlr4ParserTest
 
     @Test
     @DisplayName("Missing operator between numbers")
-    void testMissingOperator()
+    void missingOperator()
     {
       assertEquals("extraneous input '4' expecting <EOF>",
           assertThrowsExactly(SyntaxErrorException.class, () -> calculator.calculate("3 4")).getErrorMessage());
@@ -83,7 +83,7 @@ class AbstractAntlr4ParserTest
 
     @Test
     @DisplayName("Unmatched opening parenthesis")
-    void testUnmatchedOpeningParen()
+    void unmatchedOpeningParen()
     {
       assertEquals("missing ')' at <EOF>",
           assertThrowsExactly(SyntaxErrorException.class, () -> calculator.calculate("(3 + 4")).getErrorMessage());
@@ -92,7 +92,7 @@ class AbstractAntlr4ParserTest
 
     @Test
     @DisplayName("Unmatched closing parenthesis")
-    void testUnmatchedClosingParen()
+    void unmatchedClosingParen()
     {
       assertEquals("extraneous input ')' expecting <EOF>",
           assertThrowsExactly(SyntaxErrorException.class, () -> calculator.calculate("3 + 4)")).getErrorMessage());
@@ -101,7 +101,7 @@ class AbstractAntlr4ParserTest
 
     @Test
     @DisplayName("Empty input")
-    void testEmptyInput()
+    void emptyInput()
     {
       assertEquals("mismatched input <EOF> expecting {<number>, '-', '('}",
           assertThrowsExactly(SyntaxErrorException.class, () -> calculator.calculate("")).getErrorMessage());
@@ -110,7 +110,7 @@ class AbstractAntlr4ParserTest
 
     @Test
     @DisplayName("Only operator")
-    void testOnlyOperator()
+    void onlyOperator()
     {
       assertEquals("mismatched input '/' expecting {<number>, '-', '('}",
           assertThrowsExactly(SyntaxErrorException.class, () -> calculator.calculate("/")).getErrorMessage());
@@ -126,7 +126,7 @@ class AbstractAntlr4ParserTest
   {
     @Test
     @DisplayName("Division by zero")
-    void testDivisionByZero()
+    void divisionByZero()
     {
       assertEquals("""
           division by zero: 10 / 0
@@ -140,7 +140,7 @@ class AbstractAntlr4ParserTest
 
     @Test
     @DisplayName("Division by zero in subexpression")
-    void testDivisionByZeroSubexpression()
+    void divisionByZeroSubexpression()
     {
       assertEquals("""
           division by zero: -2 / 0
@@ -154,7 +154,7 @@ class AbstractAntlr4ParserTest
 
     @Test
     @DisplayName("Number out of range")
-    void testNumberOutOfRange()
+    void numberOutOfRange()
     {
       var ex = assertThrowsExactly(SyntaxErrorException.class,
           () -> calculator.calculate("1 + 99999999999999999999"));

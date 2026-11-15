@@ -17,7 +17,6 @@ package de.sayayi.lib.message.formatter.parameter.runtime.extra;
 
 import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import lombok.val;
 import org.junit.jupiter.api.*;
 
 import java.lang.reflect.Field;
@@ -47,15 +46,17 @@ final class FieldFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  void testFormattableTypes() {
+  @DisplayName("Formattable types include Field")
+  void formattableTypes() {
     assertFormatterForType(new FieldFormatter(), Field.class);
   }
 
 
   @Test
-  void testFormatV1() throws Exception
+  @DisplayName("A static array field is formatted with its modifiers, type and name")
+  void formatV1() throws Exception
   {
-    val v1 = Dummy.class.getDeclaredField("v1");
+    var v1 = Dummy.class.getDeclaredField("v1");
 
     assertEquals(
         "boolean[]",
@@ -85,9 +86,10 @@ final class FieldFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  void testFormatV2() throws Exception
+  @DisplayName("A generic field is formatted with its modifiers, parameterized type and name")
+  void formatV2() throws Exception
   {
-    val v2 = Dummy.class.getDeclaredField("v2");
+    var v2 = Dummy.class.getDeclaredField("v2");
 
     assertEquals(
         "Map<String, Integer>",

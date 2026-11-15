@@ -22,7 +22,6 @@ import de.sayayi.lib.message.internal.part.parameter.ParameterPart;
 import de.sayayi.lib.message.internal.part.post.PostFormatterPart;
 import de.sayayi.lib.message.internal.part.template.TemplatePart;
 import de.sayayi.lib.message.part.normalizer.MessagePartNormalizer;
-import lombok.val;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
 import org.junit.jupiter.api.DisplayName;
@@ -49,7 +48,7 @@ final class MessagePartTest
 {
   @Test
   @DisplayName("Leaf interfaces are sealed and permit the built-in implementations only")
-  void testSealedLeafInterfaces()
+  void sealedLeafInterfaces()
   {
     assertPermits(MessagePart.Text.class, TextPart.class);
     assertPermits(MessagePart.Parameter.class, ParameterPart.class);
@@ -74,11 +73,11 @@ final class MessagePartTest
       "%[greet]",
       "%(case,'Hello %{who}!',case:upper)"
   })
-  void testEqualsSymmetric(@Language("MessageFormat") String format)
+  void equalsSymmetric(@Language("MessageFormat") String format)
   {
-    val messageFactory = new MessageFactory(MessagePartNormalizer.PASS_THROUGH);
-    val part1 = firstPart(messageFactory.parseMessage(format));
-    val part2 = firstPart(messageFactory.parseMessage(format));
+    var messageFactory = new MessageFactory(MessagePartNormalizer.PASS_THROUGH);
+    var part1 = firstPart(messageFactory.parseMessage(format));
+    var part2 = firstPart(messageFactory.parseMessage(format));
 
     assertNotSame(part1, part2);
     assertEqualsContract(part1, part2);
@@ -87,10 +86,10 @@ final class MessagePartTest
 
   @Test
   @DisplayName("Parts of different types are never equal")
-  void testDifferentTypesNotEqual()
+  void differentTypesNotEqual()
   {
-    val text = new TextPart("name");
-    val parameter = firstPart(MessageFactory.getSharedInstance().parseMessage("%{name}"));
+    var text = new TextPart("name");
+    var parameter = firstPart(MessageFactory.getSharedInstance().parseMessage("%{name}"));
 
     assertNotEquals(text, parameter);
     assertNotEquals(parameter, text);

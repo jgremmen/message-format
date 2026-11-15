@@ -167,7 +167,7 @@ public final class PackSupport
    * @param messageFactory  factory used for creating messages while unpacking, not {@code null}
    */
   public PackSupport(@NotNull MessageFactory messageFactory) {
-    this.messageFactory = messageFactory;
+    this.messageFactory = requireNonNull(messageFactory, "messageFactory must not be null");
   }
 
 

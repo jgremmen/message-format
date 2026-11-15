@@ -158,7 +158,6 @@ public final class TemporalFormatter extends AbstractParameterFormatter<Temporal
       entry("-M", ofLocalizedTime(MEDIUM)),
 
       entry("LL", ofLocalizedDateTime(LONG, LONG)),
-      entry("LM", ofLocalizedDateTime(LONG, MEDIUM)),
       entry("L-", ofLocalizedDate(LONG)),
       entry("-L", ofLocalizedTime(LONG)),
 

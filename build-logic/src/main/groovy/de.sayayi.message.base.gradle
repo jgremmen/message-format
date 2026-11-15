@@ -52,15 +52,3 @@ repositories {
     }
   }
 }
-
-
-tasks.register('showRepositories') {
-  group = 'help'
-  description = 'Show all configured repositories.'
-
-  doLast {
-    repositories.each {
-      println "Repository: ${it.name} (${it.url})"
-    }
-  }
-}

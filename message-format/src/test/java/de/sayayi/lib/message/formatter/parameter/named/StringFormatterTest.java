@@ -24,7 +24,6 @@ import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
 import de.sayayi.lib.message.part.MapKey.MatchResult;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -56,7 +55,8 @@ import static org.junit.jupiter.api.Assertions.*;
 final class StringFormatterTest extends AbstractFormatterTest
 {
   @Test
-  public void testFormattableTypes()
+  @DisplayName("Formattable types include CharSequence and char[]")
+  public void formattableTypes()
   {
     assertFormatterForType(new StringFormatter(), CharSequence.class);
     assertFormatterForType(new StringFormatter(), char[].class);
@@ -64,9 +64,10 @@ final class StringFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  public void testFormat()
+  @DisplayName("Strings, enums and other objects are formatted with their trimmed string representation")
+  public void formatTrimmedString()
   {
-    val messageAccessor = MessageSupportFactory
+    var messageAccessor = MessageSupportFactory
         .createGeneric()
         .getMessageAccessor();
 
@@ -82,9 +83,10 @@ final class StringFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  public void testFormatter()
+  @DisplayName("String parameters are trimmed, null is omitted and numbers are formatted as text")
+  public void formatter()
   {
-    val messageSupport = MessageSupportFactory.createGeneric();
+    var messageSupport = MessageSupportFactory.createGeneric();
 
     assertEquals("This is a test 1234", messageSupport
         .message("This is %{a} %{b} %{c}")
@@ -96,10 +98,11 @@ final class StringFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  public void testFormatterWithMap()
+  @DisplayName("Empty, null and not-null keys match empty, blank, null and non-empty strings")
+  public void formatterWithMap()
   {
-    val messageSupport = MessageSupportFactory.createGeneric();
-    val parameters = new HashMap<String,Object>();
+    var messageSupport = MessageSupportFactory.createGeneric();
+    var parameters = new HashMap<String,Object>();
 
     parameters.put("empty", "");
     parameters.put("null", null);
@@ -126,9 +129,10 @@ final class StringFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  void testMapKey()
+  @DisplayName("String keys match exactly or leniently, ignoring case and accents")
+  void mapKey()
   {
-    val messageSupport = MessageSupportFactory.shared();
+    var messageSupport = MessageSupportFactory.shared();
 
     assertEquals("exact", messageSupport
         .message("%{text,format:choice,'Süd':'exact'}")
@@ -144,10 +148,10 @@ final class StringFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Collators are shared by all map keys of a map lookup")
-  void testMapKeyCollatorReuse()
+  void mapKeyCollatorReuse()
   {
-    val collatorFormatter = new CollatorCapturingFormatter();
-    val formatterService = new GenericFormatterService();
+    var collatorFormatter = new CollatorCapturingFormatter();
+    var formatterService = new GenericFormatterService();
     formatterService.addFormatter(collatorFormatter);
     formatterService.addFormatter(new ChoiceFormatter());
 
@@ -157,7 +161,7 @@ final class StringFormatterTest extends AbstractFormatterTest
         .with("v", new Value())
         .format());
 
-    val collators = collatorFormatter.collators;
+    var collators = collatorFormatter.collators;
     assertEquals(6, collators.size());
     for(var n = 2; n < 6; n++)
       assertSame(collators.get(n % 2), collators.get(n));
@@ -169,13 +173,14 @@ final class StringFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  void testDefaultToString()
+  @DisplayName("The default Object.toString() representation is only suppressed with ignore-default-tostring")
+  void defaultToString()
   {
-    val messageSupport = MessageSupportFactory.createDefault();
+    var messageSupport = MessageSupportFactory.createDefault();
     messageSupport.addMessage("OBJ", "%{object}");
 
-    val object = new Object();
-    val objectToString = object.toString();
+    var object = new Object();
+    var objectToString = object.toString();
 
     // default
     assertEquals(objectToString, messageSupport

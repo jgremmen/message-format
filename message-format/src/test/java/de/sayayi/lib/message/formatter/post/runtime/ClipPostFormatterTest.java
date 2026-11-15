@@ -17,7 +17,6 @@ package de.sayayi.lib.message.formatter.post.runtime;
 
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -45,9 +44,9 @@ final class ClipPostFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Clip without ellipsis")
-  void testClipNoEllipsis()
+  void clipNoEllipsis()
   {
-    val messageSupport = MessageSupportFactory
+    var messageSupport = MessageSupportFactory
         .createDefault()
         .setDefaultConfig("clip-suffix", false);
 
@@ -90,9 +89,9 @@ final class ClipPostFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Clip size")
-  void testClipSize()
+  void clipSize()
   {
-    val messageSupport = MessageSupportFactory.createDefault();
+    var messageSupport = MessageSupportFactory.createDefault();
 
     assertEquals(
         TEXT.substring(0, 63) + "\u2026",
@@ -133,9 +132,9 @@ final class ClipPostFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Enable/disable Ellipsis")
-  void testClipEllipsis()
+  void clipEllipsis()
   {
-    val messageSupport = MessageSupportFactory
+    var messageSupport = MessageSupportFactory
         .createDefault()
         .setLocale(GERMANY);
 
@@ -157,10 +156,10 @@ final class ClipPostFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Clip counts supplementary characters as one character")
-  void testClipSupplementaryCharacters()
+  void clipSupplementaryCharacters()
   {
-    val messageSupport = MessageSupportFactory.createDefault();
-    val emojis = "😀😁😂😃😄😅😆";  // 7 emojis
+    var messageSupport = MessageSupportFactory.createDefault();
+    var emojis = "😀😁😂😃😄😅😆";  // 7 emojis
 
     // not clipped: 7 code points (14 chars) fit into 7
     assertEquals(
@@ -198,15 +197,15 @@ final class ClipPostFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Clip counts grapheme clusters as one character")
-  void testClipGraphemeClusters()
+  void clipGraphemeClusters()
   {
-    val messageSupport = MessageSupportFactory
+    var messageSupport = MessageSupportFactory
         .createDefault()
         .setDefaultConfig("clip-suffix", false);
 
-    val thumbsUpWithSkinTone = "👍🏽";
-    val family = "👨‍👩‍👧";
-    val eWithAcute = "é";
+    var thumbsUpWithSkinTone = "👍🏽";
+    var family = "👨‍👩‍👧";
+    var eWithAcute = "é";
 
     assertEquals(
         thumbsUpWithSkinTone + family,
@@ -234,9 +233,9 @@ final class ClipPostFormatterTest extends AbstractFormatterTest
 
   @Test
   @DisplayName("Clip with custom suffix")
-  void testClipCustomSuffix()
+  void clipCustomSuffix()
   {
-    val messageSupport = MessageSupportFactory
+    var messageSupport = MessageSupportFactory
         .createDefault()
         .setLocale(GERMANY);
 

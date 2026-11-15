@@ -18,7 +18,6 @@ package de.sayayi.lib.message.formatter;
 import de.sayayi.lib.message.formatter.post.PostFormatter;
 import de.sayayi.lib.message.formatter.post.PostFormatterContext;
 import de.sayayi.lib.message.formatter.post.runtime.ClipPostFormatter;
-import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -42,7 +41,7 @@ final class GenericFormatterServiceTest
   @Test
   @DisplayName("Adding a null post formatter throws with a descriptive message")
   @SuppressWarnings("DataFlowIssue")
-  void testAddNullPostFormatter()
+  void addNullPostFormatter()
   {
     assertNullRejected(
         "postFormatter must not be null",
@@ -52,9 +51,9 @@ final class GenericFormatterServiceTest
 
   @Test
   @DisplayName("Adding a post formatter without name throws with a descriptive message")
-  void testAddPostFormatterWithoutName()
+  void addPostFormatterWithoutName()
   {
-    val formatterService = new GenericFormatterService();
+    var formatterService = new GenericFormatterService();
 
     assertNullRejected(
         "name of post formatter NamelessPostFormatter must not be null",
@@ -65,10 +64,10 @@ final class GenericFormatterServiceTest
 
   @Test
   @DisplayName("Look up a single post formatter by name")
-  void testGetPostFormatter()
+  void getPostFormatter()
   {
-    val formatterService = new GenericFormatterService();
-    val postFormatter = new ClipPostFormatter();
+    var formatterService = new GenericFormatterService();
+    var postFormatter = new ClipPostFormatter();
 
     assertNull(formatterService.getPostFormatter("clip"));
 

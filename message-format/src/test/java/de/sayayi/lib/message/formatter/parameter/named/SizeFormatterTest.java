@@ -19,7 +19,6 @@ import de.sayayi.lib.message.formatter.parameter.runtime.ArrayFormatter;
 import de.sayayi.lib.message.formatter.parameter.runtime.IterableFormatter;
 import de.sayayi.lib.message.formatter.parameter.runtime.MapFormatter;
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -43,11 +42,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 final class SizeFormatterTest extends AbstractFormatterTest
 {
   @Test
-  void testFormat()
+  @DisplayName("The size of lists, maps and arrays is formatted and selects the message of a number key")
+  void formatSizeOfCollections()
   {
-    val messageSupport = createMessageSupport(UK,
+    var messageSupport = createMessageSupport(UK,
         new SizeFormatter(), new IterableFormatter(), new ArrayFormatter(), new MapFormatter());
-    val message = messageSupport
+    var message = messageSupport
         .message("%{c,format:size} %{c,format:size,0:'empty',1:'singleton',:'multiple'}")
         .getMessage();
 
@@ -75,9 +75,10 @@ final class SizeFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  void testFormatNoSizeQueryable()
+  @DisplayName("A value without size is formatted as empty text")
+  void formatNoSizeQueryable()
   {
-    val messageSupport = createMessageSupport(UK, new SizeFormatter());
+    var messageSupport = createMessageSupport(UK, new SizeFormatter());
 
     assertEquals(
         "",

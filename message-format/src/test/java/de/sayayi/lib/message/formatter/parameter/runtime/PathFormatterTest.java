@@ -16,7 +16,6 @@
 package de.sayayi.lib.message.formatter.parameter.runtime;
 
 import de.sayayi.lib.message.internal.part.parameter.AbstractFormatterTest;
-import lombok.val;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -45,11 +44,11 @@ final class PathFormatterTest extends AbstractFormatterTest
 {
   @Test
   @EnabledOnOs({ OS.MAC, OS.LINUX })
-  @DisplayName("Format File")
+  @DisplayName("A file is formatted as path, name, parent or extension; null is formatted as null text")
   void formatFile()
   {
-    val messageAccessor = createMessageAccessor(ROOT, new PathFormatter(), new IterableFormatter());
-    val f = new File("/path1/path2/filename.ext");
+    var messageAccessor = createMessageAccessor(ROOT, new PathFormatter(), new IterableFormatter());
+    var f = new File("/path1/path2/filename.ext");
 
     assertEquals(
         nullText(),
@@ -70,7 +69,7 @@ final class PathFormatterTest extends AbstractFormatterTest
 
 
   @Test
-  @DisplayName("Format path file extension")
+  @DisplayName("The file extension of a path selects the message of a matching string key")
   void formatPathFileExtension()
   {
     assertEquals(
