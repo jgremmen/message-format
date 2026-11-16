@@ -59,19 +59,17 @@ var messageSupport = MessageSupportFactory.create(formatterService);
 
 ## DefaultFormatterService
 
-For most applications registering every formatter by hand is undesirable. `DefaultFormatterService` extends 
-`GenericFormatterService` and automatically discovers all `ParameterFormatter` and `PostFormatter` implementations
-using Java's `ServiceLoader` mechanism. This means that all formatters bundled with the library (and any third-party
-formatters that are declared as service providers) are registered without any additional code. Formatters of the
-library that are not declared as service providers, such as the [named formatters](../formatter/parameter/named/index.md)
-`classifier`, `bitmask` and `geo`, must be registered explicitly.
+For most applications registering every formatter by hand is undesirable. `DefaultFormatterService` extends
+`GenericFormatterService` and automatically discovers all `ParameterFormatter` and `PostFormatter` implementations using
+Java's `ServiceLoader` mechanism. This means that all formatters bundled with the library (and any third-party
+formatters that are declared as service providers) are registered without any additional code. Some formatters of the
+library are deliberately not declared as service providers. They are described under
+[Formatters Not Registered by Default](#formatters-not-registered-by-default).
 
 Discovery works on the class path as well as on the module path. The core module declares its built-in formatters
 with `provides` clauses in its `module-info.java` and additionally lists them in `META-INF/services` files, so both
-deployment styles find the same set of formatters. A third-party formatter needs its own service declaration, either
-a `provides de.sayayi.lib.message.formatter.parameter.ParameterFormatter with ...` clause in its module descriptor or
-a `META-INF/services/de.sayayi.lib.message.formatter.parameter.ParameterFormatter` file. Post formatters are declared
-the same way for `de.sayayi.lib.message.formatter.post.PostFormatter`.
+deployment styles find the same set of formatters. How a custom formatter is declared as a service provider is
+described under [Service Provider Registration](../formatter/development/index.md#service-provider-registration).
 
 A shared singleton is available via `getSharedInstance()`. This instance is created lazily and sealed so it cannot be 
 modified. Its formatters are discovered with the class loader that loaded the library.
@@ -88,23 +86,8 @@ messageSupport
 // "49.95"
 ```
 
-To use the auto-discovered formatters as a starting point while adding custom ones on top, create a new 
-`DefaultFormatterService` instance instead of using the shared one. The following example adds the
-`InetAddressFormatter`, which ships with the library but is not registered by default. Without it, the address would
-be formatted by its `toString()` method as `/10.0.0.1`.
-
-```java
-var formatterService = new DefaultFormatterService();
-formatterService.addFormatter(new InetAddressFormatter());
-
-var messageSupport = MessageSupportFactory.create(formatterService);
-messageSupport
-    .message("Server: %{address}")
-    .with("address",
-        InetAddress.getByAddress(new byte[] { 10, 0, 0, 1 }))
-    .format();
-// "Server: 10.0.0.1"
-```
+To use the auto-discovered formatters as a starting point while adding further formatters on top, create a new
+`DefaultFormatterService` instance instead of using the shared one, as shown in the next section.
 
 Unless a class loader is passed explicitly, formatters are discovered with the class loader that loaded the library
 (`DefaultFormatterService.class.getClassLoader()`). This makes formatters of add-on modules on the same class path
@@ -171,6 +154,90 @@ public class ExcludingFormatterService extends DefaultFormatterService
   }
 }
 ```
+
+
+## Formatters Not Registered by Default
+
+The library ships more formatters than the `DefaultFormatterService` registers. Formatters for specialized purposes,
+such as geographic coordinates or bit flags, formatters for rarely used types, such as ANTLR tokens or network
+addresses, and formatters that need configuration of their own are not declared as service providers. They are part
+of the library and documented like all other formatters, but an application that uses them has to add them to its
+formatter service. Their pages state this in a note at the top. The reference tables of the
+[type-specific](../formatter/parameter/typed/index.md#reference) and
+[named](../formatter/parameter/named/index.md#reference) formatters list which formatters are registered by default.
+
+| Formatter                                                             | Module                  | Notes                                       |
+|-----------------------------------------------------------------------|-------------------------|---------------------------------------------|
+| [`bitmask`](../formatter/parameter/named/bitmask.md)                  | `message-format`        | requires the `BitSet` formatter             |
+| [`classifier`](../formatter/parameter/named/classifier.md)            | `message-format`        |                                             |
+| [`geo`](../formatter/parameter/named/geo.md)                          | `message-format`        |                                             |
+| `filesize` (`FileSizeFormatter`)                                      | `message-format`        | deprecated for removal                      |
+| [extra type-specific formatters](../formatter/parameter/typed/index.md#formatters-not-registered-by-default) | `message-format` | for example `TokenFormatter`, `InetAddressFormatter` |
+| [`spel`](../formatter/parameter/named/spel.md)                        | `message-format-spring` | constructors for Spring integration         |
+| [`icu`](../formatter/parameter/named/icu.md), [`icu-person`](../formatter/parameter/named/icu-person.md) | `message-format-icu` | on the module path only |
+
+Such a formatter is added in three steps. The shared instance returned by `DefaultFormatterService.getSharedInstance()`
+is sealed, so the first step creates a formatter service of its own. A new `DefaultFormatterService` discovers the same
+formatters as the shared instance. The second step adds the additional formatters with `addFormatter(...)`. The third
+step creates the message support with this formatter service. The following example adds the `geo` formatter and the
+`InetAddressFormatter` to the default formatters:
+
+```java title="ShopMessageSupport.java"
+import de.sayayi.lib.message.MessageSupport;
+import de.sayayi.lib.message.MessageSupportFactory;
+import de.sayayi.lib.message.formatter.DefaultFormatterService;
+import de.sayayi.lib.message.formatter.parameter.named.extra.GeoFormatter;
+import de.sayayi.lib.message.formatter.parameter.runtime.extra.InetAddressFormatter;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Locale;
+
+public final class ShopMessageSupport
+{
+  public static MessageSupport create()
+  {
+    // step 1: a formatter service with all default formatters
+    var formatterService = new DefaultFormatterService();
+
+    // step 2: formatters that are not registered by default
+    formatterService.addFormatter(new GeoFormatter());
+    formatterService.addFormatter(new InetAddressFormatter());
+
+    // step 3: a message support using this formatter service
+    return MessageSupportFactory.create(formatterService).seal();
+  }
+
+  public static void main(String[] args) throws UnknownHostException
+  {
+    var messageSupport = create();
+
+    String text = messageSupport
+        .message("Store %{ip} at %{lat,geo:latitude}")
+        .with("ip", InetAddress.getByAddress(
+            new byte[] { 10, 0, 0, 1 }))
+        .with("lat", 51.5694)
+        .locale(Locale.US)
+        .format();
+
+    // prints "Store 10.0.0.1 at 51°34'10"N"
+    System.out.println(text);
+  }
+}
+```
+
+The configurable message support returned by `MessageSupportFactory.create(...)` can also register messages and
+templates before it is sealed. A `GenericFormatterService` can be used in the same way, but it starts without the
+default formatters, so every formatter has to be added.
+
+/// warning | Missing Formatters Are Not Reported
+A message that refers to an unregistered formatter is not rejected. A named formatter that is not registered is
+ignored, and the value is formatted by the formatter for its type, so `%{lat,format:geo}` prints the plain number
+`51.569`. A value whose type-specific formatter is not registered is formatted by the next formatter in its type
+hierarchy, often by its `toString()` method, so the address above would be printed as `/10.0.0.1`. Only an unregistered
+post formatter makes formatting fail. The formatter service should therefore be set up in a single place of the
+application, for example in a factory method like the one above or in a Spring bean definition.
+///
 
 
 ## Registering Formatters

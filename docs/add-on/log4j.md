@@ -22,8 +22,10 @@ passed as arguments (`logger.info("Login failed for %{p1}", userName)`). See
 
 ## Dependency
 
-Add the `message-format-log4j` module to the project alongside the Log4j API dependency. The module requires Log4j
-2.11.0 or later (Log4j 3 is not supported).
+Add the `message-format-log4j` module to the project. It depends on the Log4j API in the version range
+`[2.11.0,3.0)`, so Log4j 3 is not supported. The Log4j API is a `compile` dependency of the module and is therefore
+available without further declaration. Declaring it explicitly, as shown below, selects the Log4j version the
+application uses.
 
 === "Gradle (Groovy)"
 
@@ -207,6 +209,10 @@ string is not parsed and the parameters are not formatted until `getFormattedMes
 framework. If a log statement's level is below the configured threshold, no formatting work takes place at all. The
 first call to `getFormattedMessage()` formats the message and caches the result, so subsequent calls return the cached
 text.
+
+Appenders and layouts that serialize log events, for example to send them to another process, serialize a message
+with its formatted text, its format string and its throwable. The message is formatted for this purpose if it has not
+been formatted yet. The parameter values themselves are not serialized, so they do not have to be serializable.
 
 /// tip | Performance consideration
 Using `Log4jMessageFactory` is slower than Log4j's default parameterized formatting. The message format engine parses 

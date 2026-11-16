@@ -112,50 +112,32 @@ messageSupport
 // "Order A-1042 placed for Alice."
 ```
 
-A convenience overload accepts the code and a format string directly. An existing parsed `Message.WithCode` object (for
-example from a `MessageFactory`) can be passed to `addMessage(Message.WithCode)` instead.
-
-Attempting to add a message with a code that already exists throws a `DuplicateMessageException` when the content
-differs. Two messages have the same content when their parsed message parts are equal. For localized messages, the
-locales and the message of every locale must be equal. If the new message is identical to the existing one, the
-duplicate is silently ignored. This default behavior can be changed by installing a custom `MessageFilter` (see
-[Filters](#filters)).
+Besides a code and a format string, `addMessage` accepts a parsed `Message.WithCode`, for example a localized message
+created by a `MessageFactory`. The [Messages](messages.md#adding-messages-to-configurablemessagesupport) page shows all
+variants.
 
 ### Adding Templates
 
-Templates are reusable message fragments registered under a kebab-case name. They are referenced from messages using 
-the `%[template-name]` syntax. Because they share the parameter context of the enclosing message, they can access the 
-same parameter values without any extra wiring:
+Templates are reusable message fragments registered under a kebab-case name and referenced from messages with the
+`%[template-name]` syntax. `addTemplate` accepts a name together with a parsed `Template`, or a custom
+`NamedTemplate`, which carries its own name. A name that does not follow the kebab-case convention is rejected with
+an `IllegalArgumentException`. Parsing, building and implementing templates is covered on the
+[Templates](templates.md) page.
 
-```java
-var factory = messageSupport.getMessageAccessor().getMessageFactory();
+### Duplicate Handling
 
-messageSupport.addTemplate("measure",
-    factory.parseTemplate("%{value}%{unit,!empty:' %{unit}'}"));
+A message code and a template name can only be registered once. Adding a message under a code that already exists
+throws a `DuplicateMessageException` if the new message differs from the registered one. Two messages are equal when
+their parsed message parts are equal. For localized messages, the locales and the message of every locale must be
+equal. If the new message is equal to the registered one, it is silently ignored, so registering the same messages
+twice is harmless.
 
-messageSupport
-    .message("Distance: %[measure].")
-    .with("value", 42)
-    .with("unit", "km")
-    .format();
-// "Distance: 42 km."
+Templates follow the same rules and throw a `DuplicateTemplateException` on a conflict. Two parsed templates are equal
+when their message parts are equal. Two custom templates are equal when they have the same name.
 
-messageSupport
-    .message("Distance: %[measure].")
-    .with("value", 42)
-    .with("unit", "")
-    .format();
-// "Distance: 42."
-```
-
-A name that does not follow the kebab-case convention is rejected with an `IllegalArgumentException`.
-
-Just like messages, adding a template whose name already exists throws a `DuplicateTemplateException` when the content
-differs. Identical duplicates are silently ignored.
-
-Templates can also be implemented entirely in Java by extending `AbstractNamedTemplate` and can be discovered 
-automatically at startup through the `ServiceLoader` mechanism by calling `registerTemplatesFromService(ClassLoader)`. 
-Both topics are covered in detail on the [Templates](templates.md#custom-templates) page.
+The same rules apply to messages and templates registered by [adopters](../adopter/index.md) and by
+[importing a pack file](pack-files.md#importing-messages), because these use `addMessage` and `addTemplate` as well.
+The default behavior can be replaced by installing a filter, as described under [Filters](#filters).
 
 ### Default Configuration and Locale
 
@@ -164,11 +146,11 @@ locale. These topics are covered in detail on the [Default Configuration](defaul
 
 ### Filters
 
-The default duplicate handling described above can be customized by installing a `MessageFilter` or `TemplateFilter`. 
-Both are functional interfaces whose single method receives the incoming entry and returns `true` to accept it or 
-`false` to skip it. An exception thrown by a filter is passed on to the caller of `addMessage` or `addTemplate`.
-Installing a filter replaces the default filter, so the filter itself must detect duplicates if they are to be
-rejected.
+The default [duplicate handling](#duplicate-handling) can be customized by installing a `MessageFilter` or
+`TemplateFilter`. Both are functional interfaces whose single method receives the incoming entry and returns `true` to
+accept it or `false` to skip it. An exception thrown by a filter is passed on to the caller of `addMessage` or
+`addTemplate`. Installing a filter replaces the default filter, so the filter itself must detect duplicates if they are
+to be rejected.
 
 The filter is invoked while the message support holds its internal write lock. Checking for an existing entry and
 adding the new one is therefore atomic. A filter may read from the message support, for example through its message
@@ -194,6 +176,17 @@ messageSupport.setMessageFilter(message -> {
 
     return existing == null;
 });
+```
+
+A filter that always returns `true` lets a later registration replace an earlier one, so the last registration of a
+code wins:
+
+```java
+messageSupport.setMessageFilter(message -> true);
+
+messageSupport.addMessage("greeting", "Hello!");
+messageSupport.addMessage("greeting", "Hi!");
+// no exception, "greeting" now formats as "Hi!"
 ```
 
 Another scenario is selectively ignoring certain codes. When loading messages from multiple sources, it may be 
@@ -310,8 +303,8 @@ page.
 changing configuration and formatting can happen concurrently. The same applies to the sealed view returned by
 `seal()`, to the `MessageAccessor` and to all `Message` objects, which are immutable.
 
-The objects that represent a single operation are not thread-safe and must be confined to the thread that created
-them. These are the `MessageConfigurer` returned by `code(...)` and `message(...)`, the
+The objects that represent a single operation are not thread-safe and must be confined to the thread that created them.
+These are the `MessageConfigurer` returned by `code(...)` and `message(...)`, the
 [`MessageBuilder`](messages.md#building-messages-programmatically) and the
-[`SingletonParameters`](../formatter/development/utilities.md#singletonparameters) helper. Filters installed with `setMessageFilter` and
-`setTemplateFilter` run while the message support holds its write lock (see [Filters](#filters)).
+[`SingletonParameters`](../formatter/development/utilities.md#singletonparameters) helper. Filters installed with
+`setMessageFilter` and `setTemplateFilter` run while the message support holds its write lock (see [Filters](#filters)).

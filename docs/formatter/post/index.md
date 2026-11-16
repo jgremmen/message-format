@@ -81,16 +81,11 @@ configuration keys and is described in detail on the
 
 ## Registration
 
-Post formatters are registered on the `FormatterService.WithRegistry` using the `addPostFormatter` method. Each post 
-formatter has a unique name returned by its `getName()` method. Registering two post formatters with the same name is 
-not allowed and results in an exception.
-
-When using `DefaultFormatterService`, all post formatter implementations declared as services via 
-`META-INF/services/de.sayayi.lib.message.formatter.post.PostFormatter` are discovered and registered automatically 
-through Java's `ServiceLoader` mechanism. The built-in post formatters `case` and `clip` are registered this way and
-are available out of the box.
-
-To register a post formatter manually, for example when using a `GenericFormatterService`, do so during setup:
+Post formatters are identified by the unique name returned by their `getName()` method. The `DefaultFormatterService`
+discovers the built-in post formatters `case` and `clip` as service providers, so they are available out of the box.
+How post formatters are registered in code or declared as service providers is described under
+[Registration](../development/index.md#registration). A `GenericFormatterService` starts without any post formatter,
+so they are registered during setup:
 
 ```java
 var formatterService = new GenericFormatterService();

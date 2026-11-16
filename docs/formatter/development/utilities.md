@@ -362,8 +362,8 @@ The `MessageFactory` creates the imported messages and templates, and its part n
 first consumer receives `Message.WithCode` instances (messages with their associated code). The second consumer
 receives templates as name-template pairs. Either consumer may be `null` if only one type of entry is needed.
 
-The input stream is always closed when this method returns, regardless of success or failure. To read a pack from
-a part of a larger stream, see [Packs Inside Other Streams](../../configuration/pack-files.md#packs-inside-other-streams).
+The input stream is always closed when this method returns, regardless of success or failure. To read a pack from a part
+of a larger stream, see [Packs Inside Other Streams](../../configuration/pack-files.md#packs-inside-other-streams).
 
 The examples on this page use the following message support.
 
@@ -751,7 +751,8 @@ public @NotNull Text format(
   for(Object element: list)
   {
     Text formatted = (element == list)
-        ? thisText.get()  // triggers computation only on first self-reference
+        // triggers the computation only on the first self-reference
+        ? thisText.get()
         : itemMessage.formatAsText(context.getMessageAccessor(), 
               params.setValue(element));
 

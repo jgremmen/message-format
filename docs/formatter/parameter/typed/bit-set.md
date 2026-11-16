@@ -199,17 +199,3 @@ messageSupport
     .format();
 // ""
 ```
-
-
-## Null Handling
-
-A `null` parameter value produces an empty string by default. A `null` map key can be provided to handle this case 
-explicitly.
-
-```java
-messageSupport
-    .message("%{bs,null:'no flags'}")
-    .with("bs", (BitSet) null)
-    .format();
-// "no flags"
-```

@@ -70,3 +70,35 @@ entry.
 
 For a full explanation of named formatters, how they are selected and the built-in named formatters available, see the
 [Named Formatters](named/index.md) page.
+
+
+## Null Values and Empty Results
+
+All built-in parameter formatters treat `null` values and empty results the same way, unless the page of a formatter
+describes a different behavior. A `null` value is never passed to the formatting logic of a formatter. Without a
+matching map key, it produces empty text. The `null` key matches a `null` value, and the `empty` key matches it as
+well, because a `null` value has no content. The negated keys `!null` and `!empty` match all other values.
+
+```java
+messageSupport
+    .message("Due: %{dueDate}")
+    .with("dueDate", null)
+    .format();
+// "Due:"
+
+messageSupport
+    .message("Due: %{dueDate,null:'not scheduled'}")
+    .with("dueDate", null)
+    .format();
+// "Due: not scheduled"
+```
+
+The `null` and `empty` keys are checked twice. Before the value is formatted, they are compared with the value itself.
+After formatting, they are compared with the formatted text. A value that formats to empty text therefore matches the
+`empty` key, even if the value itself is not empty. The
+[string](typed/string.md#the-ignore-default-tostring-configuration) formatter, for example, can turn an object with a
+default `toString()` result into empty text, which an `empty` key then replaces.
+
+Formatters that compute something other than the formatted value, such as [`size`](named/size.md) or
+[`choice`](named/choice.md), and formatters for container types, such as [optionals](typed/optional.md), refine these
+rules. Their pages describe the differences.

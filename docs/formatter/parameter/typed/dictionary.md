@@ -144,16 +144,3 @@ messageSupport
     .format();
 // "Server: localhost:8080"
 ```
-
-
-## Null Handling
-
-A `null` parameter value produces an empty string by default. A `null` map key can be provided to produce specific text.
-
-```java
-messageSupport
-    .message("%{cfg,key:'host',null:'no config'}")
-    .with("cfg", null)
-    .format();
-// "no config"
-```

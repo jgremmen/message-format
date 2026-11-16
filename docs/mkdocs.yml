@@ -35,6 +35,7 @@ nav:
         - Boolean: formatter/parameter/typed/boolean.md
         - Byte-Array: formatter/parameter/typed/byte-array.md
         - Charset: formatter/parameter/typed/charset.md
+        - DataSize [spring]: formatter/parameter/typed/data-size.md
         - Dictionary: formatter/parameter/typed/dictionary.md
         - Enum: formatter/parameter/typed/enum.md
         - Iterable: formatter/parameter/typed/iterable.md
@@ -44,6 +45,7 @@ nav:
         - Optional: formatter/parameter/typed/optional.md
         - Path: formatter/parameter/typed/path.md
         - Reference: formatter/parameter/typed/reference.md
+        - ResolvableType [spring]: formatter/parameter/typed/resolvable-type.md
         - String: formatter/parameter/typed/string.md
         - Supplier: formatter/parameter/typed/supplier.md
         - Temporal: formatter/parameter/typed/temporal.md
@@ -51,6 +53,7 @@ nav:
         - TimeZone: formatter/parameter/typed/time-zone.md
         - Token: formatter/parameter/typed/token.md
         - Type: formatter/parameter/typed/type.md
+        - TypeDescriptor [spring]: formatter/parameter/typed/type-descriptor.md
         - URI: formatter/parameter/typed/uri.md
         - URL: formatter/parameter/typed/url.md
       - Named:

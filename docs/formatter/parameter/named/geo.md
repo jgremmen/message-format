@@ -1,8 +1,10 @@
 # Geo
 
 /// note
-This formatter is **not** included in the `DefaultFormatterService`. It must be registered explicitly by adding a 
-`GeoFormatter` instance to the formatter service.
+This formatter is **not** registered by the `DefaultFormatterService`. An application that uses it adds a `GeoFormatter`
+instance to its formatter service, as described under
+[Formatters Not Registered by Default](../../../configuration/formatter-service.md#formatters-not-registered-by-default)
+on the formatter service page.
 ///
 
 The named formatter `geo` is selected explicitly by writing `format:geo` in the message parameter configuration. It can
@@ -173,17 +175,7 @@ messageSupport
 ```
 
 
-## Null Handling
-
-A `null` parameter value produces an empty string by default. A `null` map key can be provided to produce specific text.
-
-```java
-messageSupport
-    .message("%{lat,format:geo,geo:latitude}")
-    .with("lat", null)
-    .format();
-// ""
-```
+## Non-Finite Values
 
 The values `NaN`, positive infinity and negative infinity have no coordinate representation. They are formatted as an
 empty string, so an `empty` map key can provide a replacement text.

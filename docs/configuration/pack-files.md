@@ -68,8 +68,14 @@ exist in the message support but are not used by any selected message are omitte
 registered messages and templates, so registrations from other threads during the export do not affect the result.
 
 A pack file holds at most 65535 messages and 65535 templates. If the selection exceeds either limit, `exportMessages`
-throws an `IOException` and writes nothing to the stream. The stream passed to `exportMessages` is closed when the
-method returns, regardless of whether the export succeeded. See
+throws an `IOException` and writes nothing to the stream. The pack format also limits the size of the individual
+messages and templates. A message can have at most 255 parts, a parameter map or a parameter configuration at most 255
+entries, a template reference at most 255 default parameters and 255 parameter delegates, and a localized message at
+most 255 locales. Every string, such as a text part or a map key, can have at most 65535 bytes in its UTF-8 encoding.
+These limits only apply to packs. A message that exceeds one of them can be used as usual, but `exportMessages` throws
+an `IOException` that describes the exceeded limit, and the stream contains an incomplete pack. Only a string that is
+too long is reported together with the code of the message or the name of the template. The stream passed to
+`exportMessages` is closed when the method returns, regardless of whether the export succeeded. See
 [Packs Inside Other Streams](#packs-inside-other-streams) for writing a pack without closing the stream.
 
 
@@ -236,10 +242,6 @@ automatically. Because the `Detector` interface changed between Tika 3 and Tika 
 still loads without an error, but it does not implement the methods Tika calls. Under Tika 4, `PackTika3Detector` and
 `PackTikaDetector` make every call of `Tika.detect` fail with an `AbstractMethodError`, not only the calls for pack
 files. The same applies when both detectors are listed in the service file.
-
-For this reason, the service file belongs to the application, which controls the Tika version. A reusable library
-should not ship it, because it cannot know which Tika version its users choose. When the Tika dependency is upgraded
-from version 3 to version 4, the service file must be changed at the same time.
 ///
 
 The detectors are meant for use on the class path. The module `de.sayayi.lib.message` neither requires Apache Tika nor

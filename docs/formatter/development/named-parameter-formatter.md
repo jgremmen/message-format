@@ -560,39 +560,16 @@ messageSupport
 
 ## Registration
 
-Named formatters are registered with the formatter service in the same way as typed formatters. The `addFormatter` 
-method handles both. When it detects that the formatter implements `NamedParameterFormatter`, it validates the name 
-against the kebab-case convention, registers the formatter under its name and, if the formatter returns types from
-`getFormattableTypes()`, also registers it for those types. If auto-apply is enabled, it additionally maps the 
-formatter's configuration key names for automatic activation. Registering a second named formatter with a name that
-is already taken throws a `FormatterServiceException`, and the formatter service remains unchanged.
+Named formatters are registered with `addFormatter(...)` or discovered as service providers, exactly like typed
+formatters (see [Registration](index.md#registration)). When `addFormatter` detects that the formatter implements
+`NamedParameterFormatter`, it validates the name against the kebab-case convention, registers the formatter under its
+name and, if the formatter returns types from `getFormattableTypes()`, also registers it for those types. If auto-apply
+is enabled, it additionally maps the formatter's configuration key names for automatic activation. Registering a second
+named formatter with a name that is already taken throws a `FormatterServiceException`, and the formatter service
+remains unchanged.
 
 ```java
 var formatterService = new DefaultFormatterService();
 formatterService.addFormatter(new ElapsedNamedFormatter());
 formatterService.addFormatter(new PercentNamedFormatter());
 ```
-
-The shared instance returned by `DefaultFormatterService.getSharedInstance()` is sealed and cannot be modified. To 
-register custom named formatters, create a new `DefaultFormatterService` instance as shown above.
-
-### ServiceLoader Auto-Discovery
-
-For library authors who distribute their named formatters as a JAR, the Java `ServiceLoader` mechanism provides
-automatic registration. Create a file named
-`META-INF/services/de.sayayi.lib.message.formatter.parameter.ParameterFormatter` in the resources directory and list
-the fully qualified class names of the formatters, one per line:
-
-```text title="META-INF/services/de.sayayi.lib.message.formatter.parameter.ParameterFormatter"
-com.example.formatter.ElapsedNamedFormatter
-com.example.formatter.PercentNamedFormatter
-com.example.formatter.CurrencyNamedFormatter
-```
-
-On the module path, the module descriptor declares the formatters instead, with a `provides` clause for
-`de.sayayi.lib.message.formatter.parameter.ParameterFormatter`, as shown for
-[type-specific formatters](typed-parameter-formatter.md#serviceloader-auto-discovery).
-
-When the application creates a `DefaultFormatterService`, it calls `ServiceLoader.load` for the `ParameterFormatter`
-interface and registers every discovered implementation. Named formatters are recognized and registered by name 
-automatically, just as they would be if `addFormatter` were called manually.

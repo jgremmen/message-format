@@ -30,6 +30,8 @@ import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
 
 import java.io.IOException;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Locale;
 import java.util.Map;
@@ -319,10 +321,10 @@ second.get();
 // "Hello Bob!"
 ```
 
-The snapshot contains the parameter values, not their evaluated results. A [supplier](../formatter/parameter/typed/supplier.md)
-parameter value is wrapped in a caching delegate when it is set with `with(...)`. The configurer and all suppliers
-returned by `formatSupplier()` share this delegate, so the supplier is invoked at most once and all of them format
-the same supplied value.
+The snapshot contains the parameter values, not their evaluated results. A
+[supplier](../formatter/parameter/typed/supplier.md) parameter value is wrapped in a caching delegate when it is set
+with `with(...)`. The configurer and all suppliers returned by `formatSupplier()` share this delegate, so the supplier
+is invoked at most once and all of them format the same supplied value.
 
 
 ## Creating Exceptions with Formatted Messages
@@ -334,9 +336,8 @@ need to format the message into a temporary variable before constructing the exc
 ### Immediate Exception
 
 The `formattedException` method formats the message and passes the result to the constructor function provided. The
-function is either an `ExceptionConstructor`, which receives the formatted message, or an
-`ExceptionConstructorWithCause`, which also receives a cause. Exceptions thrown by the function are passed on to the
-caller.
+single-argument variant takes an `ExceptionConstructor`, which receives the formatted message. Exceptions thrown by the
+function are passed on to the caller.
 
 ```java
 int userId = 42;
@@ -351,7 +352,8 @@ throw messageSupport
 ```
 
 A constructor reference works as well: `formattedException(IllegalArgumentException::new)` uses the `(String)`
-constructor.
+constructor. This also compiles for exception classes that have both a `(String)` and a `(String, Throwable)`
+constructor, which applies to almost every exception class of the JDK.
 
 If the exception needs a root cause, use the overload that accepts a `Throwable`. It takes an
 `ExceptionConstructorWithCause` and passes the cause, which may be `null`, to the `(String, Throwable)` constructor.
@@ -361,15 +363,15 @@ String dbHost = "db.local";
 int dbPort = 5432;
 
 try {
-    DriverManager.getConnection(
-        "jdbc:postgresql://" + dbHost + ":" + dbPort + "/shop");
+  DriverManager.getConnection(
+      "jdbc:postgresql://" + dbHost + ":" + dbPort + "/shop");
 } catch(SQLException ex) {
-    throw messageSupport
-        .message("Failed to connect to %{host}:%{port}")
-        .with("host", dbHost)
-        .with("port", dbPort)
-        .formattedException(RuntimeException::new, ex);
-    // throws RuntimeException("Failed to connect to db.local:5432", ex)
+  throw messageSupport
+      .message("Failed to connect to %{host}:%{port}")
+      .with("host", dbHost)
+      .with("port", dbPort)
+      .formattedException(RuntimeException::new, ex);
+  // throws RuntimeException("Failed to connect to db.local:5432", ex)
 }
 ```
 
@@ -439,10 +441,10 @@ Map<String,Object> params = configurer.getParameters();
 // {name=Alice, role=admin}
 ```
 
-The map returned by `getParameters()` is a live view backed by the configurer. Parameters set or removed later are
-visible in a previously obtained map. To keep the current state, copy the map, for example with `Map.copyOf(...)`.
-The map is intended for reading only. Parameters are changed through the `with`, `remove` and `clear` methods of
-the configurer.
+The map returned by `getParameters()` is an unmodifiable live view backed by the configurer. Parameters set or removed
+later are visible in a previously obtained map. To keep the current state, copy the map, for example with
+`Map.copyOf(...)`. Modifying the map throws an `UnsupportedOperationException`. Parameters are changed through the
+`with`, `remove` and `clear` methods of the configurer, which also validate the parameter names.
 
 ```java
 Map<String,Object> view = configurer.getParameters();

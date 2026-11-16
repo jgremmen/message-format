@@ -490,18 +490,16 @@ class. If `config` is `null`, the current configuration is used.
 
 ## Registration
 
-Custom formatters are registered with the formatter service. The shared instance returned by
-`DefaultFormatterService.getSharedInstance()` is sealed and cannot be modified. To add a custom formatter, create a new
-`DefaultFormatterService` instance:
+A typed formatter is registered with `addFormatter(...)` on a formatter service of its own, or discovered as a service
+provider, as described under [Registration](index.md#registration). `addFormatter` reads the `FormattableType` entries
+returned by `getFormattableTypes()` and registers the formatter for each type. Multiple formatters can coexist for the
+same type. They are ordered by their `FormattableType` order value and the formatter with the lowest order is used
+first.
 
 ```java
 var formatterService = new DefaultFormatterService();
 formatterService.addFormatter(new ColorFormatter());
 ```
-
-The `addFormatter` method reads the `FormattableType` entries returned by `getFormattableTypes()` and registers the
-formatter for each type. Multiple formatters can coexist for the same type. They are ordered by their `FormattableType`
-order value and the formatter with the lowest order is used first.
 
 If a formatter must be bound to a specific type regardless of what `getFormattableTypes()` returns, use
 `addFormatterForType`:
@@ -529,33 +527,3 @@ or `DoubleSupplier`. Parameter values of these types that are set with `MessageC
 caching delegate, and the formatter is selected based on the delegate's type. A formatter registered for the custom
 supplier type therefore never becomes a candidate. See [Supplier](../parameter/typed/supplier.md) for details.
 ///
-
-### ServiceLoader Auto-Discovery
-
-For library authors who distribute their formatters as a JAR, the Java `ServiceLoader` mechanism provides automatic
-registration. Create a file named `META-INF/services/de.sayayi.lib.message.formatter.parameter.ParameterFormatter` in 
-the resources directory and list the fully qualified class names of the formatters, one per line:
-
-```text title="META-INF/services/de.sayayi.lib.message.formatter.parameter.ParameterFormatter"
-com.example.formatter.ColorFormatter
-com.example.formatter.MeasurementFormatter
-```
-
-A library that is used on the module path declares the formatters in its module descriptor instead, because
-`META-INF/services` files of named modules are ignored:
-
-```java title="module-info.java"
-module com.example.formatter {
-  requires de.sayayi.lib.message;
-
-  provides de.sayayi.lib.message.formatter.parameter.ParameterFormatter
-      with com.example.formatter.ColorFormatter,
-           com.example.formatter.MeasurementFormatter;
-}
-```
-
-When the application creates a `DefaultFormatterService`, it calls `ServiceLoader.load` for the `ParameterFormatter` 
-interface and registers every discovered implementation. This allows the formatters to be picked up without any manual
-registration code. Service providers need a public no-argument constructor. A provider that fails validation, for
-example because of a duplicate formatter name, makes the constructor of `DefaultFormatterService` throw a
-`FormatterServiceException`.

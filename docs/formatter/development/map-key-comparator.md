@@ -466,7 +466,11 @@ formatterService.addFormatter(new CountryMapKeyComparator());
 
 messageSupport
     .message("""
-        %{country,'US':'United States','DE':'Germany','FR':'France',:'Other'}\
+        %{country,\
+            'US':'United States',\
+            'DE':'Germany',\
+            'FR':'France',\
+            :'Other'}\
         """)
     .with("country", Country.of("DE"))
     .format();
@@ -482,28 +486,12 @@ key, the engine takes the one with the highest `MatchResult` score.
 
 ## Registration
 
-Map key comparators are registered like any other parameter formatter. Use `addFormatter` on a `DefaultFormatterService`
-instance:
+A map key comparator is a parameter formatter, so it is registered with `addFormatter(...)` or discovered as a service
+provider of `ParameterFormatter`, as described under [Registration](index.md#registration). A standalone comparator is
+registered next to the formatter whose values it compares:
 
 ```java
 var formatterService = new DefaultFormatterService();
 formatterService.addFormatter(new HttpStatusFormatter());
 formatterService.addFormatter(new CountryMapKeyComparator());
 ```
-
-The shared instance returned by `DefaultFormatterService.getSharedInstance()` is sealed and cannot be modified. Custom 
-comparators require a new `DefaultFormatterService` instance.
-
-### ServiceLoader Auto-Discovery
-
-For library authors distributing comparators as a JAR, the Java `ServiceLoader` mechanism provides automatic 
-registration. Create a file named `META-INF/services/de.sayayi.lib.message.formatter.parameter.ParameterFormatter` in 
-the resources directory and list the fully qualified class names:
-
-```text title="META-INF/services/de.sayayi.lib.message.formatter.parameter.ParameterFormatter"
-com.example.formatter.HttpStatusFormatter
-com.example.formatter.CountryMapKeyComparator
-```
-
-When the application creates a `DefaultFormatterService`, it calls `ServiceLoader.load` for the `ParameterFormatter`
-interface and registers every discovered implementation automatically.

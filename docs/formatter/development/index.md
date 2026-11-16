@@ -84,6 +84,83 @@ The [Custom Map Key Comparator](map-key-comparator.md) page explains the interfa
 context and provides complete examples for both integrated and standalone comparators.
 
 
+## Registration
+
+All kinds of formatters are registered on a formatter service that implements `FormatterService.WithRegistry`.
+Parameter formatters, including named formatters, size queryables and map key comparators, are added with
+`addFormatter(...)`. Post formatters are added with `addPostFormatter(...)`. The shared instance returned by
+`DefaultFormatterService.getSharedInstance()` is sealed, so a custom formatter requires a formatter service of its own,
+which is then passed to the message support:
+
+```java title="ShopMessages.java"
+import de.sayayi.lib.message.MessageSupport;
+import de.sayayi.lib.message.MessageSupportFactory;
+import de.sayayi.lib.message.formatter.DefaultFormatterService;
+
+public final class ShopMessages
+{
+  public static MessageSupport create()
+  {
+    var formatterService = new DefaultFormatterService();
+    formatterService.addFormatter(new ColorFormatter());
+    formatterService.addPostFormatter(new MaskPostFormatter());
+
+    // all built-in formatters plus "ColorFormatter" and "mask"
+    return MessageSupportFactory.create(formatterService).seal();
+  }
+}
+```
+
+The rules that `addFormatter` and `addPostFormatter` enforce, such as unique names and the kebab-case naming
+convention, are described on the [Formatter Service](../../configuration/formatter-service.md#registering-formatters)
+page.
+
+### Service Provider Registration
+
+A library that ships formatters can let the `DefaultFormatterService` discover them, so that applications do not have
+to register them in code. Every `DefaultFormatterService` instance loads all providers of the `ParameterFormatter` and
+`PostFormatter` services through the Java `ServiceLoader` and registers them as if `addFormatter` or `addPostFormatter`
+had been called. A named formatter is registered under its name, a typed formatter for its formattable types.
+
+On the class path, the formatters are listed in service files, one fully qualified class name per line. The file name
+is the name of the service interface:
+
+```text title="META-INF/services/de.sayayi.lib.message.formatter.parameter.ParameterFormatter"
+com.example.formatter.ColorFormatter
+com.example.formatter.ElapsedNamedFormatter
+```
+
+```text title="META-INF/services/de.sayayi.lib.message.formatter.post.PostFormatter"
+com.example.formatter.MaskPostFormatter
+```
+
+Service files of named modules are ignored. A library that is used on the module path declares the same formatters in
+its module descriptor instead:
+
+```java title="module-info.java"
+module com.example.formatter {
+  requires de.sayayi.lib.message;
+
+  provides de.sayayi.lib.message.formatter.parameter.ParameterFormatter
+      with com.example.formatter.ColorFormatter,
+           com.example.formatter.ElapsedNamedFormatter;
+  provides de.sayayi.lib.message.formatter.post.PostFormatter
+      with com.example.formatter.MaskPostFormatter;
+}
+```
+
+A service provider must be a public class with a public no-argument constructor. A provider that fails validation, for
+example because its name is already taken, makes the constructor of `DefaultFormatterService` throw a
+`FormatterServiceException`. The class loader used for discovery is described on the
+[Formatter Service](../../configuration/formatter-service.md#defaultformatterservice) page.
+
+/// note | Thread Safety
+A formatter service holds a single instance of every formatter and uses it for all formatting calls, from all threads
+that share the service. Formatter implementations must therefore be thread-safe. A formatter without mutable state,
+like all examples in this section, is thread-safe by design.
+///
+
+
 ## Utilities
 
 The core module ships with several helper classes that solve problems encountered repeatedly when building formatters.

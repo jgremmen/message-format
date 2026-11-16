@@ -61,17 +61,3 @@ messageSupport
     .format();
 // "no details available"
 ```
-
-
-## Null Handling
-
-A `null` parameter value produces an empty string by default. A `null` map key can be provided to handle this case
-explicitly.
-
-```java
-messageSupport
-    .message("%{ex,null:'no error'}")
-    .with("ex", (Exception) null)
-    .format();
-// "no error"
-```

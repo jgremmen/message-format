@@ -150,20 +150,6 @@ messageSupport
 // "urgent"
 ```
 
-### Null Handling
-
-When the parameter value is `null`, the formatter outputs an empty string by default. A `null` map key can be provided
-to produce specific text.
-
-```java
-messageSupport
-    .message("%{status,null:'unknown'}")
-    .with("status", (OrderStatus) null)
-    .format();
-// "unknown"
-```
-
-
 ## Unmatched Values
 
 When a string or number map key is present but the enum constant's name or ordinal does not match any of them, the
@@ -177,7 +163,8 @@ messageSupport
 // ""
 
 messageSupport
-    .message("%{priority,'LOW':'relaxed','CRITICAL':'immediate',:'normal'}")
+    .message(
+        "%{priority,'LOW':'relaxed','CRITICAL':'immediate',":'normal'}")
     .with("priority", Priority.MEDIUM)
     .format();
 // "normal"

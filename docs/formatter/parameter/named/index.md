@@ -196,9 +196,10 @@ messageSupport
 
 ## Reference
 
-The column "Default" tells whether the `DefaultFormatterService` registers the formatter automatically. All other
-formatters must be added with `addFormatter(...)` on a
-[formatter service](../../../configuration/formatter-service.md#registering-formatters).
+The column "Default" tells whether the `DefaultFormatterService` registers the formatter automatically. How the other
+formatters are added to a formatter service is described under
+[Formatters Not Registered by Default](../../../configuration/formatter-service.md#formatters-not-registered-by-default)
+on the formatter service page.
 
 | Format Name  | Formatter Class       | Module                 | Default | Documentation                    |
 |--------------|-----------------------|------------------------|---------|----------------------------------|

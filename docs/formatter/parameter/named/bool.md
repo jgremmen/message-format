@@ -156,7 +156,8 @@ considered empty. This is the key distinction from the type-based formatters, wh
 and the `empty` key never matches.
 
 For example, a string that is neither a boolean literal nor a valid number, a number that is not finite (`NaN` or
-infinite) or an empty optional cannot be converted to a boolean. The `empty` key catches these cases. Its negated form `!empty` matches any value that was successfully converted.
+infinite) or an empty optional cannot be converted to a boolean. The `empty` key catches these cases. Its negated form
+`!empty` matches any value that was successfully converted.
 
 ```java
 messageSupport

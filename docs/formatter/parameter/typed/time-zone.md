@@ -66,17 +66,3 @@ messageSupport
     .format();
 // "CET"
 ```
-
-
-## Null Handling
-
-A `null` parameter value produces an empty string by default. A `null` map key can be provided to handle this case
-explicitly.
-
-```java
-messageSupport
-    .message("%{tz,null:'no timezone'}")
-    .with("tz", (TimeZone) null)
-    .format();
-// "no timezone"
-```

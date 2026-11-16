@@ -128,16 +128,3 @@ messageSupport
     .format();
 // "Traditional Chinese" (or localized equivalent)
 ```
-
-
-## Null Handling
-
-A `null` parameter value produces an empty string by default. A `null` map key can be provided to produce specific text.
-
-```java
-messageSupport
-    .message("%{loc,null:'no locale'}")
-    .with("loc", null)
-    .format();
-// "no locale"
-```

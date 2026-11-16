@@ -108,9 +108,11 @@ class files using several strategies, from classpath scanning to registering ind
 Alternatively, messages can be loaded from [properties files](adopter/properties/index.md) or standard Java
 [resource bundles](adopter/resource-bundle/index.md).
 
-The [Add-Ons](add-on/index.md) section describes integration with external frameworks. [Apache Log4j2](add-on/log4j.md) integration 
-replaces Log4j's default message formatting with the message format syntax. The [Spring Framework](add-on/spring/message-source.md) integration
-provides a `MessageSource` backed by the message format engine.
+The [Add-Ons](add-on/index.md) section describes the optional modules. The [ICU](formatter/parameter/named/icu.md)
+add-on provides formatters based on ICU4J, and the [Log4j](add-on/log4j.md) add-on replaces Log4j's default message
+formatting with the message format syntax. The [Spring](add-on/spring/index.md) add-on provides a `MessageSource`
+backed by the message format engine, the `spel` formatter and formatters for Spring types. The
+[highlight.js](add-on/highlight-js/index.md) add-on highlights message format strings in web pages.
 
-The [Gradle Plugin](gradle-plugin/index.md) automates annotation scanning and pack file generation at build time, so messages are 
-precompiled and ready to use without runtime classpath scanning.
+The [Gradle Plugin](gradle-plugin/index.md) automates annotation scanning and pack file generation at build time, so
+messages are precompiled and ready to use without runtime classpath scanning.

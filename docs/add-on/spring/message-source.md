@@ -12,38 +12,8 @@ formatting capabilities without any code changes on the consumer side.
 
 ## Dependency
 
-The class is part of the `message-format-spring` module, which also contains the
-[SpEL formatter](../../formatter/parameter/named/spel.md). It supports Spring Framework versions from 6.0.8 up to, but
-not including, 7.1.
-
-=== "Gradle (Groovy)"
-
-    ```groovy
-    dependencies {
-      implementation 'de.sayayi.lib:message-format-spring:0.25.0'
-    }
-    ```
-
-=== "Gradle (Kotlin)"
-
-    ```kotlin
-    dependencies {
-      implementation("de.sayayi.lib:message-format-spring:0.25.0")
-    }
-    ```
-
-=== "Maven"
-
-    ```xml
-    <dependency>
-      <groupId>de.sayayi.lib</groupId>
-      <artifactId>message-format-spring</artifactId>
-      <version>0.25.0</version>
-    </dependency>
-    ```
-
-For JPMS-based projects, the module name is `de.sayayi.lib.message.spring`. It requires `de.sayayi.lib.message`,
-`spring.core` and `spring.context` transitively.
+The class is part of the `message-format-spring` module. Its coordinates and module name are listed on the
+[Spring](index.md#dependency) page.
 
 
 ## Positional Argument Mapping
@@ -98,7 +68,7 @@ messageSource.getMessage("greeting", new Object[] { "World" }, Locale.US);
 If `p1`, `p2`, etc. are not descriptive enough or conflict with existing parameter names in the templates, a custom 
 prefix can be specified. The generated names must be valid kebab-case or lower camel-case parameter names (see
 [Syntax](../../message/syntax.md#parameters)), so prefixes like `arg`, `myArg` or `my-arg-` can be used, but not `Arg`
-or `my_arg`.
+or `my_arg`. The constructor rejects such a prefix with an `IllegalArgumentException`.
 
 ```java
 MessageSupportMessageSource messageSource =

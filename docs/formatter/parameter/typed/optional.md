@@ -241,25 +241,3 @@ messageSupport
     .format();
 // "not graded"
 ```
-
-
-## Null Handling
-
-For all four formatters, a `null` parameter value (as opposed to an empty optional) produces an empty string by default.
-A `null` map key can be provided to handle this case explicitly. An empty optional also matches the `null` key.
-
-```java
-messageSupport
-    .message("%{value,null:'not provided'}")
-    .with("value", (Optional<?>) null)
-    .format();
-// "not provided"
-```
-
-```java
-messageSupport
-    .message("%{count,null:'not provided'}")
-    .with("count", (OptionalInt) null)
-    .format();
-// "not provided"
-```

@@ -82,9 +82,10 @@ messageSupport
 
 ### Empty and Null Keys
 
-The `empty` key matches when the string value is empty or (with an equality comparison) consists only of whitespace. 
-The `null` key matches when the parameter value is `null`. A `null` value also matches `empty` since it has no string 
-content. The negated forms `!empty` and `!null` are available as well.
+The `empty` key matches an empty string and a string that consists only of whitespace. The `!empty` key matches every
+non-empty string, including one with whitespace only. When both keys are present, such a string selects `empty`. The
+`null` key and the treatment of `null` values follow the
+[general rules](../index.md#null-values-and-empty-results) for parameter formatters.
 
 ```java
 messageSupport
@@ -143,26 +144,6 @@ messageSupport
     .with("code", "0")
     .format();
 // "ok"
-```
-
-
-## Null Handling
-
-When the parameter value is `null`, the formatter outputs an empty string by default. A `null` map key can be provided 
-to produce specific text.
-
-```java
-messageSupport
-    .message("%{name}")
-    .with("name", null)
-    .format();
-// ""
-
-messageSupport
-    .message("%{name,null:'<unnamed>'}")
-    .with("name", null)
-    .format();
-// "<unnamed>"
 ```
 
 

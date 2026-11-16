@@ -1,8 +1,10 @@
 # Classifier
 
 /// note
-This formatter is **not** included in the `DefaultFormatterService`. It must be registered explicitly by adding a 
-`ClassifierFormatter` instance to the formatter service.
+This formatter is **not** registered by the `DefaultFormatterService`. An application that uses it adds a
+`ClassifierFormatter` instance to its formatter service, as described under
+[Formatters Not Registered by Default](../../../configuration/formatter-service.md#formatters-not-registered-by-default)
+on the formatter service page.
 ///
 
 The named formatter `classifier` is selected explicitly by writing `format:classifier` in the message parameter

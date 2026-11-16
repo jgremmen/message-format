@@ -219,8 +219,8 @@ messageSupport
 
 The number formatter only evaluates number keys (besides `null` and `empty`). Bool and string keys are evaluated for
 numbers when a selecting formatter such as [`choice`](../named/choice.md) picks the message. Bool keys then interpret
-the number as a boolean, so zero matches `false` and any other value matches `true`. This applies to all `Number`
-types, including `AtomicInteger`, `AtomicLong`, `LongAdder` and `LongAccumulator`.
+the number as a boolean, so zero matches `false` and any other finite value matches `true`. This applies to all
+`Number` types, including `AtomicInteger`, `AtomicLong`, `LongAdder` and `LongAccumulator`.
 
 ```java
 messageSupport
@@ -258,17 +258,17 @@ messageSupport
 // "huge"
 ```
 
-`NaN` and infinite `double` or `float` values are not valid numbers, so they never match a number or string key.
-
-### Null Handling
-
-When the parameter value is `null`, the formatter outputs an empty string by default. A `null` map key can be provided 
-to produce specific text.
+`NaN` and infinite `double` or `float` values are not valid numbers. They never match a number, string or bool key,
+so they are neither `true` nor `false`:
 
 ```java
 messageSupport
-    .message("%{score,null:'N/A'}")
-    .with("score", (Integer) null)
+    .message("%{v,format:choice,true:'yes',false:'no',:'unknown'}")
+    .with("v", Double.NaN)
     .format();
-// "N/A"
+// "unknown"
 ```
+
+/// note | Migration from 0.24
+Up to version 0.24.0, a non-finite value matched the bool key `true`.
+///

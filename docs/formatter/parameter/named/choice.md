@@ -284,7 +284,7 @@ messageSupport
             1:'GENERAL_ERROR',\
             2:'MISUSE',\
             126:'NOT_EXECUTABLE',\
-            127:'NOT_FOUND'}
+            127:'NOT_FOUND'}\
         """)
     .with("code", 0)
     .format();

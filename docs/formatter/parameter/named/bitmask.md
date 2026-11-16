@@ -1,8 +1,10 @@
 # Bitmask
 
 /// note
-This formatter is **not** included in the `DefaultFormatterService`. It must be registered explicitly by adding a 
-`BitmaskFormatter` instance to the formatter service.
+This formatter is **not** registered by the `DefaultFormatterService`. An application that uses it adds a
+`BitmaskFormatter` instance to its formatter service, as described under
+[Formatters Not Registered by Default](../../../configuration/formatter-service.md#formatters-not-registered-by-default)
+on the formatter service page.
 ///
 
 The named formatter `bitmask` is selected explicitly by writing `format:bitmask` in the message parameter
@@ -150,17 +152,4 @@ messageSupport
     .with("v", BigInteger.ONE.shiftLeft(100).or(BigInteger.ONE))
     .format();
 // "high, low"
-```
-
-
-## Null Handling
-
-A `null` parameter value produces an empty string by default. A `null` map key can be provided to produce specific text.
-
-```java
-messageSupport
-    .message("%{flags,format:bitmask,null:'no flags',0:read,2:write}")
-    .with("flags", null)
-    .format();
-// "no flags"
 ```

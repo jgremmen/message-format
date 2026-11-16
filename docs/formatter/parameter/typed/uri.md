@@ -125,16 +125,3 @@ messageSupport
     .format();
 // "development"
 ```
-
-
-## Null Handling
-
-A `null` parameter value produces an empty string by default. A `null` map key can be provided to produce specific text.
-
-```java
-messageSupport
-    .message("%{u,null:'no URI'}")
-    .with("u", null)
-    .format();
-// "no URI"
-```

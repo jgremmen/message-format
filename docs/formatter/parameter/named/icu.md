@@ -241,7 +241,9 @@ formatters in a `META-INF/services` file and its module descriptor contains no `
 application runs on the module path, the formatter is therefore not discovered and must be registered manually as
 shown below.
 
-When using `GenericFormatterService`, the formatter must be registered manually:
+On the module path, the formatter is added to the formatter service following the steps described under
+[Formatters Not Registered by Default](../../../configuration/formatter-service.md#formatters-not-registered-by-default)
+on the formatter service page. When using `GenericFormatterService`, it must be registered manually in any case:
 
 ```java
 var formatterService = new GenericFormatterService();

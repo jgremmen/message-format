@@ -18,9 +18,10 @@ Log4j's default `{}` placeholder formatting with the full message format syntax,
 named parameters `p1`, `p2` and so on. Messages are formatted lazily, so the formatting cost is only paid when a
 log statement actually reaches an appender.
 
-The [Spring](spring/index.md) add-on bridges Spring's `MessageSource` interface to a `MessageSupport` instance. Any
-Spring component that resolves messages through `MessageSource`, such as Thymeleaf templates or validation error
-messages, can use the message format syntax without changes on the consumer side.
+The [Spring](spring/index.md) add-on bridges Spring's `MessageSource` interface to a `MessageSupport` instance, so
+Spring components that resolve messages through `MessageSource` can use the message format syntax. It also provides
+the `spel` formatter for Spring Expression Language expressions and formatters for Spring types such as
+`TypeDescriptor`.
 
 The [highlight.js](highlight-js/index.md) add-on is a language definition for the JavaScript syntax highlighter
 highlight.js. It colors message format strings in web pages, such as documentation or administration pages that list

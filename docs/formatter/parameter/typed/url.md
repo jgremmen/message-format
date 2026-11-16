@@ -155,17 +155,3 @@ messageSupport
     .format();
 // "standard HTTPS"
 ```
-
-
-## Null Handling
-
-A `null` parameter value produces an empty string by default. A `null` map key can be provided to produce
-specific text.
-
-```java
-messageSupport
-    .message("%{u,null:'no URL'}")
-    .with("u", null)
-    .format();
-// "no URL"
-```

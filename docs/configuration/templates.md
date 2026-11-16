@@ -9,8 +9,7 @@ template is parsed from a format string just like a message, but unlike messages
 references. Templates are registered on a `ConfigurableMessageSupport` under a name and are resolved at format time 
 when a message references them.
 
-Template names must follow the kebab-case naming convention: lowercase letters and digits separated by single hyphens
-(e.g. `opt-error`, `item-count`). The name must start with a letter.
+Template names follow the kebab-case naming convention described on the [Syntax](../message/syntax.md#templates) page.
 
 A template is formatted in place of its `%[...]` reference. Leading and trailing spaces produced by the template are
 not significant. They are replaced by the spaces surrounding the reference in the enclosing message, so a space
@@ -108,8 +107,8 @@ For the full `MessageBuilder` API including all part types, space control and co
 ## Adding Templates to ConfigurableMessageSupport
 
 Once templates have been created or parsed, they need to be registered on a `ConfigurableMessageSupport` before messages
-can reference them. The [MessageSupport](message-support.md) page covers the `ConfigurableMessageSupport` API in detail;
-this section focuses on the different ways to add templates.
+can reference them. This section shows the different ways to add templates. What happens when a name is registered
+twice is described under [Duplicate Handling](message-support.md#duplicate-handling).
 
 ### Adding Parsed Templates
 
@@ -284,11 +283,3 @@ registered without explicit code.
 Custom templates have no format string representation and are never written to a [pack file](pack-files.md), even
 if an exported message references them. They must be registered again on the message support that imports the pack.
 ///
-
-
-### Duplicate Handling
-
-Attempting to add a template whose name already exists throws a `DuplicateTemplateException` if the content differs. If
-the new template is identical to the existing one, the duplicate is silently ignored. Two parsed templates are identical
-when their message parts are equal. Two custom templates are identical when they have the same name. This behavior can
-be customized by installing a `TemplateFilter` as described on the [MessageSupport](message-support.md#filters) page.

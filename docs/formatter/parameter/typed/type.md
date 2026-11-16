@@ -261,16 +261,3 @@ messageSupport
     .format();
 // "java.util.Optional<? extends java.lang.Number>[]"
 ```
-
-
-## Null Handling
-
-A `null` parameter value produces an empty string by default. A `null` map key can be provided to produce specific text.
-
-```java
-messageSupport
-    .message("%{t,null:'unknown type'}")
-    .with("t", null)
-    .format();
-// "unknown type"
-```

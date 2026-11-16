@@ -5,12 +5,8 @@ toc_depth: 2
 # ICU Person Name
 
 /// note
-This formatter is **not** included in the core library. It is part of the `message-format-icu` module and must be
-added as a dependency to use.
-
-```text
-de.sayayi.lib:message-format-icu:0.25.0
-```
+This formatter is **not** included in the core library. It is part of the `message-format-icu` module, whose
+coordinates are listed on the [ICU](icu.md#dependency) page.
 ///
 
 The named formatter `icu-person` formats person names from individual name part parameters. It is specifically designed
@@ -575,7 +571,9 @@ mechanism. Having the `message-format-icu` module on the class path is sufficien
 not discovered, because the module descriptor contains no `provides` clause (see [ICU](icu.md#registration)), so it
 must be registered manually as shown below.
 
-When using `GenericFormatterService`, the formatter must be registered manually:
+On the module path, the formatter is added to the formatter service following the steps described under
+[Formatters Not Registered by Default](../../../configuration/formatter-service.md#formatters-not-registered-by-default)
+on the formatter service page. When using `GenericFormatterService`, it must be registered manually in any case:
 
 ```java
 var formatterService = new GenericFormatterService();
@@ -589,33 +587,5 @@ var messageSupport = MessageSupportFactory
 
 ### Dependency
 
-Add the `message-format-icu` module to the project alongside the core message format dependency.
-
-=== "Gradle (Groovy)"
-
-    ```groovy
-    dependencies {
-      implementation 'de.sayayi.lib:message-format-icu:0.25.0'
-    }
-    ```
-
-=== "Gradle (Kotlin)"
-
-    ```kotlin
-    dependencies {
-      implementation("de.sayayi.lib:message-format-icu:0.25.0")
-    }
-    ```
-
-=== "Maven"
-
-    ```xml
-    <dependency>
-      <groupId>de.sayayi.lib</groupId>
-      <artifactId>message-format-icu</artifactId>
-      <version>0.25.0</version>
-    </dependency>
-    ```
-
-For JPMS-based projects, the module name is `de.sayayi.lib.message.icu`. It requires `de.sayayi.lib.message` and
-`com.ibm.icu`.
+The formatter is part of the `message-format-icu` module. Its coordinates and module name are listed on the
+[ICU](icu.md#dependency) page.

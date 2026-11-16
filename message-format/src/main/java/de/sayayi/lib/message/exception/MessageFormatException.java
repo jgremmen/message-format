@@ -36,8 +36,10 @@ import static java.util.stream.Collectors.toUnmodifiableSet;
  * <p>
  * Besides the cause, the exception records the context in which the error occurred (message code, template name,
  * locale, parameter name and post formatter name), as far as it is known. The context is typically added while the
- * exception propagates through nested messages and templates, using the {@code with...} methods. The order in which the
- * context is added is retained, so the detail message is able to describe the actual nesting.
+ * exception propagates through nested messages and templates, using the {@code with...} methods.
+ * <p>
+ * The detail message is derived from the recorded context. Its wording is not part of the contract and may change. Code
+ * that evaluates the context must use the getters instead of parsing the detail message.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
@@ -137,11 +139,8 @@ public class MessageFormatException extends MessageException
    * {@inheritDoc}
    * <p>
    * The returned message describes which message, template, parameter, post formatter and locale failed to format, as
-   * far as they are known, honoring the order in which they have been nested. Generated message codes and template
-   * names are omitted.
-   * <p>
-   * The context keys are concatenated into a sequence (e.g. {@code l-c-p1-t1}) and the longest registered key sequence
-   * that is a prefix of it selects the message text.
+   * far as they are known. Generated message codes and template names are omitted. The wording of the message is not
+   * specified and may change.
    *
    * @return  detail message, never {@code null}
    */
@@ -214,7 +213,8 @@ public class MessageFormatException extends MessageException
 
 
   /**
-   * Returns the context key sequence for the recorded formatting context, e.g. {@code l-c-p1-t1}.
+   * Returns a key that identifies the kinds of formatting context that have been recorded, e.g. {@code l-c-p1-t1}. The
+   * format of the key is not specified and may change.
    *
    * @return  context key sequence, never {@code null}
    *

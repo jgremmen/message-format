@@ -1,8 +1,10 @@
 # Token
 
 /// note
-This formatter is **not** included in the `DefaultFormatterService`. It must be registered explicitly by adding a
-`TokenFormatter` instance to the formatter service.
+This formatter is **not** registered by the `DefaultFormatterService`. An application that uses it adds a
+`TokenFormatter` instance to its formatter service, as described under
+[Formatters Not Registered by Default](../../../configuration/formatter-service.md#formatters-not-registered-by-default)
+on the formatter service page.
 ///
 
 The `TokenFormatter` handles ANTLR `org.antlr.v4.runtime.Token` values. It is automatically selected whenever a
@@ -12,8 +14,10 @@ formatter extracts different aspects of a token depending on the `token` configu
 
 ## Registration
 
-Because the `TokenFormatter` is not part of the default formatter set, it must be added manually to the formatter
-service before use. The ANTLR runtime dependency must be on the classpath.
+Because the `TokenFormatter` is not part of the default formatter set, it is added to the formatter service before use,
+following the steps described under
+[Formatters Not Registered by Default](../../../configuration/formatter-service.md#formatters-not-registered-by-default)
+on the formatter service page. The ANTLR runtime is a dependency of the core module and therefore always available.
 
 ```java
 import de.sayayi.lib.message.MessageSupportFactory;
@@ -242,21 +246,6 @@ positionSupport
 ```
 
 
-## Null Handling
-
-A `null` parameter value produces an empty string. Since the `TokenFormatter` extends
-`AbstractSingleTypeParameterFormatter`, it only receives non-null `Token` instances. A null value is handled by the
-framework before the formatter is invoked.
-
-```java
-messageSupport
-    .message("token: '%{t,token:text}'")
-    .with("t", null)
-    .format();
-// "token: ''"
-```
-
-
 ## Practical Example
 
 A typical use case for the `TokenFormatter` is constructing user-facing error messages in a parser. When the ANTLR
@@ -265,8 +254,8 @@ clear diagnostic.
 
 ```java
 messageSupport
-    .message(
-        "syntax error at %{t,token:position}: unexpected '%{t,token:text}'")
+    .message("syntax error at %{t,token:position}: " +
+        "unexpected '%{t,token:text}'")
     .with("t", errorToken)
     .format();
 // "syntax error at 3:12: unexpected ';'"

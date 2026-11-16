@@ -376,9 +376,8 @@ regular file or when an I/O error occurs while reading the file size.
 
 ## Registration
 
-Register a `SizeQueryable` formatter the same way as any other parameter formatter. Because the shared instance
-returned by `DefaultFormatterService.getSharedInstance()` is sealed, a separate `DefaultFormatterService` instance must 
-be created:
+A `SizeQueryable` formatter is a parameter formatter, so it is registered with `addFormatter(...)` or discovered as a
+service provider, as described under [Registration](index.md#registration):
 
 ```java
 var formatterService = new DefaultFormatterService();
@@ -386,9 +385,9 @@ formatterService.addFormatter(new RingFormatter());
 formatterService.addFormatter(new MultimapSizeFormatter());
 ```
 
-The formatter is stored alongside other formatters for the same type. When the context iterates formatters for a size 
-query, it checks each one in order of precedence. The first formatter that implements `SizeQueryable` and returns a 
+The formatter is stored alongside other formatters for the same type. When the context iterates formatters for a size
+query, it checks each one in order of precedence. The first formatter that implements `SizeQueryable` and returns a
 present `OptionalLong` provides the final answer.
 
-If multiple `SizeQueryable` formatters exist for the same type, the one with the lowest `FormattableType.order` value 
+If multiple `SizeQueryable` formatters exist for the same type, the one with the lowest `FormattableType.order` value
 (highest precedence) is consulted first. Design the order values accordingly to override a built-in size calculation.

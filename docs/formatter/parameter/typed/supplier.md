@@ -286,25 +286,3 @@ messageSupport
     .format();
 // "normal"
 ```
-
-
-## Null Handling
-
-For all five supplier formatters, a `null` parameter value (the supplier itself is `null`) produces an empty string by
-default. A `null` map key can be provided to handle this case explicitly.
-
-```java
-messageSupport
-    .message("%{data,null:'no supplier'}")
-    .with("data", (Supplier<?>) null)
-    .format();
-// "no supplier"
-```
-
-```java
-messageSupport
-    .message("%{count,null:'unavailable'}")
-    .with("count", (IntSupplier) null)
-    .format();
-// "unavailable"
-```

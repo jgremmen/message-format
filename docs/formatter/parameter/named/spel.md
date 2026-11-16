@@ -5,12 +5,10 @@ toc_depth: 2
 # SpEL
 
 /// note
-This formatter is **not** included in the core library. It is part of the `message-format-spring` module and must be
-added as a dependency to use.
-
-```text
-de.sayayi.lib:message-format-spring:0.25.0
-```
+This formatter is **not** included in the core library. It is part of the `message-format-spring` module, whose
+coordinates are listed on the [Spring](../../../add-on/spring/index.md#dependency) page. The `DefaultFormatterService`
+does not register it, so it is added to the formatter service with one of the constructors described under
+[Registration](#registration).
 ///
 
 The named formatter `spel` evaluates
@@ -309,8 +307,11 @@ as a variable.
 ## Registration
 
 Before the `spel` formatter can be used, it must be registered with the formatter service. The module does not declare
-it as a service provider, so the `DefaultFormatterService` never registers it automatically. The `SpELFormatter` class
-provides three constructors for different levels of Spring integration.
+it as a service provider, so the `DefaultFormatterService` never registers it automatically. The general steps for
+adding such a formatter are described under
+[Formatters Not Registered by Default](../../../configuration/formatter-service.md#formatters-not-registered-by-default)
+on the formatter service page. The `SpELFormatter` class provides three constructors for different levels of Spring
+integration.
 
 ### Default Constructor
 

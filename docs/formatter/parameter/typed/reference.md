@@ -107,17 +107,3 @@ messageSupport
 
 The `ReferenceFormatter` supports size queries. The size is determined by calling `get()` and querying the size of the
 referenced value. If the reference has been collected, no size is available.
-
-
-## Null Handling
-
-A `null` parameter value (the reference itself is `null`, not just the referenced object) produces an empty string by
-default. A `null` map key can be provided to handle this case explicitly.
-
-```java
-messageSupport
-    .message("%{value,null:'no reference'}")
-    .with("value", (WeakReference<String>) null)
-    .format();
-// "no reference"
-```

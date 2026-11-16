@@ -27,8 +27,11 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.time.ZoneId;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Locale;
+import java.util.TimeZone;
 
 var messageSupport = MessageSupportFactory.createDefault();
 // all built-in formatters are available
@@ -258,20 +261,6 @@ Up to version 0.24.0, every value was formatted in the system default time zone,
 `OffsetDateTime` with a different zone. Such values are now formatted in their own zone.
 ///
 
-### Null Handling
-
-A `null` parameter value produces an empty string by default. A `null` map key can be provided to handle this case
-explicitly.
-
-```java
-messageSupport
-    .message("%{date,null:'no date'}")
-    .with("date", (LocalDate) null)
-    .format();
-// "no date"
-```
-
-
 ## ToTemporalDelegate
 
 The `ToTemporalDelegate` bridges legacy date/time types to the `TemporalFormatter`. It converts values of the
@@ -333,17 +322,4 @@ messageSupport
     .with("t", sqlTime)
     .format();
 // "23:36"
-```
-
-### Null Handling
-
-A `null` parameter value produces an empty string by default. A `null` map key can be provided to handle this case
-explicitly.
-
-```java
-messageSupport
-    .message("%{date,null:'unknown'}")
-    .with("date", (Date) null)
-    .format();
-// "unknown"
 ```

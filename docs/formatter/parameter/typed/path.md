@@ -182,17 +182,3 @@ messageSupport
     .format();
 // "1048576" (if the file is 1 MB)
 ```
-
-
-## Null Handling
-
-A `null` parameter value produces an empty string by default. A `null` map key can be provided to handle this case 
-explicitly.
-
-```java
-messageSupport
-    .message("%{file,null:'no file specified'}")
-    .with("file", (Path) null)
-    .format();
-// "no file specified"
-```

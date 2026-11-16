@@ -48,21 +48,48 @@ When a message is registered through `ConfigurableMessageSupport.addMessage(...)
 ### Message.LocaleAware
 
 `Message.LocaleAware` extends `Message` and holds multiple locale-specific messages. When the message is formatted, the
-locale provided through the `Parameters` is used to select the best matching variant. The matching algorithm compares
-the language and country of each variant with the requested locale and ignores scripts and variants. It selects the
-first matching variant according to the following rules, in order of precedence:
+locale provided through the `Parameters` is used to select the best matching variant. The variant of a locale is
+selected as follows:
 
-1. A variant with the same language and the same country.
-2. A variant with the same language and no country (e.g. `de` for `de-AT`).
-3. A variant with the same language but a different country (e.g. `de-DE` for `de-AT`).
-4. A variant for the root locale (an empty language, such as `Locale.ROOT`), which acts as the language-neutral default.
-5. The first variant in iteration order.
+1. A variant with the same language is always preferred. Among these, a variant with the same language, script and
+   country is selected immediately.
+2. Otherwise, the script decides first and the country second. A variant with the same script is preferred over a
+   variant without script, which in turn is preferred over a variant with a different script. If the requested locale
+   has no script, the script of the variants is not considered. The country is ranked the same way, so for `de-AT` a
+   variant for `de` is preferred over a variant for `de-DE`.
+3. Without a variant for the requested language, the variant for the root locale (an empty language, such as
+   `Locale.ROOT`) is selected. It acts as the language-neutral default.
+4. If there is neither a variant for the language nor one for the root locale, the first variant in iteration order
+   is selected.
 
-If several variants match the same rule, the first one in iteration order is selected. A localized message created by
-`MessageFactory.parseMessage(...)` from a `Map<Locale,String>` preserves the iteration order of that map, so an
-ordered map such as `LinkedHashMap` makes the selection predictable. The last rule only applies when no variant matches
-and no root locale variant exists. A root locale variant should be provided whenever the requested locales are not
-known in advance.
+The variant of a locale, such as the `POSIX` in `en-US-POSIX`, is not considered. If several variants match equally
+well, the first one in iteration order is selected. A localized message created by `MessageFactory.parseMessage(...)`
+from a `Map<Locale,String>` preserves the iteration order of that map, so an ordered map such as `LinkedHashMap`
+makes the selection predictable. A root locale variant should be provided whenever the requested locales are not known
+in advance.
+
+```java
+import de.sayayi.lib.message.MessageFactory;
+import de.sayayi.lib.message.MessageSupportFactory;
+
+import java.util.LinkedHashMap;
+import java.util.Locale;
+
+var messageSupport = MessageSupportFactory.createDefault();
+
+var texts = new LinkedHashMap<Locale,String>();
+texts.put(Locale.forLanguageTag("sr-Latn"), "Zdravo %{name}!");
+texts.put(Locale.forLanguageTag("sr-Cyrl"), "Здраво %{name}!");
+
+messageSupport.addMessage(MessageFactory.getSharedInstance()
+    .parseMessage("greeting", texts));
+
+messageSupport.code("greeting")
+    .with("name", "Ana")
+    .locale("sr-Cyrl")
+    .format();
+// "Здраво Ana!", the variant with the requested script
+```
 
 A `Message.LocaleAware` does not have a single array of message parts or a single format string. Calling
 `getMessageParts()` or `asFormatString(Charset)` on it throws `UnsupportedOperationException`. To inspect individual 
@@ -378,8 +405,8 @@ part. See [Templates](templates.md) for details.
 ## Adding Messages to ConfigurableMessageSupport
 
 Once messages have been created or parsed, they need to be registered on a `ConfigurableMessageSupport` before they can
-be formatted by code. The [MessageSupport](message-support.md) page covers the `ConfigurableMessageSupport` API in 
-detail; this section focuses on the different ways to add messages.
+be formatted by code. This section shows the different ways to add messages. What happens when a code is registered
+twice is described under [Duplicate Handling](message-support.md#duplicate-handling).
 
 ### Adding Messages by Code and Format String
 
@@ -446,12 +473,6 @@ messageSupport
     .format();
 // "3 Artikel in Ihrem Warenkorb"
 ```
-
-### Duplicate Handling
-
-Attempting to add a message whose code already exists throws a `DuplicateMessageException` if the content differs. If 
-the new message is identical to the existing one, the duplicate is silently ignored. This behavior can be customized by
-installing a `MessageFilter` as described on the [MessageSupport](message-support.md#filters) page.
 
 ### Bulk Loading
 

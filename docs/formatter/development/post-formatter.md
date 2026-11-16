@@ -192,9 +192,10 @@ transformation is self-contained, the method can ignore the context entirely and
 
 ## Registration
 
-Post formatters are registered on the formatter service through the `addPostFormatter` method. The shared instance 
-returned by `DefaultFormatterService.getSharedInstance()` is sealed and cannot be modified. To register custom post 
-formatters, create a new `DefaultFormatterService` instance:
+Post formatters are registered with `addPostFormatter(...)` or discovered as service providers of `PostFormatter`, as
+described under [Registration](index.md#registration). Each post formatter must have a unique kebab-case name.
+Registering two post formatters with the same name, or a post formatter whose name is not kebab-case, throws a
+`FormatterServiceException`.
 
 ```java
 var formatterService = new DefaultFormatterService();
@@ -204,25 +205,3 @@ formatterService.addPostFormatter(new SlugPostFormatter());
 var messageSupport = MessageSupportFactory.create(formatterService);
 // "mask" and "slug" are available next to "case" and "clip"
 ```
-
-Each post formatter must have a unique kebab-case name. Attempting to register two post formatters with the same name,
-or a post formatter whose name is not kebab-case, throws a `FormatterServiceException`. A single post formatter
-instance is shared by all threads that use the formatter service, so implementations must be thread-safe. The
-examples on this page are stateless and therefore safe.
-
-### ServiceLoader Auto-Discovery
-
-For library authors who distribute their post formatters as a JAR, the Java `ServiceLoader` mechanism provides automatic
-registration. Create a file named `META-INF/services/de.sayayi.lib.message.formatter.post.PostFormatter` in the 
-resources directory and list the fully qualified class names of the post formatters, one per line:
-
-```text title="META-INF/services/de.sayayi.lib.message.formatter.post.PostFormatter"
-com.example.formatter.MaskPostFormatter
-com.example.formatter.SlugPostFormatter
-```
-
-On the module path, a `provides de.sayayi.lib.message.formatter.post.PostFormatter with ...` clause in the module
-descriptor takes the place of the service file.
-
-When the application creates a `DefaultFormatterService`, it calls `ServiceLoader.load` for the `PostFormatter` 
-interface and registers every discovered implementation alongside the built-in `case` and `clip` post formatters.

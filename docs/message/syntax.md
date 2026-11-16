@@ -24,7 +24,6 @@ The examples on this page use the following message support.
 ```java title="Example setup"
 import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.MessageSupportFactory;
-import de.sayayi.lib.message.formatter.DefaultFormatterService;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -151,9 +150,11 @@ named formatter explicitly with the `format` keyword. The syntax is `format:<nam
 registered `NamedParameterFormatter`.
 
 The default formatter service registers the named formatters `string`, `bool`, `choice` and `size`. The library also
-ships the named formatters `classifier`, `bitmask` and `geo`, which are not registered by default. A format
-string that refers to an unregistered name silently falls back to type-based selection. See
-[Named Formatters](../formatter/parameter/named/index.md) for the complete list and how to register them.
+ships the named formatters `classifier`, `bitmask` and `geo`, which are not registered by default. A format string that
+refers to an unregistered name silently falls back to type-based selection. See
+[Named Formatters](../formatter/parameter/named/index.md) for the complete list and
+[Formatters Not Registered by Default](../configuration/formatter-service.md#formatters-not-registered-by-default) for
+how to add them.
 
 Explicitly selecting a named formatter is particularly useful when the automatic type-based selection would pick a 
 different formatter than the one required. In the following example the parameter value is the integer `4`. Without 
@@ -297,7 +298,7 @@ messageSupport
 
 A common use case is pluralization, where specific text is provided for zero, one and many items. The text for
 "many" is a [default entry](#default-entry), which the number formatter does not consult. The
-[`choice`](#the-choice-formatter) formatter is therefore selected explicitly.
+[`choice`](#selecting-formatters) formatter is therefore selected explicitly.
 
 ```java
 messageSupport
@@ -363,11 +364,10 @@ at most one default entry, and it is only valid together with at least one keyed
 rejected by the parser. The default entry can appear at any position, but by convention it is written last.
 
 The default entry is not a general fallback that applies to every parameter. Whether it is used depends on the
-formatter. Formatters whose purpose is to select a message, such as [`choice`](#the-choice-formatter),
-[`size`](#the-size-formatter) and [`classifier`](../formatter/parameter/named/classifier.md), use the default entry
-when no key matches. The [enum](../formatter/parameter/typed/enum.md) formatter and a few other type-specific
-formatters do the same, as described on their pages. The formatters for numbers, strings and booleans ignore the
-default entry and output the formatted value instead.
+formatter. Formatters whose purpose is to [select a message](#selecting-formatters), such as `choice`, `size` and
+`classifier`, use the default entry when no key matches. The [enum](../formatter/parameter/typed/enum.md) formatter and
+a few other type-specific formatters do the same, as described on their pages. The formatters for numbers, strings and
+booleans ignore the default entry and output the formatted value instead.
 
 ```java
 messageSupport
@@ -385,51 +385,26 @@ messageSupport
 // "unknown"
 ```
 
-### The Choice Formatter
+### Selecting Formatters
 
-The `choice` formatter is a named formatter specifically designed for value-based selection. It supports all map key 
-types and picks the best matching entry. Unlike the default type-based formatters, the choice formatter does not
-convert or format the value itself. Instead, it purely acts as a selector that picks one of several mapped messages 
-based on the value.
-
-A typical use case is pluralization where the same parameter appears both as a number and as part of the choice logic.
+Map keys select text, but most formatters still output the formatted value when no key matches. Formatters whose
+purpose is to select a message behave differently. The [`choice`](../formatter/parameter/named/choice.md) formatter
+never outputs the value itself and only produces the text of the best matching entry, including the default entry. It
+is the usual choice for pluralization, where the same parameter appears both as a number and as the selector of a
+word form:
 
 ```java
 messageSupport
-    .message("%{n} %{n,format:choice,1:'colour',:'colours'}.")
-    .with("n", 1)
-    .format();
-// "1 colour."
-
-messageSupport
-    .message("%{n} %{n,format:choice,1:'colour',:'colours'}.")
+    .message("%{n} %{n,format:choice,1:'item',:'items'} left.")
     .with("n", 4)
     .format();
-// "4 colours."
+// "4 items left."
 ```
 
-### The Size Formatter
-
-The `size` formatter determines the size of a value and makes that size available for mapping. It can determine the 
-length of a string, the size of a collection, the length of an array and similar measurements. The size calculation is 
-delegated to `SizeQueryable` formatters registered for the value's type.
-
-The resulting size can then be mapped to custom text using number map keys. If no mapping is provided, the numeric size
-is formatted as text.
-
-```java
-messageSupport
-    .message("""
-        %{list,\
-            format:size,\
-            0:'empty',\
-            1:'single',\
-            :'%{list,format:size} elements'}\
-        """)
-    .with("list", List.of("a", "b", "c"))
-    .format();
-// "3 elements"
-```
+The [`size`](../formatter/parameter/named/size.md) formatter selects by the size of a string, a collection, an array or
+a similar value instead of by the value itself, and the
+[`classifier`](../formatter/parameter/named/classifier.md) formatter selects by the kind of value. Their pages
+describe which keys they support.
 
 
 ## Quoted Messages
@@ -458,16 +433,13 @@ A template is a reusable message fragment identified by a name. Templates allow 
 defined once and referenced from multiple messages. This is particularly useful for complex formatting patterns that 
 would otherwise be duplicated.
 
-Template names must follow the kebab-case naming convention: lowercase letters and digits separated by single hyphens
-(e.g. `opt-error`, `item-count`).
+Template names must follow the kebab-case naming convention. A name starts with a lowercase letter and consists of
+lowercase letters and digits separated by single hyphens (e.g. `opt-error`, `item-count`).
 
 A template reference uses the syntax `%[template-name]`. The template is registered separately on the 
 `ConfigurableMessageSupport` and is typically created through `MessageFactory.parseTemplate(String)`.
 
 ```java
-var messageSupport = MessageSupportFactory.create(
-    DefaultFormatterService.getSharedInstance());
-
 messageSupport.addTemplate("greeting",
     MessageFactory.getSharedInstance().parseTemplate("Hello %{who}!"));
 
@@ -565,64 +537,21 @@ operate on individual values, post formatters operate on already formatted text.
 The first argument is the name of the post formatter. The second argument is a quoted message whose formatted result 
 will be transformed. Any additional arguments are configuration key-value pairs that control the transformation.
 
-### Case Conversion
-
-The `case` post formatter converts text to uppercase or lowercase. The target case is specified by the `case`
-configuration key, which accepts `upper` (or `uppercase`) and `lower` (or `lowercase`). The conversion is locale-aware,
-meaning it respects locale-specific casing rules.
-
-```java
-messageSupport
-    .message("%(case,'%{name}',case:upper)")
-    .with("name", "alice")
-    .locale(Locale.US)
-    .format();
-// "ALICE"
-```
-
-```java
-messageSupport
-    .message("%(case,'%{label}',case:lowercase)")
-    .with("label", "WARNING")
-    .locale(Locale.US)
-    .format();
-// "warning"
-```
-
-### Clipping
-
-The `clip` post formatter truncates text to a maximum length. The maximum length is specified by the `clip` 
-configuration key as a numeric value. When the text exceeds this length, it is truncated and by default an ellipsis
-character is appended to indicate that the text has been clipped.
+The library ships the post formatters [`case`](../formatter/post/case.md), which converts the text to uppercase or
+lowercase, and [`clip`](../formatter/post/clip.md), which truncates the text to a maximum length. In the following
+example the sub-message contains a parameter, and its formatted result is truncated to 20 characters:
 
 ```java
 messageSupport
     .message("%(clip,'%{description}',clip:20)")
-    .with("description", 
+    .with("description",
         "This is a very long description that should be truncated")
     .format();
 // "This is a very long…"
 ```
 
-The suffix behavior can be customized. Setting `clip-suffix` to `false` disables the suffix entirely and performs a 
-hard truncation at the exact maximum length. Alternatively, a custom suffix string can be provided using
-`clip-suffix-text`.
-
-```java
-messageSupport
-    .message("%(clip,'%{text}',clip:10,clip-suffix:false)")
-    .with("text", "Hello World, this is too long")
-    .format();
-// "Hello Worl"
-```
-
-```java
-messageSupport
-    .message("%(clip,'%{text}',clip:15,clip-suffix-text:'...')")
-    .with("text", "A sentence that is way too long")
-    .format();
-// "A sentence t..."
-```
+[Post Formatters](../formatter/post/index.md) describes how sub-messages are quoted, how post formatters are nested
+and how their configuration keys are resolved.
 
 
 ## Putting It All Together
@@ -633,8 +562,6 @@ for the item count and plain text to tie everything together.
 
 ```java
 var factory = MessageFactory.getSharedInstance();
-var messageSupport = MessageSupportFactory.create(
-    DefaultFormatterService.getSharedInstance());
 
 // Define a reusable template for item counts
 messageSupport.addTemplate("item-count",

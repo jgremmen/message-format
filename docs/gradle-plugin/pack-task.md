@@ -47,10 +47,9 @@ can also be added directly on the task with `include` and `exclude`; they are ad
 Assigning the `includeRegexFilters` or `excludeRegexFilters` property on the task replaces the extension's filters
 instead. The filters control which message codes are written to the pack file and which are skipped.
 
-The filtering logic works as follows. If no include filters are defined, every scanned message is eligible. If at least
-one include filter is defined, a message is eligible only when its code matches at least one of the include patterns. 
-After that, if the message code matches any exclude pattern, it is removed from the output. Filters are standard Java 
-regular expressions matched against the full message code string.
+How include and exclude patterns are combined is described under
+[Include and Exclude Filters](extension.md#include-and-exclude-filters). The patterns are standard Java regular
+expressions that must match the full message code.
 
 The filters also apply during template validation. When `validateReferences` is enabled, the task checks for missing 
 templates only among messages that pass the filters. Messages that are excluded by the filters are not considered.
@@ -94,8 +93,9 @@ the missing template names. For a single missing template the error reads `Missi
 multiple missing templates the error reads `Missing message templates: <name1>, <name2> and <name3>`.
 
 Disabling this check (by setting the property to `false`) can be useful when templates are loaded from a different
-source at runtime, for example from a separate pack file or through programmatic registration. Be aware that a missing 
-template at runtime causes a formatting error when the message that references it is formatted.
+source at runtime, for example from a separate pack file or through programmatic registration. A template that is
+still missing at runtime does not cause an error, but its reference produces no text, so the check is the only way to
+detect such a mistake before the message is displayed.
 
 The `ignore` method on the `templates` block allows selectively suppressing the validation for specific template names
 without disabling validation entirely. This is covered in detail on the [Extension](extension.md) page. Like the
@@ -139,10 +139,6 @@ was found.
 
 When a warning strategy is active (`IGNORE_AND_WARN` or `OVERRIDE_AND_WARN`), the task logs a warning at the `WARN`
 level with the same information. This allows duplicates to be identified without failing the build.
-
-Note that two annotations with the same code or name and identical content are never considered duplicates. They are
-silently accepted regardless of the strategy. This behavior is intentional and allows the same message definition to 
-appear in multiple classes (for example, in shared interfaces) without triggering duplicate handling logic.
 
 
 ## Custom Actions
@@ -273,11 +269,10 @@ action fails the build if any message code does not match the expected pattern:
 If multiple actions are registered, they are executed in the order they were defined. Each action receives the same
 `MessageAccessor` instance.
 
-/// warning | Actions and Build Caching
-Actions only run when the task itself executes. If Gradle considers the task up to date or restores its output from
-the build cache, no action is invoked. Actions are not part of the task inputs, so adding or changing an action does
-not make the task run again either. Checks that must run on every build, such as validating message codes, should
-therefore not rely on actions alone, or the task must be forced to run, for example with `--rerun-tasks`.
+/// note | Actions and Build Caching
+A task with registered actions is never considered up to date and its output is never restored from the build cache.
+Gradle cannot tell whether an action has changed, so the task runs on every build in which it is part of the task
+graph, and every action is executed. Without actions, the task is up to date as long as its inputs do not change.
 ///
 
 

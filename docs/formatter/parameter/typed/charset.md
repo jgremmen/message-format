@@ -165,17 +165,3 @@ messageSupport
     .format();
 // "UTF-8"
 ```
-
-
-## Null Handling
-
-A `null` parameter value produces an empty string by default. A `null` map key can be used to provide specific
-text for this case.
-
-```java
-messageSupport
-    .message("%{cs,null:'no encoding specified'}")
-    .with("cs", null)
-    .format();
-// "no encoding specified"
-```

@@ -173,9 +173,10 @@ formatters are candidates for the same value.
 ### Legacy Date Objects
 
 The `ToTemporalDelegate` formatter is registered for `Calendar`, `Date`, `FileTime` and `InstantSource`, all at the
-default order of 80. When a `java.util.Date` is passed, this formatter converts it to an `Instant` and then delegates 
-formatting to the `TemporalFormatter` by calling `context.format(instant, Instant.class)`. The result is that legacy 
-date/time objects are formatted using the same temporal formatting logic as modern `java.time` types.
+default order of 80. When a `java.util.Date` is passed, this formatter converts it to an `Instant` and then delegates
+formatting to the `TemporalFormatter`. The result is that legacy date/time objects are formatted using the same
+temporal formatting logic as modern `java.time` types. The conversions for the other types, such as a `Calendar`,
+which keeps its own time zone, are listed on the [Temporal](temporal.md#totemporaldelegate) page.
 
 ```java
 messageSupport
@@ -346,9 +347,10 @@ it formats any object that is not handled by another registered formatter.
 ### Formatters Not Registered by Default
 
 The package `de.sayayi.lib.message.formatter.parameter.runtime.extra` contains further type-specific formatters. They
-are not declared as service providers, so the `DefaultFormatterService` does not register them. Each one is added with
-`addFormatter(...)` on a [formatter service](../../../configuration/formatter-service.md#registering-formatters) when
-it is needed. All of them use the default order of 80.
+are not declared as service providers, so the `DefaultFormatterService` does not register them. An application that
+needs one of them adds it to its formatter service, as described under
+[Formatters Not Registered by Default](../../../configuration/formatter-service.md#formatters-not-registered-by-default)
+on the formatter service page. All of them use the default order of 80.
 
 | Java Type Simple Name | Formatter Class            | Configuration Key | Documentation     |
 |-----------------------|----------------------------|-------------------|-------------------|
@@ -367,3 +369,14 @@ it is needed. All of them use the default order of 80.
 | `Token`               | `TokenFormatter`           |                   | [Token](token.md) |
 
 The Javadoc of each class describes the supported configuration values.
+
+### Formatters of Add-On Modules
+
+The `message-format-spring` module contributes type-specific formatters for Spring types. The
+`DefaultFormatterService` registers them automatically when the module is present.
+
+| Java Type Simple Name | Formatter Class           | Order | Documentation                           |
+|-----------------------|---------------------------|-------|-----------------------------------------|
+| `DataSize`            | `DataSizeFormatter`       | 80    | [DataSize](data-size.md)                |
+| `ResolvableType`      | `ResolvableTypeFormatter` | 80    | [ResolvableType](resolvable-type.md)    |
+| `TypeDescriptor`      | `TypeDescriptorFormatter` | 80    | [TypeDescriptor](type-descriptor.md)    |
