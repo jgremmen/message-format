@@ -15,9 +15,7 @@
  */
 package de.sayayi.lib.message.spring;
 
-import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageSupport;
-import de.sayayi.lib.message.MessageSupport.MessageConfigurer;
 import de.sayayi.lib.message.exception.MessageFormatException;
 import de.sayayi.lib.message.util.SupplierDelegate;
 import org.jetbrains.annotations.NotNull;
@@ -195,16 +193,17 @@ public class MessageSupportMessageSource implements HierarchicalMessageSource
   @Override
   public @NotNull String getMessage(@NotNull String code, Object[] args, Locale locale) throws NoSuchMessageException
   {
-    final MessageConfigurer<Message.WithCode> msg;
-
-    try {
-      msg = messageSupport.code(code);
-    } catch(IllegalArgumentException ex) {
+    // look up the message instead of calling code(code), which throws an exception for unknown codes
+    final var message = messageSupport.getMessageAccessor().getMessageByCode(code);
+    if (message == null)
+    {
       if (parentMessageSource != null)
         return parentMessageSource.getMessage(code, args, locale);
 
-      throw new NoSuchMessageException(code, locale);
+      throw noSuchMessage(code, locale);
     }
+
+    final var msg = messageSupport.message(message);
 
     if (args != null)
       for(var n = 0; n < args.length; n++)
@@ -264,8 +263,26 @@ public class MessageSupportMessageSource implements HierarchicalMessageSource
 
     final var defaultMessage = resolvable.getDefaultMessage();
     if (defaultMessage == null)
-      throw new NoSuchMessageException(isEmpty(codes) ? "" : codes[codes.length - 1], locale);
+      throw noSuchMessage(isEmpty(codes) ? "" : codes[codes.length - 1], locale);
 
     return defaultMessage;
+  }
+
+
+  /**
+   * Creates an exception for a message code that cannot be resolved. Spring's
+   * {@link NoSuchMessageException#NoSuchMessageException(String, Locale)} does not accept a {@code null} locale, in
+   * which case the exception reports the default locale instead.
+   *
+   * @param code    message code that cannot be resolved, not {@code null}
+   * @param locale  locale for message formatting, or {@code null}
+   *
+   * @return  exception for the unresolved message code, never {@code null}
+   */
+  private static @NotNull NoSuchMessageException noSuchMessage(@NotNull String code, Locale locale)
+  {
+    return locale == null
+        ? new NoSuchMessageException(code)
+        : new NoSuchMessageException(code, locale);
   }
 }

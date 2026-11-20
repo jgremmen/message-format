@@ -22,7 +22,9 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.context.support.StaticMessageSource;
 
+import java.util.Locale;
 import java.util.Optional;
 
 import static de.sayayi.lib.message.util.AssertionTestSupport.assertNullRejected;
@@ -121,6 +123,36 @@ final class MessageSupportMessageSourceTest
 
     assertThrows(NoSuchMessageException.class, () -> messageSource.getMessage("spring.message.2",
         new Object[] { new DefaultMessageSourceResolvable("spring.no-field") }, ENGLISH));
+  }
+
+
+  @Test
+  @DisplayName("Codes unknown to the message support are resolved by the parent message source")
+  void getMessageFromParent()
+  {
+    var parentMessageSource = new StaticMessageSource();
+    parentMessageSource.addMessage("spring.parent", ENGLISH, "parent {0}");
+    ((MessageSupportMessageSource)messageSource).setParentMessageSource(parentMessageSource);
+
+    assertEquals("parent jack", messageSource.getMessage("spring.parent", new Object[] { "jack" }, ENGLISH));
+    assertEquals("hello jack", messageSource.getMessage("spring.message.2", new Object[] { "jack" }, ENGLISH));
+
+    assertThrows(NoSuchMessageException.class, () -> messageSource.getMessage("spring.no-message", null, ENGLISH));
+    assertThrows(NoSuchMessageException.class, () -> messageSource.getMessage(" ", null, ENGLISH));
+  }
+
+
+  @Test
+  @DisplayName("Unknown codes without a locale report the default locale")
+  void getMessageUnknownWithoutLocale()
+  {
+    final var expectedMessage =
+        "No message found under code 'spring.no-message' for locale '" + Locale.getDefault() + "'.";
+
+    assertEquals(expectedMessage, assertThrows(NoSuchMessageException.class,
+        () -> messageSource.getMessage("spring.no-message", null, null)).getMessage());
+    assertEquals(expectedMessage, assertThrows(NoSuchMessageException.class,
+        () -> messageSource.getMessage(new DefaultMessageSourceResolvable("spring.no-message"), null)).getMessage());
   }
 
 
