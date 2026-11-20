@@ -7,6 +7,7 @@ asm = '[9.10,10)'
 antlr4-ext = '[0.6,0.8)'
 icu4j = '[74.1,79.0)'
 jetbrains-annotations = '[24.0,26.2)'
+jmh = '1.37'
 junit = '6.1.+'
 log4j = '[2.11.0,3.0)'
 lombok = '1.18.+'
@@ -27,6 +28,8 @@ asm = { module = 'org.ow2.asm:asm', version.ref = 'asm' }
 asm-commons = { module = 'org.ow2.asm:asm-commons', version.ref = 'asm' }
 icu4j = { module = 'com.ibm.icu:icu4j', version.ref = 'icu4j' }
 jetbrains-annotations = { module = 'org.jetbrains:annotations', version.ref = 'jetbrains-annotations' }
+jmh-core = { module = 'org.openjdk.jmh:jmh-core', version.ref = 'jmh' }
+jmh-generator-annprocess = { module = 'org.openjdk.jmh:jmh-generator-annprocess', version.ref = 'jmh' }
 junit-jupiter-api = { module = 'org.junit.jupiter:junit-jupiter-api', version.ref = 'junit' }
 junit-jupiter-params = { module = 'org.junit.jupiter:junit-jupiter-params', version.ref = 'junit' }
 junit-jupiter-engine = { module = 'org.junit.jupiter:junit-jupiter-engine', version.ref = 'junit' }

@@ -27,6 +27,7 @@ include 'message-format-annotations'
 include 'message-format-icu'
 include 'message-format-log4j'
 include 'message-format-spring'
+include 'message-format-benchmark'
 include 'message-gradle-plugin'
 
 include 'highlight'

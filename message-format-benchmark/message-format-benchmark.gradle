@@ -1,0 +1,84 @@
+/*
+ * Copyright 2026 Jeroen Gremmen
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+//file:noinspection DependencyNotationArgument
+
+
+plugins {
+  id 'java'
+  id 'de.sayayi.message.base'
+}
+
+
+description = 'Message Format Library Benchmarks'
+
+
+// -PbaselineJar=<jar>: benchmark the given message-format jar (e.g. built from an older commit) instead of the
+// current sources; the benchmarks only use the public API, so they run against both
+def baselineJar = providers.gradleProperty('baselineJar')
+
+
+dependencies {
+  if (baselineJar.isPresent())
+  {
+    implementation files(baselineJar.get())
+
+    // runtime dependencies of message-format, which a plain jar file does not carry
+    implementation libs.bundles.antlr4.runtime
+    implementation(libs.pack) {
+      exclude group: 'org.apache.tika'
+    }
+  }
+  else
+    implementation project(':message-format')
+
+  compileOnly libs.jetbrains.annotations
+
+  implementation libs.jmh.core
+  annotationProcessor libs.jmh.generator.annprocess
+}
+
+
+tasks.withType(JavaCompile).configureEach {
+  javaCompiler = javaToolchains.compilerFor {
+    languageVersion = JavaLanguageVersion.of(21)
+  }
+
+  options.release = 21
+  options.encoding = 'UTF-8'
+}
+
+
+tasks.register('jmh', JavaExec) {
+  group = 'verification'
+  description = 'Runs the JMH benchmarks. JMH command line options can be passed with -Pjmh.args="...".'
+
+  javaLauncher = javaToolchains.launcherFor {
+    languageVersion = JavaLanguageVersion.of(21)
+  }
+
+  mainClass = 'org.openjdk.jmh.Main'
+  classpath = sourceSets.main.runtimeClasspath
+
+  // locale independent number format in the result files; forked benchmark JVMs inherit these arguments
+  jvmArgs '-Duser.language=en', '-Duser.country=US'
+
+  def jmhArgs = providers.gradleProperty('jmh.args')
+  argumentProviders.add({ jmhArgs.map { it.trim().split(/\s+/).toList() }.getOrElse([]) } as CommandLineArgumentProvider)
+
+  // benchmark results depend on the machine state, never on task inputs only
+  outputs.upToDateWhen { false }
+}

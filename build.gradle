@@ -42,7 +42,7 @@ def projectLocalRepositoryDirs = configurations.resolvable('projectLocalReposito
 
 dependencies {
   subprojects
-      .findAll { it.path != ':highlight' }
+      .findAll { !(it.path in [':highlight', ':message-format-benchmark']) }
       .each { subproject -> add(projectLocalRepositories.name, project(subproject.path)) }
 }
 
