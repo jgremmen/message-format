@@ -32,9 +32,9 @@ import static de.sayayi.lib.message.internal.part.config.MessagePartConfig.EMPTY
 import static de.sayayi.lib.message.part.TextPartFactory.noSpaceText;
 import static de.sayayi.lib.message.util.ConcurrentTestSupport.runWithReaders;
 import static de.sayayi.lib.message.util.ConcurrentTestSupport.stress;
+import static java.time.Duration.ofSeconds;
 import static java.util.concurrent.ThreadLocalRandom.current;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
@@ -43,8 +43,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * These tests exercise concurrent formatter registration ({@link GenericFormatterService#addFormatterForType},
  * {@link GenericFormatterService#addFormatter}, {@link GenericFormatterService#addPostFormatter}) together with
  * concurrent lookups ({@link GenericFormatterService#getFormatters}, {@link GenericFormatterService#getPostFormatters},
- * {@link GenericFormatterService#getParameterConfigNames}) to make sure the read/write lock used internally does not
- * allow readers and writers to corrupt the registry or deadlock.
+ * {@link GenericFormatterService#getParameterConfigNames}) to make sure that concurrent registrations do not corrupt
+ * the registry or deadlock, and that lookups never see a partially published registration.
  *
  * @author Jeroen Gremmen
  * @since 0.25.0
@@ -115,6 +115,49 @@ final class GenericFormatterServiceConcurrencyTest
   }
 
 
+  @RepeatedTest(5)
+  @DisplayName("Formatter registered during concurrent lookups is returned by every subsequent lookup")
+  void registrationVisibleToSubsequentLookups() throws Exception
+  {
+    var service = new GenericFormatterService();
+
+    // readers keep (re)filling the formatter cache from whatever registry they see, while each registration must be
+    // visible to the writer's own lookup as soon as the registration has returned
+    runWithReaders(1, writer -> {
+      for(var i = 0; i < 200; i++)
+      {
+        var formatter = new MarkerFormatter(Integer.class);
+
+        service.addFormatterForType(new FormattableType(Integer.class), formatter);
+
+        assertTrue(Stream
+            .of(service.getFormatters(null, Integer.class, EMPTY_CONFIG))
+            .anyMatch(f -> f == formatter), "registered formatter is not returned by lookup");
+      }
+    }, 8, reader -> service.getFormatters(null, Integer.class, EMPTY_CONFIG));
+  }
+
+
+  @Test
+  @DisplayName("Named formatter registering a formatter from canFormat does not hang the lookup")
+  void registrationFromCanFormatDoesNotHang()
+  {
+    var service = new GenericFormatterService();
+
+    service.addFormatter(new MarkerNamedFormatter("reentrant") {
+      @Override
+      public boolean canFormat(@NotNull Class<?> type)
+      {
+        service.addPostFormatter(new MarkerPostFormatter("registered-by-can-format"));
+        return true;
+      }
+    });
+
+    assertTimeoutPreemptively(ofSeconds(5), () -> service.getFormatters("reentrant", String.class, EMPTY_CONFIG));
+    assertTrue(service.getPostFormatters().containsKey("registered-by-can-format"));
+  }
+
+
   @RepeatedTest(3)
   @DisplayName("High contention stress test with concurrent reads and writes")
   void highContentionStressTest() throws Exception
@@ -164,7 +207,7 @@ final class GenericFormatterServiceConcurrencyTest
 
 
   /** Minimal named formatter used to verify that concurrent named registrations do not corrupt the registry. */
-  private static final class MarkerNamedFormatter implements NamedParameterFormatter
+  private static class MarkerNamedFormatter implements NamedParameterFormatter
   {
     private final String name;
 

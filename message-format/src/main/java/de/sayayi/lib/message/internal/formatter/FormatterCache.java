@@ -16,7 +16,7 @@
 package de.sayayi.lib.message.internal.formatter;
 
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
-import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.StringJoiner;
@@ -26,36 +26,32 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 
 import static java.lang.System.arraycopy;
-import static java.util.Arrays.fill;
 import static java.util.Objects.requireNonNull;
 
 
 /**
  * The formatter cache is a fixed size cache for storing a sorted list of parameter formatters for each value type.
  * <p>
- * The cache prioritizes frequently used value types and evicts entries using an approximate (recency-based)
- * least-recently-used policy as soon as the cache size is exhausted.
+ * The cache prioritizes recently used value types and evicts entries using an approximate least-recently-used policy as
+ * soon as the cache size is exhausted.
  * <p>
  * Cached types are identified by their class name and a unique type id; the cache keeps no reference to the
  * {@code Class} objects themselves. A cached type, and the class loader that loaded it, can therefore be unloaded
  * (e.g. after redeploying an application while this library is loaded by a parent class loader). The cache entry of an
  * unloaded type is never matched again and is eventually evicted.
  * <p>
- * <b>Thread safety:</b> this class is thread-safe. Structural mutation is protected by a lock, builder functions run
- * outside the lock so that cache misses do not block other threads, and a modification-count check guards against
- * corruption from re-entrant access. Note that it is not single-flight: concurrent cache misses for the same type may
- * each independently build a formatter list.
+ * <b>Thread safety:</b> this class is thread-safe. The cached entries are kept in an immutable array which is replaced
+ * on every structural change (copy-on-write), so a cache hit does not acquire any lock. Structural changes are
+ * serialized by a lock and builder functions run outside of it, so cache misses do not block other threads. Note that
+ * it is not single-flight: concurrent cache misses for the same type may each independently build a formatter list.
  * <p>
- * If {@link #clear()} runs while a formatter list is being built, the list built before the clear is still added to the
- * cache. Callers that clear the cache because the formatters have changed must therefore make sure that {@code clear()}
- * does not run concurrently with {@link #lookup(Class, Function) lookup}.
- * {@link de.sayayi.lib.message.formatter.GenericFormatterService GenericFormatterService} ensures this by calling
- * {@code lookup} under its read lock and {@code clear} under its write lock.
+ * A formatter list built while {@link #clear()} runs concurrently is returned to its caller, but it is not added to the
+ * cache.
  *
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-@ApiStatus.Internal
+@Internal
 public final class FormatterCache
 {
   /** Sequence for assigning unique ids to types. */
@@ -73,26 +69,30 @@ public final class FormatterCache
     }
   };
 
-  /** Lock guarding all structural modifications of this cache. */
+  /** Empty node array of an empty cache. */
+  private static final TypeFormatterNode[] NO_NODES = new TypeFormatterNode[0];
+
+  /** Lock serializing all structural modifications of this cache. Lookups of cached types do not acquire it. */
   private final Lock lock = new ReentrantLock();
 
   /** Maximum number of cached types. */
   private final int capacity;
 
-  /** List nodes of the cached types, sorted by type name and type id for binary search. */
-  private final TypeFormatterNode[] typeFormatterNodes;
+  /**
+   * Nodes of the cached types, sorted by type name and type id for binary search. The array is never modified once
+   * published; each structural change publishes a new array.
+   */
+  private volatile TypeFormatterNode[] typeFormatterNodes = NO_NODES;
 
-  /** Number of cached types. */
-  private int typeCount;
+  /**
+   * Recency tick, advanced on each added type. A cache hit stamps the node with the current tick, so the node with the
+   * oldest stamp is the least recently used one. As the tick changes on cache misses only, cache hits do not write
+   * shared state, apart from stamping a node once per tick.
+   */
+  private volatile int tick;
 
-  /** Modification counter, incremented on each structural change. */
-  private int modCount;
-
-  /** Most recently promoted node, or {@code null} if the cache is empty. */
-  private TypeFormatterNode head;
-
-  /** Least recently promoted node, which is evicted first, or {@code null} if the cache is empty. */
-  private TypeFormatterNode tail;
+  /** Generation, incremented by {@link #clear()}. A formatter list built before a clear is not cached. */
+  private volatile int generation;
 
 
   /**
@@ -100,12 +100,8 @@ public final class FormatterCache
    *
    * @param n  desired cache capacity
    */
-  public FormatterCache(int n)
-  {
+  public FormatterCache(int n) {
     capacity = Math.max(n, 8);
-    typeFormatterNodes = new TypeFormatterNode[capacity];
-
-    clear();
   }
 
 
@@ -116,13 +112,8 @@ public final class FormatterCache
   {
     lock.lock();
     try {
-      fill(typeFormatterNodes, null);
-
-      head = null;
-      tail = null;
-
-      typeCount = 0;
-      modCount++;
+      typeFormatterNodes = NO_NODES;
+      generation++;
     } finally {
       lock.unlock();
     }
@@ -133,9 +124,8 @@ public final class FormatterCache
    * Looks up the parameter formatters for the given {@code type}. If the type is not yet cached, the
    * {@code buildFormatters} function is invoked to create the formatter list and the result is added to the cache.
    * <p>
-   * The {@code buildFormatters} function is invoked outside the lock to avoid blocking other threads during potentially
-   * expensive formatter construction. A modification counter is used to skip the redundant type lookup on re-entry when
-   * no concurrent modification occurred.
+   * A cached type is looked up without acquiring a lock. The {@code buildFormatters} function is invoked outside the
+   * lock to avoid blocking other threads during potentially expensive formatter construction.
    *
    * @param type             value type to look up formatters for, not {@code null}
    * @param buildFormatters  function to build the formatter list if not cached, not {@code null}
@@ -145,137 +135,110 @@ public final class FormatterCache
   public @NotNull ParameterFormatter[] lookup(@NotNull Class<?> type,
                                               @NotNull Function<Class<?>,ParameterFormatter[]> buildFormatters)
   {
-    final int _modCount;
-    int idx;
+    final var typeName = type.getName();
+    final var nodes = typeFormatterNodes;
+    var idx = findIndex(nodes, typeName, type, 0);
 
-    lock.lock();
-    try {
-      if ((idx = findTypeIndex(type)) >= 0)
-      {
-        final var node = typeFormatterNodes[idx];
+    if (idx >= 0)
+    {
+      final var node = nodes[idx];
+      final var _tick = tick;
 
-        // move to head?
-        // start moving if we've reached 75% of the total capacity and the node is located in the lower 25%
-        if (node != head && typeCount >= capacity * 3 / 4 && node.countNext < typeCount / 4)
-          moveNodeToHead(node);
+      // stamp the node at most once per tick, so frequently used types do not write to shared memory on each lookup
+      if (node.lastAccess != _tick)
+        node.lastAccess = _tick;
 
-        return node.formatters;
-      }
-
-      _modCount = modCount;
-    } finally {
-      lock.unlock();
+      return node.formatters;
     }
+
+    final var _generation = generation;
 
     // build formatters outside the lock to avoid blocking other threads
     final var formatters = buildFormatters.apply(type);
 
     lock.lock();
     try {
-      if (modCount != _modCount && (idx = findTypeIndex(type)) >= 0)
-        return typeFormatterNodes[idx].formatters;
+      final var currentNodes = typeFormatterNodes;
 
-      addNew(type, formatters);
+      // another thread may have cached the type in the meantime
+      if ((idx = findIndex(currentNodes, typeName, type, 0)) >= 0)
+        return currentNodes[idx].formatters;
 
-      return formatters;
+      // don't cache formatters which have been built before the cache was cleared
+      if (generation == _generation)
+        typeFormatterNodes = addNew(currentNodes, new TypeFormatterNode(typeName, TYPE_ID.get(type), formatters, ++tick));
     } finally {
       lock.unlock();
     }
+
+    return formatters;
   }
 
 
   /**
-   * Moves the given node to the head of the linked list, promoting it as the most recently accessed entry.
+   * Returns a new node array containing all nodes of {@code nodes} and {@code newNode}. If the cache is at full
+   * capacity, the least recently used node is left out.
    *
-   * @param typeFormatterNode  the node to promote, not {@code null}
+   * @param nodes    current, sorted node array, not {@code null}
+   * @param newNode  node to add, not {@code null}
+   *
+   * @return  new sorted node array, never {@code null}
+   *
+   * @since 0.25.1
    */
-  private void moveNodeToHead(@NotNull FormatterCache.TypeFormatterNode typeFormatterNode)
+  private @NotNull TypeFormatterNode[] addNew(@NotNull TypeFormatterNode[] nodes, @NotNull TypeFormatterNode newNode)
   {
-    final var prevNode = typeFormatterNode.prev;
-    assert prevNode != null;
+    // if capacity has been reached -> leave out the least recently used node
+    if (nodes.length == capacity)
+    {
+      final var evictIndex = findLeastRecentlyUsedIndex(nodes);
+      final var remainingNodes = new TypeFormatterNode[capacity - 1];
 
-    for(var n = prevNode; n != null; n = n.prev)
-      n.countNext--;
+      arraycopy(nodes, 0, remainingNodes, 0, evictIndex);
+      arraycopy(nodes, evictIndex + 1, remainingNodes, evictIndex, capacity - 1 - evictIndex);
 
-    prevNode.next = typeFormatterNode.next;
+      nodes = remainingNodes;
+    }
 
-    if (typeFormatterNode == tail)
-      tail = prevNode;
-    else
-      typeFormatterNode.next.prev = prevNode;
+    final var insertIndex = -findIndex(nodes, newNode.typeName, null, newNode.typeId) - 1;
+    final var newNodes = new TypeFormatterNode[nodes.length + 1];
 
-    typeFormatterNode.prev = null;
-    typeFormatterNode.next = head;
-    typeFormatterNode.countNext = head.countNext + 1;
+    arraycopy(nodes, 0, newNodes, 0, insertIndex);
+    newNodes[insertIndex] = newNode;
+    arraycopy(nodes, insertIndex, newNodes, insertIndex + 1, nodes.length - insertIndex);
 
-    head.prev = typeFormatterNode;
-    head = typeFormatterNode;
+    return newNodes;
   }
 
 
   /**
-   * Adds a new type-to-formatters mapping to the cache. If the cache is at full capacity, the least recently used entry
-   * (tail) is evicted first.
+   * Returns the index of the least recently used node, which is the node with the oldest recency stamp.
    *
-   * @param type        the value type to cache, not {@code null}
-   * @param formatters  the formatter list for the type, not {@code null}
+   * @param nodes  node array, not {@code null} and not empty
+   *
+   * @return  index of the least recently used node
+   *
+   * @since 0.25.1
    */
-  private void addNew(@NotNull Class<?> type, @NotNull ParameterFormatter[] formatters)
+  private int findLeastRecentlyUsedIndex(@NotNull TypeFormatterNode[] nodes)
   {
-    // if capacity has been reached -> remove tail
-    if (typeCount == capacity)
+    final var _tick = tick;
+    var lruIndex = 0;
+    var lruAge = -1;
+
+    for(int n = 0, l = nodes.length; n < l; n++)
     {
-      final var tailIndex = findIndex(tail.typeName, null, tail.typeId);
+      // tick difference instead of comparing stamps, which is robust against tick overflow
+      final var age = _tick - nodes[n].lastAccess;
 
-      arraycopy(typeFormatterNodes, tailIndex + 1, typeFormatterNodes, tailIndex, capacity - 1 - tailIndex);
-      typeFormatterNodes[--typeCount] = null;
-
-      final var prevNode = tail.prev;
-      assert prevNode != null;
-
-      for(var n = prevNode; n != null; n = n.prev)
-        n.countNext--;
-
-      prevNode.next = null;
-      tail = prevNode;
+      if (age > lruAge)
+      {
+        lruAge = age;
+        lruIndex = n;
+      }
     }
 
-    final var typeFormatterNode = new TypeFormatterNode(type.getName(), TYPE_ID.get(type), formatters);
-    final int insertIndex;
-
-    if (head != null)
-    {
-      insertIndex = -findIndex(typeFormatterNode.typeName, null, typeFormatterNode.typeId) - 1;
-
-      arraycopy(typeFormatterNodes, insertIndex, typeFormatterNodes, insertIndex + 1, typeCount - insertIndex);
-
-      typeFormatterNode.next = head;
-      typeFormatterNode.countNext = head.countNext + 1;
-      head.prev = typeFormatterNode;
-    }
-    else
-    {
-      insertIndex = 0;
-      tail = typeFormatterNode;
-    }
-
-    typeFormatterNodes[insertIndex] = typeFormatterNode;
-    typeCount++;
-    modCount++;
-
-    head = typeFormatterNode;
-  }
-
-
-  /**
-   * Performs a binary search for the given type in the sorted node array.
-   *
-   * @param type  the type to search for, not {@code null}
-   *
-   * @return  the index if found, or {@code -(insertion point) - 1} if not found
-   */
-  private int findTypeIndex(@NotNull Class<?> type) {
-    return findIndex(type.getName(), type, 0);
+    return lruIndex;
   }
 
 
@@ -287,6 +250,7 @@ public final class FormatterCache
    * If {@code typeId} is {@code 0}, the type id is obtained from {@code type}, but only if a node with the same type
    * name is found. This keeps the common case, where type names are unique, free of type id lookups.
    *
+   * @param nodes     sorted node array to search, not {@code null}
    * @param typeName  name of the type to search for, not {@code null}
    * @param type      type to obtain the type id from, or {@code null} if {@code typeId} is given
    * @param typeId    unique type id, or {@code 0} if it must be obtained from {@code type}
@@ -295,15 +259,15 @@ public final class FormatterCache
    *
    * @since 0.25.0
    */
-  private int findIndex(@NotNull String typeName, Class<?> type, long typeId)
+  private static int findIndex(@NotNull TypeFormatterNode[] nodes, @NotNull String typeName, Class<?> type, long typeId)
   {
     var low = 0;
-    var high = typeCount - 1;
+    var high = nodes.length - 1;
 
     while(low <= high)
     {
       final var mid = (low + high) >>> 1;
-      final var typeFormatterNode = typeFormatterNodes[mid];
+      final var typeFormatterNode = nodes[mid];
       var cmp = typeFormatterNode.typeName.compareTo(typeName);
 
       if (cmp == 0)
@@ -332,25 +296,20 @@ public final class FormatterCache
   @Override
   public String toString()
   {
-    lock.lock();
-    try {
-      final var s = new StringJoiner(", ", "[", "]");
+    final var s = new StringJoiner(", ", "[", "]");
 
-      for(var n = head; n != null; n = n.next)
-        s.add(n.toString());
+    for(var node: typeFormatterNodes)
+      s.add(node.toString());
 
-      return s.toString();
-    } finally {
-      lock.unlock();
-    }
+    return s.toString();
   }
 
 
 
 
   /**
-   * Doubly-linked list node holding the cached formatter list for a single value type. The node identifies the type by
-   * its name and unique type id and holds no reference to the type itself, so the type can be unloaded.
+   * Node holding the cached formatter list for a single value type. The node identifies the type by its name and unique
+   * type id and holds no reference to the type itself, so the type can be unloaded.
    *
    * @since 0.8.0
    */
@@ -365,28 +324,25 @@ public final class FormatterCache
     /** Sorted parameter formatters for the cached value type. */
     private final ParameterFormatter[] formatters;
 
-    /** Previous (more recently promoted) node, or {@code null} for the head node. */
-    private TypeFormatterNode prev;
-
-    /** Next (less recently promoted) node, or {@code null} for the tail node. */
-    private TypeFormatterNode next;
-
-    /** Number of nodes following this node in the list. */
-    private int countNext;
+    /** Recency tick of the last access, see {@link FormatterCache#tick}. */
+    private volatile int lastAccess;
 
 
     /**
-     * Creates a new list node for the given type and formatters.
+     * Creates a new node for the given type and formatters.
      *
      * @param typeName    class name of the cached value type, not {@code null}
      * @param typeId      unique id of the cached value type
      * @param formatters  sorted parameter formatters for the cached value type, not {@code null}
+     * @param lastAccess  recency tick of the node creation
      */
-    private TypeFormatterNode(@NotNull String typeName, long typeId, @NotNull ParameterFormatter[] formatters)
+    private TypeFormatterNode(@NotNull String typeName, long typeId, @NotNull ParameterFormatter[] formatters,
+                              int lastAccess)
     {
       this.typeName = typeName;
       this.typeId = typeId;
       this.formatters = formatters;
+      this.lastAccess = lastAccess;
     }
 
 
@@ -395,7 +351,7 @@ public final class FormatterCache
      */
     @Override
     public String toString() {
-      return countNext + ":(" + typeName + ')';
+      return lastAccess + ":(" + typeName + ')';
     }
   }
 }

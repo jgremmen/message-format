@@ -28,6 +28,7 @@ import java.lang.ref.WeakReference;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 import static de.sayayi.lib.message.util.AssertionTestSupport.assertGarbageCollected;
@@ -47,7 +48,7 @@ import static org.junit.jupiter.api.Assertions.*;
 final class FormatterCacheTest
 {
   @Test
-  @DisplayName("Cache entry reorganization on lookup")
+  @DisplayName("Least recently used entry is evicted on lookup")
   void lookup()
   {
     var cache = new FormatterCache(8);
@@ -62,34 +63,58 @@ final class FormatterCacheTest
     cache.lookup(Map.class, fn);
     cache.lookup(byte[].class, fn);
 
-    // lookup boolean which moves it to head
-    // cache: boolean, byte[], Map, Double, String, short, long, int
+    // lookup boolean which marks it as recently used
+    // least recently used first: int, long, short, String, Double, Map, byte[], boolean
     assertArrayEquals(new ParameterFormatter[0], cache.lookup(boolean.class, t -> fail()));
 
-    // lookup List, removes int
-    // cache: List, boolean, byte[], Map, Double, String, short, long
+    // lookup List, evicts int
+    // least recently used first: long, short, String, Double, Map, byte[], boolean, List
     cache.lookup(List.class, fn);
 
-    // lookup int, requires call to buildFormatters (moves it to head) and removes long
-    // cache: int, List, boolean, byte[], Map, Double, String, short
+    // lookup int, requires call to buildFormatters and evicts long
+    // least recently used first: short, String, Double, Map, byte[], boolean, List, int
     var pf = new ParameterFormatter[] { new ArrayFormatter() };
     assertArrayEquals(pf, cache.lookup(int.class, t -> pf));
 
-    // lookup byte[] which doesn't move it to head (not in lower quarter)
-    // cache: int, List, boolean, byte[], Map, Double, String, short
+    // lookup byte[] which marks it as recently used
+    // least recently used first: short, String, Double, Map, boolean, List, int/byte[]
     assertArrayEquals(new ParameterFormatter[0], cache.lookup(byte[].class, t -> fail()));
 
-    // lookup Iterator, requires call to buildFormatters (moves it to head) and removes short
-    // cache: Iterator, int, List, boolean, byte[], Map, Double, String
+    // lookup Iterator, requires call to buildFormatters and evicts short
+    // least recently used first: String, Double, Map, boolean, List, int/byte[], Iterator
     assertArrayEquals(pf, cache.lookup(Iterator.class, t -> pf));
 
-    // lookup boolean which doesn't move it to head (not in lower quarter)
-    // cache: Iterator, int, List, boolean, byte[], Map, Double, String
+    // lookup boolean which marks it as recently used
+    // least recently used first: String, Double, Map, List, int/byte[], Iterator/boolean
     assertArrayEquals(new ParameterFormatter[0], cache.lookup(boolean.class, t -> fail()));
 
-    // lookup Double which moves it to head (in lower quarter)
-    // cache: Double, Iterator, int, List, boolean, byte[], Map, String
+    // lookup Double which marks it as recently used
+    // least recently used first: String, Map, List, int/byte[], Iterator/boolean/Double
     assertArrayEquals(new ParameterFormatter[0], cache.lookup(Double.class, t -> fail()));
+
+    // lookup Set, evicts String, but keeps Double
+    cache.lookup(Set.class, fn);
+    assertArrayEquals(pf, cache.lookup(String.class, t -> pf));
+    assertArrayEquals(new ParameterFormatter[0], cache.lookup(Double.class, t -> fail()));
+  }
+
+
+  @Test
+  @DisplayName("Formatters built before clear are not cached")
+  void lookupDuringClearIsNotCached()
+  {
+    var cache = new FormatterCache(8);
+    var stale = new ParameterFormatter[] { new ArrayFormatter() };
+
+    // the cache is cleared while the formatters are being built
+    assertSame(stale, cache.lookup(String.class, t -> {
+      cache.clear();
+      return stale;
+    }));
+
+    var pf = new ParameterFormatter[0];
+    assertSame(pf, cache.lookup(String.class, t -> pf));
+    assertSame(pf, cache.lookup(String.class, t -> fail()));
   }
 
 

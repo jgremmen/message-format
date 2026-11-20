@@ -31,8 +31,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.*;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Stream;
 
 import static de.sayayi.lib.message.formatter.FormattableType.DEFAULT;
@@ -54,10 +54,11 @@ import static java.util.Objects.requireNonNull;
  * <p>
  * Formatter lookup results are cached for performance. The cache size can be configured via the constructor.
  * <p>
- * This class is thread-safe. All mutating operations ({@link #addFormatter(ParameterFormatter)},
- * {@link #addFormatterForType(FormattableType, ParameterFormatter)}, {@link #addPostFormatter(PostFormatter)}) and
- * read operations ({@link #getFormatters(String, Class, Config)}, {@link #getPostFormatters()},
- * {@link #getPostFormatter(String)}, {@link #getParameterConfigNames()}) are protected by a reentrant read/write lock to ensure safe concurrent access.
+ * This class is thread-safe. The registered formatters are kept in an immutable registry snapshot. Read operations
+ * ({@link #getFormatters(String, Class, Config)}, {@link #getPostFormatters()}, {@link #getPostFormatter(String)},
+ * {@link #getParameterConfigNames()}) work on the current snapshot without acquiring a lock. Mutating operations
+ * ({@link #addFormatter(ParameterFormatter)}, {@link #addFormatterForType(FormattableType, ParameterFormatter)},
+ * {@link #addPostFormatter(PostFormatter)}) are serialized by a lock and publish a new snapshot.
  *
  * @author Jeroen Gremmen
  * @since 0.1.0 (renamed in 0.4.1)
@@ -70,26 +71,14 @@ public non-sealed class GenericFormatterService implements FormatterService.With
   /** Maps primitive types and primitive array types to their corresponding wrapper types. */
   private static final @NotNull Map<Class<?>,Class<?>> WRAPPER_CLASS_MAP = new HashMap<>();
 
-  /** Lock guarding all formatter registrations and lookups. */
-  private final ReadWriteLock lock = new ReentrantReadWriteLock();
+  /** Lock serializing all formatter registrations. Lookups do not acquire it. */
+  private final Lock writeLock = new ReentrantLock();
 
-  /** Registered named formatters, keyed by formatter name. */
-  private final @NotNull Map<String,NamedParameterFormatter> namedFormatters = new TreeMap<>();
+  /** Maximum number of type-to-formatter mappings to cache. */
+  private final int formatterCacheSize;
 
-  /** Auto-apply named formatters, keyed by the parameter configuration names that trigger them. */
-  private final @NotNull Map<String,NamedParameterFormatter> configNameToNamedFormatterMap = new TreeMap<>();
-
-  /** Type based formatters with their priority, keyed by the type they have been registered for. */
-  private final @NotNull Map<Class<?>,List<PrioritizedParameterFormatter>> typeFormatters = new HashMap<>();
-
-  /** Accumulated parameter configuration names of all registered formatters. */
-  private final @NotNull Set<String> parameterConfigNames = new TreeSet<>();
-
-  /** Registered post formatters, keyed by post formatter name. */
-  private final @NotNull Map<String,PostFormatter> postFormatters = new HashMap<>();
-
-  /** Cache of resolved type based formatters, keyed by value type. */
-  private final @NotNull FormatterCache formatterCache;
+  /** Current registry snapshot, replaced on each registration. */
+  private volatile @NotNull Registry registry;
 
 
   static
@@ -137,7 +126,9 @@ public non-sealed class GenericFormatterService implements FormatterService.With
    */
   public GenericFormatterService(int formatterCacheSize)
   {
-    formatterCache = new FormatterCache(formatterCacheSize);
+    this.formatterCacheSize = formatterCacheSize;
+
+    registry = new Registry(Map.of(), Map.of(), Map.of(), Set.of(), Map.of(), new FormatterCache(formatterCacheSize));
 
     addFormatterForType(DEFAULT, new StringFormatter());
   }
@@ -160,13 +151,16 @@ public non-sealed class GenericFormatterService implements FormatterService.With
         requireNonNull(formattableType, "formattableType must not be null").getType(),
         requireNonNull(formatter, "formatter must not be null"));
 
-    final var writeLock = lock.writeLock();
-
     writeLock.lock();
     try {
-      registerFormatterForType(formattableType, formatter);
+      final var r = registry;
+      final var typeFormatters = new HashMap<>(r.typeFormatters);
+      final var parameterConfigNames = new TreeSet<>(r.parameterConfigNames);
 
-      formatterCache.clear();
+      registerFormatterForType(typeFormatters, parameterConfigNames, formattableType, formatter);
+
+      registry = new Registry(r.namedFormatters, r.configNameToNamedFormatterMap, typeFormatters,
+          Set.copyOf(parameterConfigNames), r.postFormatters, new FormatterCache(formatterCacheSize));
     } finally {
       writeLock.unlock();
     }
@@ -202,19 +196,31 @@ public non-sealed class GenericFormatterService implements FormatterService.With
 
 
   /**
-   * Registers {@code formatter} for {@code formattableType}. This method must only be called after
-   * {@link #validateFormatterForType(Class, ParameterFormatter)} has passed for the same formatter and type.
+   * Registers {@code formatter} for {@code formattableType} in the given registry copies. This method must only be
+   * called after {@link #validateFormatterForType(Class, ParameterFormatter)} has passed for the same formatter and
+   * type.
+   * <p>
+   * The formatter list for the type is replaced by a new list, as the existing list may be shared with the current
+   * registry snapshot.
    *
-   * @param formattableType  the formattable type to register the formatter for, not {@code null}
-   * @param formatter        the formatter to register, not {@code null}
+   * @param typeFormatters        copy of the type based formatters to register the formatter in, not {@code null}
+   * @param parameterConfigNames  copy of the parameter configuration names to add the formatter's names to, not
+   *                              {@code null}
+   * @param formattableType       the formattable type to register the formatter for, not {@code null}
+   * @param formatter             the formatter to register, not {@code null}
    *
    * @since 0.25.0
    */
-  private void registerFormatterForType(@NotNull FormattableType formattableType, @NotNull ParameterFormatter formatter)
+  private static void registerFormatterForType(
+      @NotNull Map<Class<?>,List<PrioritizedParameterFormatter>> typeFormatters,
+      @NotNull Set<String> parameterConfigNames, @NotNull FormattableType formattableType,
+      @NotNull ParameterFormatter formatter)
   {
-    typeFormatters
-        .computeIfAbsent(formattableType.getType(), t -> new ArrayList<>(4))
-        .add(new PrioritizedParameterFormatter(formattableType.getOrder(), formatter));
+    final var type = formattableType.getType();
+    final var formatters = new ArrayList<>(typeFormatters.getOrDefault(type, List.of()));
+
+    formatters.add(new PrioritizedParameterFormatter(formattableType.getOrder(), formatter));
+    typeFormatters.put(type, List.copyOf(formatters));
 
     parameterConfigNames.addAll(formatter.getParameterConfigNames());
   }
@@ -240,10 +246,9 @@ public non-sealed class GenericFormatterService implements FormatterService.With
   {
     requireNonNull(formatter, "formatter must not be null");
 
-    final var writeLock = lock.writeLock();
-
     writeLock.lock();
     try {
+      final var r = registry;
       NamedParameterFormatter namedParameterFormatter = null;
 
       if (formatter instanceof NamedParameterFormatter npf)
@@ -259,30 +264,43 @@ public non-sealed class GenericFormatterService implements FormatterService.With
           throw new FormatterServiceException("formatter name '" + formatterName +
               "' must match the kebab case naming convention");
         }
-        else if (namedFormatters.containsKey(formatterName))
+        else if (r.namedFormatters.containsKey(formatterName))
           throw new FormatterServiceException("named formatter '" + formatterName + "' has already been registered");
 
         if (namedParameterFormatter.autoApplyOnNamedConfigParameter())
-          validateAutoApplyNamedFormatter(namedParameterFormatter);
+          validateAutoApplyNamedFormatter(r.configNameToNamedFormatterMap, namedParameterFormatter);
       }
 
       final var formattableTypes = formatter.getFormattableTypes();
       for(var formattableType: formattableTypes)
         validateFormatterForType(formattableType.getType(), formatter);
 
-      // all validations passed; commit the mutations
+      // all validations passed; commit the mutations to copies of the registry
+      var namedFormatters = r.namedFormatters;
+      var configNameToNamedFormatterMap = r.configNameToNamedFormatterMap;
+
       if (namedParameterFormatter != null)
       {
-        namedFormatters.put(namedParameterFormatter.getName(), namedParameterFormatter);
+        final var newNamedFormatters = new TreeMap<>(namedFormatters);
+        newNamedFormatters.put(namedParameterFormatter.getName(), namedParameterFormatter);
+        namedFormatters = newNamedFormatters;
 
         if (namedParameterFormatter.autoApplyOnNamedConfigParameter())
-          registerAutoApplyNamedFormatter(namedParameterFormatter);
+        {
+          final var newConfigNameToNamedFormatterMap = new TreeMap<>(configNameToNamedFormatterMap);
+          registerAutoApplyNamedFormatter(newConfigNameToNamedFormatterMap, namedParameterFormatter);
+          configNameToNamedFormatterMap = newConfigNameToNamedFormatterMap;
+        }
       }
 
-      for(var formattableType: formattableTypes)
-        registerFormatterForType(formattableType, formatter);
+      final var typeFormatters = new HashMap<>(r.typeFormatters);
+      final var parameterConfigNames = new TreeSet<>(r.parameterConfigNames);
 
-      formatterCache.clear();
+      for(var formattableType: formattableTypes)
+        registerFormatterForType(typeFormatters, parameterConfigNames, formattableType, formatter);
+
+      registry = new Registry(namedFormatters, configNameToNamedFormatterMap, typeFormatters,
+          Set.copyOf(parameterConfigNames), r.postFormatters, new FormatterCache(formatterCacheSize));
     } finally {
       writeLock.unlock();
     }
@@ -292,13 +310,17 @@ public non-sealed class GenericFormatterService implements FormatterService.With
   /**
    * Validates that {@code namedParameterFormatter} can be registered for auto-apply.
    *
-   * @param namedParameterFormatter  the named formatter to validate for auto-apply, not {@code null}
+   * @param configNameToNamedFormatterMap  registered auto-apply named formatters, keyed by configuration name, not
+   *                                       {@code null}
+   * @param namedParameterFormatter        the named formatter to validate for auto-apply, not {@code null}
    *
    * @throws FormatterServiceException  if a configuration key conflicts with an already registered auto-apply formatter
    *
    * @since 0.25.0
    */
-  private void validateAutoApplyNamedFormatter(@NotNull NamedParameterFormatter namedParameterFormatter)
+  private static void validateAutoApplyNamedFormatter(
+      @NotNull Map<String,NamedParameterFormatter> configNameToNamedFormatterMap,
+      @NotNull NamedParameterFormatter namedParameterFormatter)
   {
     for(var parameterConfigName: namedParameterFormatter.getParameterConfigNames())
     {
@@ -306,8 +328,8 @@ public non-sealed class GenericFormatterService implements FormatterService.With
 
       if (existingNamedFormatter != null && !existingNamedFormatter.equals(namedParameterFormatter))
       {
-        throw new FormatterServiceException("parameter config name '" + parameterConfigName +
-            "' for formatter '" + namedParameterFormatter.getName() + "' is in conflict with formatter '" +
+        throw new FormatterServiceException("parameter config name '" + parameterConfigName +  "' for formatter '" +
+            namedParameterFormatter.getName() + "' is in conflict with formatter '" +
             existingNamedFormatter.getName() + '\'');
       }
     }
@@ -317,13 +339,17 @@ public non-sealed class GenericFormatterService implements FormatterService.With
   /**
    * Registers a named formatter for automatic application when its configuration keys are present in the parameter
    * configuration. This method must only be called after
-   * {@link #validateAutoApplyNamedFormatter(NamedParameterFormatter)} has passed for the same formatter.
+   * {@link #validateAutoApplyNamedFormatter(Map, NamedParameterFormatter)} has passed for the same formatter.
    *
-   * @param namedParameterFormatter  the named formatter to register for auto-apply, not {@code null}
+   * @param configNameToNamedFormatterMap  copy of the auto-apply named formatters to register the formatter in, not
+   *                                       {@code null}
+   * @param namedParameterFormatter        the named formatter to register for auto-apply, not {@code null}
    *
    * @since 0.25.0
    */
-  private void registerAutoApplyNamedFormatter(@NotNull NamedParameterFormatter namedParameterFormatter)
+  private static void registerAutoApplyNamedFormatter(
+      @NotNull Map<String,NamedParameterFormatter> configNameToNamedFormatterMap,
+      @NotNull NamedParameterFormatter namedParameterFormatter)
   {
     for(var parameterConfigName: namedParameterFormatter.getParameterConfigNames())
       configNameToNamedFormatterMap.put(parameterConfigName, namedParameterFormatter);
@@ -350,14 +376,19 @@ public non-sealed class GenericFormatterService implements FormatterService.With
           postFormatter.getClass().getSimpleName() + " does not match the kebab case naming convention");
     }
 
-    final var writeLock = lock.writeLock();
-
     writeLock.lock();
     try {
-      if (postFormatters.containsKey(postFormatterName))
+      final var r = registry;
+
+      if (r.postFormatters.containsKey(postFormatterName))
         throw new FormatterServiceException("post formatter '" + postFormatterName + "' has already been registered");
 
+      final var postFormatters = new HashMap<>(r.postFormatters);
       postFormatters.put(postFormatterName, postFormatter);
+
+      // post formatters do not affect type based formatter lookups, so the formatter cache is kept
+      registry = new Registry(r.namedFormatters, r.configNameToNamedFormatterMap, r.typeFormatters,
+          r.parameterConfigNames, Map.copyOf(postFormatters), r.formatterCache);
     } finally {
       writeLock.unlock();
     }
@@ -390,55 +421,55 @@ public non-sealed class GenericFormatterService implements FormatterService.With
   {
     requireNonNull(type, "type must not be null");
 
-    final var readLock = lock.readLock();
+    // work on a consistent snapshot; a registration published meanwhile comes with its own formatter cache, so
+    // formatters built from this snapshot never end up in the cache of a newer snapshot
+    final var r = registry;
 
-    readLock.lock();
-    try {
-      // explicit named formatter
-      if (format != null)
+    // explicit named formatter
+    if (format != null)
+    {
+      var namedFormatter = r.namedFormatters.get(format);
+      if (namedFormatter != null && namedFormatter.canFormat(type))
+        return new ParameterFormatter[] { namedFormatter };
+    }
+
+    // auto-config named formatter
+    if (config != null && !r.configNameToNamedFormatterMap.isEmpty())
+      for(var parameterConfigName: config.getConfigNames())
       {
-        var namedFormatter = namedFormatters.get(format);
+        var namedFormatter = r.configNameToNamedFormatterMap.get(parameterConfigName);
         if (namedFormatter != null && namedFormatter.canFormat(type))
           return new ParameterFormatter[] { namedFormatter };
       }
 
-      // auto-config named formatter
-      if (config != null && !configNameToNamedFormatterMap.isEmpty())
-        for(var parameterConfigName: config.getConfigNames())
-        {
-          var namedFormatter = configNameToNamedFormatterMap.get(parameterConfigName);
-          if (namedFormatter != null && namedFormatter.canFormat(type))
-            return new ParameterFormatter[] { namedFormatter };
-        }
+    // type based formatters
+    final var typeFormatters = r.typeFormatters;
+    final var formattersByType = r.formatterCache.lookup(type, t ->
+        streamTypes(typeFormatters, t)
+            .map(typeFormatters::get)
+            .filter(Objects::nonNull)
+            .flatMap(Collection::stream)
+            .sorted()
+            .map(PrioritizedParameterFormatter::formatter)
+            .distinct()
+            .toArray(ParameterFormatter[]::new));
 
-      // type based formatters
-      final var formattersByType = formatterCache.lookup(type, t ->
-          streamTypes(t)
-              .map(typeFormatters::get)
-              .filter(Objects::nonNull)
-              .flatMap(Collection::stream)
-              .sorted()
-              .map(PrioritizedParameterFormatter::formatter)
-              .distinct()
-              .toArray(ParameterFormatter[]::new));
-
-      return formattersByType.clone();  // defensive copy
-    } finally {
-      readLock.unlock();
-    }
+    return formattersByType.clone();  // defensive copy
   }
 
 
   /**
-   * Returns a stream of all types in the class hierarchy of the given {@code type}, including superclasses,
-   * interfaces and wrapper types for primitives.
+   * Returns a stream of all types in the class hierarchy of the given {@code type}, including superclasses, interfaces
+   * and wrapper types for primitives.
    *
-   * @param type  the type to resolve, not {@code null}
+   * @param typeFormatters  registered type based formatters, not {@code null}
+   * @param type            the type to resolve, not {@code null}
    *
    * @return  a stream of all candidate types to match against registered formatters, never {@code null}
    */
   @Contract(pure = true)
-  private @NotNull Stream<Class<?>> streamTypes(@NotNull Class<?> type)
+  private static @NotNull Stream<Class<?>> streamTypes(
+      @NotNull Map<Class<?>,List<PrioritizedParameterFormatter>> typeFormatters, @NotNull Class<?> type)
   {
     final var collectedTypes = new HashSet<Class<?>>();
 
@@ -491,16 +522,8 @@ public non-sealed class GenericFormatterService implements FormatterService.With
    * This implementation returns an immutable snapshot of the post formatters registered at the time of the call.
    */
   @Override
-  public @UnmodifiableView @NotNull Map<String,PostFormatter> getPostFormatters()
-  {
-    final var readLock = lock.readLock();
-
-    readLock.lock();
-    try {
-      return Map.copyOf(postFormatters);
-    } finally {
-      readLock.unlock();
-    }
+  public @UnmodifiableView @NotNull Map<String,PostFormatter> getPostFormatters() {
+    return registry.postFormatters;
   }
 
 
@@ -510,16 +533,8 @@ public non-sealed class GenericFormatterService implements FormatterService.With
    * This implementation looks up the post formatter directly, without creating a snapshot of all post formatters.
    */
   @Override
-  public PostFormatter getPostFormatter(@NotNull String name)
-  {
-    final var readLock = lock.readLock();
-
-    readLock.lock();
-    try {
-      return postFormatters.get(name);
-    } finally {
-      readLock.unlock();
-    }
+  public PostFormatter getPostFormatter(@NotNull String name) {
+    return registry.postFormatters.get(name);
   }
 
 
@@ -529,16 +544,8 @@ public non-sealed class GenericFormatterService implements FormatterService.With
    * This implementation returns an immutable snapshot of the configuration names known at the time of the call.
    */
   @Override
-  public @UnmodifiableView @NotNull Set<String> getParameterConfigNames()
-  {
-    final var readLock = lock.readLock();
-
-    readLock.lock();
-    try {
-      return Set.copyOf(parameterConfigNames);
-    } finally {
-      readLock.unlock();
-    }
+  public @UnmodifiableView @NotNull Set<String> getParameterConfigNames() {
+    return registry.parameterConfigNames;
   }
 
 
@@ -546,5 +553,34 @@ public non-sealed class GenericFormatterService implements FormatterService.With
   @Override
   public @NotNull FormatterService seal() {
     return new FormatterServiceDelegate(this);
+  }
+
+
+
+
+  /**
+   * Immutable snapshot of all registered formatters. The maps and sets of a published snapshot are never modified; a
+   * registration publishes a new snapshot instead.
+   * <p>
+   * The formatter cache belongs to the snapshot whose type based formatters it caches. A registration that changes the
+   * type based formatters therefore publishes a snapshot with a new, empty formatter cache.
+   *
+   * @param namedFormatters                registered named formatters, keyed by formatter name
+   * @param configNameToNamedFormatterMap  auto-apply named formatters, keyed by the parameter configuration names that
+   *                                       trigger them
+   * @param typeFormatters                 type based formatters with their priority, keyed by the type they have been
+   *                                       registered for
+   * @param parameterConfigNames           accumulated parameter configuration names of all registered formatters
+   * @param postFormatters                 registered post formatters, keyed by post formatter name
+   * @param formatterCache                 cache of resolved type based formatters, keyed by value type
+   *
+   * @since 0.25.1
+   */
+  private record Registry(@NotNull Map<String,NamedParameterFormatter> namedFormatters,
+                          @NotNull Map<String,NamedParameterFormatter> configNameToNamedFormatterMap,
+                          @NotNull Map<Class<?>,List<PrioritizedParameterFormatter>> typeFormatters,
+                          @NotNull Set<String> parameterConfigNames,
+                          @NotNull Map<String,PostFormatter> postFormatters,
+                          @NotNull FormatterCache formatterCache) {
   }
 }
