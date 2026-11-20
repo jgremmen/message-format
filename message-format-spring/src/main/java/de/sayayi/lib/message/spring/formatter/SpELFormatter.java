@@ -31,13 +31,10 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardOperatorOverloader;
 import org.springframework.expression.spel.support.StandardTypeComparator;
 import org.springframework.expression.spel.support.StandardTypeConverter;
+import org.springframework.util.ConcurrentLruCache;
 
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import static java.util.Objects.requireNonNull;
 import static org.springframework.expression.spel.SpelMessage.TYPE_NOT_FOUND;
@@ -200,16 +197,11 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object> impl
   /** Property accessors allowing properties to be read, but not written. */
   private final List<PropertyAccessor> propertyAccessors = List.of(forReadOnlyAccess());
 
-  /** Parsed expressions by expression string. The least recently used expression is evicted first. */
-  private final Map<String,Expression> expressionCache = new LinkedHashMap<>(16, 0.75f, true) {
-    @Override
-    protected boolean removeEldestEntry(Map.Entry<String,Expression> eldest) {
-      return size() > EXPRESSION_CACHE_SIZE;
-    }
-  };
-
-  /** Lock guarding access to {@link #expressionCache}. */
-  private final Lock expressionCacheLock = new ReentrantLock();
+  /**
+   * Parsed expressions by expression string. The least recently used expression is evicted first. Cached expressions
+   * are looked up without locking; expressions are parsed outside any lock and invalid expressions are not cached.
+   */
+  private final ConcurrentLruCache<String,Expression> expressionCache;
 
 
   /**
@@ -219,6 +211,7 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object> impl
   {
     spelExpressionParser = new SpelExpressionParser();
     typeConverter = new StandardTypeConverter();
+    expressionCache = new ConcurrentLruCache<>(EXPRESSION_CACHE_SIZE, spelExpressionParser::parseExpression);
   }
 
 
@@ -243,6 +236,7 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object> impl
   {
     spelExpressionParser = new SpelExpressionParser(new SpelParserConfiguration(null, classLoader));
     typeConverter = new StandardTypeConverter(conversionService);
+    expressionCache = new ConcurrentLruCache<>(EXPRESSION_CACHE_SIZE, spelExpressionParser::parseExpression);
   }
 
 
@@ -287,32 +281,8 @@ public final class SpELFormatter extends AbstractParameterFormatter<Object> impl
    *
    * @throws ParseException  if {@code spelExpr} is not a valid SpEL expression
    */
-  private @NotNull Expression getExpression(@NotNull String spelExpr)
-  {
-    Expression expression;
-
-    expressionCacheLock.lock();
-    try {
-      expression = expressionCache.get(spelExpr);
-    } finally {
-      expressionCacheLock.unlock();
-    }
-
-    if (expression == null)
-    {
-      // parse outside the lock; if another thread cached the expression meanwhile, its instance is used
-      final var parsedExpression = spelExpressionParser.parseExpression(spelExpr);
-
-      expressionCacheLock.lock();
-      try {
-        if ((expression = expressionCache.putIfAbsent(spelExpr, parsedExpression)) == null)
-          expression = parsedExpression;
-      } finally {
-        expressionCacheLock.unlock();
-      }
-    }
-
-    return expression;
+  private @NotNull Expression getExpression(@NotNull String spelExpr) {
+    return expressionCache.get(spelExpr);
   }
 
 

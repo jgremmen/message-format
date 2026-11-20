@@ -85,9 +85,10 @@ public final class FormatterCache
   private volatile TypeFormatterNode[] typeFormatterNodes = NO_NODES;
 
   /**
-   * Recency tick, advanced on each added type. A cache hit stamps the node with the current tick, so the node with the
-   * oldest stamp is the least recently used one. As the tick changes on cache misses only, cache hits do not write
-   * shared state, apart from stamping a node once per tick.
+   * Recency tick, advanced on each added type. An added node is stamped with the tick before advancing it and a cache
+   * hit stamps the node with the current tick, so a hit node is always more recent than all nodes added before the hit
+   * and the node with the oldest stamp is the least recently used one. As the tick changes on cache misses only, cache
+   * hits do not write shared state, apart from stamping a node once per tick.
    */
   private volatile int tick;
 
@@ -166,7 +167,10 @@ public final class FormatterCache
 
       // don't cache formatters which have been built before the cache was cleared
       if (generation == _generation)
-        typeFormatterNodes = addNew(currentNodes, new TypeFormatterNode(typeName, TYPE_ID.get(type), formatters, ++tick));
+      {
+        typeFormatterNodes =
+            addNew(currentNodes, new TypeFormatterNode(typeName, TYPE_ID.get(type), formatters, tick++));
+      }
     } finally {
       lock.unlock();
     }

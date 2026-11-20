@@ -32,6 +32,7 @@ import static java.util.concurrent.TimeUnit.MICROSECONDS;
  * Measures end-to-end message formatting with string, integer, decimal and date parameters.
  * <ul>
  *   <li>{@code formatByCode}: formats a registered message, as used by message bundles.</li>
+ *   <li>{@code formatPatterns}: formats custom number and date patterns, which are cached by their formatters.</li>
  *   <li>
  *     {@code formatText}: formats a message text, which is parsed once and then taken from the message factory cache,
  *     as used by {@code MessageSupport.message(String)} and the Log4j message factory.
@@ -52,6 +53,10 @@ public class MessageFormatBenchmark
 {
   private static final String MESSAGE =
       "Hello %{name}, %{count} orders totalling %{amount,number:'#,##0.00'} have been shipped on %{date,date:medium}";
+
+  /** Message with custom number and date patterns, which are taken from the formatters' pattern caches. */
+  private static final String PATTERN_MESSAGE =
+      "%{amount,number:'0.00'} / %{ratio,number:'0.0%'} on %{date,date:'yyyy-MM-dd'}";
 
   private static final LocalDate DATE = LocalDate.of(2026, 11, 20);
 
@@ -77,6 +82,19 @@ public class MessageFormatBenchmark
         .with("name", "Alice")
         .with("count", 42)
         .with("amount", 1234.5)
+        .with("date", DATE)
+        .locale(Locale.US)
+        .format();
+  }
+
+
+  @Benchmark
+  public String formatPatterns()
+  {
+    return messageSupport
+        .message(PATTERN_MESSAGE)
+        .with("amount", 1234.5)
+        .with("ratio", 0.125)
         .with("date", DATE)
         .locale(Locale.US)
         .format();

@@ -16,6 +16,7 @@
 package de.sayayi.lib.message;
 
 import de.sayayi.lib.message.exception.MessageParserException;
+import de.sayayi.lib.message.internal.BoundedCache;
 import de.sayayi.lib.message.internal.MessageTemplate;
 import de.sayayi.lib.message.internal.message.EmptyMessage;
 import de.sayayi.lib.message.internal.message.EmptyMessageWithCode;
@@ -36,8 +37,6 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 import static de.sayayi.lib.message.part.normalizer.MessagePartNormalizer.PASS_THROUGH;
@@ -97,10 +96,7 @@ public class MessageFactory
   final MessageCompiler messageCompiler;
 
   /** Cache of parsed messages keyed by their format string, or {@code null} if caching is disabled. */
-  private final @Nullable Map<String,Message.WithSpaces> messageCache;
-
-  /** Lock guarding access to {@link #messageCache}, or {@code null} if caching is disabled. */
-  private final @Nullable Lock messageCacheLock;
+  private final @Nullable BoundedCache<String,Message.WithSpaces> messageCache;
 
 
   /**
@@ -145,22 +141,7 @@ public class MessageFactory
     this.messagePartNormalizer = requireNonNull(messagePartNormalizer, "messagePartNormalizer must not be null");
     this.messageCompiler = new MessageCompiler(this);
 
-    if (messageCacheSize > 0)
-    {
-      messageCacheLock = new ReentrantLock();
-      messageCache = new LinkedHashMap<>(32, 0.75f, true) {
-        /** Evicts the least recently used message once the cache exceeds its maximum size. */
-        @Override
-        protected boolean removeEldestEntry(Map.Entry<String,Message.WithSpaces> eldest) {
-          return size() > messageCacheSize;
-        }
-      };
-    }
-    else
-    {
-      messageCacheLock = null;
-      messageCache = null;
-    }
+    messageCache = messageCacheSize > 0 ? new BoundedCache<>(messageCacheSize) : null;
   }
 
 
@@ -196,9 +177,9 @@ public class MessageFactory
    * <p>
    * If this factory was created with a message cache (see {@link #MessageFactory(MessagePartNormalizer, int)}),
    * previously parsed messages are returned from the cache. When the cache is full, the least recently used entry is
-   * evicted. Messages are compiled outside the cache lock, so concurrent calls do not wait for each other's
-   * compilation. If two threads parse the same uncached text at the same time, both compile it and the message cached
-   * first is returned to both of them, unless it has been evicted in the meantime.
+   * evicted. Cached messages are looked up without locking and messages are compiled outside any lock, so concurrent
+   * calls do not wait for each other. If two threads parse the same uncached text at the same time, both compile it
+   * and the message cached first is returned to both of them.
    *
    * @param text  message format text, not {@code null}
    *
@@ -211,35 +192,9 @@ public class MessageFactory
   @Contract(pure = true)
   public @NotNull Message.WithSpaces parseMessage(@NotNull @Language("MessageFormat") String text)
   {
-    if (messageCacheLock == null)
-      return messageCompiler.compileMessage(text);
-
-    Message.WithSpaces message;
-
-    messageCacheLock.lock();
-    try {
-      //noinspection DataFlowIssue
-      message = messageCache.get(text);
-    } finally {
-      messageCacheLock.unlock();
-    }
-
-    if (message == null)
-    {
-      // compile outside the lock, so other threads are not blocked; if another thread has cached the same text in the
-      // meantime, its message is returned instead
-      final var compiledMessage = messageCompiler.compileMessage(text);
-
-      messageCacheLock.lock();
-      try {
-        if ((message = messageCache.putIfAbsent(text, compiledMessage)) == null)
-          message = compiledMessage;
-      } finally {
-        messageCacheLock.unlock();
-      }
-    }
-
-    return message;
+    return messageCache == null
+        ? messageCompiler.compileMessage(text)
+        : messageCache.get(text, messageCompiler::compileMessage);
   }
 
 

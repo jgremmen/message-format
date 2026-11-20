@@ -18,6 +18,7 @@ package de.sayayi.lib.message.formatter.parameter.runtime;
 import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.parameter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
+import de.sayayi.lib.message.internal.BoundedCache;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -28,11 +29,8 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalQueries;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ClassifierContext.CLASSIFIER_TEMPORAL;
 import static de.sayayi.lib.message.part.TextPartFactory.emptyText;
@@ -174,15 +172,8 @@ public final class TemporalFormatter extends AbstractParameterFormatter<Temporal
   /**
    * Formatters for custom patterns, keyed by pattern. The least recently used formatter is evicted first.
    */
-  private final Map<String,DateTimeFormatter> patternFormatterCache = new LinkedHashMap<>(16, 0.75f, true) {
-    @Override
-    protected boolean removeEldestEntry(Map.Entry<String,DateTimeFormatter> eldest) {
-      return size() > PATTERN_FORMATTER_CACHE_SIZE;
-    }
-  };
-
-  /** Lock guarding access to {@link #patternFormatterCache}. */
-  private final Lock patternFormatterCacheLock = new ReentrantLock();
+  private final BoundedCache<String,DateTimeFormatter> patternFormatterCache =
+      new BoundedCache<>(PATTERN_FORMATTER_CACHE_SIZE);
 
 
   /**
@@ -267,32 +258,8 @@ public final class TemporalFormatter extends AbstractParameterFormatter<Temporal
    *
    * @since 0.25.0
    */
-  private @NotNull DateTimeFormatter getPatternFormatter(@NotNull String pattern)
-  {
-    DateTimeFormatter formatter;
-
-    patternFormatterCacheLock.lock();
-    try {
-      formatter = patternFormatterCache.get(pattern);
-    } finally {
-      patternFormatterCacheLock.unlock();
-    }
-
-    if (formatter == null)
-    {
-      // create outside the lock; if another thread cached the formatter meanwhile, its instance is used
-      final var createdFormatter = ofPattern(pattern);
-
-      patternFormatterCacheLock.lock();
-      try {
-        if ((formatter = patternFormatterCache.putIfAbsent(pattern, createdFormatter)) == null)
-          formatter = createdFormatter;
-      } finally {
-        patternFormatterCacheLock.unlock();
-      }
-    }
-
-    return formatter;
+  private @NotNull DateTimeFormatter getPatternFormatter(@NotNull String pattern) {
+    return patternFormatterCache.get(pattern, DateTimeFormatter::ofPattern);
   }
 
 

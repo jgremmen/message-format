@@ -20,6 +20,7 @@ import de.sayayi.lib.message.formatter.FormattableType;
 import de.sayayi.lib.message.formatter.parameter.AbstractParameterFormatter;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter.MapKeyComparator;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
+import de.sayayi.lib.message.internal.BoundedCache;
 import de.sayayi.lib.message.part.MapKey.MatchResult;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
@@ -31,16 +32,12 @@ import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
-import java.util.LinkedHashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.LongAccumulator;
 import java.util.concurrent.atomic.LongAdder;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import static de.sayayi.lib.message.formatter.parameter.ParameterFormatter.ClassifierContext.CLASSIFIER_NUMBER;
 import static de.sayayi.lib.message.part.MapKey.MatchResult.Defined.*;
@@ -141,15 +138,7 @@ public final class NumberFormatter
    * Number formats by format and locale. The least recently used number format is evicted first. As number formats
    * are not thread-safe, the cached instances are never used for formatting directly, only clones of them.
    */
-  private final Map<Key,NumberFormat> numberFormatCache = new LinkedHashMap<>(16, 0.75f, true) {
-    @Override
-    protected boolean removeEldestEntry(Map.Entry<Key,NumberFormat> eldest) {
-      return size() > NUMBER_FORMAT_CACHE_SIZE;
-    }
-  };
-
-  /** Lock guarding access to {@link #numberFormatCache}. */
-  private final Lock numberFormatCacheLock = new ReentrantLock();
+  private final BoundedCache<Key,NumberFormat> numberFormatCache = new BoundedCache<>(NUMBER_FORMAT_CACHE_SIZE);
 
 
   /**
@@ -216,29 +205,8 @@ public final class NumberFormatter
    */
   private @NotNull NumberFormat getFormatter(String format, Parameters parameters)
   {
-    final var key = new Key(isPlainFormat(format) ? "" : format, parameters.getLocale());
-    NumberFormat numberFormat;
-
-    numberFormatCacheLock.lock();
-    try {
-      numberFormat = numberFormatCache.get(key);
-    } finally {
-      numberFormatCacheLock.unlock();
-    }
-
-    if (numberFormat == null)
-    {
-      // create outside the lock; if another thread cached the number format meanwhile, its instance is used
-      final var createdNumberFormat = createFormatter(key.format, key.locale);
-
-      numberFormatCacheLock.lock();
-      try {
-        if ((numberFormat = numberFormatCache.putIfAbsent(key, createdNumberFormat)) == null)
-          numberFormat = createdNumberFormat;
-      } finally {
-        numberFormatCacheLock.unlock();
-      }
-    }
+    final var numberFormat = numberFormatCache.get(new Key(isPlainFormat(format) ? "" : format, parameters.getLocale()),
+        key -> createFormatter(key.format, key.locale));
 
     // clone the cached number format, as it is not thread-safe
     return (NumberFormat)numberFormat.clone();

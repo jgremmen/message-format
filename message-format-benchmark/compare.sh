@@ -26,7 +26,8 @@
 #
 # The baseline is built from a detached git worktree in .build/benchmark, which is removed afterwards. The
 # benchmarks of the working tree run against both versions, so they must only use API present in the baseline.
-# Baseline and current runs alternate per thread count, so slow drift of the machine state affects both alike.
+# Baseline and current runs alternate per thread count, and which of them runs first alternates as well, so slow drift
+# of the machine state (e.g. thermal throttling) does not favor one of them.
 
 set -euo pipefail
 
@@ -54,6 +55,7 @@ rm -f "$work"/*.csv "$work"/*.log
 
 # build the baseline jar
 git -C "$root" worktree remove --force "$worktree" 2>/dev/null || true
+rm -rf "$worktree"  # leftovers not known to git, e.g. directories created by an IDE
 git -C "$root" worktree add --detach --quiet "$worktree" "$baseline_commit"
 trap 'git -C "$root" worktree remove --force "$worktree"' EXIT
 
@@ -76,12 +78,28 @@ run_jmh() {  # <result base name> <threads> [gradle options...]
     { echo "benchmark failed, see $result.log" >&2; exit 1; }
 }
 
-for t in ${threads//,/ }; do
-  echo "Running baseline ($baseline_commit) with $t thread(s) ..."
-  run_jmh "$work/baseline-t$t" "$t" -PbaselineJar="$baseline_jar"
+run_baseline() {  # <threads>
+  echo "Running baseline ($baseline_commit) with $1 thread(s) ..."
+  run_jmh "$work/baseline-t$1" "$1" -PbaselineJar="$baseline_jar"
+}
 
-  echo "Running working tree with $t thread(s) ..."
-  run_jmh "$work/current-t$t" "$t"
+run_current() {  # <threads>
+  echo "Running working tree with $1 thread(s) ..."
+  run_jmh "$work/current-t$1" "$1"
+}
+
+baseline_first=true
+
+for t in ${threads//,/ }; do
+  if $baseline_first; then
+    run_baseline "$t"
+    run_current "$t"
+    baseline_first=false
+  else
+    run_current "$t"
+    run_baseline "$t"
+    baseline_first=true
+  fi
 done
 
 # join the results by benchmark and thread count

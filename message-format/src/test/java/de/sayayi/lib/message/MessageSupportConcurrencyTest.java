@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.time.LocalDate;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.IntConsumer;
 
@@ -37,14 +38,15 @@ import static java.util.concurrent.ThreadLocalRandom.current;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Timeout.ThreadMode.SEPARATE_THREAD;
 
 
 /**
  * Concurrency regression tests for {@link MessageSupport} / {@link de.sayayi.lib.message.internal.MessageSupportImpl}.
  * <p>
  * These tests exercise concurrent message/template registration, locale and default configuration changes together
- * with concurrent reads (message/template lookup and message formatting) to make sure the read/write lock used
- * internally does not allow readers and writers to corrupt the registries, lose updates or deadlock.
+ * with concurrent reads (message/template lookup and message formatting) to make sure readers and writers do not
+ * corrupt the registries, lose updates or deadlock.
  *
  * @author Jeroen Gremmen
  * @since 0.25.0
@@ -168,7 +170,8 @@ final class MessageSupportConcurrencyTest
     var messageFactory = support.getMessageAccessor().getMessageFactory();
     var threadCount = 16;
 
-    var messageResults = registerConcurrently(threadCount, idx -> support.addMessage("MSG", "text " + idx));
+    var messageResults = registerConcurrently(threadCount,
+        idx -> support.addMessage("MSG", "text " + idx));
 
     assertEquals(1, messageResults.added);
     assertEquals(threadCount - 1, messageResults.duplicates);
@@ -258,6 +261,30 @@ final class MessageSupportConcurrencyTest
   }
 
 
+  @Test
+  @Timeout(value = 5, unit = SECONDS, threadMode = SEPARATE_THREAD)  // a hanging lock cannot be interrupted
+  @DisplayName("Message filter waiting for formatting on another thread does not hang")
+  void messageFilterWaitingForFormattingOnOtherThread()
+  {
+    var support = createGeneric();
+
+    support
+        .addMessage("EXISTING", "Hello %{name}")
+        .setMessageFilter(message -> {
+          // formatting on another thread reads messages, templates and default config while this thread adds a message
+          final var formatted = CompletableFuture
+              .supplyAsync(() -> support.code("EXISTING").with("name", "x").format())
+              .join();
+
+          return !formatted.isEmpty();
+        });
+
+    support.addMessage("NEW", "text");
+
+    assertTrue(support.getMessageAccessor().hasMessageWithCode("NEW"));
+  }
+
+
   @RepeatedTest(3)
   @DisplayName("High contention stress test with concurrent reads and writes")
   void highContentionStressTest() throws Exception
@@ -284,14 +311,19 @@ final class MessageSupportConcurrencyTest
   private static @NotNull RegistrationResults registerConcurrently(int threadCount, @NotNull IntConsumer registration)
       throws Exception
   {
-    var added = (int)getConcurrently(threadCount, idx -> {
-      try {
-        registration.accept(idx);
-        return true;
-      } catch(DuplicateMessageException | DuplicateTemplateException ex) {
-        return false;
-      }
-    }).stream().filter(Boolean::booleanValue).count();
+    var added = (int)getConcurrently(
+        threadCount,
+        idx -> {
+          try {
+            registration.accept(idx);
+            return true;
+          } catch(DuplicateMessageException | DuplicateTemplateException ex) {
+            return false;
+          }
+        })
+        .stream()
+        .filter(Boolean::booleanValue)
+        .count();
 
     return new RegistrationResults(added, threadCount - added);
   }
