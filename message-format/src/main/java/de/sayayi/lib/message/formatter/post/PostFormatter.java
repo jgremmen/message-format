@@ -28,6 +28,12 @@ import org.jetbrains.annotations.NotNull;
  * {@link de.sayayi.lib.message.formatter.DefaultFormatterService DefaultFormatterService} or can be registered with
  * {@link de.sayayi.lib.message.formatter.FormatterService.WithRegistry#addPostFormatter(PostFormatter)
  * addPostFormatter}.
+ * <p>
+ * A post formatter which is discovered with the {@link java.util.ServiceLoader} mechanism is instantiated while the
+ * shared default formatter service is being created. Its constructor and static initializers must therefore not access
+ * the shared instances ({@code MessageSupportFactory.shared()}, {@code DefaultFormatterService.getSharedInstance()}),
+ * directly or indirectly. Doing so fails with an {@link IllegalStateException} or, if another thread creates the shared
+ * instances at the same time, may deadlock. Access them lazily when formatting instead.
  *
  * @see PostFormatterContext
  *

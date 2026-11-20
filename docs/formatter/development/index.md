@@ -154,6 +154,13 @@ example because its name is already taken, makes the constructor of `DefaultForm
 `FormatterServiceException`. The class loader used for discovery is described on the
 [Formatter Service](../../configuration/formatter-service.md#defaultformatterservice) page.
 
+/// warning | No Shared Instances During Construction
+A service provider is instantiated while the shared `DefaultFormatterService` is being created. Its constructor and
+static initializers must not access `MessageSupportFactory.shared()` or `DefaultFormatterService.getSharedInstance()`,
+not even indirectly. On the same thread this fails with an `IllegalStateException`. If another thread creates the
+shared instances at the same time, the application may hang. Access the shared instances when formatting instead.
+///
+
 /// note | Thread Safety
 A formatter service holds a single instance of every formatter and uses it for all formatting calls, from all threads
 that share the service. Formatter implementations must therefore be thread-safe. A formatter without mutable state,

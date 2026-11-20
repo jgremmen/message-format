@@ -279,6 +279,13 @@ The shared `MessageSupport` singleton returned by `MessageSupportFactory.shared(
 automatically with the class loader of the library, so any `NamedTemplate` providers visible to that class loader are
 registered without explicit code.
 
+/// warning | No Shared Message Support During Construction
+The constructor and static initializers of a `NamedTemplate` provider must not access `MessageSupportFactory.shared()`,
+not even indirectly, as the provider is instantiated while the shared message support is being created. On the same
+thread this fails with an `IllegalStateException`. If another thread creates the shared instance at the same time,
+the application may hang.
+///
+
 /// note | Custom Templates and Pack Files
 Custom templates have no format string representation and are never written to a [pack file](pack-files.md), even
 if an exported message references them. They must be registered again on the message support that imports the pack.

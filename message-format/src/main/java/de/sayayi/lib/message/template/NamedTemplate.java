@@ -24,10 +24,15 @@ import org.jetbrains.annotations.NotNull;
  * A {@link Template} that carries a name, making it eligible for automatic registration via the
  * {@link java.util.ServiceLoader} mechanism.
  * <p>
- * Implementations must extend {@link AbstractNamedTemplate} rather than implementing this interface directly. The
- * name returned by {@link #getName()} is used as the registration key when the template is discovered through
+ * Implementations must extend {@link AbstractNamedTemplate} rather than implementing this interface directly. The name
+ * returned by {@link #getName()} is used as the registration key when the template is discovered through
  * {@link MessageSupport.ConfigurableMessageSupport#registerTemplatesFromService(ClassLoader)
  * registerTemplatesFromService}.
+ * <p>
+ * The shared message support ({@code MessageSupportFactory.shared()}) discovers named templates while it is being
+ * created. The constructor and static initializers of a named template must therefore not access the shared message
+ * support, directly or indirectly. Doing so fails with an {@link IllegalStateException} or, if another thread creates
+ * the shared instance at the same time, may deadlock.
  *
  * @author Jeroen Gremmen
  * @since 0.24.0

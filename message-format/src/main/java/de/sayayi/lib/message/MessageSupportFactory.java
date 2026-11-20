@@ -85,7 +85,14 @@ public final class MessageSupportFactory
    *
    * @return  shared message support instance, never {@code null}
    */
-  public static @NotNull MessageSupport shared() {
+  public static @NotNull MessageSupport shared()
+  {
+    // initialize the shared instances it depends on first, so no lock is held while the default formatter service
+    // instantiates its service providers. A provider accessing the shared message support from another thread would
+    // otherwise wait for this lock while this thread waits for the formatter service, which deadlocks.
+    DefaultFormatterService.getSharedInstance();
+    MessageFactory.getSharedInstance();
+
     return SHARED_SUPPLIER.get();
   }
 

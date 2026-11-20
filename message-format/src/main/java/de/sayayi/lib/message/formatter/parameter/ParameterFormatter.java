@@ -67,6 +67,12 @@ import static java.util.Optional.empty;
  *     formatter is available.
  *   </li>
  * </ul>
+ * <p>
+ * A formatter which is discovered with the {@link java.util.ServiceLoader} mechanism is instantiated while the shared
+ * default formatter service is being created. Its constructor and static initializers must therefore not access the
+ * shared instances ({@code MessageSupportFactory.shared()}, {@code DefaultFormatterService.getSharedInstance()}),
+ * directly or indirectly. Doing so fails with an {@link IllegalStateException} or, if another thread creates the shared
+ * instances at the same time, may deadlock. Access them lazily when formatting instead.
  *
  * @author Jeroen Gremmen
  * @since 0.1.0
