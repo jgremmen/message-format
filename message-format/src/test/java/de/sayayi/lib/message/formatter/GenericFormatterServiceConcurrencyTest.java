@@ -15,6 +15,7 @@
  */
 package de.sayayi.lib.message.formatter;
 
+import de.sayayi.lib.message.exception.FormatterServiceException;
 import de.sayayi.lib.message.formatter.parameter.NamedParameterFormatter;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatterContext;
@@ -25,7 +26,10 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
 
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CountDownLatch;
 import java.util.stream.Stream;
 
 import static de.sayayi.lib.message.internal.part.config.MessagePartConfig.EMPTY_CONFIG;
@@ -158,6 +162,61 @@ final class GenericFormatterServiceConcurrencyTest
   }
 
 
+  @Test
+  @DisplayName("Formatter method synchronized with a concurrent registration does not deadlock")
+  void synchronizedFormatterMethodDoesNotDeadlock() throws Exception
+  {
+    var service = new GenericFormatterService();
+    var formatter = new ParameterFormatter() {
+      @Override
+      public @NotNull Text format(@NotNull ParameterFormatterContext context, Object value) {
+        return noSpaceText(String.valueOf(value));
+      }
+
+      @Override
+      public synchronized @NotNull Set<FormattableType> getFormattableTypes() {
+        return Set.of(new FormattableType(Long.class));
+      }
+    };
+
+    assertNoDeadlock(formatter,
+        () -> service.addPostFormatter(new MarkerPostFormatter("registered-while-synchronized")),
+        () -> service.addFormatter(formatter));
+
+    assertTrue(service.getPostFormatters().containsKey("registered-while-synchronized"));
+    assertSame(formatter, service.getFormatters(null, Long.class, EMPTY_CONFIG)[0]);
+  }
+
+
+  @Test
+  @DisplayName("Registered formatter with synchronized equals does not deadlock a concurrent registration")
+  void synchronizedEqualsOfRegisteredFormatterDoesNotDeadlock() throws Exception
+  {
+    var service = new GenericFormatterService();
+    var registered = new AutoApplyFormatter("registered") {
+      @Override
+      public synchronized boolean equals(Object o) {
+        return this == o;
+      }
+
+      @Override
+      public int hashCode() {
+        return System.identityHashCode(this);
+      }
+    };
+
+    service.addFormatter(registered);
+
+    // the conflicting configuration name makes the registration compare both formatters
+    assertNoDeadlock(registered,
+        () -> service.addPostFormatter(new MarkerPostFormatter("registered-while-synchronized")),
+        () -> assertThrows(FormatterServiceException.class,
+            () -> service.addFormatter(new AutoApplyFormatter("conflicting"))));
+
+    assertTrue(service.getPostFormatters().containsKey("registered-while-synchronized"));
+  }
+
+
   @RepeatedTest(3)
   @DisplayName("High contention stress test with concurrent reads and writes")
   void highContentionStressTest() throws Exception
@@ -175,6 +234,69 @@ final class GenericFormatterServiceConcurrencyTest
           service.getPostFormatters();
           service.getParameterConfigNames();
         });
+  }
+
+
+
+
+  /**
+   * Runs {@code registration} while another thread holds the monitor of {@code monitor} and runs
+   * {@code whileHoldingMonitor}, and asserts that both threads terminate. The threads are daemon threads, as a
+   * deadlocked lock cannot be interrupted.
+   */
+  private static void assertNoDeadlock(@NotNull Object monitor, @NotNull Runnable whileHoldingMonitor,
+                                       @NotNull Runnable registration) throws InterruptedException
+  {
+    var monitorHeld = new CountDownLatch(1);
+    var failures = new ConcurrentLinkedQueue<Throwable>();
+
+    var monitorThread = startDaemon(failures, () -> {
+      synchronized(monitor) {
+        monitorHeld.countDown();
+
+        // give the registration time to start waiting for the monitor
+        Thread.sleep(200);
+
+        whileHoldingMonitor.run();
+      }
+    });
+
+    var registrationThread = startDaemon(failures, () -> {
+      monitorHeld.await();
+      registration.run();
+    });
+
+    monitorThread.join(5000);
+    registrationThread.join(5000);
+
+    assertFalse(monitorThread.isAlive() || registrationThread.isAlive(), "registration deadlocks");
+    assertTrue(failures.isEmpty(), () -> "unexpected failure: " + failures.peek());
+  }
+
+
+  private static @NotNull Thread startDaemon(@NotNull Queue<Throwable> failures,
+                                             @NotNull InterruptibleRunnable runnable)
+  {
+    var thread = new Thread(() -> {
+      try {
+        runnable.run();
+      } catch(Throwable ex) {
+        failures.add(ex);
+      }
+    });
+
+    thread.setDaemon(true);
+    thread.start();
+
+    return thread;
+  }
+
+
+
+
+  @FunctionalInterface
+  private interface InterruptibleRunnable {
+    void run() throws InterruptedException;
   }
 
 
@@ -226,6 +348,29 @@ final class GenericFormatterServiceConcurrencyTest
     @Override
     public @NotNull Text format(@NotNull ParameterFormatterContext context, Object value) {
       return noSpaceText(String.valueOf(value));
+    }
+  }
+
+
+
+
+  /** Named formatter which is applied automatically on its configuration name {@code shared-config}. */
+  private static class AutoApplyFormatter extends MarkerNamedFormatter
+  {
+    private AutoApplyFormatter(String name) {
+      super(name);
+    }
+
+
+    @Override
+    public boolean autoApplyOnNamedConfigParameter() {
+      return true;
+    }
+
+
+    @Override
+    public @NotNull Set<String> getParameterConfigNames() {
+      return Set.of("shared-config");
     }
   }
 
