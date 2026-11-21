@@ -58,8 +58,11 @@ public final class Log4jMessageFactory extends AbstractMessageFactory
   }
 
 
-  /** Message support used to parse and format the log messages. */
-  private final MessageSupport messageSupport;
+  /**
+   * Message support used to parse and format the log messages. For the default message support this is {@code null}
+   * until the first message is created.
+   */
+  private volatile MessageSupport messageSupport;
 
   /** {@code true} if messages with Log4j-style placeholders only are delegated to {@link ParameterizedMessage}. */
   private final boolean parameterizedMessageFallback;
@@ -77,18 +80,18 @@ public final class Log4jMessageFactory extends AbstractMessageFactory
   /**
    * Creates a new factory with a default {@link MessageSupport} instance using the shared
    * {@link DefaultFormatterService}.
+   * <p>
+   * The default message support is created when the first message is created, not by this constructor. So creating a
+   * logger backed by this factory does not access the shared formatter service. This matters if a logger is created
+   * while the shared formatter service is being initialized, e.g. in the static initializer of a formatter discovered
+   * with the {@link java.util.ServiceLoader} mechanism.
    *
    * @param parameterizedMessageFallback  if {@code true}, messages containing Log4j-style <code>{}</code> placeholders
    *                                      (and no message-format placeholders) are delegated to
    *                                      {@link ParameterizedMessage} for backward compatibility
    */
-  public Log4jMessageFactory(boolean parameterizedMessageFallback)
-  {
-    this(MessageSupportFactory
-            .create(
-                DefaultFormatterService.getSharedInstance(),
-                new MessageFactory(PASS_THROUGH, 256)),
-        parameterizedMessageFallback);
+  public Log4jMessageFactory(boolean parameterizedMessageFallback) {
+    this.parameterizedMessageFallback = parameterizedMessageFallback;
   }
 
 
@@ -96,8 +99,8 @@ public final class Log4jMessageFactory extends AbstractMessageFactory
    * Creates a new factory backed by the given {@link MessageSupport} instance.
    *
    * @param messageSupport                the message support to use for formatting, not {@code null}
-   * @param parameterizedMessageFallback  if {@code true}, messages containing Log4j-style <code>{}</code>
-   *                                      placeholders (and no message-format placeholders) are delegated to
+   * @param parameterizedMessageFallback  if {@code true}, messages containing Log4j-style <code>{}</code> placeholders
+   *                                      (and no message-format placeholders) are delegated to
    *                                      {@link ParameterizedMessage} for backward compatibility
    */
   public Log4jMessageFactory(@NotNull MessageSupport messageSupport, boolean parameterizedMessageFallback)
@@ -158,7 +161,7 @@ public final class Log4jMessageFactory extends AbstractMessageFactory
         !(message.contains("\\{}") || message.contains("%{") || message.contains("%[") || message.contains("%(")))
       return new ParameterizedMessage(message, parameters);
 
-    final var builder = messageSupport.message(message);
+    final var builder = getMessageSupport().message(message);
     Throwable throwable = null;
     int length;
 
@@ -185,5 +188,27 @@ public final class Log4jMessageFactory extends AbstractMessageFactory
           }
         },
         throwable);
+  }
+
+
+  /**
+   * Returns the message support used to parse and format the log messages. The default message support is created on
+   * the first call.
+   *
+   * @return  message support, never {@code null}
+   *
+   * @since 0.25.1
+   */
+  private @NotNull MessageSupport getMessageSupport()
+  {
+    var support = messageSupport;
+    if (support == null)
+    {
+      messageSupport = support = MessageSupportFactory.create(
+          DefaultFormatterService.getSharedInstance(),
+          new MessageFactory(PASS_THROUGH, 256));
+    }
+
+    return support;
   }
 }
