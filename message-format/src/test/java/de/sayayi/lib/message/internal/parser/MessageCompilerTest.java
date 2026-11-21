@@ -31,6 +31,7 @@ import de.sayayi.lib.message.internal.part.typedvalue.TypedValueNumber;
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.normalizer.LRUMessagePartNormalizer;
+import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
 
@@ -379,7 +380,77 @@ final class MessageCompilerTest
   }
 
 
-  private static void assertCompiles(@NotNull String formatString, @NotNull MessagePart... expectedParts) {
-    assertArrayEquals(expectedParts, COMPILER.compileMessage(formatString).getMessageParts());
+  @Test
+  @DisplayName("Plain text compiles to the same message as with the parser")
+  void plainTextCompilesLikeParser()
+  {
+    // fixed edge cases
+    for(@Language("MessageFormat") var text: new String[] {
+        "", " ", "     ", "a", " a", "a ", "  a  b  ", "this  is  a  text", " a  b ",
+        "   ", "'quoted' \"text\"", "{}", "a {} b", "100$ + 5 = <x> | ~y ^ `z`", "­soft­hyphen",
+        "äöü ÄÖÜ ß ½ ² ª º µ", "a%b", "50 %", "a\\b",
+        "a\tb", "a\nb", "\u007f", "\u0085", " ", "　", "café €", "😀"
+    })
+      assertCompilesLikeParser(text);
+
+    // every character up to U+00FF, alone and surrounded by text and spaces
+    for(var ch = 0; ch <= 0xff; ch++)
+    {
+      @Language("MessageFormat")
+      final var s = String.valueOf((char)ch);
+
+      assertCompilesLikeParser(s);
+      assertCompilesLikeParser("a" + s + "b");
+      assertCompilesLikeParser(" " + s + s + " ");
+    }
+
+    // random text, mostly plain
+    final var random = new java.util.Random(4711);
+    final var alphabet = "abcXYZ019  .,;:!?'\"-_()[]{}<>=+*/&#@$^|~`äß½­%\\\t\u0085";
+
+    for(var n = 0; n < 5000; n++)
+    {
+      final var length = random.nextInt(12);
+      final var text = new StringBuilder(length);
+
+      for(var i = 0; i < length; i++)
+        text.append(alphabet.charAt(random.nextInt(alphabet.length())));
+
+      assertCompilesLikeParser(text.toString());
+    }
+  }
+
+
+  private static void assertCompilesLikeParser(@Language("MessageFormat") @NotNull String text)
+  {
+    for(var template: new boolean[] { false, true })
+    {
+      Object expected;
+      try {
+        expected = COMPILER.compileWithParser(text, template);
+      } catch(MessageParserException ex) {
+        expected = ex.getMessage();
+      }
+
+      Object actual;
+      try {
+        actual = template ? COMPILER.compileTemplate(text) : COMPILER.compileMessage(text);
+      } catch(MessageParserException ex) {
+        actual = ex.getMessage();
+      }
+
+      assertEquals(expected, actual, () -> "text: " + text.chars()
+          .mapToObj(ch -> String.format("U+%04X", ch))
+          .toList());
+    }
+  }
+
+
+  private static void assertCompiles(@Language("MessageFormat") @NotNull String formatString,
+                                     @NotNull MessagePart... expectedParts)
+  {
+    assertArrayEquals(
+        expectedParts,
+        COMPILER.compileMessage(formatString).getMessageParts());
   }
 }

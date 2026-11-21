@@ -88,6 +88,29 @@ public final class MessageCompiler extends AbstractAntlr4Parser
   private static final SyntaxErrorFormatter SYNTAX_ERROR_FORMATTER =
       new GenericSyntaxErrorFormatter(1, 0, 0 ,2);
 
+  /**
+   * Bit mask of the {@linkplain Character#getType(char) character types} the lexer accepts as text characters, see
+   * fragment {@code Character} in {@code MessageLexer.g4}. Private use characters ({@code \p{Co}}) are not included,
+   * as there are none up to {@code U+00FF}.
+   *
+   * @see #isPlainText(String)
+   */
+  private static final int PLAIN_CHAR_TYPES =
+      (1 << Character.SPACE_SEPARATOR) |  // [\p{Zs}]+
+      (1 << Character.UPPERCASE_LETTER) | (1 << Character.LOWERCASE_LETTER) | (1 << Character.TITLECASE_LETTER) |
+      (1 << Character.MODIFIER_LETTER) | (1 << Character.OTHER_LETTER) |  // [\p{L}]
+      (1 << Character.DECIMAL_DIGIT_NUMBER) | (1 << Character.LETTER_NUMBER) |
+      (1 << Character.OTHER_NUMBER) |  // [\p{N}]
+      (1 << Character.CONNECTOR_PUNCTUATION) | (1 << Character.DASH_PUNCTUATION) |
+      (1 << Character.START_PUNCTUATION) | (1 << Character.END_PUNCTUATION) |
+      (1 << Character.INITIAL_QUOTE_PUNCTUATION) | (1 << Character.FINAL_QUOTE_PUNCTUATION) |
+      (1 << Character.OTHER_PUNCTUATION) |  // [\p{P}]
+      (1 << Character.MATH_SYMBOL) | (1 << Character.CURRENCY_SYMBOL) | (1 << Character.MODIFIER_SYMBOL) |
+      (1 << Character.OTHER_SYMBOL) |  // [\p{S}]
+      (1 << Character.NON_SPACING_MARK) | (1 << Character.ENCLOSING_MARK) |
+      (1 << Character.COMBINING_SPACING_MARK) |  // [\p{M}]
+      (1 << Character.FORMAT);  // [\p{Cf}]
+
   /** Message factory providing the message part normalizer and used to create nested messages. */
   private final @NotNull MessageFactory messageFactory;
 
@@ -138,7 +161,11 @@ public final class MessageCompiler extends AbstractAntlr4Parser
 
 
   /**
-   * Compiles message text with the shared parser pipeline for either full messages or templates.
+   * Compiles message text for either full messages or templates.
+   * <p>
+   * Plain text, which cannot contain any parameter, template or post formatter part, is compiled without invoking the
+   * parser. The resulting message is identical to the one the parser would produce. All other text is compiled with the
+   * shared parser pipeline.
    *
    * @param text      message or template text, not {@code null}
    * @param template  {@code true} to compile template input, {@code false} to compile a regular message
@@ -148,8 +175,65 @@ public final class MessageCompiler extends AbstractAntlr4Parser
    * @throws MessageParserException  if the input contains invalid message-format syntax
    */
   @Contract(pure = true)
-  private @NotNull Message.WithSpaces compileMessage(@NotNull @Language("MessageFormat") String text,
-                                                     boolean template)
+  private @NotNull Message.WithSpaces compileMessage(@NotNull @Language("MessageFormat") String text, boolean template)
+  {
+    if (text.isEmpty())
+      return EmptyMessage.INSTANCE;
+
+    if (isPlainText(text))
+    {
+      return new TextMessage(messageFactory
+          .getMessagePartNormalizer()
+          .normalize(new TextPart(text)));
+    }
+
+    return compileWithParser(text, template);
+  }
+
+
+  /**
+   * Tells whether {@code text} consists of plain characters only, which the lexer turns into text characters without
+   * escape sequences, skipped control characters or any parameter, template or post formatter part.
+   * <p>
+   * Only characters up to {@code U+00FF} are considered plain, as their Unicode categories are identical for the lexer
+   * and the JDK. Text containing {@code %} (possible parameter, template or post formatter start), {@code \}
+   * (escape sequences), control characters, or any other character is not plain and must be compiled by the parser.
+   *
+   * @param text  message text, not {@code null}
+   *
+   * @return  {@code true} if {@code text} is plain text, {@code false} if it must be compiled by the parser
+   *
+   * @since 0.25.1
+   */
+  @Contract(pure = true)
+  private static boolean isPlainText(@NotNull String text)
+  {
+    for(int n = 0, length = text.length(); n < length; n++)
+    {
+      final var ch = text.charAt(n);
+
+      if (ch == '%' || ch == '\\' || ch > 'ÿ' || ((PLAIN_CHAR_TYPES >> Character.getType(ch)) & 1) == 0)
+        return false;
+    }
+
+    return true;
+  }
+
+
+  /**
+   * Compiles message text with the shared parser pipeline for either full messages or templates.
+   *
+   * @param text      message or template text, not {@code null}
+   * @param template  {@code true} to compile template input, {@code false} to compile a regular message
+   *
+   * @return  compiled message model, never {@code null}
+   *
+   * @throws MessageParserException  if the input contains invalid message-format syntax
+   *
+   * @since 0.25.1
+   */
+  @Contract(pure = true)
+  @NotNull Message.WithSpaces compileWithParser(@NotNull @Language("MessageFormat") String text, boolean template)
   {
     final var listener = new Listener(template);
 

@@ -130,7 +130,7 @@ class MessageBuilderTest
               .mapDefault().message(b -> b.parameter("value"))
           .build();
 
-      assertMessage(message, "%{value,null:nothing,:'%{value}'}", "nothing", "value", null);
+      assertMessage(message, "%{value,null:nothing,:'%{value}'}", "nothing", "value");
       assertEquals("hello", shared().message(message).with("value", "hello").format());
     }
 
