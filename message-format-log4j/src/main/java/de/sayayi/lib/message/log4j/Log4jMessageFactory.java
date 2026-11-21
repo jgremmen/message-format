@@ -19,7 +19,6 @@ import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
-import de.sayayi.lib.message.util.SupplierDelegate;
 import org.apache.logging.log4j.message.AbstractMessageFactory;
 import org.apache.logging.log4j.message.Message;
 import org.apache.logging.log4j.message.ParameterizedMessage;
@@ -48,6 +47,17 @@ import static java.util.Objects.requireNonNull;
  */
 public final class Log4jMessageFactory extends AbstractMessageFactory
 {
+  /** Precomputed parameter names {@code p1}, {@code p2}, etc. for the most common parameter counts. */
+  private static final String[] PARAMETER_NAMES = new String[16];
+
+
+  static
+  {
+    for(var n = 0; n < PARAMETER_NAMES.length; n++)
+      PARAMETER_NAMES[n] = "p" + (n + 1);
+  }
+
+
   /** Message support used to parse and format the log messages. */
   private final MessageSupport messageSupport;
 
@@ -123,8 +133,8 @@ public final class Log4jMessageFactory extends AbstractMessageFactory
    * If the message string contains Log4j-style <code>{}</code> placeholders but no message-format placeholders
    * (<code>%{</code>, <code>%[</code> or <code>%(</code>) and the parameterized message fallback is enabled,
    * formatting is delegated to a {@link ParameterizedMessage}
-   * for backward compatibility. Otherwise, the message is parsed using message-format syntax and parameters are
-   * mapped to variables {@code p1}, {@code p2}, etc.
+   * for backward compatibility. Otherwise, the message is parsed using message-format syntax and parameters are mapped
+   * to variables {@code p1}, {@code p2}, etc.
    * <p>
    * If the last parameter is a {@link Throwable}, it is additionally attached to the returned message. The formatted
    * message string is evaluated lazily when first requested and then cached. Runtime exceptions occurring while
@@ -155,25 +165,25 @@ public final class Log4jMessageFactory extends AbstractMessageFactory
     if (parameters != null && (length = parameters.length) > 0)
     {
       for(var n = 0; n < length; n++)
-        builder.with("p" + (n + 1), parameters[n]);
+        builder.with(n < PARAMETER_NAMES.length ? PARAMETER_NAMES[n] : "p" + (n + 1), parameters[n]);
 
       // check if the last parameter is a throwable
       if (parameters[length - 1] instanceof Throwable throwableParam)
         throwable = throwableParam;
     }
 
-    final var formatSupplier = builder.formatSupplier();
-
-    return new Log4jMessage(message,
-        SupplierDelegate.of(() -> {
+    // the builder is not used otherwise, so it can format the message lazily; Log4jMessage caches the result
+    return new Log4jMessage(
+        message,
+        () -> {
           try {
-            return formatSupplier.get();
+            return builder.format();
           } catch(RuntimeException ex) {
             // don't throw exceptions if the message is not valid; report the cause via the status logger
             StatusLogger.getLogger().warn("failed to format message: {}", message, ex);
             return "<internal error formatting: " + message + '>';
           }
-        }),
+        },
         throwable);
   }
 }

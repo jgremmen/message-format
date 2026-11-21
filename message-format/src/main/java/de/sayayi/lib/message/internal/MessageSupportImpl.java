@@ -35,6 +35,7 @@ import de.sayayi.lib.message.template.Template;
 import de.sayayi.lib.message.util.SortedStringMap;
 import de.sayayi.lib.message.util.SupplierDelegate;
 import de.sayayi.lib.pack.PackOutputStream;
+import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
@@ -375,8 +376,8 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
 
   /** {@inheritDoc} */
   @Override
-  public @NotNull MessageConfigurer<Message> message(@NotNull String message) {
-    return new Configurer<>(SupplierDelegate.of(() -> messageFactory.parseMessage(message)));
+  public @NotNull MessageConfigurer<Message> message(@NotNull @Language("MessageFormat") String message) {
+    return new Configurer<>(new ParsedMessageSupplier(messageFactory, message));
   }
 
 

@@ -46,6 +46,13 @@ final class Log4jMessage implements Message
   /** Supplier providing the formatted message. */
   private final transient Supplier<String> messageSupplier;
 
+  /**
+   * Formatted message, or {@code null} if the message has not been formatted yet.
+   *
+   * @since 0.25.1
+   */
+  private transient volatile String formattedMessage;
+
   /** Throwable associated with this log message, or {@code null}. */
   private final Throwable throwable;
 
@@ -68,11 +75,19 @@ final class Log4jMessage implements Message
   /**
    * {@inheritDoc}
    * <p>
-   * The formatted message is obtained by invoking the message supplier.
+   * The formatted message is obtained by invoking the message supplier on the first call and is cached afterwards. If
+   * the message supplier throws an exception, nothing is cached.
    */
   @Override
-  public String getFormattedMessage() {
-    return messageSupplier.get();
+  public String getFormattedMessage()
+  {
+    var message = formattedMessage;
+
+    // concurrent first calls may each invoke the supplier, which formats the same text; this avoids locking
+    if (message == null)
+      formattedMessage = message = messageSupplier.get();
+
+    return message;
   }
 
 

@@ -235,21 +235,48 @@ class Log4jMessageFactoryTest
 
     StatusLogger.getLogger().registerListener(listener);
     try {
-      assertEquals("<internal error formatting: not valid %{}>",
-          LOG4J_MESSAGE_FACTORY.newMessage("not valid %{}").getFormattedMessage());
+      final var message = LOG4J_MESSAGE_FACTORY.newMessage("not valid %{}");
+
+      // the fallback text is cached, so the warning is reported once, although the message is formatted twice
+      assertEquals("<internal error formatting: not valid %{}>", message.getFormattedMessage());
+      assertEquals("<internal error formatting: not valid %{}>", message.getFormattedMessage());
     } finally {
       StatusLogger.getLogger().removeListener(listener);
     }
 
-    final var warning = statusData
+    final var warnings = statusData
         .stream()
         .filter(data -> data.getMessage().getFormattedMessage().contains("not valid %{}"))
-        .findFirst()
-        .orElse(null);
+        .toList();
 
-    assertNotNull(warning, "no status logger warning for invalid message");
+    assertEquals(1, warnings.size(), "expected exactly one status logger warning for invalid message");
+
+    final var warning = warnings.get(0);
     assertEquals(WARN, warning.getLevel());
     assertInstanceOf(RuntimeException.class, warning.getThrowable());
+  }
+
+
+  @Test
+  @DisplayName("Formatted message is cached")
+  void formattedMessageIsCached()
+  {
+    final var message = LOG4J_MESSAGE_FACTORY.newMessage("Hello %{p1}", "Alice");
+
+    assertSame(message.getFormattedMessage(), message.getFormattedMessage());
+  }
+
+
+  @Test
+  @DisplayName("Parameters beyond the precomputed parameter names are available")
+  void manyParameters()
+  {
+    final var parameters = new Object[20];
+    for(var n = 0; n < parameters.length; n++)
+      parameters[n] = n + 1;
+
+    assertEquals("1 16 17 20",
+        LOG4J_MESSAGE_FACTORY.newMessage("%{p1} %{p16} %{p17} %{p20}", parameters).getFormattedMessage());
   }
 
 
