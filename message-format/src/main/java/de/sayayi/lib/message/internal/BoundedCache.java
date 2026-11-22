@@ -15,7 +15,7 @@
  */
 package de.sayayi.lib.message.internal;
 
-import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -41,7 +41,7 @@ import java.util.function.Function;
  * @author Jeroen Gremmen
  * @since 0.25.1
  */
-@ApiStatus.Internal
+@Internal
 public final class BoundedCache<K,V>
 {
   /** Maximum number of cached entries. */

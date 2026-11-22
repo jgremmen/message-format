@@ -19,7 +19,7 @@ import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.charset.Charset;
@@ -31,7 +31,7 @@ import java.nio.charset.Charset;
  * @author Jeroen Gremmen
  * @since 0.1.0
  */
-@ApiStatus.Internal
+@Internal
 public final class EmptyMessage implements Message.WithSpaces
 {
   /** Empty message instance. */

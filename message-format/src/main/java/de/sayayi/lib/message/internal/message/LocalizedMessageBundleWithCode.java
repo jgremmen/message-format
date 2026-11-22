@@ -23,7 +23,7 @@ import de.sayayi.lib.message.internal.pack.PackSupport;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
-import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
@@ -50,7 +50,7 @@ import static java.util.stream.Collectors.toUnmodifiableSet;
  * @author Jeroen Gremmen
  * @since 0.1.0 (renamed in 0.5.0)
  */
-@ApiStatus.Internal
+@Internal
 public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCode implements LocaleAware
 {
   /** Localized message map. */

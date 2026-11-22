@@ -19,7 +19,7 @@ import de.sayayi.lib.message.formatter.FormatterService;
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.post.PostFormatter;
 import de.sayayi.lib.message.part.MessagePart.Config;
-import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
@@ -39,7 +39,7 @@ import static java.util.Objects.requireNonNull;
  * @author Jeroen Gremmen
  * @since 0.25.0
  */
-@ApiStatus.Internal
+@Internal
 public final class FormatterServiceDelegate implements FormatterService
 {
   /** Formatter service all calls are forwarded to. */

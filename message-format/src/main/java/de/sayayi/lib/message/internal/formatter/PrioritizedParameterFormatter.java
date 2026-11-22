@@ -16,7 +16,7 @@
 package de.sayayi.lib.message.internal.formatter;
 
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
-import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 
 
@@ -30,7 +30,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Jeroen Gremmen
  * @since 0.25.0
  */
-@ApiStatus.Internal
+@Internal
 public record PrioritizedParameterFormatter(int order, @NotNull ParameterFormatter formatter)
     implements Comparable<PrioritizedParameterFormatter>
 {

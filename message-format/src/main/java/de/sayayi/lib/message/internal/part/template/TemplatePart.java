@@ -24,7 +24,7 @@ import de.sayayi.lib.message.part.TypedValue.StringValue;
 import de.sayayi.lib.message.util.SortedStringMap;
 import de.sayayi.lib.pack.PackInputStream;
 import de.sayayi.lib.pack.PackOutputStream;
-import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -53,7 +53,7 @@ import static java.util.stream.Collectors.joining;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-@ApiStatus.Internal
+@Internal
 public final class TemplatePart implements MessagePart.Template
 {
   /** template name. */
