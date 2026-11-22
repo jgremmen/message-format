@@ -18,12 +18,11 @@ package de.sayayi.lib.message.internal;
 import de.sayayi.lib.message.FormatStringSerializer.Context;
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.Message.Parameters;
-import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.exception.MessageFormatException;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.TextJoiner;
-import de.sayayi.lib.message.template.Template;
+import de.sayayi.lib.message.template.TemplateWithMessage;
 import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -37,7 +36,7 @@ import static java.util.stream.Collectors.joining;
 
 
 /**
- * A {@link Template.WithMessage} implementation that wraps a {@link Message} and delegates formatting to it.
+ * A {@link TemplateWithMessage} implementation that wraps a {@link Message} and delegates formatting to it.
  * <p>
  * This is the standard template type used when templates are parsed from message format strings or imported from pack
  * files. Instances are immutable and thread safe.
@@ -47,7 +46,7 @@ import static java.util.stream.Collectors.joining;
  */
 @Internal
 @SuppressWarnings("ClassCanBeRecord")
-public final class MessageTemplate implements Template.WithMessage
+public final class MessageTemplate implements TemplateWithMessage
 {
   /** Message this template delegates formatting to. */
   private final Message message;
@@ -71,21 +70,6 @@ public final class MessageTemplate implements Template.WithMessage
   @Contract(pure = true)
   public @NotNull Message getMessage() {
     return message;
-  }
-
-
-  /**
-   * {@inheritDoc}
-   * <p>
-   * This implementation considers {@code template} the same if it is a message template whose message is the same as
-   * the message of this template, as determined by {@link MessageFactory#isSame(Message, Message)}.
-   */
-  @Contract(pure = true)
-  public boolean isSame(@NotNull Template template)
-  {
-    return
-        template instanceof Template.WithMessage messageTemplate &&
-        MessageFactory.isSame(message, messageTemplate.getMessage());
   }
 
 

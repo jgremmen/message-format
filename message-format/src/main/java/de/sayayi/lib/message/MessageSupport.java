@@ -22,9 +22,8 @@ import de.sayayi.lib.message.formatter.post.PostFormatter;
 import de.sayayi.lib.message.internal.MessageSupportImpl;
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.TypedValue;
-import de.sayayi.lib.message.template.AbstractNamedTemplate;
-import de.sayayi.lib.message.template.NamedTemplate;
 import de.sayayi.lib.message.template.Template;
+import de.sayayi.lib.message.template.TemplateWithName;
 import de.sayayi.lib.message.util.MessageUtil;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
@@ -151,8 +150,8 @@ public interface MessageSupport
    * Templates that are not referenced by any message are not exported.
    * <p>
    * Only templates backed by a {@link Message} (i.e. templates parsed from a message format string or created via
-   * {@link MessageFactory}) can be packed. Custom template implementations, such as those extending
-   * {@link AbstractNamedTemplate}, have no serializable message representation and are therefore never included in the
+   * {@link MessageFactory}) can be packed. Custom template implementations, such as those implementing
+   * {@link TemplateWithName}, have no serializable message representation and are therefore never included in the
    * exported pack, even if they are referenced by an exported message. Such custom templates must be registered again
    * (e.g. via {@link ConfigurableMessageSupport#registerTemplatesFromService(ClassLoader)}) on the message support
    * instance that imports the pack.
@@ -191,8 +190,8 @@ public interface MessageSupport
    * exclude some of these templates, but never adds templates that are not referenced by a selected message.
    * <p>
    * Only templates backed by a {@link Message} (i.e. templates parsed from a message format string or created via
-   * {@link MessageFactory}) can be packed. Custom template implementations, such as those extending
-   * {@link AbstractNamedTemplate}, have no serializable message representation, so regardless of
+   * {@link MessageFactory}) can be packed. Custom template implementations, such as those implementing
+   * {@link TemplateWithName}, have no serializable message representation, so regardless of
    * {@code templateNameFilter} they are never included in the exported pack, even if they are referenced by an
    * exported message. Such custom templates must be registered again (e.g. via
    * {@link ConfigurableMessageSupport#registerTemplatesFromService(ClassLoader)}) on the message support instance that
@@ -844,14 +843,14 @@ public interface MessageSupport
 
 
     /**
-     * Discovers and registers all {@link NamedTemplate} service providers available from the given class loader.
+     * Discovers and registers all {@link TemplateWithName} service providers available from the given class loader.
      * <p>
-     * Each discovered {@code NamedTemplate} is registered under the name returned by {@link NamedTemplate#getName()}.
-     * The configured {@link TemplateFilter} is applied to each discovered template before registration.
+     * Each discovered template is registered under the name returned by {@link TemplateWithName#getName()}. The
+     * configured {@link TemplateFilter} is applied to each discovered template before registration.
      * <p>
-     * Service providers are declared either in a {@code META-INF/services/de.sayayi.lib.message.template.NamedTemplate}
-     * file or in a {@code module-info.java} using
-     * {@code provides de.sayayi.lib.message.template.NamedTemplate with ...}.
+     * Service providers are declared either in a
+     * {@code META-INF/services/de.sayayi.lib.message.template.TemplateWithName} file or in a {@code module-info.java}
+     * using {@code provides de.sayayi.lib.message.template.TemplateWithName with ...}.
      *
      * @param classLoader  class loader used for service discovery, not {@code null}
      *
@@ -859,7 +858,7 @@ public interface MessageSupport
      *
      * @since 0.24.0
      *
-     * @see AbstractNamedTemplate
+     * @see TemplateWithName
      */
     @Contract(value = "_ -> this", mutates = "this")
     @NotNull ConfigurableMessageSupport registerTemplatesFromService(@NotNull ClassLoader classLoader);
@@ -1157,7 +1156,7 @@ public interface MessageSupport
 
     /**
      * Adds a named template to this publisher. The template is registered under the name returned by
-     * {@link NamedTemplate#getName()}.
+     * {@link TemplateWithName#getName()}.
      *
      * @param template  named template, not {@code null}
      *
@@ -1169,7 +1168,7 @@ public interface MessageSupport
      * @since 0.24.0
      */
     @Contract(value = "_ -> this", mutates = "this")
-    default @NotNull MessagePublisher addTemplate(@NotNull NamedTemplate template) {
+    default @NotNull MessagePublisher addTemplate(@NotNull TemplateWithName template) {
       return addTemplate(template.getName(), template);
     }
   }

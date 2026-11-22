@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import de.sayayi.lib.message.template.AbstractNamedTemplate;
 
 /**
  * Provides the message format library for parsing, formatting and managing parameterized, locale-aware messages.
@@ -38,9 +37,9 @@ import de.sayayi.lib.message.template.AbstractNamedTemplate;
  *     programmatically.
  *   </li>
  *   <li>
- *     {@link de.sayayi.lib.message.template.Template Template}: reusable template that can be registered by name
- *     and referenced from messages. Custom templates extend
- *     {@link AbstractNamedTemplate AbstractNamedTemplate} and can be discovered automatically
+ *     {@link de.sayayi.lib.message.template.Template Template}: reusable template that can be registered by name and
+ *     referenced from messages. Custom templates implement
+ *     {@link de.sayayi.lib.message.template.TemplateWithName TemplateWithName} and can be discovered automatically
  *     via the {@link java.util.ServiceLoader} mechanism.
  *   </li>
  * </ul>
@@ -67,27 +66,32 @@ import de.sayayi.lib.message.template.AbstractNamedTemplate;
  * </ul>
  *
  * <h2>Formatting</h2>
- * <p>Parameter values are converted to text by
+ * Parameter values are converted to text by
  * {@linkplain de.sayayi.lib.message.formatter.parameter.ParameterFormatter parameter formatters}, which are type-based
  * or {@linkplain de.sayayi.lib.message.formatter.parameter.NamedParameterFormatter named}. Additional transformations
  * can be applied through {@linkplain de.sayayi.lib.message.formatter.post.PostFormatter post formatters}.
  *
  * <h2>Services</h2>
- * <p>The module uses the following service interfaces:
+ * The module uses the following service interfaces:
  * <ul>
- *   <li>{@link de.sayayi.lib.message.formatter.parameter.ParameterFormatter ParameterFormatter} and
- *       {@link de.sayayi.lib.message.formatter.post.PostFormatter PostFormatter}: discovered by the
- *       {@link de.sayayi.lib.message.formatter.DefaultFormatterService DefaultFormatterService}</li>
- *   <li>{@link de.sayayi.lib.message.template.NamedTemplate NamedTemplate}: discovered by
- *       {@link de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport#registerTemplatesFromService
- *       registerTemplatesFromService}</li>
+ *   <li>
+ *     {@link de.sayayi.lib.message.formatter.parameter.ParameterFormatter ParameterFormatter} and
+ *     {@link de.sayayi.lib.message.formatter.post.PostFormatter PostFormatter}: discovered by the
+ *     {@link de.sayayi.lib.message.formatter.DefaultFormatterService DefaultFormatterService}
+ *   </li>
+ *   <li>
+ *     {@link de.sayayi.lib.message.template.TemplateWithName TemplateWithName}: discovered by
+ *     {@link de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport#registerTemplatesFromService
+ *     registerTemplatesFromService}
+ *   </li>
  * </ul>
- * <p>It provides its built-in named and runtime parameter formatters and its post formatters as implementations of
- * these services, as well as a {@link java.nio.file.spi.FileTypeDetector FileTypeDetector} that recognizes message
- * format pack files.
+ * <p>
+ * It provides its built-in named and runtime parameter formatters and its post formatters as implementations of these
+ * services, as well as a {@link java.nio.file.spi.FileTypeDetector FileTypeDetector} that recognizes message format
+ * pack files.
  *
  * <h2>Message sources</h2>
- * <p>Messages can be loaded from properties files or resource bundles using the
+ * Messages can be loaded from properties files or resource bundles using the
  * {@linkplain de.sayayi.lib.message.adopter adopter} classes, or packed into a compact binary format for efficient
  * storage and distribution.
  *
@@ -128,7 +132,7 @@ module de.sayayi.lib.message
   // service provider interfaces
   uses de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
   uses de.sayayi.lib.message.formatter.post.PostFormatter;
-  uses de.sayayi.lib.message.template.NamedTemplate;
+  uses de.sayayi.lib.message.template.TemplateWithName;
 
   // internal service implementations
   provides java.nio.file.spi.FileTypeDetector with

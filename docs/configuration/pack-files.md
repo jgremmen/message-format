@@ -59,7 +59,7 @@ The optional `messageCodeFilter` selects which message codes to include, and `nu
 `templateNameFilter` selects which of the referenced templates to include, and `null` includes all templates referenced
 by the selected messages. The filter can only exclude referenced templates; it never adds templates that are not 
 referenced by a selected message. Only templates that were created from parsed message format strings, through
-`MessageFactory` or `MessageBuilder`, can be serialized. Custom `AbstractNamedTemplate` implementations are excluded
+`MessageFactory` or `MessageBuilder`, can be serialized. Custom `TemplateWithName` implementations are excluded
 automatically since they have no serializable message representation, so they must be registered again on the message
 support that imports the pack.
 

@@ -20,7 +20,6 @@ import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.exception.MessageFormatException;
-import de.sayayi.lib.message.internal.MessageTemplate;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -33,12 +32,12 @@ import org.jetbrains.annotations.NotNull;
  * A template is either of the following:
  * <ul>
  *   <li>
- *     a {@link WithMessage}: a template backed by a {@link Message}, as created from a message format string or
- *     imported from a pack file
+ *     a {@link TemplateWithMessage}: a template backed by a {@link Message}, as created from a message format string
+ *     or imported from a pack file
  *   </li>
  *   <li>
- *     a {@link NamedTemplate}: a template implemented in Java, which carries its own name and is typically discovered
- *     through the {@link java.util.ServiceLoader} mechanism
+ *     a {@link TemplateWithName}: a template implemented in Java, which carries its own name and is typically
+ *     discovered through the {@link java.util.ServiceLoader} mechanism
  *   </li>
  * </ul>
  * <p>
@@ -49,7 +48,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @see MessageAccessor#getTemplateByName(String)
  */
-public sealed interface Template permits Template.WithMessage, NamedTemplate
+public sealed interface Template permits TemplateWithMessage, TemplateWithName
 {
   /**
    * Tells whether this template is semantically equivalent to the given {@code template}.
@@ -79,26 +78,4 @@ public sealed interface Template permits Template.WithMessage, NamedTemplate
   @Contract(pure = true)
   @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
       throws MessageFormatException;
-
-
-
-
-  /**
-   * A template backed by a {@link Message}, which provides the template content.
-   * <p>
-   * Templates of this kind are created when templates are defined using message format strings or imported from pack
-   * files. Formatting such a template formats its message.
-   *
-   * @since 0.25.1
-   */
-  sealed interface WithMessage extends Template permits MessageTemplate
-  {
-    /**
-     * Returns the message providing the content of this template.
-     *
-     * @return  template message, never {@code null}
-     */
-    @Contract(pure = true)
-    @NotNull Message getMessage();
-  }
 }

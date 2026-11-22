@@ -30,13 +30,13 @@ import de.sayayi.lib.message.internal.part.typedvalue.TypedValueNumber;
 import de.sayayi.lib.message.internal.part.typedvalue.TypedValueString;
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.TypedValue;
-import de.sayayi.lib.message.template.NamedTemplate;
 import de.sayayi.lib.message.template.Template;
+import de.sayayi.lib.message.template.TemplateWithName;
 import de.sayayi.lib.message.util.SortedStringMap;
 import de.sayayi.lib.message.util.SupplierDelegate;
 import de.sayayi.lib.pack.PackOutputStream;
 import org.intellij.lang.annotations.Language;
-import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
@@ -76,7 +76,7 @@ import static java.util.stream.Collectors.toCollection;
  * @author Jeroen Gremmen
  * @since 0.8.0
  */
-@ApiStatus.Internal
+@Internal
 public final class MessageSupportImpl implements MessageSupport.ConfigurableMessageSupport
 {
   /**
@@ -275,7 +275,7 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
   public @NotNull ConfigurableMessageSupport registerTemplatesFromService(@NotNull ClassLoader classLoader)
   {
     ServiceLoader
-        .load(NamedTemplate.class, requireNonNull(classLoader, "classLoader must not be null"))
+        .load(TemplateWithName.class, requireNonNull(classLoader, "classLoader must not be null"))
         .forEach(template -> addTemplate(template.getName(), template));
 
     return this;
