@@ -83,8 +83,10 @@ final class MessageParameters implements Parameters
 
 
   /**
-   * Tells whether the given object is a {@code MessageParameters} instance with the same locale and parameter values
-   * as this instance.
+   * {@inheritDoc}
+   * <p>
+   * Instances are equal if the other object is a {@code MessageParameters} instance with the same locale and parameter
+   * values.
    * <p>
    * Other {@link Parameters} implementations are never considered equal, even if they provide the same locale and
    * parameter values. This keeps {@code equals} symmetric, as other implementations may use identity equality.
@@ -108,7 +110,9 @@ final class MessageParameters implements Parameters
 
 
   /**
-   * Returns the hash code for this instance, based on the locale and the parameter values.
+   * {@inheritDoc}
+   * <p>
+   * The hash code is based on the locale and the parameter values.
    *
    * @return  hash code
    */

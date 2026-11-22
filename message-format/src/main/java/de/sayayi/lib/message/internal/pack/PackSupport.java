@@ -161,8 +161,8 @@ public final class PackSupport
 
 
   /**
-   * Creates a new pack support instance using the given message factory to re-create messages from their packed
-   * string representation and to deduplicate equivalent instances encountered while unpacking.
+   * Creates a new pack support instance using the given message factory to re-create messages from their packed string
+   * representation and to deduplicate equivalent instances encountered while unpacking.
    *
    * @param messageFactory  factory used for creating messages while unpacking, not {@code null}
    */
@@ -177,7 +177,8 @@ public final class PackSupport
    * @param message      message to pack, not {@code null}
    * @param packStream   output stream to write to, not {@code null}
    *
-   * @throws IOException  if an I/O error occurs during packing
+   * @throws IOException               if an I/O error occurs during packing
+   * @throws IllegalArgumentException  if {@code message} is of an unsupported message type
    */
   @Contract(mutates = "param2,io")
   public static void pack(@NotNull Message message, @NotNull PackOutputStream packStream) throws IOException
@@ -212,14 +213,14 @@ public final class PackSupport
 
 
   /**
-   * Unpacks a {@link Message.WithSpaces} from the given input stream. Equivalent instances are
-   * deduplicated.
+   * Unpacks a {@link Message.WithSpaces} from the given input stream. Equivalent instances are deduplicated.
    *
    * @param packStream   input stream to read from, not {@code null}
    *
    * @return  unpacked message with spaces, never {@code null}
    *
-   * @throws IOException  if an I/O error occurs during unpacking
+   * @throws IOException            if an I/O error occurs during unpacking
+   * @throws IllegalStateException  if the pack stream does not contain a message with spaces at the current position
    */
   @Contract(mutates = "param1,io")
   public @NotNull Message.WithSpaces unpackMessageWithSpaces(@NotNull PackInputStream packStream) throws IOException
@@ -254,7 +255,8 @@ public final class PackSupport
    *
    * @return  unpacked message with code, never {@code null}
    *
-   * @throws IOException  if an I/O error occurs during unpacking
+   * @throws IOException            if an I/O error occurs during unpacking
+   * @throws IllegalStateException  if the pack stream does not contain a message with code at the current position
    */
   @Contract(mutates = "param1,io")
   public @NotNull Message.WithCode unpackMessageWithCode(@NotNull PackInputStream packStream) throws IOException
@@ -277,7 +279,8 @@ public final class PackSupport
    *
    * @return  unpacked message, never {@code null}
    *
-   * @throws IOException  if an I/O error occurs during unpacking
+   * @throws IOException            if an I/O error occurs during unpacking
+   * @throws IllegalStateException  if the pack stream does not contain a message at the current position
    */
   @Contract(mutates = "param1,io")
   public @NotNull Message unpackMessage(@NotNull PackInputStream packStream) throws IOException
@@ -348,14 +351,15 @@ public final class PackSupport
 
 
   /**
-   * Unpacks a {@link MessagePart} from the given input stream. Equivalent instances are
-   * deduplicated. Supports backward-compatible reading of older pack format versions.
+   * Unpacks a {@link MessagePart} from the given input stream. Equivalent instances are deduplicated. Supports
+   * backward-compatible reading of older pack format versions.
    *
    * @param packStream   input stream to read from, not {@code null}
    *
    * @return  unpacked message part, never {@code null}
    *
-   * @throws IOException  if an I/O error occurs during unpacking
+   * @throws IOException            if an I/O error occurs during unpacking
+   * @throws IllegalStateException  if the pack stream does not contain a message part at the current position
    */
   @Contract(mutates = "param1,io")
   @SuppressWarnings("OptionalGetWithoutIsPresent")
@@ -383,13 +387,13 @@ public final class PackSupport
 
 
   /**
-   * Packs a {@link MapKey} into the given output stream. A {@code null} map key is packed as
-   * the default/catch-all key.
+   * Packs a {@link MapKey} into the given output stream. A {@code null} map key is packed as the default/catch-all key.
    *
    * @param mapKey       map key to pack, or {@code null} for the default key
    * @param packStream   output stream to write to, not {@code null}
    *
-   * @throws IOException  if an I/O error occurs during packing
+   * @throws IOException               if an I/O error occurs during packing
+   * @throws IllegalArgumentException  if {@code mapKey} is of an unsupported map key type
    */
   @Contract(mutates = "param2,io")
   public static void pack(MapKey mapKey, @NotNull PackOutputStream packStream) throws IOException
@@ -424,14 +428,15 @@ public final class PackSupport
 
 
   /**
-   * Unpacks a {@link MapKey} from the given input stream. Equivalent instances are deduplicated.
-   * Returns {@code null} for the default/catch-all key.
+   * Unpacks a {@link MapKey} from the given input stream. Equivalent instances are deduplicated. Returns {@code null}
+   * for the default/catch-all key.
    *
    * @param packStream   input stream to read from, not {@code null}
    *
    * @return  unpacked map key, or {@code null} for the default key
    *
-   * @throws IOException  if an I/O error occurs during unpacking
+   * @throws IOException            if an I/O error occurs during unpacking
+   * @throws IllegalStateException  if the pack stream does not contain a map key at the current position
    */
   @Contract(mutates = "param1,io")
   @SuppressWarnings("DuplicatedCode")
@@ -458,7 +463,8 @@ public final class PackSupport
    * @param typedValue   typed value to pack, not {@code null}
    * @param packStream   output stream to write to, not {@code null}
    *
-   * @throws IOException  if an I/O error occurs during packing
+   * @throws IOException               if an I/O error occurs during packing
+   * @throws IllegalArgumentException  if {@code typedValue} is of an unsupported typed value type
    */
   @Contract(mutates = "param2,io")
   public static void pack(@NotNull TypedValue<?> typedValue, @NotNull PackOutputStream packStream) throws IOException
@@ -488,14 +494,14 @@ public final class PackSupport
 
 
   /**
-   * Unpacks a {@link TypedValue} from the given input stream. Equivalent instances are
-   * deduplicated.
+   * Unpacks a {@link TypedValue} from the given input stream. Equivalent instances are deduplicated.
    *
    * @param packStream   input stream to read from, not {@code null}
    *
    * @return  unpacked typed value, never {@code null}
    *
-   * @throws IOException  if an I/O error occurs during unpacking
+   * @throws IOException            if an I/O error occurs during unpacking
+   * @throws IllegalStateException  if the pack stream does not contain a typed value at the current position
    *
    * @since 0.21.0
    */
@@ -546,10 +552,9 @@ public final class PackSupport
 
 
   /**
-   * Packs a {@code long} value using variable-length encoding optimized for smaller numbers.
-   * Values close to zero require fewer bits (as little as 5 bits for values in the range
-   * {@code -8..7}), while the full {@code long} range is still supported at the cost of more
-   * bits.
+   * Packs a {@code long} value using variable-length encoding optimized for smaller numbers. Values close to zero
+   * require fewer bits (as little as 5 bits for values in the range {@code -8..7}), while the full {@code long} range
+   * is still supported at the cost of more bits.
    *
    * @param value        the value to pack
    * @param packStream   output stream to write to, not {@code null}

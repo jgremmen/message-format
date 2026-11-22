@@ -154,8 +154,10 @@ to be rejected.
 
 The filter is invoked while the message support holds its internal write lock. Checking for an existing entry and
 adding the new one is therefore atomic. A filter may read from the message support, for example through its message
-accessor, but it must return quickly and must never wait for another thread that uses the same message support, as
-this would cause a deadlock.
+accessor, but it must return quickly. It must never wait for another thread that adds messages or templates to the same
+message support, imports or exports a pack, or calls `findMissingTemplates`, as these threads wait for the same lock
+and this would cause a deadlock. Waiting for a thread that only formats messages is safe, because formatting does not
+acquire the lock.
 
 A typical use case is logging every message that gets registered, for example during development when tracking what is
 being loaded from annotation scanning or pack files is desired:
@@ -301,7 +303,11 @@ page.
 `MessageFactory`, `ConfigurableMessageSupport` and the singletons returned by
 `DefaultFormatterService.getSharedInstance()` and `MessageSupportFactory.shared()` are all thread-safe. Adding messages,
 changing configuration and formatting can happen concurrently. The same applies to the sealed view returned by
-`seal()`, to the `MessageAccessor` and to all `Message` objects, which are immutable.
+`seal()`, to the `MessageAccessor` and to all `Message` objects, which are immutable. Looking up messages and
+templates, the default locale and the default configuration does not acquire a lock, so formatting never waits for a
+thread that is adding messages or templates. Adding messages and templates, which includes importing a pack, is
+serialized by an internal lock. `exportMessages` and `MessageAccessor.findMissingTemplates` acquire the same lock
+briefly to take a consistent snapshot of the registered messages and templates.
 
 The objects that represent a single operation are not thread-safe and must be confined to the thread that created them.
 These are the `MessageConfigurer` returned by `code(...)` and `message(...)`, the

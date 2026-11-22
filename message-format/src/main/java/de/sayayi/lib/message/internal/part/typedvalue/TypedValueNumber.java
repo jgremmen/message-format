@@ -69,7 +69,7 @@ public record TypedValueNumber(long longValue) implements NumberValue
 
 
   /**
-   * Returns the string representation of this numeric value.
+   * {@inheritDoc}
    *
    * @return  string representation, never {@code null}
    */

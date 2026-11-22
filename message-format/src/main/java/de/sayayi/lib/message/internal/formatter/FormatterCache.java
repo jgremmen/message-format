@@ -69,7 +69,11 @@ public final class FormatterCache
     }
   };
 
-  /** Empty node array of an empty cache. */
+  /**
+   * Empty node array of an empty cache.
+   *
+   * @since 0.26.0
+   */
   private static final TypeFormatterNode[] NO_NODES = new TypeFormatterNode[0];
 
   /** Lock serializing all structural modifications of this cache. Lookups of cached types do not acquire it. */
@@ -89,10 +93,16 @@ public final class FormatterCache
    * hit stamps the node with the current tick, so a hit node is always more recent than all nodes added before the hit
    * and the node with the oldest stamp is the least recently used one. As the tick changes on cache misses only, cache
    * hits do not write shared state, apart from stamping a node once per tick.
+   *
+   * @since 0.26.0
    */
   private volatile int tick;
 
-  /** Generation, incremented by {@link #clear()}. A formatter list built before a clear is not cached. */
+  /**
+   * Generation, incremented by {@link #clear()}. A formatter list built before a clear is not cached.
+   *
+   * @since 0.26.0
+   */
   private volatile int generation;
 
 
@@ -188,7 +198,7 @@ public final class FormatterCache
    *
    * @return  new sorted node array, never {@code null}
    *
-   * @since 0.25.1
+   * @since 0.26.0
    */
   private @NotNull TypeFormatterNode[] addNew(@NotNull TypeFormatterNode[] nodes, @NotNull TypeFormatterNode newNode)
   {
@@ -222,7 +232,7 @@ public final class FormatterCache
    *
    * @return  index of the least recently used node
    *
-   * @since 0.25.1
+   * @since 0.26.0
    */
   private int findLeastRecentlyUsedIndex(@NotNull TypeFormatterNode[] nodes)
   {
@@ -328,7 +338,11 @@ public final class FormatterCache
     /** Sorted parameter formatters for the cached value type. */
     private final ParameterFormatter[] formatters;
 
-    /** Recency tick of the last access, see {@link FormatterCache#tick}. */
+    /**
+     * Recency tick of the last access, see {@link FormatterCache#tick}.
+     *
+     * @since 0.26.0
+     */
     private volatile int lastAccess;
 
 

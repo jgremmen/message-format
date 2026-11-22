@@ -27,11 +27,11 @@ import java.util.function.Supplier;
 /**
  * Supplier parsing a message text without locking on first use and caching the parsed message.
  * <p>
- * Concurrent first calls may parse the message text more than once. This is harmless, as each call yields an
- * equivalent message.
+ * Concurrent first calls may parse the message text more than once. This is harmless, as each call yields an equivalent
+ * message.
  *
  * @author Jeroen Gremmen
- * @since 0.25.1
+ * @since 0.26.0
  */
 @Internal
 final class ParsedMessageSupplier implements Supplier<Message>
@@ -60,7 +60,9 @@ final class ParsedMessageSupplier implements Supplier<Message>
 
 
   /**
-   * Returns the parsed message, parsing the message text on the first call.
+   * {@inheritDoc}
+   * <p>
+   * The message text is parsed on the first call only, subsequent calls return the parsed message.
    *
    * @return  parsed message, never {@code null}
    */

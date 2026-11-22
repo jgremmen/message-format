@@ -141,7 +141,8 @@ public final class FormattableType implements Comparable<FormattableType>, Seria
 
 
   /**
-   * Indicates whether this formattable type is equal to another object.
+   * {@inheritDoc}
+   * <p>
    * Two formattable types are equal when they describe the same class and priority order.
    *
    * @param o  object to compare with
@@ -155,7 +156,9 @@ public final class FormattableType implements Comparable<FormattableType>, Seria
 
 
   /**
-   * Returns a hash code consistent with {@link #equals(Object)}, based on the type and the order.
+   * {@inheritDoc}
+   * <p>
+   * The hash code is based on the type and the order.
    *
    * @return  hash code value for this formattable type
    */
@@ -166,7 +169,9 @@ public final class FormattableType implements Comparable<FormattableType>, Seria
 
 
   /**
-   * Compares this formattable type with another by priority order, then by type name when the orders are equal.
+   * {@inheritDoc}
+   * <p>
+   * Formattable types are ordered by priority order, then by type name when the orders are equal.
    *
    * @param o  formattable type to compare with, not {@code null}
    *
@@ -188,7 +193,7 @@ public final class FormattableType implements Comparable<FormattableType>, Seria
 
 
   /**
-   * Returns a readable representation of this formattable type.
+   * {@inheritDoc}
    *
    * @return  a string containing the type and its priority order
    */

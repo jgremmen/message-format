@@ -367,7 +367,8 @@ public final class ParameterPart implements MessagePart.Parameter
    *
    * @return  unpacked parameter part, never {@code null}
    *
-   * @throws IOException  if an I/O error occurs
+   * @throws IOException            if an I/O error occurs
+   * @throws IllegalStateException  if the pack stream contains an unexpected map key type
    *
    * @since 0.21.0
    */

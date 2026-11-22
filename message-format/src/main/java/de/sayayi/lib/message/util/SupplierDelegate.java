@@ -79,8 +79,10 @@ public final class SupplierDelegate<T> implements Supplier<T>
 
 
   /**
-   * Returns the cached value, invoking the delegate supplier on the first call. Subsequent calls will return the cached
-   * value without invoking the delegate again.
+   * {@inheritDoc}
+   * <p>
+   * The delegate supplier is invoked on the first call only, subsequent calls return the cached value without invoking
+   * the delegate again.
    * <p>
    * This method is thread-safe: concurrent first calls invoke the delegate supplier only once. If the delegate supplier
    * throws an exception, the exception is relayed to the caller and the delegate supplier is invoked again on the next

@@ -127,7 +127,7 @@ public final class MessagePartMap implements MessagePart.Map
 
 
   /**
-   * Tells whether the parameter configuration contains any values.
+   * {@inheritDoc}
    *
    * @return  {@code true} if the parameter configuration contains at least 1 value,
    *          {@code false} otherwise

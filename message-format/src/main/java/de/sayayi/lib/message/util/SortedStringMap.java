@@ -369,7 +369,9 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
 
 
   /**
-   * Returns a shallow copy of this map. The returned map is unsealed.
+   * {@inheritDoc}
+   * <p>
+   * The returned map is unsealed.
    *
    * @return  a new {@code SortedStringMap} with the same entries
    */
@@ -853,7 +855,9 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
 
 
     /**
-     * Sets the value of this entry and of the corresponding entry in the enclosing map.
+     * {@inheritDoc}
+     * <p>
+     * This implementation also sets the value of the corresponding entry in the enclosing map.
      *
      * @param value  new value
      *
@@ -925,7 +929,10 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
 
 
     /**
-     * Always throws {@link UnsupportedOperationException} as this delegate is only used for sealed maps.
+     * {@inheritDoc}
+     * <p>
+     * This implementation always throws {@link UnsupportedOperationException} as this delegate is only used for sealed
+     * maps.
      *
      * @throws UnsupportedOperationException  always
      */
@@ -964,8 +971,8 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
 
 
   /**
-   * A {@link Spliterator} over the entries of the enclosing {@link SortedStringMap}, providing
-   * ordered, sized and non-splitting traversal.
+   * A {@link Spliterator} over the entries of the enclosing {@link SortedStringMap}, providing ordered, sized and
+   * non-splitting traversal.
    *
    * @since 0.24.0
    */
@@ -994,7 +1001,9 @@ public final class SortedStringMap<V> extends AbstractMap<String,V> implements C
 
 
     /**
-     * This spliterator does not support splitting.
+     * {@inheritDoc}
+     * <p>
+     * This spliterator does not support splitting and always returns {@code null}.
      *
      * @return  always {@code null}
      */

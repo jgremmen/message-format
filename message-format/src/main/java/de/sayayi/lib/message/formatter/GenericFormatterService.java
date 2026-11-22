@@ -75,10 +75,18 @@ public non-sealed class GenericFormatterService implements FormatterService.With
   /** Lock serializing all formatter registrations. Lookups do not acquire it. */
   private final Lock writeLock = new ReentrantLock();
 
-  /** Maximum number of type-to-formatter mappings to cache. */
+  /**
+   * Maximum number of type-to-formatter mappings to cache.
+   *
+   * @since 0.26.0
+   */
   private final int formatterCacheSize;
 
-  /** Current registry snapshot, replaced on each registration. */
+  /**
+   * Current registry snapshot, replaced on each registration.
+   *
+   * @since 0.26.0
+   */
   private volatile @NotNull Registry registry;
 
 
@@ -247,6 +255,8 @@ public non-sealed class GenericFormatterService implements FormatterService.With
    * <p>
    * The methods of {@code formatter} and of already registered formatters are invoked without holding the registration
    * lock, so a formatter whose methods synchronize with other threads registering formatters does not deadlock.
+   * <p>
+   * Registering a formatter clears the internal formatter lookup cache.
    */
   @Override
   @MustBeInvokedByOverriders
@@ -279,7 +289,7 @@ public non-sealed class GenericFormatterService implements FormatterService.With
 
 
   /**
-   * Validates a formatter against the registry snapshot {@code r} and returns a new registry with the formatter added.
+   * Validates a formatter against the given registry snapshot and returns a new registry with the formatter added.
    *
    * @param registry          registry snapshot, not {@code null}
    * @param properties        properties of the formatter to register, not {@code null}
@@ -289,7 +299,7 @@ public non-sealed class GenericFormatterService implements FormatterService.With
    *
    * @throws FormatterServiceException  if the formatter is not eligible for registration
    *
-   * @since 0.25.1
+   * @since 0.26.0
    */
   private @NotNull Registry registerFormatter(@NotNull Registry registry, @NotNull FormatterProperties properties,
                                               @NotNull List<FormattableType> formattableTypes)
@@ -609,7 +619,7 @@ public non-sealed class GenericFormatterService implements FormatterService.With
    * @param autoApply             {@code true} if the named formatter is applied automatically on its configuration keys
    * @param parameterConfigNames  parameter configuration names of the formatter, not {@code null}
    *
-   * @since 0.25.1
+   * @since 0.26.0
    */
   private record FormatterProperties(@NotNull ParameterFormatter formatter, NamedParameterFormatter namedFormatter,
                                      String name, boolean autoApply, @NotNull List<String> parameterConfigNames)
@@ -651,7 +661,7 @@ public non-sealed class GenericFormatterService implements FormatterService.With
    * @param postFormatters                 registered post formatters, keyed by post formatter name
    * @param formatterCache                 cache of resolved type based formatters, keyed by value type
    *
-   * @since 0.25.1
+   * @since 0.26.0
    */
   private record Registry(@NotNull Map<String,NamedParameterFormatter> namedFormatters,
                           @NotNull Map<String,NamedParameterFormatter> configNameToNamedFormatterMap,

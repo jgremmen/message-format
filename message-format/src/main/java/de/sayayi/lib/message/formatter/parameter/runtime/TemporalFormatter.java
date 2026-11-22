@@ -170,7 +170,7 @@ public final class TemporalFormatter extends AbstractParameterFormatter<Temporal
 
 
   /**
-   * Formatters for custom patterns, keyed by pattern. The least recently used formatter is evicted first.
+   * Formatters for custom patterns, keyed by pattern, evicted using an approximate least recently used policy.
    */
   private final BoundedCache<String,DateTimeFormatter> patternFormatterCache =
       new BoundedCache<>(PATTERN_FORMATTER_CACHE_SIZE);

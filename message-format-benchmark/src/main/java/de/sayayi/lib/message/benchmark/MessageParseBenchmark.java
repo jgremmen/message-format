@@ -17,6 +17,7 @@ package de.sayayi.lib.message.benchmark;
 
 import de.sayayi.lib.message.Message;
 import de.sayayi.lib.message.MessageFactory;
+import org.intellij.lang.annotations.Language;
 import org.openjdk.jmh.annotations.*;
 
 import java.util.concurrent.ThreadLocalRandom;
@@ -32,10 +33,11 @@ import static java.util.concurrent.TimeUnit.MICROSECONDS;
  *   <li>{@code parsePlainText}: plain texts without parameters, like most log messages.</li>
  *   <li>{@code parseMessageWithParameters}: texts with parameters, which always require the parser.</li>
  * </ul>
+ * <p>
  * Run with several thread counts (JMH option {@code -t}) to see how parsing scales under contention.
  *
  * @author Jeroen Gremmen
- * @since 0.25.1
+ * @since 0.26.0
  */
 @State(Scope.Benchmark)
 @BenchmarkMode(Mode.Throughput)
@@ -46,6 +48,7 @@ import static java.util.concurrent.TimeUnit.MICROSECONDS;
 public class MessageParseBenchmark
 {
   /** Plain message texts, the number of texts must be a power of 2. */
+  @Language("MessageFormat")
   private static final String[] PLAIN_TEXTS = {
       "Application started in 3.42 seconds",
       "Connection to database server db-01.example.com:5432 established",
@@ -58,6 +61,7 @@ public class MessageParseBenchmark
   };
 
   /** Message texts with parameters, the number of texts must be a power of 2. */
+  @Language("MessageFormat")
   private static final String[] PARAMETER_TEXTS = {
       "Application started in %{seconds} seconds",
       "Connection to %{host}:%{port} established",
@@ -69,9 +73,11 @@ public class MessageParseBenchmark
       "Shutting down %{service}, waiting for %{tasks,1:'1 task',:'%{tasks} tasks'}"
   };
 
+  /** Message factory under test, without a message cache. */
   private MessageFactory messageFactory;
 
 
+  /** Creates a message factory without a message cache, so every call parses its text. */
   @Setup
   public void setup()
   {
@@ -80,12 +86,26 @@ public class MessageParseBenchmark
   }
 
 
+  /**
+   * Parses the next plain text of the calling thread.
+   *
+   * @param cursor  per-thread cursor selecting the text to parse, not {@code null}
+   *
+   * @return  parsed message, never {@code null}
+   */
   @Benchmark
   public Message.WithSpaces parsePlainText(TextCursor cursor) {
     return messageFactory.parseMessage(PLAIN_TEXTS[cursor.next()]);
   }
 
 
+  /**
+   * Parses the next message text with parameters of the calling thread.
+   *
+   * @param cursor  per-thread cursor selecting the text to parse, not {@code null}
+   *
+   * @return  parsed message, never {@code null}
+   */
   @Benchmark
   public Message.WithSpaces parseMessageWithParameters(TextCursor cursor) {
     return messageFactory.parseMessage(PARAMETER_TEXTS[cursor.next()]);
@@ -98,9 +118,17 @@ public class MessageParseBenchmark
   @State(Scope.Thread)
   public static class TextCursor
   {
+    /** Position counter; only its lower bits are used as index into the text arrays. */
     private int n = ThreadLocalRandom.current().nextInt(PLAIN_TEXTS.length);
 
 
+    /**
+     * Returns the index of the next text and advances the cursor, wrapping around at the end of the text arrays.
+     *
+     * @return  index into {@link MessageParseBenchmark#PLAIN_TEXTS PLAIN_TEXTS} and
+     *          {@link MessageParseBenchmark#PARAMETER_TEXTS PARAMETER_TEXTS}, in the range {@code 0} to
+     *          {@code PLAIN_TEXTS.length - 1}
+     */
     int next() {
       return n++ & (PLAIN_TEXTS.length - 1);
     }

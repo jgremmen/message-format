@@ -168,15 +168,17 @@ Beyond message-based templates, the library supports custom `Template` implement
 returns formatted text directly from Java code, without a parsed message format string.
 
 The `Template` interface is sealed and permits two implementation paths. Templates backed by a parsed message format
-string are created by `MessageFactory` and `MessageBuilder` and implement `Template.WithMessage`, which gives access to
-the underlying message. Templates implemented entirely in Java implement `JavaTemplate`, which is open for custom
-implementations and allows formatted output to be produced through arbitrary logic rather than through the message
-format parser.
+string are created by `MessageFactory` and `MessageBuilder` or imported from a [pack file](pack-files.md). They
+implement `Template.WithMessage`, whose `getMessage()` method gives access to the underlying message.
+`Template.WithMessage` is sealed as well and cannot be implemented by application code. Templates implemented entirely
+in Java implement `JavaTemplate`, which is open for custom implementations and allows formatted output to be produced
+through arbitrary logic rather than through the message format parser.
 
 A custom template must implement the `getName()` method (returning the kebab-case template name) and the `formatAsText`
 method, which receives a `MessageAccessor` and a `Parameters` object and returns a `MessagePart.Text`. The default
 `isSame` implementation considers two templates the same when the other template is a `JavaTemplate` with the
-same name.
+same name. A registered template is shared by every thread that formats messages with the message support, so its
+implementation must be thread-safe.
 
 The following example implements a template that renders the current date:
 

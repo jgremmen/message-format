@@ -47,7 +47,11 @@ import static java.util.Objects.requireNonNull;
  */
 public final class Log4jMessageFactory extends AbstractMessageFactory
 {
-  /** Precomputed parameter names {@code p1}, {@code p2}, etc. for the most common parameter counts. */
+  /**
+   * Precomputed parameter names {@code p1}, {@code p2}, etc. for the most common parameter counts.
+   *
+   * @since 0.26.0
+   */
   private static final String[] PARAMETER_NAMES = new String[16];
 
 
@@ -197,7 +201,7 @@ public final class Log4jMessageFactory extends AbstractMessageFactory
    *
    * @return  message support, never {@code null}
    *
-   * @since 0.25.1
+   * @since 0.26.0
    */
   private @NotNull MessageSupport getMessageSupport()
   {

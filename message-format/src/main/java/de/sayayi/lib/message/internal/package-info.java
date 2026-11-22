@@ -31,6 +31,9 @@
  *   <li>
  *     {@code ValueProtector} for protecting supplier parameter values from being evaluated more than once
  *   </li>
+ *   <li>
+ *     {@link BoundedCache}, a thread safe cache with a maximum size, used for parsed messages and formatter patterns
+ *   </li>
  * </ul>
  * <p>
  * <strong>This package is not part of the public API.</strong> Its classes are subject to change without notice and

@@ -268,7 +268,3 @@ messageSupport
     .format();
 // "unknown"
 ```
-
-/// note | Migration from 0.24
-Up to version 0.24.0, a non-finite value matched the bool key `true`.
-///

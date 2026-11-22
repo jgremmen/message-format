@@ -388,11 +388,11 @@ properties and wire the pack file into the jar:
     ```groovy
     plugins {
       id 'java'
-      id 'de.sayayi.plugin.gradle.message' version '0.25.0'
+      id 'de.sayayi.plugin.gradle.message' version '0.26.0'
     }
 
     dependencies {
-      implementation 'de.sayayi.lib:message-format-annotations:0.25.0'
+      implementation 'de.sayayi.lib:message-format-annotations:0.26.0'
     }
 
     messageFormat {
@@ -415,11 +415,11 @@ properties and wire the pack file into the jar:
     ```kotlin
     plugins {
       java
-      id("de.sayayi.plugin.gradle.message") version "0.25.0"
+      id("de.sayayi.plugin.gradle.message") version "0.26.0"
     }
 
     dependencies {
-      implementation("de.sayayi.lib:message-format-annotations:0.25.0")
+      implementation("de.sayayi.lib:message-format-annotations:0.26.0")
     }
 
     messageFormat {
@@ -464,7 +464,7 @@ subproject produces its own `.mfp` file and at runtime the application imports a
     // core/build.gradle
     plugins {
       id 'java-library'
-      id 'de.sayayi.plugin.gradle.message' version '0.25.0'
+      id 'de.sayayi.plugin.gradle.message' version '0.26.0'
     }
 
     jar {
@@ -478,7 +478,7 @@ subproject produces its own `.mfp` file and at runtime the application imports a
     // orders/build.gradle
     plugins {
       id 'java-library'
-      id 'de.sayayi.plugin.gradle.message' version '0.25.0'
+      id 'de.sayayi.plugin.gradle.message' version '0.26.0'
     }
 
     jar {
@@ -500,7 +500,7 @@ subproject produces its own `.mfp` file and at runtime the application imports a
     // core/build.gradle.kts
     plugins {
       `java-library`
-      id("de.sayayi.plugin.gradle.message") version "0.25.0"
+      id("de.sayayi.plugin.gradle.message") version "0.26.0"
     }
 
     tasks.jar {
@@ -514,7 +514,7 @@ subproject produces its own `.mfp` file and at runtime the application imports a
     // orders/build.gradle.kts
     plugins {
       `java-library`
-      id("de.sayayi.plugin.gradle.message") version "0.25.0"
+      id("de.sayayi.plugin.gradle.message") version "0.26.0"
     }
 
     tasks.jar {
@@ -612,7 +612,7 @@ configured to scan the compiled classes of multiple subprojects:
     // app/build.gradle
     plugins {
       id 'java'
-      id 'de.sayayi.plugin.gradle.message' version '0.25.0'
+      id 'de.sayayi.plugin.gradle.message' version '0.26.0'
     }
 
     dependencies {
@@ -644,7 +644,7 @@ configured to scan the compiled classes of multiple subprojects:
     // app/build.gradle.kts
     plugins {
       java
-      id("de.sayayi.plugin.gradle.message") version "0.25.0"
+      id("de.sayayi.plugin.gradle.message") version "0.26.0"
     }
 
     dependencies {

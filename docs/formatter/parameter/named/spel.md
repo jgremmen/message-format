@@ -296,13 +296,6 @@ to message format strings that are loaded from sources an attacker could modify,
 runtime and passed to `message(String)` or to a [Log4j](../../../add-on/log4j.md#constant-message-strings) logger.
 ///
 
-/// note | Migration from 0.24
-Up to version 0.24.0, the evaluation context resolved type references and static methods through a standard type
-locator and method resolver. Expressions that use `T(...)`, static methods or methods of `Class` objects now fail and
-must be rewritten, for example by passing the required value as an additional message parameter and referring to it
-as a variable.
-///
-
 
 ## Registration
 

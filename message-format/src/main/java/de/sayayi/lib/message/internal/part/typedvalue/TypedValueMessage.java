@@ -77,7 +77,9 @@ public record TypedValueMessage(@NotNull Message.WithSpaces messageValue) implem
 
 
   /**
-   * Returns the string representation of the wrapped message.
+   * {@inheritDoc}
+   * <p>
+   * This implementation returns the string representation of the wrapped message.
    *
    * @return  string representation, never {@code null}
    */

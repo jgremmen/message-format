@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * Tests {@link BoundedCache}: lookup, least-recently-used eviction, failing value creation and concurrent access.
  *
  * @author Jeroen Gremmen
- * @since 0.25.1
+ * @since 0.26.0
  */
 @DisplayName("Bounded cache")
 @TestMethodOrder(MethodOrderer.DisplayName.class)

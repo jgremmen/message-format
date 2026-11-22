@@ -78,7 +78,9 @@ public enum MapKeyBool implements MapKey
 
 
   /**
-   * Returns the string representation of this boolean map key ({@code "true"} or {@code "false"}).
+   * {@inheritDoc}
+   * <p>
+   * The string representation is {@code "true"} or {@code "false"}.
    *
    * @return  string representation, never {@code null}
    */

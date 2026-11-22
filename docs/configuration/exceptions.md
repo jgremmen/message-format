@@ -128,12 +128,6 @@ and may change, so it is only suitable for comparisons within the same library v
 The static factory method `MessageFormatException.of(Exception)` wraps any exception in a `MessageFormatException` if
 it is not already one. If the argument is already a `MessageFormatException`, it is returned as-is.
 
-/// note | Migration from 0.24
-Up to version 0.24.0, the exception stored a single code, template, locale and parameter, and its detail message did
-not describe nested parts correctly. The wording of the detail messages has changed. Code that parsed detail messages
-must use the getters instead.
-///
-
 
 ## MessageParserException
 
@@ -193,12 +187,6 @@ wrapped in a `MessageAdopterException` naming the class. The resource bundle ado
 for an explicitly requested locale does not exist. The underlying error is available through `getCause()`. A format
 string that cannot be parsed is not wrapped. It propagates as a `MessageParserException`. Importing a pack file reports
 errors as an `IOException`, not as a `MessageAdopterException`.
-
-/// note | Migration from 0.24
-Up to version 0.24.0, the annotation adopter wrapped every failure, including a `MessageParserException`, in a
-`MessageAdopterException`. Code that handled invalid message syntax by catching `MessageAdopterException` must catch
-`MessageParserException` as well.
-///
 
 
 ## FormatterServiceException

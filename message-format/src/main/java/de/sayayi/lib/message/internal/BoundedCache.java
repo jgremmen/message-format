@@ -39,7 +39,7 @@ import java.util.function.Function;
  * @param <V>  value type
  *
  * @author Jeroen Gremmen
- * @since 0.25.1
+ * @since 0.26.0
  */
 @Internal
 public final class BoundedCache<K,V>
@@ -66,6 +66,8 @@ public final class BoundedCache<K,V>
    * Creates an empty cache with the given maximum size.
    *
    * @param maxSize  maximum number of cached entries, positive
+   *
+   * @throws IllegalArgumentException  if {@code maxSize} is not positive
    */
   public BoundedCache(int maxSize)
   {

@@ -120,7 +120,9 @@ final class ValueProtector
 
 
     /**
-     * Returns the cached value, invoking the delegate boolean supplier on the first call.
+     * {@inheritDoc}
+     * <p>
+     * The delegate boolean supplier is invoked on the first call only, subsequent calls return the cached value.
      *
      * @return  supplied boolean value
      */
@@ -158,7 +160,9 @@ final class ValueProtector
 
 
     /**
-     * Returns the cached value, invoking the delegate int supplier on the first call.
+     * {@inheritDoc}
+     * <p>
+     * The delegate int supplier is invoked on the first call only, subsequent calls return the cached value.
      *
      * @return  supplied int value
      */
@@ -196,7 +200,9 @@ final class ValueProtector
 
 
     /**
-     * Returns the cached value, invoking the delegate long supplier on the first call.
+     * {@inheritDoc}
+     * <p>
+     * The delegate long supplier is invoked on the first call only, subsequent calls return the cached value.
      *
      * @return  supplied long value
      */
@@ -234,7 +240,9 @@ final class ValueProtector
 
 
     /**
-     * Returns the cached value, invoking the delegate double supplier on the first call.
+     * {@inheritDoc}
+     * <p>
+     * The delegate double supplier is invoked on the first call only, subsequent calls return the cached value.
      *
      * @return  supplied double value
      */

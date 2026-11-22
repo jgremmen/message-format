@@ -31,7 +31,7 @@ application uses.
 
     ```groovy
     dependencies {
-      implementation 'de.sayayi.lib:message-format-log4j:0.25.0'
+      implementation 'de.sayayi.lib:message-format-log4j:0.26.0'
       implementation 'org.apache.logging.log4j:log4j-api:2.26.1'
     }
     ```
@@ -40,7 +40,7 @@ application uses.
 
     ```kotlin
     dependencies {
-      implementation("de.sayayi.lib:message-format-log4j:0.25.0")
+      implementation("de.sayayi.lib:message-format-log4j:0.26.0")
       implementation("org.apache.logging.log4j:log4j-api:2.26.1")
     }
     ```
@@ -51,7 +51,7 @@ application uses.
     <dependency>
       <groupId>de.sayayi.lib</groupId>
       <artifactId>message-format-log4j</artifactId>
-      <version>0.25.0</version>
+      <version>0.26.0</version>
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
@@ -273,9 +273,12 @@ private static final Logger logger =
 
 ## Custom MessageSupport
 
-The default constructor creates a `MessageSupport` instance internally, using the shared `DefaultFormatterService` and
+The default constructor uses an internal `MessageSupport` instance, backed by the shared `DefaultFormatterService` and
 a `MessageFactory` with pass-through normalization and a cache size of 256 entries. This setup is appropriate for most 
-applications.
+applications. The internal instance is created when the factory creates its first message, not by the constructor.
+Creating a logger with this factory therefore does not access the shared formatter service. A logger can thus be
+obtained in the static initializer of a formatter that is discovered by the shared `DefaultFormatterService`, as long
+as nothing is logged before that service has been created.
 
 For more control over the formatting pipeline, a custom `MessageSupport` instance can be provided. This allows 
 registering custom formatters, adding templates, configure default parameter values, or use a different formatter 
@@ -327,11 +330,6 @@ Status logger output is controlled by Log4j's own configuration, for example the
 
 Only runtime exceptions are handled this way. An `Error` thrown while formatting, such as an `OutOfMemoryError` or a
 `StackOverflowError`, is propagated to the logging call.
-
-/// note | Migration from 0.24
-Up to version 0.24.0, every `Throwable` thrown while formatting was replaced by the placeholder without being reported.
-Formatting failures now additionally appear as `StatusLogger` warnings, and an `Error` is no longer suppressed.
-///
 
 
 ## Constant Message Strings

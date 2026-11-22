@@ -117,7 +117,9 @@ public final class TypedValueString implements StringValue
 
 
   /**
-   * Compares this typed value string with another object for equality based on the wrapped string value.
+   * {@inheritDoc}
+   * <p>
+   * Equality is based on the wrapped string value.
    *
    * @param o  the object to compare with
    *
@@ -130,7 +132,9 @@ public final class TypedValueString implements StringValue
 
 
   /**
-   * Returns the hash code based on the wrapped string value.
+   * {@inheritDoc}
+   * <p>
+   * The hash code is based on the wrapped string value.
    *
    * @return  hash code
    */
@@ -141,7 +145,9 @@ public final class TypedValueString implements StringValue
 
 
   /**
-   * Returns the string value enclosed in single quotes, with internal single quotes escaped.
+   * {@inheritDoc}
+   * <p>
+   * This implementation returns the string value enclosed in single quotes, with internal single quotes escaped.
    *
    * @return  quoted string representation, never {@code null}
    */

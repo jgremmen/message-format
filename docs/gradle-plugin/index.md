@@ -21,7 +21,7 @@ order:
     ```groovy
     plugins {
       id 'java'
-      id 'de.sayayi.plugin.gradle.message' version '0.25.0'
+      id 'de.sayayi.plugin.gradle.message' version '0.26.0'
     }
     ```
 
@@ -30,7 +30,7 @@ order:
     ```kotlin
     plugins {
       java
-      id("de.sayayi.plugin.gradle.message") version "0.25.0"
+      id("de.sayayi.plugin.gradle.message") version "0.26.0"
     }
     ```
 
@@ -106,11 +106,11 @@ The build script applies the plugin and includes the pack file in the jar:
     ```groovy
     plugins {
       id 'java'
-      id 'de.sayayi.plugin.gradle.message' version '0.25.0'
+      id 'de.sayayi.plugin.gradle.message' version '0.26.0'
     }
 
     dependencies {
-      implementation 'de.sayayi.lib:message-format-annotations:0.25.0'
+      implementation 'de.sayayi.lib:message-format-annotations:0.26.0'
     }
 
     jar {
@@ -125,11 +125,11 @@ The build script applies the plugin and includes the pack file in the jar:
     ```kotlin
     plugins {
       java
-      id("de.sayayi.plugin.gradle.message") version "0.25.0"
+      id("de.sayayi.plugin.gradle.message") version "0.26.0"
     }
 
     dependencies {
-      implementation("de.sayayi.lib:message-format-annotations:0.25.0")
+      implementation("de.sayayi.lib:message-format-annotations:0.26.0")
     }
 
     tasks.jar {

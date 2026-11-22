@@ -90,7 +90,7 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
    * Lock serializing message and template registration and taking consistent snapshots of messages and templates.
    * Readers never acquire it.
    *
-   * @since 0.25.1
+   * @since 0.26.0
    */
   private final @NotNull Lock writeLock = new ReentrantLock();
 

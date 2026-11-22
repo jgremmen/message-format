@@ -251,12 +251,6 @@ Only `file` URLs and the URLs of jar, war and zip archives can be scanned. If th
 resource with another protocol, for example from an application server's virtual file system, the scan throws a
 `MessageAdopterException`.
 
-/// note | Migration from 0.24
-Up to version 0.24.0, package resources with an unsupported URL protocol were silently skipped, as were class
-directories whose path contained spaces or non-ASCII characters. Such directories are now scanned, and unsupported
-URLs cause a `MessageAdopterException` instead of an incomplete result.
-///
-
 ```java
 adopter.adopt(
     Thread.currentThread().getContextClassLoader(),
@@ -407,10 +401,6 @@ try {
 }
 ```
 
-/// note | Migration from 0.24
-Up to version 0.24.0, a `MessageParserException` raised during adoption was wrapped in a `MessageAdopterException`.
-///
-
 When two `@Text` entries within the same `@MessageDef` target the same locale but contain different text, the adopter
 throws a `DuplicateMessageException`. The equivalent situation for `@TemplateDef` results in a 
 `DuplicateTemplateException`. If two entries target the same locale and contain identical text, the duplicate is 
@@ -474,7 +464,7 @@ module com.example.shop {
 
     ```groovy
     dependencies {
-      implementation 'de.sayayi.lib:message-format-annotations:0.25.0'
+      implementation 'de.sayayi.lib:message-format-annotations:0.26.0'
     }
     ```
 
@@ -482,7 +472,7 @@ module com.example.shop {
 
     ```kotlin
     dependencies {
-      implementation("de.sayayi.lib:message-format-annotations:0.25.0")
+      implementation("de.sayayi.lib:message-format-annotations:0.26.0")
     }
     ```
 
@@ -492,6 +482,6 @@ module com.example.shop {
     <dependency>
       <groupId>de.sayayi.lib</groupId>
       <artifactId>message-format-annotations</artifactId>
-      <version>0.25.0</version>
+      <version>0.26.0</version>
     </dependency>
     ```

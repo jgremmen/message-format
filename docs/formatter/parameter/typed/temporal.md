@@ -256,11 +256,6 @@ messageSupport
 // "3/2/24, 8:30 AM"
 ```
 
-/// note | Migration from 0.24
-Up to version 0.24.0, every value was formatted in the system default time zone, even a `ZonedDateTime` or an
-`OffsetDateTime` with a different zone. Such values are now formatted in their own zone.
-///
-
 ## ToTemporalDelegate
 
 The `ToTemporalDelegate` bridges legacy date/time types to the `TemporalFormatter`. It converts values of the

@@ -246,7 +246,8 @@ public abstract class AbstractAnnotationAdopter extends AbstractMessageAdopter
    * @param classPathPrefix  classpath prefix (package path ending with {@code /}) the entries must match, not
    *                         {@code null}
    *
-   * @throws IOException  if an I/O error occurs while reading the archive
+   * @throws IOException              if an I/O error occurs while reading the archive
+   * @throws MessageAdopterException  if the archive cannot be opened as a zip file
    */
   private void adopt_scan_zipEntries(@NotNull URL zipUrl, @NotNull String classPathPrefix) throws IOException
   {

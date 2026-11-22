@@ -86,8 +86,9 @@ public final class MessageTemplate implements Template.WithMessage
 
 
   /**
-   * Returns a string representation of this template, useful for debugging. A localized template lists the format
-   * string of each locale, e.g. {@code Template(en="Hello",de="Hallo")}.
+   * {@inheritDoc}
+   * <p>
+   * A localized template lists the format string of each locale, e.g. {@code Template(en="Hello",de="Hallo")}.
    *
    * @return  string representation, never {@code null}
    */

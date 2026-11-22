@@ -74,7 +74,9 @@ public enum TypedValueBool implements BoolValue
 
 
   /**
-   * Returns the string representation of this boolean value ({@code "true"} or {@code "false"}).
+   * {@inheritDoc}
+   * <p>
+   * The string representation is {@code "true"} or {@code "false"}.
    *
    * @return  string representation, never {@code null}
    */

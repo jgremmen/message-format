@@ -75,7 +75,7 @@ public enum MapKeyEmpty implements MapKey
 
 
   /**
-   * Returns the string representation of this empty map key.
+   * {@inheritDoc}
    *
    * @return  string representation, never {@code null}
    */

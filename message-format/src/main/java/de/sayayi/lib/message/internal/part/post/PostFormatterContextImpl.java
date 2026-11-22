@@ -77,8 +77,10 @@ final class PostFormatterContextImpl extends BaseConfigAccessor implements PostF
 
 
   /**
-   * Always throws {@link UnsupportedOperationException}. Message-typed configuration values are not supported in the
-   * post formatter context.
+   * {@inheritDoc}
+   * <p>
+   * This implementation always throws {@link UnsupportedOperationException}, as message-typed configuration values are
+   * not supported in the post formatter context.
    *
    * @param name  configuration key, not {@code null}
    *

@@ -50,8 +50,10 @@ var messageSupport = MessageSupportFactory.create(
 
 When an application formats the same inline message string repeatedly (via `messageSupport.message("...")`), the format
 string is parsed on every call unless the factory has a message cache. The shared factory has one. A caching
-`MessageFactory` keeps up to the configured number of parsed messages in an LRU cache. Once the cache is full, the least
-recently used entry is evicted to make room for new ones.
+`MessageFactory` keeps up to the configured number of parsed messages. When a newly parsed message exceeds that size,
+entries are evicted using an approximate least recently used policy. Eviction runs after the new message has been
+added and is not waited for by other threads, so the cache may briefly hold a few more messages than its configured
+size.
 
 ```java
 var factory = new MessageFactory(MessagePartNormalizer.PASS_THROUGH, 512);
@@ -79,10 +81,13 @@ map-based variants. Messages registered by code through `addMessage(String, Stri
 cache, although they are parsed only once and then stored in the message support. Templates parsed with
 `parseTemplate(...)` are never cached.
 
-/// tip | Cache Contention
-Lookups, and parsing on a cache miss, happen while the factory holds its cache lock. Threads that parse many
-different format strings at the same time therefore wait for each other. Registering frequently used messages by code,
-or importing them from a [pack file](pack-files.md), avoids repeated parsing altogether.
+/// tip | Concurrent Cache Misses
+The message cache has no lock that lookups or parsing wait on. A cache hit does not acquire a lock, and a format string
+missing from the cache is parsed outside of the cache. A normalizer such as `LRUMessagePartNormalizer` still guards its
+own part cache with a lock during parsing. The message cache does not coordinate concurrent misses, though. When
+several threads parse the same uncached format string at the same time, each of them parses it, and all of them
+receive the message that was cached first. Registering frequently used messages by code, or importing them from a
+[pack file](pack-files.md), avoids repeated parsing altogether.
 ///
 
 

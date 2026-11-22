@@ -36,7 +36,7 @@ Unlike the `spel` formatter, the three type-specific formatters are registered a
 
     ```groovy
     dependencies {
-      implementation 'de.sayayi.lib:message-format-spring:0.25.0'
+      implementation 'de.sayayi.lib:message-format-spring:0.26.0'
     }
     ```
 
@@ -44,7 +44,7 @@ Unlike the `spel` formatter, the three type-specific formatters are registered a
 
     ```kotlin
     dependencies {
-      implementation("de.sayayi.lib:message-format-spring:0.25.0")
+      implementation("de.sayayi.lib:message-format-spring:0.26.0")
     }
     ```
 
@@ -54,7 +54,7 @@ Unlike the `spel` formatter, the three type-specific formatters are registered a
     <dependency>
       <groupId>de.sayayi.lib</groupId>
       <artifactId>message-format-spring</artifactId>
-      <version>0.25.0</version>
+      <version>0.26.0</version>
     </dependency>
     ```
 

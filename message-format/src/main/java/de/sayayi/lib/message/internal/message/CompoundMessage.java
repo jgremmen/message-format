@@ -66,10 +66,13 @@ public final class CompoundMessage implements Message.WithSpaces
   /**
    * Constructs a compound message based on the given {@code messageParts}.
    * <p>
-   * At least 1 message part is required. The message parts must not contain adjacent text parts, otherwise an
-   * {@link IllegalArgumentException} is thrown.
+   * At least 1 message part is required. A single text part is not allowed, as such a message is represented by a
+   * text message instead. The message parts must not contain adjacent text parts.
    *
    * @param messageParts  message parts, not {@code null} and not empty
+   *
+   * @throws IllegalArgumentException  if {@code messageParts} is empty, consists of a single text part only or contains
+   *                                   adjacent text parts
    */
   public CompoundMessage(@NotNull List<MessagePart> messageParts)
   {

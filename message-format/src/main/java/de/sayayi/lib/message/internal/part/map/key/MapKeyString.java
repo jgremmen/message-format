@@ -121,7 +121,9 @@ public final class MapKeyString implements MapKey
 
 
   /**
-   * Compares this string map key with another object for equality based on the string value and comparison type.
+   * {@inheritDoc}
+   * <p>
+   * Equality is based on the string value and the comparison type.
    *
    * @param o  the object to compare with
    *
@@ -134,7 +136,9 @@ public final class MapKeyString implements MapKey
 
 
   /**
-   * Returns the hash code based on the string value and comparison type.
+   * {@inheritDoc}
+   * <p>
+   * The hash code is based on the string value and the comparison type.
    *
    * @return  hash code
    */
@@ -145,8 +149,9 @@ public final class MapKeyString implements MapKey
 
 
   /**
-   * Returns the string representation of this string map key, including the comparison type prefix and the quoted
-   * string value.
+   * {@inheritDoc}
+   * <p>
+   * The string representation includes the comparison type prefix and the quoted string value.
    *
    * @return  string representation, never {@code null}
    */

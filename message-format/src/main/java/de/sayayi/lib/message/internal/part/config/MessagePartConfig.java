@@ -87,7 +87,7 @@ public final class MessagePartConfig implements MessagePart.Config
 
 
   /**
-   * Tells whether the parameter configuration contains any values.
+   * {@inheritDoc}
    *
    * @return  {@code true} if the parameter configuration contains at least 1 value, {@code false} otherwise
    */
@@ -137,7 +137,9 @@ public final class MessagePartConfig implements MessagePart.Config
 
 
   /**
-   * Compares this configuration with another object for equality based on the underlying configuration map.
+   * {@inheritDoc}
+   * <p>
+   * Equality is based on the underlying configuration map.
    *
    * @param o  the object to compare with
    *
@@ -150,7 +152,9 @@ public final class MessagePartConfig implements MessagePart.Config
 
 
   /**
-   * Returns the hash code based on the underlying configuration map.
+   * {@inheritDoc}
+   * <p>
+   * The hash code is based on the underlying configuration map.
    *
    * @return  hash code
    */
@@ -161,7 +165,9 @@ public final class MessagePartConfig implements MessagePart.Config
 
 
   /**
-   * Returns a string representation of this configuration in the form <code>{key1=value1,key2=value2,...}</code>.
+   * {@inheritDoc}
+   * <p>
+   * The string has the form <code>{key1=value1,key2=value2,...}</code>.
    *
    * @return  string representation, never {@code null}
    */

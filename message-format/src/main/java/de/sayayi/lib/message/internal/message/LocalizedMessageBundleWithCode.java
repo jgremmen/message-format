@@ -44,8 +44,8 @@ import static java.util.stream.Collectors.toUnmodifiableSet;
 
 
 /**
- * {@link Message.WithCode} implementation that holds multiple locale-specific messages and selects the best
- * matching message at format time based on the requested locale.
+ * {@link Message.WithCode} implementation that holds multiple locale-specific messages and selects the best matching
+ * message at format time based on the requested locale.
  *
  * @author Jeroen Gremmen
  * @since 0.1.0 (renamed in 0.5.0)
@@ -61,8 +61,10 @@ public final class LocalizedMessageBundleWithCode extends AbstractMessageWithCod
    * Creates a localized message bundle with code.
    *
    * @param code               message code, not {@code null} and not empty
-   * @param localizedMessages  localized message map, not {@code null}. The map must contain at least 2 entries and no
-   *                           mapped value can be {@code null}
+   * @param localizedMessages  localized message map, not {@code null}. The map must not be empty and no mapped value
+   *                           can be {@code null}. A {@code null} locale key is treated as {@link Locale#ROOT}
+   *
+   * @throws IllegalArgumentException  if {@code localizedMessages} is empty or contains a {@code null} message
    */
   public LocalizedMessageBundleWithCode(@NotNull String code, @NotNull Map<Locale,@NotNull Message> localizedMessages)
   {

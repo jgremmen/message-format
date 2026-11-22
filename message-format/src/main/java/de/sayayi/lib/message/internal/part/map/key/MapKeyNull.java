@@ -74,7 +74,7 @@ public enum MapKeyNull implements MapKey
 
 
   /**
-   * Returns the string representation of this null map key.
+   * {@inheritDoc}
    *
    * @return  string representation, never {@code null}
    */

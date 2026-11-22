@@ -70,7 +70,10 @@ import static org.objectweb.asm.Opcodes.*;
 
 
 /**
- * Tests for all {@link AnnotationAdopter} methods.
+ * Tests {@link AnnotationAdopter}: adoption of messages and templates through all {@code adopt} entry points (classes,
+ * class files, class file content, class loader package scanning in directories and jars, and annotation instances),
+ * validation of {@code @Text} values and locales, error reporting for parse failures, duplicates, missing or corrupt
+ * class files and unsupported URLs, and the avoidance of duplicate visits.
  *
  * @author Jeroen Gremmen
  * @since 0.24.0

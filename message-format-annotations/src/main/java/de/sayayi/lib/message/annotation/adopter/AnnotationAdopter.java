@@ -106,6 +106,8 @@ public final class AnnotationAdopter extends AbstractAnnotationAdopter
 
 
   /**
+   * {@inheritDoc}
+   * <p>
    * Parses the given class file input stream using the ASM {@link ClassReader}, visiting class-level and method-level
    * annotations to detect message and template definitions. Only non-synthetic methods are visited.
    *

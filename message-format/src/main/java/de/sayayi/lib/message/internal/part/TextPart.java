@@ -208,8 +208,10 @@ public final class TextPart implements MessagePart.Text
 
 
   /**
-   * Compares this text part to the specified object. The result is {@code true} if and only if the argument is an
-   * instance of {@code TextPart} with the same text content, space-before and space-after flags.
+   * {@inheritDoc}
+   * <p>
+   * The result is {@code true} if and only if the argument is an instance of {@code TextPart} with the same text
+   * content, space-before and space-after flags.
    *
    * @param o  the object to compare this text part against
    *
@@ -233,7 +235,9 @@ public final class TextPart implements MessagePart.Text
 
 
   /**
-   * Returns a hash code for this text part, computed from the text content, space-before and space-after flags.
+   * {@inheritDoc}
+   * <p>
+   * The hash code is computed from the text content, space-before and space-after flags.
    *
    * @return  a hash code value for this text part
    */
@@ -244,7 +248,7 @@ public final class TextPart implements MessagePart.Text
 
 
   /**
-   * Returns a string representation of this text part, useful for debugging.
+   * {@inheritDoc}
    *
    * @return  string representation, never {@code null}
    */

@@ -49,7 +49,7 @@ final class Log4jMessage implements Message
   /**
    * Formatted message, or {@code null} if the message has not been formatted yet.
    *
-   * @since 0.25.1
+   * @since 0.26.0
    */
   private transient volatile String formattedMessage;
 

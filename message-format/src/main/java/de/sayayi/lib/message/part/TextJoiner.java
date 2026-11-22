@@ -194,8 +194,9 @@ public final class TextJoiner
 
 
   /**
-   * Returns the string representation of this joiner by delegating to
-   * {@link #asSpacedText() asSpacedText()}.{@link Object#toString() toString()}.
+   * {@inheritDoc}
+   * <p>
+   * This implementation delegates to {@link #asSpacedText() asSpacedText()}.{@link Object#toString() toString()}.
    *
    * @return  the joined text as a string, never {@code null}
    */

@@ -135,7 +135,7 @@ public final class NumberFormatter
 
 
   /**
-   * Number formats by format and locale. The least recently used number format is evicted first. As number formats
+   * Number formats by format and locale, evicted using an approximate least recently used policy. As number formats
    * are not thread-safe, the cached instances are never used for formatting directly, only clones of them.
    */
   private final BoundedCache<Key,NumberFormat> numberFormatCache = new BoundedCache<>(NUMBER_FORMAT_CACHE_SIZE);

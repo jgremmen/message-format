@@ -94,12 +94,6 @@ Unless a class loader is passed explicitly, formatters are discovered with the c
 visible in environments whose system class loader does not see the application libraries, such as Spring Boot
 executable jars, servlet containers or build tool plugins. The thread context class loader is deliberately not used.
 
-/// note | Migration from 0.24
-Up to version 0.24.0, `DefaultFormatterService` used the system class loader when no class loader was given.
-Applications that relied on discovering formatters that are visible to the system class loader but not to the class
-loader of the library must now pass that class loader to the constructor.
-///
-
 A custom `ClassLoader` can also be provided if the formatters need to be discovered from a specific location, and the
 internal formatter cache size can be configured. Passing `null` as the class loader selects the class loader of the
 library. The formatter cache stores the resolved list of parameter formatters for each value type so that the class
@@ -367,6 +361,10 @@ the configuration final, discard every reference to the original service after s
 
 ## Thread Safety
 
-`GenericFormatterService` and `DefaultFormatterService` are thread-safe. Registration and formatter lookup are guarded
-by a read/write lock, so formatters can be registered while other threads format messages. The formatters
-themselves are shared by all threads that use the service, so custom formatters must be thread-safe as well.
+`GenericFormatterService` and `DefaultFormatterService` are thread-safe. The registered formatters are kept in an
+immutable snapshot. Formatter lookups read the current snapshot without acquiring a lock, so formatting never waits for
+a registration. Registrations are serialized by a lock, and each one publishes a new snapshot. A lookup that runs
+concurrently with a registration therefore sees the formatters either before or after that registration, never a
+partial state. The methods of the formatter being registered, such as `getName()` or `getFormattableTypes()`, are
+invoked without holding the registration lock. The formatters themselves are shared by all threads that use the
+service, so custom formatters must be thread-safe as well.

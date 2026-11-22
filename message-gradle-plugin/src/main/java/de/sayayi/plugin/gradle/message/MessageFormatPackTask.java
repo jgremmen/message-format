@@ -284,6 +284,8 @@ public abstract class MessageFormatPackTask extends DefaultTask
    *
    * @param action  custom action, not {@code null}
    *
+   * @throws InvalidUserDataException  if {@code action} is {@code null}
+   *
    * @since 0.8.0
    */
   public void action(Action<@NotNull MessageAccessor> action)
@@ -503,7 +505,8 @@ public abstract class MessageFormatPackTask extends DefaultTask
    * Compiles the given regular expressions.
    *
    * @param regexList  regular expressions, not {@code null}
-   * @param kind       kind of the filter ({@code include}, {@code exclude} or {@code ignore}), used in the error message
+   * @param kind       kind of the filter ({@code include}, {@code exclude} or {@code ignore}), used in the error
+   *                   message
    *
    * @return  compiled patterns, never {@code null}
    *

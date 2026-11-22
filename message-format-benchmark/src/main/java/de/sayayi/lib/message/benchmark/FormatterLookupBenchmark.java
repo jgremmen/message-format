@@ -30,13 +30,14 @@ import static java.util.concurrent.TimeUnit.MICROSECONDS;
 
 
 /**
- * Measures the formatter lookup of {@link FormatterService#getFormatters(String, Class, de.sayayi.lib.message.part.MessagePart.Config)
- * getFormatters}, which runs for every formatted parameter. All types are cached, so this measures the cache hit path.
+ * Measures the formatter lookup of
+ * {@link FormatterService#getFormatters(String, Class, de.sayayi.lib.message.part.MessagePart.Config) getFormatters},
+ * which runs for every formatted parameter. All types are cached, so this measures the cache hit path.
  * <p>
  * Run with several thread counts (JMH option {@code -t}) to see how the lookup scales under contention.
  *
  * @author Jeroen Gremmen
- * @since 0.25.1
+ * @since 0.26.0
  */
 @State(Scope.Benchmark)
 @BenchmarkMode(Mode.Throughput)
@@ -52,10 +53,16 @@ public class FormatterLookupBenchmark
       BigDecimal.class, LocalDate.class, List.class, Map.class
   };
 
+  /** Formatter service under test, with all {@link #TYPES} already in its formatter cache. */
   private FormatterService formatterService;
 
 
+  /**
+   * Creates the formatter service and looks up the formatters for all {@link #TYPES} once, so the benchmark only
+   * measures cache hits.
+   */
   @Setup
+  @SuppressWarnings("ResultOfMethodCallIgnored")
   public void setup()
   {
     formatterService = new DefaultFormatterService();
@@ -66,6 +73,13 @@ public class FormatterLookupBenchmark
   }
 
 
+  /**
+   * Looks up the formatters for the next type of the calling thread.
+   *
+   * @param cursor  per-thread cursor selecting the type to look up, not {@code null}
+   *
+   * @return  formatters for the selected type, never {@code null}
+   */
   @Benchmark
   public ParameterFormatter[] getFormatters(TypeCursor cursor) {
     return formatterService.getFormatters(null, TYPES[cursor.next()], null);
@@ -78,9 +92,17 @@ public class FormatterLookupBenchmark
   @State(Scope.Thread)
   public static class TypeCursor
   {
+    /** Position counter; only its lower bits are used as index into {@link FormatterLookupBenchmark#TYPES TYPES}. */
     private int n = ThreadLocalRandom.current().nextInt(TYPES.length);
 
 
+    /**
+     * Returns the index of the next type and advances the cursor, wrapping around at the end of
+     * {@link FormatterLookupBenchmark#TYPES TYPES}.
+     *
+     * @return  index into {@link FormatterLookupBenchmark#TYPES TYPES}, in the range {@code 0} to
+     *          {@code TYPES.length - 1}
+     */
     int next() {
       return n++ & (TYPES.length - 1);
     }

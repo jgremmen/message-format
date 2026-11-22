@@ -274,7 +274,9 @@ public final class NodeFormatter extends AbstractParameterFormatter<Node>
 
 
     /**
-     * Returns the XPath expression built so far.
+     * {@inheritDoc}
+     * <p>
+     * This implementation returns the XPath expression built so far.
      *
      * @return  XPath expression, never {@code null}
      */

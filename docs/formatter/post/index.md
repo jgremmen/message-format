@@ -131,11 +131,6 @@ messageSupport
 // "Name: (unverified)"
 ```
 
-/// note | Migration from 0.24
-Up to version 0.24.0, the spaces around a post formatter with an empty result were discarded entirely, which could
-join the surrounding words.
-///
-
 
 ## Reference
 

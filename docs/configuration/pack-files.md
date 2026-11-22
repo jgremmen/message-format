@@ -169,11 +169,6 @@ A pack file uses the magic bytes `%{msg}` and a version number to identify itsel
 `PackConstants.MIME_TYPE` holds the MIME type and `PackConstants.PACK_CONFIG` the pack configuration with the magic
 bytes, the supported version range and compression support.
 
-/// note | Migration from 0.24
-`PackConstants` moved from `de.sayayi.lib.message` to the new package `de.sayayi.lib.message.pack`. Imports of the
-old class must be updated.
-///
-
 The library registers a `java.nio.file.spi.FileTypeDetector`, so `Files.probeContentType(Path)` reports the MIME type
 for pack files without further setup. In environments where this service is not active, for example because of class
 loader separation in plugin frameworks, the `MessageUtil.isMessageFormatPack(Path)` utility method probes the file
@@ -206,12 +201,11 @@ Content inspection frameworks such as [Apache Tika](https://tika.apache.org/) ca
 bytes and report the `application/x-message-format-pack` MIME type. The library ships two detector classes in the 
 `de.sayayi.lib.message.pack` package that plug into Tika's detection pipeline. Which class applies depends on the Tika 
 version on the classpath. `PackTika3Detector` covers Apache Tika in the range `[1.19,4.0)`, and `PackTika4Detector` 
-covers Apache Tika in the range `[4.0,5.0)`. A third class, `PackTikaDetector`, keeps the class name used by earlier
-releases and behaves like `PackTika3Detector`.
+covers Apache Tika in the range `[4.0,5.0)`. A third class, `PackTikaDetector`, behaves exactly like
+`PackTika3Detector` and can be used in its place.
 
-Prior to version 0.25.0 the Tika 3 detector was registered automatically. That automatic registration has been removed.
-Tika discovers detectors through the `ServiceLoader` mechanism, so the appropriate detector must now be registered 
-explicitly. This is done by adding the fully qualified class name to a service file named 
+The library does not register any of these detectors itself. Tika discovers detectors through the `ServiceLoader`
+mechanism, so the appropriate detector must be registered explicitly by the application. This is done by adding the fully qualified class name to a service file named 
 `META-INF/services/org.apache.tika.detect.Detector` on the application classpath.
 
 For Apache Tika 3, the service file contains a single line:

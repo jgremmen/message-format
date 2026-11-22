@@ -43,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * instances. The service provider is only visible to that class loader and does not affect other tests.
  *
  * @author Jeroen Gremmen
- * @since 0.25.1
+ * @since 0.26.0
  */
 @DisplayName("Shared instance initialization")
 final class SharedInstanceInitializationTest

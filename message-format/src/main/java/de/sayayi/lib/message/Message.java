@@ -395,8 +395,10 @@ public sealed interface Message extends FormatStringSerializer
 
 
     /**
-     * Always throws {@link UnsupportedOperationException} because a locale-aware message does not have a single array
-     * of message parts. Each locale has its own associated message with its own parts.
+     * {@inheritDoc}
+     * <p>
+     * This implementation always throws {@link UnsupportedOperationException} because a locale-aware message does not
+     * have a single array of message parts. Each locale has its own associated message with its own parts.
      *
      * @return  never returns normally
      *
@@ -412,8 +414,11 @@ public sealed interface Message extends FormatStringSerializer
 
 
     /**
-     * Always throws {@link UnsupportedOperationException} because a locale-aware message does not have a single format
-     * string representation. Each locale has its own associated message with its own format string.
+     * {@inheritDoc}
+     * <p>
+     * This implementation always throws {@link UnsupportedOperationException} because a locale-aware message does not
+     * have a single format string representation. Each locale has its own associated message with its own format
+     * string.
      *
      * @param charset  ignored
      *

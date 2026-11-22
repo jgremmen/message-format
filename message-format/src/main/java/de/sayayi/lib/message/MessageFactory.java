@@ -64,9 +64,9 @@ import static java.util.Objects.requireNonNull;
  * enabling deduplication or caching strategies for large message sets. For simple use cases the
  * {@linkplain #getSharedInstance() shared instance} is sufficient.
  * <p>
- * Optionally, a message cache can be enabled via {@link #MessageFactory(MessagePartNormalizer, int)} to avoid
- * repeated parsing of the same message format string. When the cache reaches its configured maximum size, the least
- * recently used entry is evicted. See {@link #parseMessage(String)} for details.
+ * Optionally, a message cache can be enabled via {@link #MessageFactory(MessagePartNormalizer, int)} to avoid repeated
+ * parsing of the same message format string. When the cache exceeds its configured maximum size, entries are evicted
+ * using an approximate least recently used policy. See {@link #parseMessage(String)} for details.
  * <p>
  * This class is <strong>thread-safe</strong>. All public methods can be called concurrently from multiple threads.
  *
@@ -128,11 +128,12 @@ public class MessageFactory
    * Constructs a new message factory with the given {@code messagePartNormalizer} and a message cache of the given
    * {@code messageCacheSize}.
    * <p>
-   * When the cache is full, the least recently used message is evicted before adding a new one.
-   * A {@code messageCacheSize} of {@code 0} or less disables caching.
+   * When a new message exceeds the cache size, entries are evicted using an approximate least recently used policy, so
+   * the cache may briefly hold a few more messages than {@code messageCacheSize}. A {@code messageCacheSize} of
+   * {@code 0} or less disables caching.
    *
-   * @param messagePartNormalizer  message part normalizer instance, never {@code null}
-   * @param messageCacheSize       maximum number of cached messages, or {@code 0} to disable caching
+   * @param messagePartNormalizer  message part normalizer instance, not {@code null}
+   * @param messageCacheSize       maximum number of cached messages, or {@code 0} or less to disable caching
    *
    * @since 0.21.0
    */
@@ -176,10 +177,10 @@ public class MessageFactory
    * Parses a message format text into a message instance.
    * <p>
    * If this factory was created with a message cache (see {@link #MessageFactory(MessagePartNormalizer, int)}),
-   * previously parsed messages are returned from the cache. When the cache is full, the least recently used entry is
-   * evicted. Cached messages are looked up without locking and messages are compiled outside any lock, so concurrent
-   * calls do not wait for each other. If two threads parse the same uncached text at the same time, both compile it
-   * and the message cached first is returned to both of them.
+   * previously parsed messages are returned from the cache. When the cache is full, entries are evicted using an
+   * approximate least recently used policy. Cached messages are looked up without locking and messages are compiled
+   * outside any lock, so concurrent calls do not wait for each other. If two threads parse the same uncached text at
+   * the same time, both compile it and the message cached first is returned to both of them.
    *
    * @param text  message format text, not {@code null}
    *

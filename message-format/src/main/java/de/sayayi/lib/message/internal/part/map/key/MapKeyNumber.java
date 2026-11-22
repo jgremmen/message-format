@@ -107,7 +107,9 @@ public final class MapKeyNumber implements MapKey
 
 
   /**
-   * Compares this numeric map key with another object for equality based on the number and comparison type.
+   * {@inheritDoc}
+   * <p>
+   * Equality is based on the number and the comparison type.
    *
    * @param o  the object to compare with
    *
@@ -120,7 +122,9 @@ public final class MapKeyNumber implements MapKey
 
 
   /**
-   * Returns the hash code based on the number and comparison type.
+   * {@inheritDoc}
+   * <p>
+   * The hash code is based on the number and the comparison type.
    *
    * @return  hash code
    */
@@ -131,7 +135,9 @@ public final class MapKeyNumber implements MapKey
 
 
   /**
-   * Returns the string representation of this numeric map key, including the comparison type prefix.
+   * {@inheritDoc}
+   * <p>
+   * The string representation includes the comparison type prefix.
    *
    * @return  string representation, never {@code null}
    */

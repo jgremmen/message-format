@@ -94,6 +94,8 @@ public final class MessageCompiler extends AbstractAntlr4Parser
    * as there are none up to {@code U+00FF}.
    *
    * @see #isPlainText(String)
+   *
+   * @since 0.26.0
    */
   private static final int PLAIN_CHAR_TYPES =
       (1 << Character.SPACE_SEPARATOR) |  // [\p{Zs}]+
@@ -203,7 +205,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
    *
    * @return  {@code true} if {@code text} is plain text, {@code false} if it must be compiled by the parser
    *
-   * @since 0.25.1
+   * @since 0.26.0
    */
   @Contract(pure = true)
   private static boolean isPlainText(@NotNull String text)
@@ -230,7 +232,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
    *
    * @throws MessageParserException  if the input contains invalid message-format syntax
    *
-   * @since 0.25.1
+   * @since 0.26.0
    */
   @Contract(pure = true)
   @NotNull Message.WithSpaces compileWithParser(@NotNull @Language("MessageFormat") String text, boolean template)

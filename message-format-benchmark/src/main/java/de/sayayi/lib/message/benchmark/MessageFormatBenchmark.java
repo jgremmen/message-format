@@ -19,6 +19,7 @@ import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.MessageSupport;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.formatter.DefaultFormatterService;
+import org.intellij.lang.annotations.Language;
 import org.openjdk.jmh.annotations.*;
 
 import java.time.LocalDate;
@@ -38,10 +39,11 @@ import static java.util.concurrent.TimeUnit.MICROSECONDS;
  *     as used by {@code MessageSupport.message(String)} and the Log4j message factory.
  *   </li>
  * </ul>
+ * <p>
  * Run with several thread counts (JMH option {@code -t}) to see how formatting scales under contention.
  *
  * @author Jeroen Gremmen
- * @since 0.25.1
+ * @since 0.26.0
  */
 @State(Scope.Benchmark)
 @BenchmarkMode(Mode.Throughput)
@@ -51,18 +53,27 @@ import static java.util.concurrent.TimeUnit.MICROSECONDS;
 @Fork(1)
 public class MessageFormatBenchmark
 {
+  /** Message with string, integer, decimal and date parameters, registered under the code {@code ORDERS-SHIPPED}. */
+  @Language("MessageFormat")
   private static final String MESSAGE =
       "Hello %{name}, %{count} orders totalling %{amount,number:'#,##0.00'} have been shipped on %{date,date:medium}";
 
   /** Message with custom number and date patterns, which are taken from the formatters' pattern caches. */
+  @Language("MessageFormat")
   private static final String PATTERN_MESSAGE =
       "%{amount,number:'0.00'} / %{ratio,number:'0.0%'} on %{date,date:'yyyy-MM-dd'}";
 
+  /** Date parameter value used by all benchmarks. */
   private static final LocalDate DATE = LocalDate.of(2026, 11, 20);
 
+  /** Message support under test, with {@link #MESSAGE} registered as {@code ORDERS-SHIPPED}. */
   private MessageSupport messageSupport;
 
 
+  /**
+   * Creates the message support, using a message factory with a message cache of 256 entries, and registers
+   * {@link #MESSAGE} under the code {@code ORDERS-SHIPPED}.
+   */
   @Setup
   public void setup()
   {
@@ -74,6 +85,11 @@ public class MessageFormatBenchmark
   }
 
 
+  /**
+   * Formats the registered message {@code ORDERS-SHIPPED}.
+   *
+   * @return  formatted message, never {@code null}
+   */
   @Benchmark
   public String formatByCode()
   {
@@ -88,6 +104,11 @@ public class MessageFormatBenchmark
   }
 
 
+  /**
+   * Formats {@link #PATTERN_MESSAGE}, which uses custom number and date patterns.
+   *
+   * @return  formatted message, never {@code null}
+   */
   @Benchmark
   public String formatPatterns()
   {
@@ -101,6 +122,11 @@ public class MessageFormatBenchmark
   }
 
 
+  /**
+   * Formats the message text {@link #MESSAGE}, which is taken from the message factory cache after the first call.
+   *
+   * @return  formatted message, never {@code null}
+   */
   @Benchmark
   public String formatText()
   {

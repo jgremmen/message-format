@@ -51,6 +51,8 @@ public class MessageFormatPlugin implements Plugin<@NotNull Project>
 
 
   /**
+   * {@inheritDoc}
+   * <p>
    * Applies the plugin to the given {@code project} by registering the {@link MessageFormatExtension messageFormat}
    * extension. The {@link MessageFormatPackTask messageFormatPack} task is registered once the {@link JavaPlugin} has
    * been applied to the project.

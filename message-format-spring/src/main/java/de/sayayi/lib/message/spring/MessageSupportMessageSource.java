@@ -144,6 +144,8 @@ public class MessageSupportMessageSource implements HierarchicalMessageSource
 
 
   /**
+   * {@inheritDoc}
+   * <p>
    * Resolves and formats a message for the given {@code code} and {@code locale}. If the code is known to the backing
    * {@link MessageSupport}, the message is formatted with the supplied {@code args} mapped as positional parameters.
    * Otherwise, the parent message source is consulted. If no message can be resolved, the {@code defaultMessage} is
@@ -175,6 +177,8 @@ public class MessageSupportMessageSource implements HierarchicalMessageSource
 
 
   /**
+   * {@inheritDoc}
+   * <p>
    * Resolves and formats a message for the given {@code code} and {@code locale}. The supplied {@code args} are mapped
    * to positional parameters using the configured parameter prefix. Arguments that are a
    * {@link MessageSourceResolvable} are resolved with this message source, like Spring's {@code AbstractMessageSource}
@@ -231,6 +235,8 @@ public class MessageSupportMessageSource implements HierarchicalMessageSource
 
 
   /**
+   * {@inheritDoc}
+   * <p>
    * Resolves and formats a message using the codes, arguments and default message provided by the given
    * {@code resolvable}. The codes are tried in order; the first code known to the backing {@link MessageSupport} is
    * used. If none of the codes can be resolved, the parent message source is consulted. If that also fails, the
@@ -278,6 +284,8 @@ public class MessageSupportMessageSource implements HierarchicalMessageSource
    * @param locale  locale for message formatting, or {@code null}
    *
    * @return  exception for the unresolved message code, never {@code null}
+   *
+   * @since 0.26.0
    */
   private static @NotNull NoSuchMessageException noSuchMessage(@NotNull String code, Locale locale)
   {
