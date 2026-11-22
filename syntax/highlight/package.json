@@ -1,6 +1,6 @@
 {
   "name": "highlightjs-message-format",
-  "version": "0.25.0-SNAPSHOT",
+  "version": "0.25.1-SNAPSHOT",
   "description": "highlight.js language for message-format messages, driven by the ANTLR grammar",
   "private": true,
   "license": "Apache-2.0",
