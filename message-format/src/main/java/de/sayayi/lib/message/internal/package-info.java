@@ -23,7 +23,7 @@
  *     {@link MessageSupportImpl} for managing messages and templates
  *   </li>
  *   <li>
- *     {@link MessageTemplate} for representing message templates
+ *     {@link MessageTemplate}, the template implementation backed by a message
  *   </li>
  *   <li>
  *     {@link MessageParameters} and {@link NoParameters} for formatting parameters

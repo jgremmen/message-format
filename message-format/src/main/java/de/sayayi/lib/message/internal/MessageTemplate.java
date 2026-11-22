@@ -24,7 +24,7 @@ import de.sayayi.lib.message.exception.MessageFormatException;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.TextJoiner;
 import de.sayayi.lib.message.template.Template;
-import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,17 +37,17 @@ import static java.util.stream.Collectors.joining;
 
 
 /**
- * A {@link Template} implementation that wraps a {@link Message} and delegates formatting to it.
+ * A {@link Template.WithMessage} implementation that wraps a {@link Message} and delegates formatting to it.
  * <p>
- * This is the standard template type used when templates are parsed from message format strings
- * or imported from pack files.
+ * This is the standard template type used when templates are parsed from message format strings or imported from pack
+ * files. Instances are immutable and thread safe.
  *
  * @author Jeroen Gremmen
  * @since 0.24.0
  */
-@ApiStatus.Internal
+@Internal
 @SuppressWarnings("ClassCanBeRecord")
-public final class MessageTemplate implements Template
+public final class MessageTemplate implements Template.WithMessage
 {
   /** Message this template delegates formatting to. */
   private final Message message;
@@ -64,9 +64,9 @@ public final class MessageTemplate implements Template
 
 
   /**
-   * Returns the wrapped message.
-   *
-   * @return  message, never {@code null}
+   * {@inheritDoc}
+   * <p>
+   * The returned message is the one passed to the constructor.
    */
   @Contract(pure = true)
   public @NotNull Message getMessage() {
@@ -74,17 +74,26 @@ public final class MessageTemplate implements Template
   }
 
 
-  /** {@inheritDoc} */
+  /**
+   * {@inheritDoc}
+   * <p>
+   * This implementation considers {@code template} the same if it is a message template whose message is the same as
+   * the message of this template, as determined by {@link MessageFactory#isSame(Message, Message)}.
+   */
   @Contract(pure = true)
   public boolean isSame(@NotNull Template template)
   {
     return
-        template instanceof MessageTemplate messageTemplate &&
+        template instanceof Template.WithMessage messageTemplate &&
         MessageFactory.isSame(message, messageTemplate.getMessage());
   }
 
 
-  /** {@inheritDoc} */
+  /**
+   * {@inheritDoc}
+   * <p>
+   * The text is the result of formatting the wrapped message with the given accessor and parameters.
+   */
   @Override
   public @NotNull Text formatAsText(@NotNull MessageAccessor messageAccessor, @NotNull Parameters parameters)
       throws MessageFormatException {
