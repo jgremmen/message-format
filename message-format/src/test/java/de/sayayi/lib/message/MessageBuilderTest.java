@@ -130,7 +130,8 @@ class MessageBuilderTest
               .mapDefault().message(b -> b.parameter("value"))
           .build();
 
-      assertMessage(message, "%{value,null:nothing,:'%{value}'}", "nothing", "value");
+      //noinspection DataFlowIssue
+      assertMessage(message, "%{value,null:nothing,:'%{value}'}", "nothing", "value", null);
       assertEquals("hello", shared().message(message).with("value", "hello").format());
     }
 
