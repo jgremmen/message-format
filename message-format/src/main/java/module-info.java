@@ -39,8 +39,8 @@
  *   <li>
  *     {@link de.sayayi.lib.message.template.Template Template}: reusable template that can be registered by name and
  *     referenced from messages. Custom templates implement
- *     {@link de.sayayi.lib.message.template.TemplateWithName TemplateWithName} and can be discovered automatically
- *     via the {@link java.util.ServiceLoader} mechanism.
+ *     {@link de.sayayi.lib.message.template.JavaTemplate JavaTemplate} and can be discovered automatically via the
+ *     {@link java.util.ServiceLoader} mechanism.
  *   </li>
  * </ul>
  *
@@ -80,7 +80,7 @@
  *     {@link de.sayayi.lib.message.formatter.DefaultFormatterService DefaultFormatterService}
  *   </li>
  *   <li>
- *     {@link de.sayayi.lib.message.template.TemplateWithName TemplateWithName}: discovered by
+ *     {@link de.sayayi.lib.message.template.JavaTemplate JavaTemplate}: discovered by
  *     {@link de.sayayi.lib.message.MessageSupport.ConfigurableMessageSupport#registerTemplatesFromService
  *     registerTemplatesFromService}
  *   </li>
@@ -132,7 +132,7 @@ module de.sayayi.lib.message
   // service provider interfaces
   uses de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
   uses de.sayayi.lib.message.formatter.post.PostFormatter;
-  uses de.sayayi.lib.message.template.TemplateWithName;
+  uses de.sayayi.lib.message.template.JavaTemplate;
 
   // internal service implementations
   provides java.nio.file.spi.FileTypeDetector with

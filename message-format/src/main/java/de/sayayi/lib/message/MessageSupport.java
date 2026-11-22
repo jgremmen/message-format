@@ -22,8 +22,8 @@ import de.sayayi.lib.message.formatter.post.PostFormatter;
 import de.sayayi.lib.message.internal.MessageSupportImpl;
 import de.sayayi.lib.message.part.MessagePart;
 import de.sayayi.lib.message.part.TypedValue;
+import de.sayayi.lib.message.template.JavaTemplate;
 import de.sayayi.lib.message.template.Template;
-import de.sayayi.lib.message.template.TemplateWithName;
 import de.sayayi.lib.message.util.MessageUtil;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
@@ -151,10 +151,10 @@ public interface MessageSupport
    * <p>
    * Only templates backed by a {@link Message} (i.e. templates parsed from a message format string or created via
    * {@link MessageFactory}) can be packed. Custom template implementations, such as those implementing
-   * {@link TemplateWithName}, have no serializable message representation and are therefore never included in the
-   * exported pack, even if they are referenced by an exported message. Such custom templates must be registered again
-   * (e.g. via {@link ConfigurableMessageSupport#registerTemplatesFromService(ClassLoader)}) on the message support
-   * instance that imports the pack.
+   * {@link JavaTemplate}, have no serializable message representation and are therefore never included in the exported
+   * pack, even if they are referenced by an exported message. Such custom templates must be registered again (e.g. via
+   * {@link ConfigurableMessageSupport#registerTemplatesFromService(ClassLoader)}) on the message support instance that
+   * imports the pack.
    * <p>
    * The {@code stream} is closed when this method returns, regardless of whether the export was successful or not.
    * Packs are meant to be written as a whole, e.g. to a file. To write a pack as part of a larger stream nevertheless,
@@ -191,7 +191,7 @@ public interface MessageSupport
    * <p>
    * Only templates backed by a {@link Message} (i.e. templates parsed from a message format string or created via
    * {@link MessageFactory}) can be packed. Custom template implementations, such as those implementing
-   * {@link TemplateWithName}, have no serializable message representation, so regardless of
+   * {@link JavaTemplate}, have no serializable message representation, so regardless of
    * {@code templateNameFilter} they are never included in the exported pack, even if they are referenced by an
    * exported message. Such custom templates must be registered again (e.g. via
    * {@link ConfigurableMessageSupport#registerTemplatesFromService(ClassLoader)}) on the message support instance that
@@ -203,11 +203,11 @@ public interface MessageSupport
    * {@link java.io.FilterOutputStream FilterOutputStream} wrapping that stream, which overrides
    * {@link OutputStream#close() close()} to only flush the wrapped stream.
    * <p>
-   * The pack format has limits which don't apply to messages and templates themselves: a message can have at most
-   * 255 parts, a parameter map or parameter configuration at most 255 entries, a template reference at most 255
-   * default parameters and 255 parameter delegates, a localized message at most 255 locales, and each string can have
-   * at most 65535 bytes in (modified) UTF-8 encoding. Messages and templates exceeding these limits can be used as
-   * usual, but must be reduced in size before they can be packed.
+   * The pack format has limits which don't apply to messages and templates themselves: a message can have at most 255
+   * parts, a parameter map or parameter configuration at most 255 entries, a template reference at most 255 default
+   * parameters and 255 parameter delegates, a localized message at most 255 locales, and each string can have at most
+   * 65535 bytes in (modified) UTF-8 encoding. Messages and templates exceeding these limits can be used as usual, but
+   * must be reduced in size before they can be packed.
    *
    * @param stream             pack output stream, not {@code null}. The stream is closed by this method
    * @param compress           {@code true} compress pack, {@code false} do not compress pack
@@ -217,10 +217,9 @@ public interface MessageSupport
    *                           {@code null} all templates referenced by the selected messages will be included, except
    *                           for custom (non-message-backed) template implementations, which are always excluded
    *
-   * @throws IOException  if an I/O error occurs, if the pack would contain more than 65535 messages or more
-   *                      than 65535 templates (in which case nothing is written to {@code stream}) or if a message or
-   *                      template exceeds a limit of the pack format (in which case {@code stream} contains an
-   *                      incomplete pack)
+   * @throws IOException  if an I/O error occurs, if the pack would contain more than 65535 messages or more than 65535
+   *                      templates (in which case nothing is written to {@code stream}) or if a message or template
+   *                      exceeds a limit of the pack format (in which case {@code stream} contains an incomplete pack)
    *
    * @see ConfigurableMessageSupport#importMessages(InputStream)
    */
@@ -843,14 +842,14 @@ public interface MessageSupport
 
 
     /**
-     * Discovers and registers all {@link TemplateWithName} service providers available from the given class loader.
+     * Discovers and registers all {@link JavaTemplate} service providers available from the given class loader.
      * <p>
-     * Each discovered template is registered under the name returned by {@link TemplateWithName#getName()}. The
+     * Each discovered template is registered under the name returned by {@link JavaTemplate#getName()}. The
      * configured {@link TemplateFilter} is applied to each discovered template before registration.
      * <p>
      * Service providers are declared either in a
-     * {@code META-INF/services/de.sayayi.lib.message.template.TemplateWithName} file or in a {@code module-info.java}
-     * using {@code provides de.sayayi.lib.message.template.TemplateWithName with ...}.
+     * {@code META-INF/services/de.sayayi.lib.message.template.JavaTemplate} file or in a {@code module-info.java}
+     * using {@code provides de.sayayi.lib.message.template.JavaTemplate with ...}.
      *
      * @param classLoader  class loader used for service discovery, not {@code null}
      *
@@ -858,7 +857,7 @@ public interface MessageSupport
      *
      * @since 0.24.0
      *
-     * @see TemplateWithName
+     * @see JavaTemplate
      */
     @Contract(value = "_ -> this", mutates = "this")
     @NotNull ConfigurableMessageSupport registerTemplatesFromService(@NotNull ClassLoader classLoader);
@@ -1156,7 +1155,7 @@ public interface MessageSupport
 
     /**
      * Adds a named template to this publisher. The template is registered under the name returned by
-     * {@link TemplateWithName#getName()}.
+     * {@link JavaTemplate#getName()}.
      *
      * @param template  named template, not {@code null}
      *
@@ -1168,7 +1167,7 @@ public interface MessageSupport
      * @since 0.24.0
      */
     @Contract(value = "_ -> this", mutates = "this")
-    default @NotNull MessagePublisher addTemplate(@NotNull TemplateWithName template) {
+    default @NotNull MessagePublisher addTemplate(@NotNull JavaTemplate template) {
       return addTemplate(template.getName(), template);
     }
   }

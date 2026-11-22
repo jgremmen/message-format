@@ -26,13 +26,13 @@
  *     and referenced from messages
  *   </li>
  *   <li>
- *     {@link de.sayayi.lib.message.template.TemplateWithMessage TemplateWithMessage}: a template backed by a
+ *     {@link de.sayayi.lib.message.template.Template.WithMessage Template.WithMessage}: a template backed by a
  *     {@link de.sayayi.lib.message.Message Message}, as created from message format strings or pack files
  *   </li>
  *   <li>
- *     {@link de.sayayi.lib.message.template.TemplateWithName TemplateWithName}: a template implemented in Java that
- *     carries a name, enabling automatic registration via the {@link java.util.ServiceLoader} mechanism; custom
- *     templates implement this interface
+ *     {@link de.sayayi.lib.message.template.JavaTemplate JavaTemplate}: a template implemented in Java that carries a
+ *     name, enabling automatic registration via the {@link java.util.ServiceLoader} mechanism; custom templates
+ *     implement this interface
  *   </li>
  * </ul>
  *

@@ -28,7 +28,7 @@ import de.sayayi.lib.message.internal.message.LocalizedMessageBundleWithCode;
 import de.sayayi.lib.message.internal.message.MessageDelegateWithCode;
 import de.sayayi.lib.message.internal.message.TextMessage;
 import de.sayayi.lib.message.part.MessagePart.Text;
-import de.sayayi.lib.message.template.TemplateWithName;
+import de.sayayi.lib.message.template.JavaTemplate;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -86,7 +86,7 @@ final class MessageFormatExceptionTest
         .thenAnswer(invocation -> { throw new MessageFormatException(null); });
 
     MESSAGE_SUPPORT.addTemplate("tpl", new MessageTemplate(THROWING_MESSAGE));
-    MESSAGE_SUPPORT.addTemplate(new TemplateWithName() {
+    MESSAGE_SUPPORT.addTemplate(new JavaTemplate() {
       @Override
       public @NotNull String getName() {
         return "throwing-tpl";

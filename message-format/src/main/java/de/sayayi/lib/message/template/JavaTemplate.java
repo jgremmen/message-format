@@ -21,6 +21,7 @@ import de.sayayi.lib.message.MessageSupportFactory;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+
 /**
  * A template implemented in Java that carries a name, making it eligible for automatic registration via the
  * {@link java.util.ServiceLoader} mechanism.
@@ -30,8 +31,8 @@ import org.jetbrains.annotations.NotNull;
  * formatted output. The name is used as the registration key when the template is discovered through
  * {@link MessageSupport.ConfigurableMessageSupport#registerTemplatesFromService(ClassLoader)
  * registerTemplatesFromService}. Service providers are declared for this interface either in {@code module-info.java}
- * ({@code provides de.sayayi.lib.message.template.TemplateWithName with ...}) or in a
- * {@code META-INF/services/de.sayayi.lib.message.template.TemplateWithName} file.
+ * ({@code provides de.sayayi.lib.message.template.JavaTemplate with ...}) or in a
+ * {@code META-INF/services/de.sayayi.lib.message.template.JavaTemplate} file.
  * <p>
  * Implementations must be thread safe, as a registered template may be used by several threads at the same time.
  * <p>
@@ -40,9 +41,9 @@ import org.jetbrains.annotations.NotNull;
  * support, directly or indirectly. Doing so fails with an {@link IllegalStateException} or, if another thread creates
  * the shared instance at the same time, may deadlock.
  *
- * @since 0.25.1
+ * @since 0.26.0
  */
-public non-sealed interface TemplateWithName extends Template
+public non-sealed interface JavaTemplate extends Template
 {
   /**
    * Returns the kebab-case name under which this template is registered.
@@ -63,7 +64,7 @@ public non-sealed interface TemplateWithName extends Template
   default boolean isSame(@NotNull Template template)
   {
     return
-        template instanceof TemplateWithName templateWithName &&
-            getName().equals(templateWithName.getName());
+        template instanceof JavaTemplate javaTemplate &&
+        getName().equals(javaTemplate.getName());
   }
 }

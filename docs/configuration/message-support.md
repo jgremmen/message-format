@@ -16,7 +16,7 @@ Instances are created through `MessageSupportFactory`, which offers a sealed sha
 several `create` methods for configurable instances.
 
 The `shared()` method returns a lazily initialized, sealed singleton that is backed by the shared 
-`DefaultFormatterService`. It also discovers and registers any `TemplateWithName` service providers on the classpath.
+`DefaultFormatterService`. It also discovers and registers any `JavaTemplate` service providers on the classpath.
 It is convenient for simple scenarios that only require inline message formatting and do not need to register messages
 or customize configuration:
 
@@ -120,7 +120,7 @@ variants.
 
 Templates are reusable message fragments registered under a kebab-case name and referenced from messages with the
 `%[template-name]` syntax. `addTemplate` accepts a name together with a parsed `Template`, or a custom
-`TemplateWithName`, which carries its own name. A name that does not follow the kebab-case convention is rejected with
+`JavaTemplate`, which carries its own name. A name that does not follow the kebab-case convention is rejected with
 an `IllegalArgumentException`. Parsing, building and implementing templates is covered on the
 [Templates](templates.md) page.
 

@@ -164,18 +164,18 @@ space, because the spacing of a template reference is determined by the enclosin
 ### Custom Templates
 
 Beyond message-based templates, the library supports custom `Template` implementations through the
-`TemplateWithName` interface. A custom template receives the message accessor and parameters at format time and 
+`JavaTemplate` interface. A custom template receives the message accessor and parameters at format time and 
 returns formatted text directly from Java code, without a parsed message format string.
 
 The `Template` interface is sealed and permits two implementation paths. Templates backed by a parsed message format
-string are created by `MessageFactory` and `MessageBuilder` and implement `TemplateWithMessage`, which gives access to
-the underlying message. Templates implemented entirely in Java implement `TemplateWithName`, which is open for custom
+string are created by `MessageFactory` and `MessageBuilder` and implement `Template.WithMessage`, which gives access to
+the underlying message. Templates implemented entirely in Java implement `JavaTemplate`, which is open for custom
 implementations and allows formatted output to be produced through arbitrary logic rather than through the message
 format parser.
 
 A custom template must implement the `getName()` method (returning the kebab-case template name) and the `formatAsText`
 method, which receives a `MessageAccessor` and a `Parameters` object and returns a `MessagePart.Text`. The default
-`isSame` implementation considers two templates the same when the other template is a `TemplateWithName` with the
+`isSame` implementation considers two templates the same when the other template is a `JavaTemplate` with the
 same name.
 
 The following example implements a template that renders the current date:
@@ -187,13 +187,13 @@ import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.TextPartFactory;
-import de.sayayi.lib.message.template.TemplateWithName;
+import de.sayayi.lib.message.template.JavaTemplate;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import org.jetbrains.annotations.NotNull;
 
-public class CurrentDateTemplate implements TemplateWithName
+public class CurrentDateTemplate implements JavaTemplate
 {
   @Override
   public @NotNull String getName() {
@@ -217,7 +217,7 @@ public class CurrentDateTemplate implements TemplateWithName
 ```
 
 Register the custom template on a `ConfigurableMessageSupport` like any other template. The
-`addTemplate(TemplateWithName)` overload registers it under the name returned by `getName()`:
+`addTemplate(JavaTemplate)` overload registers it under the name returned by `getName()`:
 
 ```java
 messageSupport.addTemplate(new CurrentDateTemplate());
@@ -236,12 +236,12 @@ Custom templates can be registered automatically through the Java `ServiceLoader
 manually in code. This is especially useful for library authors who want to ship templates that are available out of 
 the box when the library is on the classpath.
 
-To participate in service-based discovery, implement `TemplateWithName` and its `getName()` method to return the
+To participate in service-based discovery, implement `JavaTemplate` and its `getName()` method to return the
 kebab-case name under which the template will be registered. The `CurrentDateTemplate` class shown above already meets
 these requirements. As with every service provider, the class must be public and have a public no-argument constructor.
 
 Declare the provider in the `module-info.java` or in a
-`META-INF/services/de.sayayi.lib.message.template.TemplateWithName` file:
+`META-INF/services/de.sayayi.lib.message.template.JavaTemplate` file:
 
 === "module-info.java"
 
@@ -249,14 +249,14 @@ Declare the provider in the `module-info.java` or in a
     module com.example.reports {
       requires de.sayayi.lib.message;
 
-      provides de.sayayi.lib.message.template.TemplateWithName
+      provides de.sayayi.lib.message.template.JavaTemplate
           with com.example.CurrentDateTemplate;
     }
     ```
 
 === "META-INF/services"
 
-    ```text title="META-INF/services/de.sayayi.lib.message.template.TemplateWithName"
+    ```text title="META-INF/services/de.sayayi.lib.message.template.JavaTemplate"
     com.example.CurrentDateTemplate
     ```
 
@@ -274,11 +274,11 @@ Each discovered template is passed through the installed `TemplateFilter` and re
 `getName()`. A provider whose name does not follow the kebab-case convention causes an `IllegalArgumentException`.
 
 The shared `MessageSupport` singleton returned by `MessageSupportFactory.shared()` performs this discovery 
-automatically with the class loader of the library, so any `TemplateWithName` providers visible to that class loader are
+automatically with the class loader of the library, so any `JavaTemplate` providers visible to that class loader are
 registered without explicit code.
 
 /// warning | No Shared Message Support During Construction
-The constructor and static initializers of a `TemplateWithName` provider must not access
+The constructor and static initializers of a `JavaTemplate` provider must not access
 `MessageSupportFactory.shared()`, not even indirectly, as the provider is instantiated while the shared message support
 is being created. On the same thread this fails with an `IllegalStateException`. If another thread creates the shared
 instance at the same time, the application may hang.

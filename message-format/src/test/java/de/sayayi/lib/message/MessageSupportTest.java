@@ -19,8 +19,8 @@ import de.sayayi.lib.message.Message.Parameters;
 import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.exception.DuplicateTemplateException;
 import de.sayayi.lib.message.part.MessagePart.Text;
+import de.sayayi.lib.message.template.JavaTemplate;
 import de.sayayi.lib.message.template.Template;
-import de.sayayi.lib.message.template.TemplateWithName;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -297,7 +297,7 @@ final class MessageSupportTest
       @Override
       public Enumeration<URL> getResources(String name) throws IOException
       {
-        return ("META-INF/services/" + TemplateWithName.class.getName()).equals(name)
+        return ("META-INF/services/" + JavaTemplate.class.getName()).equals(name)
             ? enumeration(List.of(serviceFile.toUri().toURL()))
             : super.getResources(name);
       }
@@ -312,7 +312,7 @@ final class MessageSupportTest
 
 
 
-  public static final class GreetingTestTemplate implements TemplateWithName
+  public static final class GreetingTestTemplate implements JavaTemplate
   {
     @Override
     public @NotNull String getName() {

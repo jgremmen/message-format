@@ -22,7 +22,7 @@ import de.sayayi.lib.message.MessageSupport.MessageAccessor;
 import de.sayayi.lib.message.exception.MessageFormatException;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.TextJoiner;
-import de.sayayi.lib.message.template.TemplateWithMessage;
+import de.sayayi.lib.message.template.Template;
 import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -36,7 +36,7 @@ import static java.util.stream.Collectors.joining;
 
 
 /**
- * A {@link TemplateWithMessage} implementation that wraps a {@link Message} and delegates formatting to it.
+ * A {@link Template.WithMessage} implementation that wraps a {@link Message} and delegates formatting to it.
  * <p>
  * This is the standard template type used when templates are parsed from message format strings or imported from pack
  * files. Instances are immutable and thread safe.
@@ -46,7 +46,7 @@ import static java.util.stream.Collectors.joining;
  */
 @Internal
 @SuppressWarnings("ClassCanBeRecord")
-public final class MessageTemplate implements TemplateWithMessage
+public final class MessageTemplate implements Template.WithMessage
 {
   /** Message this template delegates formatting to. */
   private final Message message;
