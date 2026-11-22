@@ -293,7 +293,7 @@ public final class ArrayFormatter extends AbstractListFormatter<Object> implemen
    *
    * @since 0.8.0
    */
-  private static final class TextIterator extends AbstractTextIterator
+  private final class TextIterator extends AbstractTextIterator
   {
     /** Message accessor used to format the elements. */
     private final MessageAccessor messageAccessor;
@@ -338,8 +338,9 @@ public final class ArrayFormatter extends AbstractListFormatter<Object> implemen
           .orElse(DEFAULT_VALUE_MESSAGE);
 
       parameters = new SingletonParameters(context.getLocale(), "value");
-      thisText = SupplierDelegate.of(() -> noSpaceText(
-          context.getConfigValueString(CONFIG_THIS).orElse("(this array)")));
+      thisText = SupplierDelegate.of(() -> noSpaceText(context
+          .getConfigValueString(CONFIG_THIS)
+          .orElseGet(() -> getResource("this.array", context.getLocale()))));
       length = getLength(array);
 
       initIterator();

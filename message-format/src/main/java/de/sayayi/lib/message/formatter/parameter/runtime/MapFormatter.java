@@ -267,7 +267,7 @@ public final class MapFormatter extends AbstractListFormatter<Map<?,?>> implemen
    *
    * @since 0.12.0
    */
-  private static final class TextIterator extends AbstractTextIterator
+  private final class TextIterator extends AbstractTextIterator
   {
     /** Message accessor used to format the elements. */
     private final MessageAccessor messageAccessor;
@@ -308,7 +308,9 @@ public final class MapFormatter extends AbstractListFormatter<Map<?,?>> implemen
           .orElse(DEFAULT_KEY_VALUE_MESSAGE);
       parameters = new KeyValueParameters(context.getLocale());
 
-      thisText = SupplierDelegate.of(() -> context.getConfigValueString(CONFIG_MAP_THIS).orElse("(this map)"));
+      thisText = SupplierDelegate.of(() -> context
+          .getConfigValueString(CONFIG_MAP_THIS)
+          .orElseGet(() -> getResource("this.map", context.getLocale())));
 
       initIterator();
     }

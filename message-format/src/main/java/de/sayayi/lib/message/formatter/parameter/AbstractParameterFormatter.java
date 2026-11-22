@@ -15,9 +15,13 @@
  */
 package de.sayayi.lib.message.formatter.parameter;
 
+import de.sayayi.lib.message.internal.formatter.FormatterResources;
 import de.sayayi.lib.message.part.MessagePart.Text;
 import de.sayayi.lib.message.part.TextPartFactory;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Locale;
 
 import static de.sayayi.lib.message.part.MapKey.EMPTY_NULL_TYPE;
 import static de.sayayi.lib.message.part.TextPartFactory.nullText;
@@ -128,4 +132,27 @@ public abstract class AbstractParameterFormatter<T> implements ParameterFormatte
    * @return  formatted text, never {@code null}
    */
   protected abstract @NotNull Text formatValue(@NotNull ParameterFormatterContext context, @NotNull T value);
+
+
+  /**
+   * Returns the formatter resource with the given {@code key} for the given {@code locale}.
+   * <p>
+   * The resources are provided by the library. For a locale, the resources of the locale itself and of its more general
+   * locales are combined, so a key missing for {@code de_CH} is looked up for {@code de} and finally in the default
+   * resources. The default locale of the JVM is never used as a fallback.
+   * <p>
+   * The resources of a locale are read once and cached afterwards, so this method is suitable for use in each
+   * formatting call. A missing key is reported by returning {@code null}, not by throwing an exception.
+   *
+   * @param key     resource key, not {@code null}
+   * @param locale  locale, not {@code null}
+   *
+   * @return  resource value, or {@code null} if no resource with this key exists for {@code locale}
+   *
+   * @since 0.26.0
+   */
+  @Contract(pure = true)
+  protected String getResource(@NotNull String key, @NotNull Locale locale) {
+    return FormatterResources.shared().getResource(key, locale);
+  }
 }
