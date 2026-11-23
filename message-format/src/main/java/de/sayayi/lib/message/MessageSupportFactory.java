@@ -20,9 +20,11 @@ import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.formatter.FormatterService;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import de.sayayi.lib.message.internal.MessageSupportImpl;
-import de.sayayi.lib.message.internal.SharedInstance;
+import de.sayayi.lib.message.util.SharedInstanceSupplier;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.function.Supplier;
 
 
 /**
@@ -61,8 +63,8 @@ public final class MessageSupportFactory
    *
    * @since 0.25.0
    */
-  private static final SharedInstance<MessageSupport> SHARED = new SharedInstance<>(() ->
-      createDefault().registerTemplatesFromService(MessageSupportFactory.class.getClassLoader()).seal());
+  private static final Supplier<MessageSupport> SHARED = new SharedInstanceSupplier<>(
+      () -> createDefault().registerTemplatesFromService(MessageSupportFactory.class.getClassLoader()).seal());
 
 
   /** This class is not meant to be instantiated. */

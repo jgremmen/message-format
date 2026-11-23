@@ -30,11 +30,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
@@ -49,7 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 0.26.0
  */
 @DisplayName("Shared instance initialization")
-final class SharedInstanceInitializationTest
+final class SharedInstanceSupplierInitializationTest
 {
   @Test
   @DisplayName("Provider accessing the shared message support during concurrent initialization does not hang")
@@ -253,9 +249,9 @@ final class SharedInstanceInitializationTest
     {
       super(new URL[] {
           location(MessageSupportFactory.class),
-          location(SharedInstanceInitializationTest.class),
+          location(SharedInstanceSupplierInitializationTest.class),
           resourceDir.toUri().toURL()
-      }, SharedInstanceInitializationTest.class.getClassLoader());
+      }, SharedInstanceSupplierInitializationTest.class.getClassLoader());
     }
 
 

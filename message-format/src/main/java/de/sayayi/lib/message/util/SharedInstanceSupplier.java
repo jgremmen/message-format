@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.internal;
+package de.sayayi.lib.message.util;
 
-import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.atomic.AtomicReference;
@@ -26,17 +25,26 @@ import static java.util.Objects.requireNonNull;
 
 
 /**
- * Lazily created shared instance, which is published without holding a lock while it is being created.
+ * Supplier of a lazily created instance, which is shared by all threads and created without holding a lock.
  * <p>
- * Shared instances, such as the shared formatter service, instantiate service providers while they are being created.
- * A provider's constructor or static initializer is code outside this library. If the shared instance were created
- * while holding a lock, a thread initializing a provider class, whose static initializer accesses the shared
- * instance, would wait for that lock, while the thread holding the lock waits for the class initialization to complete.
- * Without a lock, each thread creates the instance on its own and the instance published first is returned to all
- * threads. The instances created by the other threads are discarded.
+ * The instance is created by a factory on the first call to {@link #get()}. Unlike a supplier creating the instance
+ * while holding a lock, such as {@link SupplierDelegate}, no thread waits for another thread creating the instance.
+ * This prevents deadlocks if the factory runs code which waits for other threads. An example is a factory which
+ * initializes a class, while another thread is initializing that class and calls this supplier from its static
+ * initializer. With a lock, that thread would wait for the lock, while the thread holding the lock waits for the class
+ * initialization to complete.
  * <p>
- * Accessing the shared instance while it is being created on the same thread, e.g. from the constructor of a service
- * provider, fails with an {@link IllegalStateException} instead of recursing.
+ * If several threads call {@link #get()} before an instance has been published, each of them creates an instance. The
+ * instance published first is returned to all threads and the instances created by the other threads are discarded.
+ * The factory must therefore tolerate being invoked more than once, and a discarded instance must not require any
+ * cleanup. If the instance is expensive to create and its factory does not call code outside of your control, a
+ * {@link SupplierDelegate} is the better choice.
+ * <p>
+ * If the factory throws an exception, no instance is published and the exception is relayed to the caller. The next
+ * call to {@link #get()} invokes the factory again.
+ * <p>
+ * A call to {@link #get()} from the factory on the same thread, directly or indirectly, fails with an
+ * {@link IllegalStateException} instead of recursing.
  * <p>
  * This class is thread-safe.
  *
@@ -45,8 +53,7 @@ import static java.util.Objects.requireNonNull;
  * @author Jeroen Gremmen
  * @since 0.26.0
  */
-@Internal
-public final class SharedInstance<T>
+public final class SharedInstanceSupplier<T> implements Supplier<@NotNull T>
 {
   /** Factory creating the instance, not {@code null}. */
   private final @NotNull Supplier<T> factory;
@@ -59,22 +66,24 @@ public final class SharedInstance<T>
 
 
   /**
-   * Creates a shared instance, which is created by {@code factory} on first access.
+   * Creates a supplier for the instance created by {@code factory} on the first call to {@link #get()}.
    *
    * @param factory  factory creating the instance, not {@code null}. It must not return {@code null}
    */
-  public SharedInstance(@NotNull Supplier<T> factory) {
+  public SharedInstanceSupplier(@NotNull Supplier<T> factory) {
     this.factory = requireNonNull(factory, "factory must not be null");
   }
 
 
   /**
-   * Returns the shared instance, creating it if no instance has been published yet.
+   * Returns the shared instance, creating it with the factory if no instance has been published yet.
    *
    * @return  shared instance, never {@code null}
    *
-   * @throws IllegalStateException  if called while the current thread creates the instance
+   * @throws IllegalStateException  if called by the factory on the same thread, directly or indirectly
+   * @throws NullPointerException   if the factory returns {@code null}
    */
+  @Override
   public @NotNull T get()
   {
     final var value = instance.get();
@@ -87,7 +96,8 @@ public final class SharedInstance<T>
    *
    * @return  published instance, never {@code null}
    *
-   * @throws IllegalStateException  if called while the current thread creates the instance
+   * @throws IllegalStateException  if called by the factory on the same thread, directly or indirectly
+   * @throws NullPointerException   if the factory returns {@code null}
    */
   private @NotNull T create()
   {
@@ -111,6 +121,6 @@ public final class SharedInstance<T>
    */
   @Override
   public String toString() {
-    return "SharedInstance(created=" + (instance.get() != null) + ')';
+    return "SharedInstanceSupplier(created=" + (instance.get() != null) + ')';
   }
 }

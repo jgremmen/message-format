@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.sayayi.lib.message.internal;
+package de.sayayi.lib.message.util;
 
 import org.junit.jupiter.api.*;
 
@@ -25,21 +25,22 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
- * Tests {@link SharedInstance}: lazy creation, recursion detection, failing creation and concurrent first access.
+ * Tests {@link SharedInstanceSupplier}: lazy creation, recursion detection, failing creation and concurrent first
+ * access.
  *
  * @author Jeroen Gremmen
  * @since 0.26.0
  */
 @DisplayName("Shared instance")
 @TestMethodOrder(MethodOrderer.DisplayName.class)
-final class SharedInstanceTest
+final class SharedInstanceSupplierTest
 {
   @Test
   @DisplayName("Instance is created on first access only")
   void createdOnce()
   {
     final var created = new AtomicInteger();
-    final var shared = new SharedInstance<>(() -> "instance-" + created.incrementAndGet());
+    final var shared = new SharedInstanceSupplier<>(() -> "instance-" + created.incrementAndGet());
 
     assertEquals(0, created.get());
     assertEquals("instance-1", shared.get());
@@ -52,8 +53,8 @@ final class SharedInstanceTest
   @DisplayName("Recursive access on the same thread is rejected")
   void recursiveAccess()
   {
-    final var holder = new AtomicReference<SharedInstance<String>>();
-    holder.set(new SharedInstance<>(() -> holder.get().get()));
+    final var holder = new AtomicReference<SharedInstanceSupplier<String>>();
+    holder.set(new SharedInstanceSupplier<>(() -> holder.get().get()));
 
     final var ex = assertThrows(IllegalStateException.class, () -> holder.get().get());
 
@@ -66,7 +67,7 @@ final class SharedInstanceTest
   void failingCreation()
   {
     final var attempts = new AtomicInteger();
-    final var shared = new SharedInstance<>(() -> {
+    final var shared = new SharedInstanceSupplier<>(() -> {
       if (attempts.incrementAndGet() == 1)
         throw new IllegalArgumentException("first attempt fails");
 
@@ -83,7 +84,7 @@ final class SharedInstanceTest
   @DisplayName("Factory returning null is rejected")
   void nullInstance()
   {
-    final var shared = new SharedInstance<String>(() -> null);
+    final var shared = new SharedInstanceSupplier<String>(() -> null);
 
     assertThrows(NullPointerException.class, shared::get);
   }
@@ -93,7 +94,7 @@ final class SharedInstanceTest
   @DisplayName("Concurrent first access returns the same instance to all threads")
   void concurrentFirstAccess() throws Exception
   {
-    final var shared = new SharedInstance<>(Object::new);
+    final var shared = new SharedInstanceSupplier<>(Object::new);
     final var instances = getConcurrently(16, thread -> shared.get());
 
     for(var instance: instances)

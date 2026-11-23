@@ -17,9 +17,10 @@ package de.sayayi.lib.message.formatter;
 
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.post.PostFormatter;
-import de.sayayi.lib.message.internal.SharedInstance;
+import de.sayayi.lib.message.util.SharedInstanceSupplier;
 
 import java.util.ServiceLoader;
+import java.util.function.Supplier;
 
 
 /**
@@ -79,8 +80,8 @@ public class DefaultFormatterService extends GenericFormatterService
    *
    * @since 0.25.0
    */
-  private static final SharedInstance<FormatterService> SHARED_INSTANCE =
-      new SharedInstance<>(() -> new DefaultFormatterService().seal());
+  private static final Supplier<FormatterService> SHARED_INSTANCE = new SharedInstanceSupplier<>(
+      () -> new DefaultFormatterService().seal());
 
   /** Class loader used to load parameter and post formatter service classes, never {@code null}. */
   protected final ClassLoader classLoader;
@@ -97,8 +98,8 @@ public class DefaultFormatterService extends GenericFormatterService
    *
    * @return  shared instance of the default formatter service, never {@code null}
    *
-   * @throws IllegalStateException  if called while the shared instance is being created on the same thread, e.g. by
-   *                                the constructor of a formatter service provider
+   * @throws IllegalStateException  if called while the shared instance is being created on the same thread, e.g. by the
+   *                                constructor of a formatter service provider
    */
   public static FormatterService getSharedInstance() {
     return SHARED_INSTANCE.get();
