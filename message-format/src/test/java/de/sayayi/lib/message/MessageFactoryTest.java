@@ -135,12 +135,12 @@ final class MessageFactoryTest
   void parseMessageCacheEvictsLRU()
   {
     final var factory = new MessageFactory(PASS_THROUGH, 2);
-    final var messageA = factory.parseMessage("a");
+    final var messageA = factory.parseMessage("%{a}");
 
-    factory.parseMessage("b");
-    factory.parseMessage("c"); // should evict "a"
+    factory.parseMessage("%{b}");
+    factory.parseMessage("%{c}"); // should evict "%{a}"
 
-    assertNotSame(messageA, factory.parseMessage("a"), "evicted message should be re-parsed");
+    assertNotSame(messageA, factory.parseMessage("%{a}"), "evicted message should be re-parsed");
   }
 
 
@@ -150,13 +150,32 @@ final class MessageFactoryTest
   {
     var factory = new MessageFactory(PASS_THROUGH, 2);
 
-    final var messageA = factory.parseMessage("a");
+    final var messageA = factory.parseMessage("%{a}");
 
-    factory.parseMessage("b");
-    factory.parseMessage("a"); // access "a" so "b" becomes LRU
-    factory.parseMessage("c"); // should evict "b", not "a"
+    factory.parseMessage("%{b}");
+    factory.parseMessage("%{a}"); // access "%{a}" so "%{b}" becomes LRU
+    factory.parseMessage("%{c}"); // should evict "%{b}", not "%{a}"
 
-    assertSame(messageA, factory.parseMessage("a"), "recently accessed message should survive eviction");
+    assertSame(messageA, factory.parseMessage("%{a}"), "recently accessed message should survive eviction");
+  }
+
+
+  @Test
+  @DisplayName("Cache does not store plain text, which therefore does not evict other messages")
+  void parseMessageCacheSkipsPlainText()
+  {
+    final var factory = new MessageFactory(PASS_THROUGH, 1);
+    final var message = factory.parseMessage("hello %{name}");
+
+    // one-off plain texts, e.g. log messages built by string concatenation
+    for(var n = 0; n < 100; n++)
+      assertEquals("user " + n + " logged in", factory.parseMessage("user " + n + " logged in").asFormatString(UTF_8));
+
+    assertSame(message, factory.parseMessage("hello %{name}"), "plain text should not evict cached messages");
+
+    // plain text is compiled again on each call
+    assertNotSame(factory.parseMessage("plain"), factory.parseMessage("plain"));
+    assertEquals(factory.parseMessage("plain"), factory.parseMessage("plain"));
   }
 
 

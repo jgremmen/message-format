@@ -55,6 +55,10 @@ entries are evicted using an approximate least recently used policy. Eviction ru
 added and is not waited for by other threads, so the cache may briefly hold a few more messages than its configured
 size.
 
+Empty strings and plain text without any parameter, template, post formatter or escape sequence are not cached. They
+are compiled without the parser, which is faster than a cache lookup, so they never evict the messages worth caching.
+Each call returns a new, equal message for such text.
+
 ```java
 var factory = new MessageFactory(MessagePartNormalizer.PASS_THROUGH, 512);
 var messageSupport = MessageSupportFactory.create(

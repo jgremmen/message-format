@@ -177,10 +177,13 @@ public class MessageFactory
    * Parses a message format text into a message instance.
    * <p>
    * If this factory was created with a message cache (see {@link #MessageFactory(MessagePartNormalizer, int)}),
-   * previously parsed messages are returned from the cache. When the cache is full, entries are evicted using an
-   * approximate least recently used policy. Cached messages are looked up without locking and messages are compiled
-   * outside any lock, so concurrent calls do not wait for each other. If two threads parse the same uncached text at
-   * the same time, both compile it and the message cached first is returned to both of them.
+   * previously parsed messages are returned from the cache. Empty text and text without any parameter, template, post
+   * formatter or escape sequence are not cached, as they are compiled faster than they are looked up, and caching them,
+   * e.g. for log messages built by string concatenation, would evict the messages worth caching. Such text returns a
+   * new, equal message on each call. When the cache is full, entries are evicted using an approximate least recently
+   * used policy. Cached messages are looked up without locking and messages are compiled outside any lock, so
+   * concurrent calls do not wait for each other. If two threads parse the same uncached text at the same time, both
+   * compile it and the message cached first is returned to both of them.
    *
    * @param text  message format text, not {@code null}
    *
@@ -193,9 +196,16 @@ public class MessageFactory
   @Contract(pure = true)
   public @NotNull Message.WithSpaces parseMessage(@NotNull @Language("MessageFormat") String text)
   {
-    return messageCache == null
-        ? messageCompiler.compileMessage(text)
-        : messageCache.get(text, messageCompiler::compileMessage);
+    if (messageCache == null)
+      return messageCompiler.compileMessage(text);
+
+    final var plainMessage = messageCompiler.compilePlainMessage(text);
+    if (plainMessage != null)
+      return plainMessage;
+
+    return messageCache.get(
+        text,
+        (@Language("MessageFormat") String text0) -> messageCompiler.compileWithParser(text0, false));
   }
 
 

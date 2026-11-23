@@ -377,5 +377,7 @@ The same rule applies to every other way of building the message string at runti
 globally (see [Global Configuration](#global-configuration)), because then the log statements of all libraries in the
 application are parsed as well.
 
-Constant message strings also keep the message cache of the factory effective. Every distinct string is parsed and
-cached separately, so concatenated values cause a cache miss and a new parse on every call.
+Constant message strings also keep the message cache of the factory effective. Every distinct string with parameters,
+templates or post formatters is parsed and cached separately, so concatenating values into such a string causes a cache
+miss and a new parse on every call. Plain text without message format syntax is not cached and is compiled without the
+parser, so concatenated plain text does not affect the cache.

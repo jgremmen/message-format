@@ -179,6 +179,25 @@ public final class MessageCompiler extends AbstractAntlr4Parser
   @Contract(pure = true)
   private @NotNull Message.WithSpaces compileMessage(@NotNull @Language("MessageFormat") String text, boolean template)
   {
+    final var plainMessage = compilePlainMessage(text);
+    return plainMessage != null ? plainMessage : compileWithParser(text, template);
+  }
+
+
+  /**
+   * Compiles the given message {@code text} without invoking the parser, if it is empty or consists of plain text only.
+   * The resulting message is identical to the one the parser would produce.
+   *
+   * @param text  message text, not {@code null}
+   *
+   * @return  compiled message, or {@code null} if {@code text} must be compiled by the parser
+   *          ({@link #compileWithParser(String, boolean)})
+   *
+   * @since 0.26.0
+   */
+  @Contract(pure = true)
+  public Message.WithSpaces compilePlainMessage(@NotNull @Language("MessageFormat") String text)
+  {
     if (text.isEmpty())
       return EmptyMessage.INSTANCE;
 
@@ -189,7 +208,7 @@ public final class MessageCompiler extends AbstractAntlr4Parser
           .normalize(new TextPart(text)));
     }
 
-    return compileWithParser(text, template);
+    return null;
   }
 
 
@@ -235,7 +254,8 @@ public final class MessageCompiler extends AbstractAntlr4Parser
    * @since 0.26.0
    */
   @Contract(pure = true)
-  @NotNull Message.WithSpaces compileWithParser(@NotNull @Language("MessageFormat") String text, boolean template)
+  public @NotNull Message.WithSpaces compileWithParser(@NotNull @Language("MessageFormat") String text,
+                                                      boolean template)
   {
     final var listener = new Listener(template);
 
