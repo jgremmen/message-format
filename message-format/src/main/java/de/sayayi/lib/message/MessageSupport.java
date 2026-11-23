@@ -447,6 +447,12 @@ public interface MessageSupport
      *     evaluation.
      *   </li>
      *   <li>
+     *     The delegate invokes the supplier while holding a lock, so that it is invoked only once if the parameters are
+     *     formatted by several threads at the same time, e.g. through a supplier returned by {@link #formatSupplier()}
+     *     that is shared between threads. These threads wait until the supplier returns. The supplier must therefore
+     *     not wait for another thread that formats the message with the same parameters, as this would deadlock.
+     *   </li>
+     *   <li>
      *     {@link #getParameters()} returns the caching delegate, not the supplier passed to this method. If the
      *     supplier implements other types besides the supplier interface, the delegate does not.
      *   </li>
@@ -630,8 +636,8 @@ public interface MessageSupport
 
 
   /**
-   * Configurable extension of {@link MessageSupport} providing methods to add/import messages, register templates,
-   * set default configuration values and change the default locale.
+   * Configurable extension of {@link MessageSupport} providing methods to add/import messages, register templates, set
+   * default configuration values and change the default locale.
    * <p>
    * This interface is thread-safe; it may be shared and modified concurrently by multiple threads.
    *
@@ -806,9 +812,13 @@ public interface MessageSupport
      * message support.
      * <p>
      * The filter is invoked while this message support holds its write lock, so checking for an existing message and
-     * adding the new one is atomic. The filter may read from this message support (e.g. through its
-     * {@link MessageSupport#getMessageAccessor() message accessor}), but it should return quickly and must not wait for
-     * other threads that access this message support, as this would deadlock.
+     * adding the new one is atomic. The lock is also held while messages or templates are added and while a snapshot
+     * is taken for {@link MessageSupport#exportMessages(OutputStream, boolean, Predicate, Predicate) exportMessages}
+     * and {@link MessageAccessor#findMissingTemplates(Predicate) findMissingTemplates}, but not for reading or
+     * formatting messages. The filter may read from this message support (e.g. through its
+     * {@link MessageSupport#getMessageAccessor() message accessor}) and may wait for other threads formatting messages,
+     * but it should return quickly and must not wait for other threads that add messages or templates to this message
+     * support, export it or look for missing templates, as this would deadlock.
      * <p>
      * Exceptions thrown by the message filter are relayed to the caller.
      *
@@ -832,9 +842,13 @@ public interface MessageSupport
      * template is not added to the message support.
      * <p>
      * The filter is invoked while this message support holds its write lock, so checking for an existing template and
-     * adding the new one is atomic. The filter may read from this message support (e.g. through its
-     * {@link MessageSupport#getMessageAccessor() message accessor}), but it should return quickly and must not wait
-     * for other threads that access this message support, as this would deadlock.
+     * adding the new one is atomic. The lock is also held while messages or templates are added and while a snapshot
+     * is taken for {@link MessageSupport#exportMessages(OutputStream, boolean, Predicate, Predicate) exportMessages}
+     * and {@link MessageAccessor#findMissingTemplates(Predicate) findMissingTemplates}, but not for reading or
+     * formatting messages. The filter may read from this message support (e.g. through its
+     * {@link MessageSupport#getMessageAccessor() message accessor}) and may wait for other threads formatting messages,
+     * but it should return quickly and must not wait for other threads that add messages or templates to this message
+     * support, export it or look for missing templates, as this would deadlock.
      * <p>
      * Exceptions thrown by the template filter are relayed to the caller.
      *

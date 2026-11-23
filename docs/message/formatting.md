@@ -324,7 +324,9 @@ second.get();
 The snapshot contains the parameter values, not their evaluated results. A
 [supplier](../formatter/parameter/typed/supplier.md) parameter value is wrapped in a caching delegate when it is set
 with `with(...)`. The configurer and all suppliers returned by `formatSupplier()` share this delegate, so the supplier
-is invoked at most once and all of them format the same supplied value.
+is invoked at most once and all of them format the same supplied value. If several threads format with the shared
+delegate at the same time, they wait until the first invocation of the supplier returns. The supplier must therefore
+not wait for another thread formatting with the same parameters, as this would deadlock.
 
 
 ## Creating Exceptions with Formatted Messages

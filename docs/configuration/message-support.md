@@ -157,7 +157,8 @@ adding the new one is therefore atomic. A filter may read from the message suppo
 accessor, but it must return quickly. It must never wait for another thread that adds messages or templates to the same
 message support, imports or exports a pack, or calls `findMissingTemplates`, as these threads wait for the same lock
 and this would cause a deadlock. Waiting for a thread that only formats messages is safe, because formatting does not
-acquire the lock.
+acquire the lock. The default filters run under the same lock and call `isSame` on the already registered entry, so a
+custom `JavaTemplate` overriding `isSame` must follow the same rules.
 
 A typical use case is logging every message that gets registered, for example during development when tracking what is
 being loaded from annotation scanning or pack files is desired:

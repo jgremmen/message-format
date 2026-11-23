@@ -54,6 +54,12 @@ public sealed interface Template permits Template.WithMessage, JavaTemplate
 {
   /**
    * Tells whether this template is semantically equivalent to the given {@code template}.
+   * <p>
+   * The default template filter of a configurable message support calls this method to detect duplicate templates,
+   * while the message support holds its write lock (see
+   * {@link MessageSupport.ConfigurableMessageSupport#setTemplateFilter(MessageSupport.TemplateFilter)
+   * setTemplateFilter}). Implementations must therefore return quickly and must not wait for other threads that add
+   * messages or templates to the message support, export it or look for missing templates, as this would deadlock.
    *
    * @param template  template to compare with, not {@code null}
    *
