@@ -17,10 +17,9 @@ package de.sayayi.lib.message.formatter;
 
 import de.sayayi.lib.message.formatter.parameter.ParameterFormatter;
 import de.sayayi.lib.message.formatter.post.PostFormatter;
-import de.sayayi.lib.message.util.SupplierDelegate;
+import de.sayayi.lib.message.internal.SharedInstance;
 
 import java.util.ServiceLoader;
-import java.util.function.Supplier;
 
 
 /**
@@ -80,8 +79,8 @@ public class DefaultFormatterService extends GenericFormatterService
    *
    * @since 0.25.0
    */
-  private static final Supplier<FormatterService> SHARED_INSTANCE_SUPPLIER =
-      SupplierDelegate.of(() -> new DefaultFormatterService().seal());
+  private static final SharedInstance<FormatterService> SHARED_INSTANCE =
+      new SharedInstance<>(() -> new DefaultFormatterService().seal());
 
   /** Class loader used to load parameter and post formatter service classes, never {@code null}. */
   protected final ClassLoader classLoader;
@@ -91,11 +90,18 @@ public class DefaultFormatterService extends GenericFormatterService
    * Returns a shared instance of the default formatter service. This service includes all parameter formatters which
    * are available as a service and accessible by the class loader that loaded this library. The shared instance is
    * {@linkplain FormatterService.WithRegistry#seal() sealed}, so it cannot be modified.
+   * <p>
+   * The shared instance is created without holding a lock, as creating it instantiates the formatter service
+   * providers. If several threads access the shared instance for the first time at the same time, each of them may
+   * create an instance, but all of them receive the same instance.
    *
    * @return  shared instance of the default formatter service, never {@code null}
+   *
+   * @throws IllegalStateException  if called while the shared instance is being created on the same thread, e.g. by
+   *                                the constructor of a formatter service provider
    */
   public static FormatterService getSharedInstance() {
-    return SHARED_INSTANCE_SUPPLIER.get();
+    return SHARED_INSTANCE.get();
   }
 
 

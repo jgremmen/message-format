@@ -38,8 +38,8 @@ import org.jetbrains.annotations.NotNull;
  * <p>
  * The shared message support ({@link MessageSupportFactory#shared()}) discovers named templates while it is being
  * created. The constructor and static initializers of a named template must therefore not access the shared message
- * support, directly or indirectly. Doing so fails with an {@link IllegalStateException} or, if another thread creates
- * the shared instance at the same time, may deadlock.
+ * support, directly or indirectly. Doing so on the thread creating the shared message support fails with an
+ * {@link IllegalStateException}.
  *
  * @since 0.26.0
  */

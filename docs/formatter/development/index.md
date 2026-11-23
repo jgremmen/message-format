@@ -157,8 +157,8 @@ example because its name is already taken, makes the constructor of `DefaultForm
 /// warning | No Shared Instances During Construction
 A service provider is instantiated while the shared `DefaultFormatterService` is being created. Its constructor and
 static initializers must not access `MessageSupportFactory.shared()` or `DefaultFormatterService.getSharedInstance()`,
-not even indirectly. On the same thread this fails with an `IllegalStateException`. If another thread creates the
-shared instances at the same time, the application may hang. Access the shared instances when formatting instead.
+not even indirectly. On the thread creating the shared instances, this fails with an `IllegalStateException`. Access
+the shared instances when formatting instead.
 ///
 
 /// note | Thread Safety

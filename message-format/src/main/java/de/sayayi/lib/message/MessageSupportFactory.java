@@ -20,11 +20,9 @@ import de.sayayi.lib.message.formatter.DefaultFormatterService;
 import de.sayayi.lib.message.formatter.FormatterService;
 import de.sayayi.lib.message.formatter.GenericFormatterService;
 import de.sayayi.lib.message.internal.MessageSupportImpl;
-import de.sayayi.lib.message.util.SupplierDelegate;
+import de.sayayi.lib.message.internal.SharedInstance;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.function.Supplier;
 
 
 /**
@@ -63,7 +61,7 @@ public final class MessageSupportFactory
    *
    * @since 0.25.0
    */
-  private static final Supplier<MessageSupport> SHARED_SUPPLIER = SupplierDelegate.of(() ->
+  private static final SharedInstance<MessageSupport> SHARED = new SharedInstance<>(() ->
       createDefault().registerTemplatesFromService(MessageSupportFactory.class.getClassLoader()).seal());
 
 
@@ -82,18 +80,19 @@ public final class MessageSupportFactory
    * The shared instance automatically discovers and registers all
    * {@link de.sayayi.lib.message.template.JavaTemplate JavaTemplate} service providers on the classpath, and
    * is then {@linkplain ConfigurableMessageSupport#seal() sealed} so it cannot be modified further.
+   * <p>
+   * The shared instance is created without holding a lock, as creating it instantiates the template service
+   * providers. If several threads access the shared instance for the first time at the same time, each of them may
+   * create an instance, but all of them receive the same instance.
    *
    * @return  shared message support instance, never {@code null}
+   *
+   * @throws IllegalStateException  if called while the shared instance, or the shared formatter service it is based
+   *                                on, is being created on the same thread, e.g. by the constructor of a service
+   *                                provider
    */
-  public static @NotNull MessageSupport shared()
-  {
-    // initialize the shared instances it depends on first, so no lock is held while the default formatter service
-    // instantiates its service providers. A provider accessing the shared message support from another thread would
-    // otherwise wait for this lock while this thread waits for the formatter service, which deadlocks.
-    DefaultFormatterService.getSharedInstance();
-    MessageFactory.getSharedInstance();
-
-    return SHARED_SUPPLIER.get();
+  public static @NotNull MessageSupport shared() {
+    return SHARED.get();
   }
 
 

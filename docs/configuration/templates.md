@@ -282,8 +282,7 @@ registered without explicit code.
 /// warning | No Shared Message Support During Construction
 The constructor and static initializers of a `JavaTemplate` provider must not access
 `MessageSupportFactory.shared()`, not even indirectly, as the provider is instantiated while the shared message support
-is being created. On the same thread this fails with an `IllegalStateException`. If another thread creates the shared
-instance at the same time, the application may hang.
+is being created. On the thread creating the shared message support, this fails with an `IllegalStateException`.
 ///
 
 /// note | Custom Templates and Pack Files
