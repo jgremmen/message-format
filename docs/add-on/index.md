@@ -27,3 +27,8 @@ The [highlight.js](highlight-js/index.md) add-on is a language definition for th
 highlight.js. It colors message format strings in web pages, such as documentation or administration pages that list
 messages. It is generated from the same ANTLR grammar as the Java parser, so the highlighting follows the actual
 syntax. Unlike the other add-ons, it is not a Maven artifact but a set of JavaScript and CSS files for web projects.
+
+The [IntelliJ Plugin](intellij.md) adds the language `MessageFormat` to IntelliJ IDEA. It recognizes message format
+strings in Java code, in `.messageformat` files and in Markdown code fences, and provides highlighting, validation,
+code completion, inspections and a viewer for pack files. Like the highlight.js add-on, it is not a Maven artifact. It
+is installed from a custom plugin repository.

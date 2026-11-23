@@ -100,6 +100,7 @@ nav:
       - add-on/highlight-js/index.md
       - Integration: add-on/highlight-js/integration.md
       - Styling: add-on/highlight-js/styling.md
+    - IntelliJ Plugin: add-on/intellij.md
   - Gradle Plugin:
     - gradle-plugin/index.md
     - Extension Configuration: gradle-plugin/extension.md
