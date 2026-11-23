@@ -15,19 +15,35 @@
  */
 
 /**
- * Utility classes for the message format library.
+ * Utilities which are used throughout the message format library and are available to applications and formatter
+ * implementations as well.
  * <p>
- * This package provides supporting utilities used throughout the message format framework:
+ * The package provides the following classes:
  * <ul>
- *   <li>{@link de.sayayi.lib.message.util.MessageUtil MessageUtil}: static helper methods for message processing
- *       and analysis</li>
- *   <li>{@link de.sayayi.lib.message.util.ParameterValueHelper ParameterValueHelper}: type-safe conversions for
- *       message parameter values</li>
- *   <li>{@link de.sayayi.lib.message.util.SortedStringMap SortedStringMap}: a compact, array-backed map with
- *       sorted string keys</li>
- *   <li>{@link de.sayayi.lib.message.util.SupplierDelegate SupplierDelegate}: a caching supplier decorator</li>
- *   <li>{@link de.sayayi.lib.message.util.AbstractAntlr4Parser AbstractAntlr4Parser}: base parser integrating
- *       ANTLR4 syntax error reporting with the message support framework</li>
+ *   <li>
+ *     {@link de.sayayi.lib.message.util.MessageUtil MessageUtil}: static helpers for name validation, space handling,
+ *     format string serialization and pack file import
+ *   </li>
+ *   <li>
+ *     {@link de.sayayi.lib.message.util.ParameterValueHelper ParameterValueHelper}: type-safe conversions of message
+ *     parameter values
+ *   </li>
+ *   <li>
+ *     {@link de.sayayi.lib.message.util.SortedStringMap SortedStringMap}: a compact, array-backed map with sorted
+ *     string keys, which can be sealed to make it immutable
+ *   </li>
+ *   <li>
+ *     {@link de.sayayi.lib.message.util.SupplierDelegate SupplierDelegate}: a supplier caching the value of another
+ *     supplier, which is invoked once while holding a lock
+ *   </li>
+ *   <li>
+ *     {@link de.sayayi.lib.message.util.SharedInstanceSupplier SharedInstanceSupplier}: a supplier of a lazily created
+ *     instance shared by all threads, which is created without holding a lock
+ *   </li>
+ *   <li>
+ *     {@link de.sayayi.lib.message.util.AbstractAntlr4Parser AbstractAntlr4Parser}: base class for ANTLR4 parsers
+ *     reporting syntax errors with messages formatted by a message support
+ *   </li>
  * </ul>
  *
  * @author Jeroen Gremmen

@@ -25,11 +25,19 @@ import static java.util.Objects.requireNonNull;
 
 
 /**
- * This supplier implementation delegates to another supplier and caches the supplied value, thus
- * invoking the delegated supplier only once.
+ * Supplier which delegates to another supplier and caches the supplied value, so the delegate supplier is invoked only
+ * once.
  * <p>
- * This class is thread-safe. The class of the delegate supplier is available through {@link #getDelegateClass()}, even
- * after the value has been obtained.
+ * The delegate supplier is invoked lazily, on the first call to {@link #get()}. The supplied value may be
+ * {@code null}, which is cached as well. If the delegate supplier throws an exception, nothing is cached and the next
+ * call invokes it again. The delegate supplier is released once the value has been obtained, while its class remains
+ * available through {@link #getDelegateClass()}.
+ * <p>
+ * This class is thread-safe. The delegate supplier is invoked while holding a lock, so concurrent first calls wait for
+ * the value instead of invoking the delegate supplier again. The delegate supplier must therefore not wait for another
+ * thread calling this supplier, as this would deadlock. If the delegate supplier runs code which may wait for other
+ * threads, such as code initializing classes or instantiating service providers, use {@link SharedInstanceSupplier}
+ * instead.
  *
  * <h2>Example</h2>
  * <pre>

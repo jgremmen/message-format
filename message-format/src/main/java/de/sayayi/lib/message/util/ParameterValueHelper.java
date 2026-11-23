@@ -30,10 +30,10 @@ import static de.sayayi.lib.message.util.MessageUtil.findEnumValue;
 
 
 /**
- * Utility class that provides type-safe conversions for
- * {@linkplain Parameters#getParameterValue(String) parameter values}. Each method retrieves a named parameter value
- * from a {@link Parameters} instance and attempts to convert it to the requested type, returning an {@link Optional}
- * (or {@link OptionalInt}/{@link OptionalLong}) that is empty when the value is {@code null} or cannot be converted.
+ * Type-safe conversions for {@linkplain Parameters#getParameterValue(String) parameter values}. Each method retrieves a
+ * named parameter value from a {@link Parameters} instance and attempts to convert it to the requested type, returning
+ * an {@link Optional} (or {@link OptionalInt}/{@link OptionalLong}) that is empty when the value is {@code null} or
+ * cannot be converted.
  * <p>
  * This class backs the default convenience methods on {@link Parameters} such as
  * {@link Parameters#getParameterValueAsBoolean(String)},
@@ -61,8 +61,8 @@ public final class ParameterValueHelper
    * @param parameters  parameters instance to retrieve the value from, not {@code null}
    * @param name        parameter name, not {@code null}
    *
-   * @return  an {@link Optional} containing the boolean value, or an empty optional if the value is {@code null}
-   *          or not convertible to a boolean
+   * @return  an {@link Optional} containing the boolean value, or an empty optional if the value is {@code null} or not
+   *          convertible to a boolean
    */
   @Contract(pure = true)
   public static @NotNull Optional<Boolean> getBoolean(@NotNull Parameters parameters, @NotNull String name)
@@ -97,14 +97,15 @@ public final class ParameterValueHelper
    * Retrieves the named parameter value and converts it to an {@code int}.
    * <p>
    * The conversion supports {@link Number} subclasses, {@link BigInteger}, {@link BigDecimal}, numeric strings and
-   * values wrapped in {@link Optional}, {@link OptionalInt} or {@link OptionalLong}. If the value overflows the
-   * {@code int} range or cannot be parsed, an empty result is returned.
+   * values wrapped in {@link Optional}, {@link OptionalInt} or {@link OptionalLong}. {@link Double}, {@link Float} and
+   * {@link BigDecimal} values are converted only if they have no fractional part. If the value has a fractional part,
+   * overflows the {@code int} range or cannot be parsed, an empty result is returned.
    *
    * @param parameters  parameters instance to retrieve the value from, not {@code null}
    * @param name        parameter name, not {@code null}
    *
-   * @return  an {@link OptionalInt} containing the int value, or an empty optional if the value is {@code null}
-   *          or not convertible to an int
+   * @return  an {@link OptionalInt} containing the int value, or an empty optional if the value is {@code null} or not
+   *          convertible to an int
    */
   @Contract(pure = true)
   public static @NotNull OptionalInt getInt(@NotNull Parameters parameters, @NotNull String name)
@@ -125,14 +126,15 @@ public final class ParameterValueHelper
    * Retrieves the named parameter value and converts it to a {@code long}.
    * <p>
    * The conversion supports {@link Number} subclasses, {@link BigInteger}, {@link BigDecimal}, numeric strings and
-   * values wrapped in {@link Optional}, {@link OptionalInt} or {@link OptionalLong}. If the value overflows the
-   * {@code long} range or cannot be parsed, an empty result is returned.
+   * values wrapped in {@link Optional}, {@link OptionalInt} or {@link OptionalLong}. {@link Double}, {@link Float} and
+   * {@link BigDecimal} values are converted only if they have no fractional part. If the value has a fractional part,
+   * overflows the {@code long} range or cannot be parsed, an empty result is returned.
    *
    * @param parameters  parameters instance to retrieve the value from, not {@code null}
    * @param name        parameter name, not {@code null}
    *
-   * @return  an {@link OptionalLong} containing the long value, or an empty optional if the value is {@code null}
-   *          or not convertible to a long
+   * @return  an {@link OptionalLong} containing the long value, or an empty optional if the value is {@code null} or
+   *          not convertible to a long
    */
   @Contract(pure = true)
   public static @NotNull OptionalLong getLong(@NotNull Parameters parameters, @NotNull String name)
@@ -221,8 +223,8 @@ public final class ParameterValueHelper
    * @param parameters  parameters instance to retrieve the value from, not {@code null}
    * @param name        parameter name, not {@code null}
    *
-   * @return  an {@link Optional} containing the string value, or an empty optional if the value is {@code null}
-   *          or not a {@link CharSequence}
+   * @return  an {@link Optional} containing the string value, or an empty optional if the value is {@code null} or not
+   *          a {@link CharSequence}
    */
   @Contract(pure = true)
   public static @NotNull Optional<String> getString(@NotNull Parameters parameters, @NotNull String name)

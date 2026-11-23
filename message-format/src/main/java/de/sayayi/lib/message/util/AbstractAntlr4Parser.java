@@ -34,10 +34,20 @@ import static java.util.Objects.requireNonNull;
 
 
 /**
- * Extension of the ANTLR4 base parser that integrates with the message format library for syntax error reporting.
+ * Base class for ANTLR4 parsers which report syntax errors with messages formatted by a {@link MessageSupport}.
  * <p>
- * This class provides convenience methods to create syntax error messages using the {@link MessageSupport} framework,
- * allowing parsers to produce localized and parameterized error messages.
+ * It extends the ANTLR4 parser base class of the {@code antlr4-runtime-ext} library with methods creating syntax errors
+ * from a message code or an inline message format string. The error message can be parameterized and localized before
+ * the location of the error is specified, so parsers can produce syntax errors in the language of their users.
+ * <p>
+ * Example of a parser rule reporting an error:
+ * <pre>{@code
+ * syntaxErrorCode("parser.unexpected-token")
+ *     .with("token", token.getText())
+ *     .locale(locale)
+ *     .with(token)
+ *     .report();
+ * }</pre>
  *
  * @author Jeroen Gremmen
  * @since 0.24.0
@@ -93,11 +103,13 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
 
 
   /**
-   * Creates a syntax error message builder using a message code from the message support.
+   * Creates a syntax error message builder for the message with the given {@code code} in the message support.
    *
    * @param code  message code to look up, not {@code null}
    *
    * @return a new syntax error message builder, never {@code null}
+   *
+   * @throws IllegalArgumentException  if the message support has no message with the given {@code code}
    */
   @Contract(value = "_ -> new", pure = true)
   protected @NotNull SyntaxErrorMessageBuilder syntaxErrorCode(@NotNull String code) {
@@ -106,9 +118,10 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
 
 
   /**
-   * Creates a syntax error message builder using an inline message format string.
+   * Creates a syntax error message builder for an inline message format string. The string is parsed when the error
+   * message is formatted.
    *
-   * @param message  message format string to parse, not {@code null}
+   * @param message  message format string, not {@code null}
    *
    * @return a new syntax error message builder, never {@code null}
    */
@@ -124,8 +137,10 @@ public abstract class AbstractAntlr4Parser extends de.sayayi.lib.antlr4.Abstract
    * A builder that combines the message format parameterization capabilities of {@link MessageConfigurer} with the
    * syntax error location tracking of {@link SyntaxErrorBuilder}.
    * <p>
-   * Parameters and locale are configured first, then the token position is specified which transitions the builder into
-   * a {@link SyntaxErrorBuilder} that can report the error.
+   * Parameters and locale are configured first. Specifying the location of the error formats the message and
+   * transitions to a {@link SyntaxErrorBuilder}, which reports the error.
+   * <p>
+   * A builder is meant to create a single syntax error and is not thread-safe.
    *
    * @since 0.24.0
    */

@@ -76,7 +76,10 @@ public final class SharedInstanceSupplier<T> implements Supplier<@NotNull T>
 
 
   /**
-   * Returns the shared instance, creating it with the factory if no instance has been published yet.
+   * {@inheritDoc}
+   * <p>
+   * Returns the shared instance, creating it with the factory if no instance has been published yet. The factory is
+   * invoked without holding a lock, so concurrent first calls may each invoke it. All of them return the same instance.
    *
    * @return  shared instance, never {@code null}
    *
@@ -118,6 +121,8 @@ public final class SharedInstanceSupplier<T> implements Supplier<@NotNull T>
 
   /**
    * {@inheritDoc}
+   * <p>
+   * The string representation tells whether an instance has been published, without creating it.
    */
   @Override
   public String toString() {

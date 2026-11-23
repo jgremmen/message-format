@@ -44,15 +44,18 @@ import static java.util.Objects.requireNonNull;
 
 
 /**
- * Utility class providing static helper methods for message processing, including:
+ * Static helper methods for working with messages, format strings and message format packs.
+ * <p>
+ * The helpers cover the following areas:
  * <ul>
- *   <li>Name validation (kebab-case, lower camel-case, general name format)</li>
- *   <li>Space-aware string trimming and normalization</li>
- *   <li>Message and string serialization into the format string representation</li>
- *   <li>Pack file detection and message/template import</li>
+ *   <li>name validation (kebab-case, lower camel-case and names as defined by the message format syntax)</li>
+ *   <li>space-aware string trimming and normalization</li>
+ *   <li>serialization of strings and messages into the format string representation</li>
+ *   <li>pack file detection and import of messages and templates from a pack</li>
+ *   <li>lookup of enum constants by name</li>
  * </ul>
- *
- * <p>This class cannot be instantiated.
+ * <p>
+ * All methods are stateless and thread-safe. This class cannot be instantiated.
  *
  * @author Jeroen Gremmen
  * @since 0.21.0
@@ -64,12 +67,13 @@ public final class MessageUtil
 
 
   /**
-   * Validates that the specified name is not {@code null} and not empty.
+   * Validates that the specified name is neither {@code null} nor blank.
    *
    * @param name             the name to validate, may be {@code null}
-   * @param nameDescription  the name description to use in exception messages
+   * @param nameDescription  description of the name used in exception messages, e.g. {@code "message code"}, not
+   *                         {@code null}
    *
-   * @return  the validated name, never {@code null} or empty
+   * @return  the validated name, never {@code null} or blank
    *
    * @throws NullPointerException      if {@code name} is {@code null}
    * @throws IllegalArgumentException  if {@code name} is blank
@@ -87,8 +91,8 @@ public final class MessageUtil
 
 
   /**
-   * Determines if the specified character is a space character. A character is considered
-   * to be a space character if its general category type is any of the following:
+   * Determines if the specified character is a space character. A character is considered to be a space character if
+   * its general category type is any of the following:
    * <ul>
    * <li> {@code SPACE_SEPARATOR}
    * <li> {@code PARAGRAPH_SEPARATOR}
@@ -99,8 +103,7 @@ public final class MessageUtil
    *
    * @param ch  the character to be tested
    *
-   * @return  {@code true} if the character is a space character,
-   *          {@code false} otherwise
+   * @return  {@code true} if the character is a space character, {@code false} otherwise
    *
    * @see Character#isSpaceChar(char)
    */
@@ -113,12 +116,15 @@ public final class MessageUtil
 
 
   /**
-   * Returns a string without leading and trailing spaces. This method differs from
-   * {@link String#trim()} in that it doesn't trim newlines.
+   * Returns a string without leading and trailing {@linkplain #isSpaceChar(char) space characters}.
+   * <p>
+   * Unlike {@link String#trim()}, this method removes Unicode space separators, but keeps newlines and other control
+   * characters except tab and carriage return.
    *
    * @param s  string to trim, or {@code null}
    *
-   * @return  trimmed string, or {@code null} if {@code s} is {@code null}
+   * @return  trimmed string, or {@code null} if {@code s} is {@code null}. If {@code s} has no leading or trailing
+   *          space characters, {@code s} itself is returned
    *
    * @see #isSpaceChar(char)
    */
@@ -251,7 +257,8 @@ public final class MessageUtil
 
 
   /**
-   * Returns whether string {@code s} is empty or not.
+   * Tells whether string {@code s} is {@code null} or has zero length. Spaces are not considered empty, see
+   * {@link #isTrimmedEmpty(String)}.
    *
    * @param s  string or {@code null}
    *
@@ -312,8 +319,7 @@ public final class MessageUtil
    *
    * @param name  the name to check, not {@code null}
    *
-   * @return  {@code true} if {@code name} is a valid lower camel-case name,
-   *          {@code false} otherwise
+   * @return  {@code true} if {@code name} is a valid lower camel-case name, {@code false} otherwise
    */
   @Contract(pure = true)
   public static boolean isLowerCamelCaseName(@NotNull String name)
@@ -338,9 +344,8 @@ public final class MessageUtil
 
 
   /**
-   * Checks whether {@code name} is either a valid kebab-case or lower camel-case name. This method combines the logic
-   * of {@link #isKebabCaseName(String)} and {@link #isLowerCamelCaseName(String)} in a single pass for optimal
-   * performance.
+   * Checks whether {@code name} is either a valid kebab-case or lower camel-case name. The result is the same as
+   * {@code isKebabCaseName(name) || isLowerCamelCaseName(name)}.
    * <p>
    * A valid kebab-case name must satisfy the following conditions:
    * <ul>
@@ -594,8 +599,8 @@ public final class MessageUtil
    * {@code empty} or {@code format}, it is serialized unquoted. Otherwise, it is serialized as a quoted string,
    * so parsing the result yields the same string value.
    *
-   * @param context  the serialization context providing charset encoding, text joiner and
-   *                 string quoting information, not {@code null}
+   * @param context  the serialization context providing charset encoding, text joiner and string quoting information,
+   *                 not {@code null}
    * @param string   the string to serialize, not {@code null}
    *
    * @see #serializeString(Context, String)
@@ -613,18 +618,18 @@ public final class MessageUtil
 
 
   /**
-   * Serializes a string as a quoted string into the format string representation. The quote
-   * character is automatically chosen to prevent or reduce unnecessary escape sequences in the
-   * resulting format string: if the string contains more single quotes ({@code '}) than double
-   * quotes ({@code "}), a double quote is used as the wrapper; otherwise a single quote is used.
+   * Serializes a string as a quoted string into the format string representation. The quote character is automatically
+   * chosen to prevent or reduce unnecessary escape sequences in the resulting format string: if the string contains
+   * more single quotes ({@code '}) than double quotes ({@code "}), a double quote is used as the wrapper; otherwise a
+   * single quote is used.
    * <p>
    * The opening and closing quote characters are appended to the context's
-   * {@linkplain Context#textJoiner() text joiner} and the string content between the quotes is
-   * serialized using {@link #serializeString(Context, String)} with the chosen quote set as the
-   * active {@linkplain Context#withStringQuote(char) string quote}.
+   * {@linkplain Context#textJoiner() text joiner} and the string content between the quotes is serialized using
+   * {@link #serializeString(Context, String)} with the chosen quote set as the active
+   * {@linkplain Context#withStringQuote(char) string quote}.
    *
-   * @param context  the serialization context providing charset encoding, text joiner and
-   *                 string quoting information, not {@code null}
+   * @param context  the serialization context providing charset encoding, text joiner and string quoting information,
+   *                 not {@code null}
    * @param string   the string to serialize as a quoted string, not {@code null}
    *
    * @see #serializeString(Context, String)
@@ -705,10 +710,10 @@ public final class MessageUtil
   /**
    * Tells whether the file at the given {@code path} is a message format pack file.
    * <p>
-   * This method is useful in environments where the {@link PackFileTypeDetector} service implementation is not
-   * installed or active. For example, due to classloader separation in plugin frameworks such as IntelliJ IDEA or
-   * Gradle. It bypasses the {@link java.nio.file.Files#probeContentType(Path) Files.probeContentType()} SPI mechanism
-   * and directly probes the file content instead.
+   * This method is useful in environments where the file type detector for pack files is not installed or active, e.g.
+   * because of class loader separation in plugin frameworks such as IntelliJ IDEA or Gradle. Unlike
+   * {@link java.nio.file.Files#probeContentType(Path) Files.probeContentType()}, it does not depend on installed file
+   * type detectors and probes the file content directly.
    *
    * @param path  the path to the file to check, not {@code null}
    *
@@ -746,6 +751,9 @@ public final class MessageUtil
    * The pack is read without a buffer, so that an uncompressed pack is read exactly up to its end. As it is read in
    * small pieces, {@code packStream} should be buffered, e.g. by wrapping it in a
    * {@link java.io.BufferedInputStream BufferedInputStream}, unless it is held in memory.
+   * <p>
+   * The consumers are invoked while the pack is being read. An exception thrown by a consumer stops the import and is
+   * relayed to the caller; entries passed to the consumers before remain with them.
    *
    * @param messageFactory    message factory used to create the imported messages and templates, not {@code null}
    * @param packStream        pack input stream, not {@code null}. The stream is closed by this method
@@ -834,8 +842,8 @@ public final class MessageUtil
 
 
   /**
-   * Finds an enum constant matching the given string value. The match is case-insensitive and also supports
-   * hyphenated names (e.g. "my-value" matches {@code MY_VALUE}).
+   * Finds an enum constant matching the given string value. The match is case-insensitive and also supports hyphenated
+   * names (e.g. "my-value" matches {@code MY_VALUE}).
    *
    * @param value     the string value to match against enum constant names, not {@code null}
    * @param enumType  the enum class to search, not {@code null}
