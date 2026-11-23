@@ -17,6 +17,7 @@ import de.sayayi.lib.message.MessageFactory;
 import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.util.MessageUtil;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -85,7 +86,7 @@ The `importMessages` method on `ConfigurableMessageSupport` reads a pack file fr
 messages and templates it contains to the message support instance.
 
 ```java
-try(var in = new FileInputStream("messages.mfp")) {
+try(var in = new BufferedInputStream(new FileInputStream("messages.mfp"))) {
   messageSupport.importMessages(in);
 }
 // all messages and templates from messages.mfp are registered
@@ -98,6 +99,11 @@ and template found in the pack file is added to the message support through the 
 already registered one therefore throws a `DuplicateMessageException` or `DuplicateTemplateException`, and the entries
 read before the conflict remain registered. A stream that is not a valid pack file results in an `IOException`.
 
+The pack is read in small pieces and without a buffer of its own, so that an uncompressed pack is read exactly up to
+its end. Pass a buffered stream, such as a `BufferedInputStream`, unless the pack is held in memory. This applies to
+streams returned by `Class.getResourceAsStream` as well. Exporting needs no buffered stream, as the pack is written
+through a buffer.
+
 For lower-level control over the imported entries, the static utility method `MessageUtil.importMessages` can be used 
 instead. It takes the `MessageFactory` used to create the messages, a `Consumer<Message.WithCode>` for messages and a
 `BiConsumer<String,Template>` for templates, allowing each entry to be inspected or transformed before adding it.
@@ -105,7 +111,7 @@ Either consumer may be `null` to skip that kind of entry. The stream is closed w
 whether the import succeeded.
 
 ```java
-try(var inputStream = new FileInputStream("messages.mfp")) {
+try(var inputStream = new BufferedInputStream(new FileInputStream("messages.mfp"))) {
   MessageUtil.importMessages(MessageFactory.getSharedInstance(),
       inputStream,
       message -> System.out.println("Message: " + message.getCode()),

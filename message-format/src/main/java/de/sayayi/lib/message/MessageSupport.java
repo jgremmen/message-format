@@ -161,6 +161,8 @@ public interface MessageSupport
    * e.g. as an entry of a {@link java.util.zip.ZipOutputStream ZipOutputStream}, pass a
    * {@link java.io.FilterOutputStream FilterOutputStream} wrapping that stream, which overrides
    * {@link OutputStream#close() close()} to only flush the wrapped stream.
+   * <p>
+   * The pack is written through a buffer, so {@code stream} does not need to be buffered.
    *
    * @param stream  pack output stream, not {@code null}. The stream is closed by this method
    *
@@ -202,6 +204,8 @@ public interface MessageSupport
    * e.g. as an entry of a {@link java.util.zip.ZipOutputStream ZipOutputStream}, pass a
    * {@link java.io.FilterOutputStream FilterOutputStream} wrapping that stream, which overrides
    * {@link OutputStream#close() close()} to only flush the wrapped stream.
+   * <p>
+   * The pack is written through a buffer, so {@code stream} does not need to be buffered.
    * <p>
    * The pack format has limits which don't apply to messages and templates themselves: a message can have at most 255
    * parts, a parameter map or parameter configuration at most 255 entries, a template reference at most 255 default
@@ -686,6 +690,10 @@ public interface MessageSupport
      * {@link InputStream#close() close()} to do nothing. Note that a compressed pack may be read beyond its end, so the
      * position of the wrapped stream is undefined after the import, unless the pack is delimited by the wrapped stream
      * itself, as is the case for a ZIP entry.
+     * <p>
+     * The pack is read without a buffer, so that an uncompressed pack is read exactly up to its end. As it is read in
+     * small pieces, {@code packStream} should be buffered, e.g. by wrapping it in a
+     * {@link java.io.BufferedInputStream BufferedInputStream}, unless it is held in memory.
      *
      * @param packStream  pack input stream, not {@code null}. The stream is closed by this method
      *

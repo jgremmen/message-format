@@ -76,8 +76,8 @@ import de.sayayi.lib.message.MessageSupportFactory;
 
 var messageSupport = MessageSupportFactory.createDefault();
 
-try(var in = ShopMessages.class
-    .getResourceAsStream("/META-INF/my-app.mfp")) {
+try(var in = new BufferedInputStream(ShopMessages.class
+    .getResourceAsStream("/META-INF/my-app.mfp"))) {
   messageSupport.importMessages(in);
 }
 // All messages and templates from the pack file are now available.
@@ -149,8 +149,8 @@ bundles it into the jar. At runtime:
 ```java
 var messageSupport = MessageSupportFactory.createDefault();
 
-try(var in = ShopMessages.class
-    .getResourceAsStream("/META-INF/shop.mfp")) {
+try(var in = new BufferedInputStream(ShopMessages.class
+    .getResourceAsStream("/META-INF/shop.mfp"))) {
   messageSupport.importMessages(in);
 }
 

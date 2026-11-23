@@ -536,7 +536,8 @@ for(var resource: List.of(
     "/META-INF/core.mfp",
     "/META-INF/orders.mfp")) 
 {
-  try(var in = getClass().getResourceAsStream(resource)) {
+  try(var in = new BufferedInputStream(
+      getClass().getResourceAsStream(resource))) {
     messageSupport.importMessages(in);
   }
 }

@@ -381,6 +381,7 @@ import de.sayayi.lib.message.util.SortedStringMap;
 import de.sayayi.lib.message.util.SupplierDelegate;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.BufferedInputStream;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -403,7 +404,8 @@ var messageSupport = MessageSupportFactory.createDefault();
 ```java
 var factory = messageSupport.getMessageAccessor().getMessageFactory();
 
-try(var stream = Files.newInputStream(Path.of("messages.mfp"))) {
+try(var stream = new BufferedInputStream(
+    Files.newInputStream(Path.of("messages.mfp")))) {
   MessageUtil.importMessages(factory, stream,
       message -> messageSupport.addMessage(message),
       (name, template) -> messageSupport.addTemplate(name, template));

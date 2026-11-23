@@ -22,10 +22,13 @@ import de.sayayi.lib.message.MessageSupportFactory;
 import de.sayayi.lib.message.exception.DuplicateMessageException;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.StreamCorruptedException;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -159,6 +162,29 @@ final class MessageSupportPackTest
         .importMessages(packStream);
 
     assertTrue(packStream.closed);
+  }
+
+
+  @ParameterizedTest(name = "[{index}] compress = {0}")
+  @DisplayName("Export writes the pack in blocks, not byte by byte")
+  @ValueSource(booleans = { false, true })
+  void exportBuffered(boolean compress) throws IOException
+  {
+    var stream = new WriteCountingOutputStream();
+
+    messageSupport.exportMessages(stream, compress, null, null);
+
+    assertTrue(stream.bytes > 0);
+    assertEquals(0, stream.singleByteWrites);
+    // the pack is smaller than the buffer; flushing a compressed pack writes the GZip trailer separately
+    assertTrue(stream.blockWrites <= 2, "too many block writes: " + stream.blockWrites);
+
+    // the buffered pack is complete
+    var imported = MessageSupportFactory.createGeneric();
+    imported.importMessages(new ByteArrayInputStream(stream.toByteArray()));
+
+    assertEquals(messageSupport.getMessageAccessor().getMessageCodes(),
+        imported.getMessageAccessor().getMessageCodes());
   }
 
 
@@ -425,6 +451,41 @@ final class MessageSupportPackTest
     @Override
     public void close() {
       closed = true;
+    }
+  }
+
+
+
+
+  /** Output stream counting single byte and block writes. */
+  private static final class WriteCountingOutputStream extends OutputStream
+  {
+    private final ByteArrayOutputStream bytesWritten = new ByteArrayOutputStream();
+    private int singleByteWrites;
+    private int blockWrites;
+    private int bytes;
+
+
+    @Override
+    public void write(int b)
+    {
+      singleByteWrites++;
+      bytes++;
+      bytesWritten.write(b);
+    }
+
+
+    @Override
+    public void write(byte @NotNull [] b, int off, int len)
+    {
+      blockWrites++;
+      bytes += len;
+      bytesWritten.write(b, off, len);
+    }
+
+
+    private byte @NotNull [] toByteArray() {
+      return bytesWritten.toByteArray();
     }
   }
 

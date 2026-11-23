@@ -742,6 +742,10 @@ public final class MessageUtil
    * {@link InputStream#close() close()} to do nothing. Note that a compressed pack may be read beyond its end, so the
    * position of the wrapped stream is undefined after the import, unless the pack is delimited by the wrapped stream
    * itself, as is the case for a ZIP entry.
+   * <p>
+   * The pack is read without a buffer, so that an uncompressed pack is read exactly up to its end. As it is read in
+   * small pieces, {@code packStream} should be buffered, e.g. by wrapping it in a
+   * {@link java.io.BufferedInputStream BufferedInputStream}, unless it is held in memory.
    *
    * @param messageFactory    message factory used to create the imported messages and templates, not {@code null}
    * @param packStream        pack input stream, not {@code null}. The stream is closed by this method

@@ -40,6 +40,7 @@ import org.jetbrains.annotations.ApiStatus.Internal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.*;
@@ -330,7 +331,8 @@ public final class MessageSupportImpl implements MessageSupport.ConfigurableMess
             " selected)");
       }
 
-      try(var dataStream = new PackOutputStream(PACK_CONFIG, VERSION, compress, stream)) {
+      try(var dataStream = new PackOutputStream(PACK_CONFIG, VERSION, compress,
+          stream instanceof BufferedOutputStream ? stream : new BufferedOutputStream(stream))) {
         // pack all filtered messages
         dataStream.writeUnsignedShort(messageCodesCount);
 
