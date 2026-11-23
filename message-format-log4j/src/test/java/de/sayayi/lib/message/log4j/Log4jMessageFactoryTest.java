@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static de.sayayi.lib.message.util.AssertionTestSupport.assertNullRejected;
+import static de.sayayi.lib.message.util.ConcurrentTestSupport.getConcurrently;
 import static org.apache.logging.log4j.Level.ALL;
 import static org.apache.logging.log4j.Level.WARN;
 import static org.apache.logging.log4j.LogManager.ROOT_LOGGER_NAME;
@@ -100,6 +101,21 @@ class Log4jMessageFactoryTest
     appender.stop();
 
     context.updateLoggers();
+  }
+
+
+  @RepeatedTest(5)
+  @DisplayName("Concurrent first messages share one default message support")
+  void concurrentDefaultMessageSupport() throws Exception
+  {
+    final var factory = new Log4jMessageFactory();
+    final var messageSupports = getConcurrently(16, thread -> {
+      factory.newMessage("thread %{p1}", thread);
+      return factory.getMessageSupport();
+    });
+
+    for(var messageSupport: messageSupports)
+      assertSame(factory.getMessageSupport(), messageSupport);
   }
 
 

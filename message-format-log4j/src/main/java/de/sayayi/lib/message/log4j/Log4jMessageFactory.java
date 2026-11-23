@@ -27,6 +27,8 @@ import org.apache.logging.log4j.status.StatusLogger;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import static de.sayayi.lib.message.part.normalizer.MessagePartNormalizer.PASS_THROUGH;
 import static java.util.Objects.requireNonNull;
 
@@ -63,10 +65,10 @@ public final class Log4jMessageFactory extends AbstractMessageFactory
 
 
   /**
-   * Message support used to parse and format the log messages. For the default message support this is {@code null}
+   * Message support used to parse and format the log messages. For the default message support this holds {@code null}
    * until the first message is created.
    */
-  private volatile MessageSupport messageSupport;
+  private final AtomicReference<MessageSupport> messageSupport;
 
   /** {@code true} if messages with Log4j-style placeholders only are delegated to {@link ParameterizedMessage}. */
   private final boolean parameterizedMessageFallback;
@@ -94,7 +96,9 @@ public final class Log4jMessageFactory extends AbstractMessageFactory
    *                                      (and no message-format placeholders) are delegated to
    *                                      {@link ParameterizedMessage} for backward compatibility
    */
-  public Log4jMessageFactory(boolean parameterizedMessageFallback) {
+  public Log4jMessageFactory(boolean parameterizedMessageFallback)
+  {
+    this.messageSupport = new AtomicReference<>();
     this.parameterizedMessageFallback = parameterizedMessageFallback;
   }
 
@@ -109,7 +113,7 @@ public final class Log4jMessageFactory extends AbstractMessageFactory
    */
   public Log4jMessageFactory(@NotNull MessageSupport messageSupport, boolean parameterizedMessageFallback)
   {
-    this.messageSupport = requireNonNull(messageSupport, "messageSupport must not be null");
+    this.messageSupport = new AtomicReference<>(requireNonNull(messageSupport, "messageSupport must not be null"));
     this.parameterizedMessageFallback = parameterizedMessageFallback;
   }
 
@@ -198,19 +202,26 @@ public final class Log4jMessageFactory extends AbstractMessageFactory
   /**
    * Returns the message support used to parse and format the log messages. The default message support is created on
    * the first call.
+   * <p>
+   * The default message support is created without holding a lock, as creating it may create the shared formatter
+   * service. Concurrent first calls may each create a message support, but all of them return the one published first,
+   * so all messages share its message cache.
    *
    * @return  message support, never {@code null}
    *
    * @since 0.26.0
    */
-  private @NotNull MessageSupport getMessageSupport()
+  @NotNull MessageSupport getMessageSupport()
   {
-    var support = messageSupport;
+    var support = messageSupport.get();
     if (support == null)
     {
-      messageSupport = support = MessageSupportFactory.create(
+      final var created = MessageSupportFactory.create(
           DefaultFormatterService.getSharedInstance(),
           new MessageFactory(PASS_THROUGH, 256));
+
+      if ((support = messageSupport.compareAndExchange(null, created)) == null)
+        support = created;
     }
 
     return support;
