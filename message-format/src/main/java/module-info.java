@@ -46,23 +46,46 @@
  *
  * <h2>Exported packages</h2>
  * <ul>
- *   <li>{@code de.sayayi.lib.message}: core API (messages, message support, factories and builders)</li>
- *   <li>{@code de.sayayi.lib.message.adopter}: adopters reading messages and templates from resource bundles and
- *       properties</li>
- *   <li>{@code de.sayayi.lib.message.exception}: exceptions thrown by the library</li>
- *   <li>{@code de.sayayi.lib.message.formatter}: formatter services resolving parameter and post formatters</li>
- *   <li>{@code de.sayayi.lib.message.formatter.parameter}: parameter formatter SPI and base classes</li>
- *   <li>{@code de.sayayi.lib.message.formatter.parameter.named} and {@code ...named.extra}: formatters selected by
- *       name</li>
- *   <li>{@code de.sayayi.lib.message.formatter.parameter.runtime} and {@code ...runtime.extra}: formatters selected by
- *       the type of the parameter value</li>
- *   <li>{@code de.sayayi.lib.message.formatter.post} and {@code ...post.runtime}: post formatter SPI and built-in post
- *       formatters</li>
- *   <li>{@code de.sayayi.lib.message.pack}: constants and Apache Tika detectors for packed messages</li>
- *   <li>{@code de.sayayi.lib.message.part} and {@code ...part.normalizer}: building blocks of parsed messages and
- *       message part normalizers</li>
- *   <li>{@code de.sayayi.lib.message.template}: template API</li>
- *   <li>{@code de.sayayi.lib.message.util}: general-purpose helper classes</li>
+ *   <li>
+ *     {@code de.sayayi.lib.message}: core API (messages, message support, factories and builders)
+ *   </li>
+ *   <li>
+ *     {@code de.sayayi.lib.message.adopter}: adopters reading messages and templates from resource bundles and
+ *     properties
+ *   </li>
+ *   <li>
+ *     {@code de.sayayi.lib.message.exception}: exceptions thrown by the library
+ *   </li>
+ *   <li>
+ *     {@code de.sayayi.lib.message.formatter}: formatter services resolving parameter and post formatters
+ *   </li>
+ *   <li>
+ *     {@code de.sayayi.lib.message.formatter.parameter}: parameter formatter SPI and base classes
+ *   </li>
+ *   <li>
+ *     {@code de.sayayi.lib.message.formatter.parameter.named} and {@code ...named.extra}: formatters selected by name
+ *   </li>
+ *   <li>
+ *     {@code de.sayayi.lib.message.formatter.parameter.runtime} and {@code ...runtime.extra}: formatters selected by
+ *     the type of the parameter value
+ *   </li>
+ *   <li>
+ *     {@code de.sayayi.lib.message.formatter.post} and {@code ...post.runtime}: post formatter SPI and built-in post
+ *     formatters
+ *   </li>
+ *   <li>
+ *     {@code de.sayayi.lib.message.pack}: constants and Apache Tika detectors for packed messages
+ *   </li>
+ *   <li>
+ *     {@code de.sayayi.lib.message.part} and {@code ...part.normalizer}: building blocks of parsed messages and message
+ *     part normalizers
+ *   </li>
+ *   <li>
+ *     {@code de.sayayi.lib.message.template}: template API
+ *   </li>
+ *   <li>
+ *     {@code de.sayayi.lib.message.util}: general-purpose helper classes
+ *   </li>
  * </ul>
  *
  * <h2>Formatting</h2>
